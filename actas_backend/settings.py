@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import mongoengine
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -31,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'council_minutes.apps.CouncilMinutesConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -70,19 +72,24 @@ TEMPLATES = [
 WSGI_APPLICATION = 'actas_backend.wsgi.application'
 
 
-# Database
+# Database and MongoDB config
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
+MONGODB_AUTH = os.environ.get('ACTAS_DB_AUTH')
+MONGODB_USER = os.environ.get('ACTAS_DB_USER')
+MONGODB_PASS = os.environ.get('ACTAS_DB_PASS')
+MONGODB_HOST = os.environ.get('ACTAS_DB_HOST')
+MONGODB_NAME = os.environ.get('ACTAS_DB_NAME')
 DATABASES = {
     'default': {
         'ENGINE':   'djongo',
-        'NAME':     os.environ.get('ACTAS_DB_NAME'),
-        'HOST':     os.environ.get('ACTAS_DB_HOST'),
-        'USERNAME': os.environ.get('ACTAS_DB_USER'),
-        'PASSWORD': os.environ.get('ACTAS_DB_PASS')
+        'NAME':     MONGODB_NAME,
+        'HOST':     MONGODB_HOST,
+        'USERNAME': MONGODB_USER,
+        'PASSWORD': MONGODB_PASS
     }
 }
-
+mongoengine.connect(host=MONGODB_HOST) #We don't have authentication here. TODO: Add authentication
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
