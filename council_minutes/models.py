@@ -46,7 +46,25 @@ class Request(DynamicDocument):
     TYPE_EVALUADOR_ADICIONAL_POSGRADO = 'EAPOS'
     TYPE_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO = 'DJPOS'
     TYPE_DESIGNACION_DE_JURADOS_CALIGICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO = 'DJPOS'
-    TYPEExención de pago por créditos sobrantes de pregrado (Posgrado)	Exención de pago por cursar tesis como única actividad académica (Posgrado)	Exención por mejores SABER PRO (Posgrado)	Generación de recibo único de pago (Posgrado)	Homologación, convalidación y equivalencia (Posgrado)	Informe de Avance de Tesis (Posgrado)	Inscripción de asignaturas (Posgrado)	Modificación de jurados calificadores (Posgrado)	Modificación de objetivos de tesis / propuesta (Posgrado)	Recurso de reposición (Posgrado)	Recurso de reposición con subsidio de apelación (Posgrado)	Reembolso (Posgrado)	Registro de calificación del proyecto y examen doctoral (Posgrado)	Reingreso (Posgrado)	Reserva de cupo adicional (Posgrado)	Retiro definitivo del programa (Posgrado)	Registro de calificación de movilidad (Posgrado)	Tránsito entre programas (Posgrado)	Traslado (Posgrado)
+    TYPE_EXENCION_DE_PAGO_POR_CREDITOS_SOBRANTES_DE_PREGRADO_POSGRADO = ''
+    TYPE_EXENCION_DE_PAGO_POR_CURSAR_TESIS_COMO_UNICA_ACTIVIDAD_ACADEMICA_POSGRADO = ''
+    TYPE_EXCENCION_POR_MEJORES_SABER_PRO_POSGRADO = ''
+    TYPE_GENERACION_DE_RECIBO_UNICO_DE_PAGO_POSGRADO = ''
+    TYPE_HOMOLOGACION_CONVALIDACION_Y_EQUIVALENCIA_POSGRADO = ''
+    TYPE_INFORMACION_DE_AVANCE_DE_TESIS_POSGRADO = ''
+    TYPE_INSCRIPCION_DE_ASIGNATURAS_POSGRADO = ''
+    TYPE_MODIFICACION_DE_JURADOS_CALIFICADORES_POSGRADO = ''
+    TYPE_MODIFICACION_DE_OBJETIVOS_DE_TESIS_PROPUESTA_POSGRADO = ''
+    TYPE_RECURSO_DE_REPOSICION_POSGRADO = ''
+    TYPE_RECURSO_DE_REPOSICION_CON_SUBSIDIO_DE_APELACION_POSGRADO = ''
+    TYPE_REEMBOLSO_POSGRADO = ''
+    TYPE_REGISTRO_DE_CALIFICACION_DEL_PROYECTO_Y_EXAMEN_DOCTORAL_POSGRADO = ''
+    TYPE_REINGRESO_POSGRADO = ''
+    TYPE_RESERVA_DE_CUPO_ADICIONAL_POSGRADO = ''
+    TYPE_RETIRO_DEFINITIVO_DEL_PROGRAMA_POSGRADO = ''
+    TYPE_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD_POSGRADO = ''
+    TYPE_TRANSITO_ENTRE_PROGRAMAS_POSGRADO = ''
+    TYPE_TRASLADO_POSGRADO = ''
     type = StringField(max_length=255, required=True)
     APPROVAL_STATUS_APLAZA = 'AL'
     APPROVAL_STATUS_APRUEBA = 'AP'
@@ -54,6 +72,7 @@ class Request(DynamicDocument):
     APPROVAL_STATUS_EN_ESPERA = 'EE'
     APPROVAL_STATUS_NO_APRUEVA = 'NA'
     APPROVAL_STATUS_NO_TRAMITA = 'NT'
+    APPROVAL_STATUS_SE_INHIBE = 'SI'
     APPROVAL_STATUS_CHOICES = (
         (APPROVAL_STATUS_APLAZA, 'Aplaza'),
         (APPROVAL_STATUS_APRUEBA, 'Aprueba'),
@@ -61,15 +80,41 @@ class Request(DynamicDocument):
         (APPROVAL_STATUS_EN_ESPERA, 'En espera'),
         (APPROVAL_STATUS_NO_APRUEVA, 'No Aprueva'),
         (APPROVAL_STATUS_NO_TRAMITA, 'No Tramita'),
+        (APPROVAL_STATUS_SE_INHIBE, 'Se Inhibe'),
     )
     approval_status = StringField(cmax_length=255, choices=APPROVAL_STATUS_CHOICES) 
     student_name = StringField(max_length=511)
-    DNI_TYPE_CEDULA = 'CC'
-    dni_types = ('Cédula', 'Pasaporte', 'More') #We have more choises, TODO: write the missing ones 
+    DNI_TYPE_CEDULA_DE_CIUDADANIA = 'CC'
+    DNI_TYPE_PASAPORTE = 'PS'
+    DNI_TYPE_TARJETA_DE_IDENTIDAD = 'TI'
+    DNI_TYPE_CEDULA_DE_EXTRANJERIA = 'CE'
+    DNI_TYPE_OTRO = 'OT'
+    #dni_types = ('Cédula', 'Pasaporte', 'More') #We have more choises, TODO: write the missing ones 
     stud_dni_type = StringField(choices=dni_types)
     stud_dni = StringField(max_length=22)
     acad_peri = StringField(max_length=10)
-    cod_programs = ('VISI','2505','2541','2542','2544','2545','2546','2547','2548','2549','2879','BAPA','BAPC','BAPD','BAPE','BAPG','BAPH','BAPI','BAPM','BAPN','BAPO','BGCH','BGFA','BGFC','BGFD','BGFI','BGFM','2562','2577','2578','2698','2699','2700','2701','2702','2703','2704','2705','2706','2707','2708','2709','2710','2794','2856','2865','2882','2928','TGFI','2064','2113','2217','2278','2285','2573','2687','2691','2696','2792','2886','2896','2682','2683','2684','2685','2686','2838','2839','2880','2887')
+    cod_programs = ('BGCH','BGFA','BGFC','BGFD','BGFI','BGFM','2562','2577','2578','2698','2699','2700','2701','2702','2703','2704','2705','2706','2707','2708','2709','2710','2794','2856','2865','2882','2928','TGFI','2064','2113','2217','2278','2285','2573','2687','2691','2696','2792','2886','2896','2682','2683','2684','2685','2686','2838','2839','2880','2887')
+    PROG_ESTUDIANTES_VISITANTES = 'VISI'
+    PROG_INGENIERIA_AGRONOMICA = '2505'
+    PROG_INGENIERIA_ACRICOLA = '2541'
+    PROG_INGENIERIA_CIVIL = '2542'
+    PROG_INGENIERIA_ELECTRICA = '2544'
+    PROG_INGENIERIA_ELECTRONICA = '2545'
+    PROG_INGENIERIA_INDUSTRIAL = '2546'
+    PROG_INGENIERIA_MECANICA = '2547'
+    PROG_INGENIERIA_MECATRONICA = '2548'
+    PROG_INGENIERIA_QUIMICA = '2549'
+    PROG_INGENIERIA_DE_SISTEMAS_Y_COMPUTACION = '2879'
+    PROG_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_ARTES = 'BAPA'
+    PROG_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_CIENCIAS = 'BAPC'
+    PROG_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_DERECHO = 'BAPD'
+    PROG_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_ECONOMIA = 'BAPE'
+    PROG_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_AGRONOMIA = 'BAPG'
+    PROG_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_HUMANAS = 'BAPH'
+    PROG_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_INGENIERIA = 'BAPI'
+    PROG_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_MEDICINA = 'BAPM'
+    PROG_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_ENFERMERIA = 'BAPN'
+    PROG_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_ODONTOLOGIA = 'BAPO'
     req_acad_prog = StringField(max_length=4, choices=cod_programs)
     req_just = StringField(max_length = 255)
 
