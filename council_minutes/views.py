@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
-from .models import Test, Request
+from .models import Request
 from .helpers import QuerySetEncoder
 import json
 from mongoengine.errors import ValidationError
