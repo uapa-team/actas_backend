@@ -2,16 +2,15 @@ from mongoengine import *
 
 # Create your models here.
 class Request(DynamicDocument):
-    date = DateField(required=True)
-
     TYPE_TRASLADO_PREGRADO = 'TRASPRE'
     TYPE_REINGRESO_PREGRADO = 'REINPRE'
+    TYPE_REEMBOLSO_PREGRADO = 'REEMPRE'
     TYPE_CONCEPTO_CSU_PREGRADO = 'CCSUPRE'
-    TYPE_APOYO_ECONOMICO_PREGRADO = 'APECPRE'
     TYPE_CAMBIO_DE_GRUPO_PREGRADO = 'CGRUPRE'
     TYPE_TRABAJO_DE_GRADO_PREGADO = 'TGRAPRE'
     TYPE_DOBLE_TITULACION_PREGRADO = 'DTITPRE'
     TYPE_CAMBIO_DE_TIPOLOGIA_PREGRADO = 'CTIPPRE'
+    TYPE_RECURSO_DE_APELACION_PREGRADO = 'REAPPRE'
     TYPE_EXPEDICION_DE_RECIBO_PREGRADO = 'EREPPRE'
     TYPE_PRACTICA_ESTUDIANTIL_PREGRADO = 'PESTPRE'
     TYPE_RECURSO_DE_REPOSICION_PREGRADO = 'RREPPRE'
@@ -29,10 +28,10 @@ class Request(DynamicDocument):
     TYPE_HOMOLOGACION_CONVALIDACION_EQUIVALENCIA_PREGRADO = 'HCEMPRE'
     TYPE_ELIMINACION_DE_LA_HISTORIA_ACADEMICA_BAPI_PREGRADO = 'EBAPPRE'
     TYPE_RECURSO_DE_REPOSICION_CON_SUBSIDIO_DE_APELACION_PREGRADO = 'RRSAPRE'
+    TYPE_DEVOLUCION_PROPORCIONAL_DEL_VALOR_PAGADO_POR_CONCEPTO_DE_DERECHOS_DE_MATRICULA_PREGRADO = 'DPVPPRE'
     TYPE_TRASLADO_POSGRADO = 'TRASPOS'
     TYPE_REEMBOLSO_POSGRADO = 'REEMPOS'
     TYPE_REINGRESO_POSGRADO = 'REINPOS'
-    TYPE_CAMBIO_DE_TIPOLOGIA = 'CTIPPOS'
     TYPE_APOYO_ECONOMICO_POSGRADO = 'AECOPOS'
     TYPE_CAMBIO_DE_GRUPO_POSGRADO = 'CGRUPOS'
     TYPE_CAMBIO_DE_PERFIL_POSGRADO = 'CPERPOS'
@@ -41,13 +40,14 @@ class Request(DynamicDocument):
     TYPE_BECA_MEJOR_PROMEDIO_POSGRADO = 'BMEPPOS'
     TYPE_ADMISION_AUTOMATICA_POSGRADO = 'AAUTPOS'
     TYPE_EVALUADOR_ADICIONAL_POSGRADO = 'EVAAPOS'
+    TYPE_CAMBIO_DE_TIPOLOGIA_POSGRADO = 'CTIPPOS'
     TYPE_RECURSO_DE_REPOSICION_POSGRADO = 'REREPOS'
     TYPE_TRANSITO_ENTRE_PROGRAMAS_POSGRADO = 'TEPRPOS'
     TYPE_DESIGNACION_DE_CODIRECTOR_POSGRADO = 'DCODPOS'
     TYPE_RESERVA_DE_CUPO_ADICIONAL_POSGRADO = 'RCUAPOS'
     TYPE_CANCELACION_DE_ASIGNATURAS_POSGRADO = 'CASIPOS'
     TYPE_INSCRIPCION_DE_ASIGNATURAS_POSGRADO = 'IASIPOS'
-    TYPE_INFORMACION_DE_AVANCE_DE_TESIS_POSGRADO = 'IATEPOS'
+    TYPE_INFORME_DE_AVANCE_DE_TESIS_POSGRADO = 'IATEPOS'
     TYPE_RETIRO_DEFINITIVO_DEL_PROGRAMA_POSGRADO = 'RDPRPOS'
     TYPE_EXCENCION_POR_MEJORES_SABER_PRO_POSGRADO = 'EMSPPOS'
     TYPE_CANCELACION_DE_PERIODO_ACADEMICO_POSGRADO = 'CPACPOS'
@@ -56,17 +56,80 @@ class Request(DynamicDocument):
     TYPE_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD_POSGRADO = 'RCMOPOS'
     TYPE_HOMOLOGACION_CONVALIDACION_Y_EQUIVALENCIA_POSGRADO = 'HCEMPOS'
     TYPE_MODIFICACION_DE_OBJETIVOS_DE_TESIS_PROPUESTA_POSGRADO = 'MOTPPOS'
-    TYPE_APROBACION_PROYECTO_PROPUESTA_Y_DESIGNACION_DE_DIRECTOR = 'APGDPOS'
     TYPE_RECURSO_DE_REPOSICION_CON_SUBSIDIO_DE_APELACION_POSGRADO = 'RRSAPOS'
     TYPE_CAMBIO_DE_DIRECTIOR_CODIRECTOR_JURADO_O_EVALUADOR_POSGRADO = 'CDCJPOS'
     TYPE_EXENCION_DE_PAGO_POR_CREDITOS_SOBRANTES_DE_PREGRADO_POSGRADO = 'EPCSPOS'
     TYPE_AMPLIACION_DE_LA_FECHA_DE_PAGO_DE_DERECHOS_ACADEMICOS_POSGRADO = 'AFPDPOS'
     TYPE_REGISTRO_DE_CALIFICACION_DEL_PROYECTO_Y_EXAMEN_DOCTORAL_POSGRADO = 'RCPEPOS'
+    TYPE_APROBACION_PROYECTO_PROPUESTA_Y_DESIGNACION_DE_DIRECTOR_POSGRADO = 'APGDPOS'
     TYPE_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO = 'DJCTPOS'
     TYPE_EXENCION_DE_PAGO_POR_CURSAR_TESIS_COMO_UNICA_ACTIVIDAD_ACADEMICA_POSGRADO = 'EPTUPOS'
     TYPE_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO = 'DJCPOS'
-    TYPE_DEVOLUCION_PROPORCIONAL_DEL_VALOR_PAGADO_POR_CONCEPTO_DE_DERECHOS_DE_MATRICULA_PREGRADO = 'DPVPPRE'
-    type = StringField(max_length=255, required=True)
+    TYPE_CHOICES = (
+        (TYPE_TRASLADO_PREGRADO, 'Traslado (Pregrado)'),
+        (TYPE_REINGRESO_PREGRADO, 'Reingreso (Pregrado)'),
+        (TYPE_REEMBOLSO_PREGRADO, 'Reembolso (Pregrado)'),
+        (TYPE_CONCEPTO_CSU_PREGRADO, 'Concepto CSU (Pregrado)'),
+        (TYPE_CAMBIO_DE_GRUPO_PREGRADO, 'Cambio de grupo (Pregrado)'),
+        (TYPE_TRABAJO_DE_GRADO_PREGADO, 'Trabajo de grado (Pregrado)'),
+        (TYPE_DOBLE_TITULACION_PREGRADO, 'Doble titulación (Pregrado)'),
+        (TYPE_CAMBIO_DE_TIPOLOGIA_PREGRADO, 'Cambio de tipología (Pregrado)'),
+        (TYPE_EXPEDICION_DE_RECIBO_PREGRADO, 'Expedición de recibo (Pregrado)'),
+        (TYPE_PRACTICA_ESTUDIANTIL_PREGRADO, 'Práctica estudiantil (Pregrado)'),
+        (TYPE_RECURSO_DE_APELACION_PREGRADO, 'Recurso de apelación (Pregrado)'),
+        (TYPE_RECURSO_DE_REPOSICION_PREGRADO, 'Recurso de reposición (Pregrado)'),
+        (TYPE_DEVOLUCION_DE_CREDITOS_PREGRADO, 'Devolución de créditos (Pregrado)'),
+        (TYPE_DESISTIMIENTO_MOVILIDAD_PREGRADO, 'Desistimiento movilidad (Pregrado)'),
+        (TYPE_CREDITOS_EXCEDENTES_MAPI_PREGRADO, 'Créditos excedentes MAPI (Pregrado)'),
+        (TYPE_MODIFICACION_DE_DECISION_PREGRADO, 'Modificación de decisión (Pregrado)'),
+        (TYPE_RESERVA_DE_CUPO_ADICIONAL_PREGRADO, 'Reserva de cupo adicional (Pregrado)'),
+        (TYPE_CANCELACION_DE_ASIGNATURAS_PREGRADO, 'Cancelación de asignaturas (Pregrado)'),
+        (TYPE_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO, 'Carga inferior a la mínima (Pregrado)'),
+        (TYPE_INSCRIPCION_DE_ASIGNATURAS_PREGRADO, 'Inscripción de asignaturas (Pregrado)'),
+        (TYPE_RETIRO_DEFINITIVO_DEL_PROGRAMA_PREGRADO, 'Retiro definitivo del programa (Pregrado)'),
+        (TYPE_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO, 'Cancelación de periodo académico (Pregrado)'),
+        (TYPE_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD_PREGRADO, 'Registro de calificación de movilidad (Pregrado)'),
+        (TYPE_HOMOLOGACION_CONVALIDACION_EQUIVALENCIA_PREGRADO, 'Homologación, convalidación y equivalencia (Pregrado)'),
+        (TYPE_ELIMINACION_DE_LA_HISTORIA_ACADEMICA_BAPI_PREGRADO, 'Eliminación de la historia académica BAPI (Pregrado)'),
+        (TYPE_RECURSO_DE_REPOSICION_CON_SUBSIDIO_DE_APELACION_PREGRADO, 'Recurso de reposición con subsidio de apelación (Pregrado)'),
+        (TYPE_DEVOLUCION_PROPORCIONAL_DEL_VALOR_PAGADO_POR_CONCEPTO_DE_DERECHOS_DE_MATRICULA_PREGRADO, 'Devolución proporcional del valor pagado por concepto de derechos de matrícula (Pregrado)'),
+        (TYPE_TRASLADO_POSGRADO, 'Traslado (Posgrado)'),
+        (TYPE_REEMBOLSO_POSGRADO, 'Reembolso (Posgrado)'),
+        (TYPE_REINGRESO_POSGRADO, 'Reingreso (Posgrado)'),
+        (TYPE_APOYO_ECONOMICO_POSGRADO, 'Apoyo económico (Posgrado)'),
+        (TYPE_CAMBIO_DE_GRUPO_POSGRADO, 'Cambio de grupo (Posgrado)'),
+        (TYPE_CAMBIO_DE_PERFIL_POSGRADO, 'Cambio de perfil (Posgrado)'),
+        (TYPE_CAMBIO_DE_TIPOLOGIA_POSGRADO, 'Cambio de tipología (Posgrado)'),
+        (TYPE_APROBACION_PASANTIA_POSGRADO, 'Aprobación pasantía (Posgrado)'),
+        (TYPE_BECA_MEJOR_PROMEDIO_POSGRADO, 'Beca mejor promedio (Posgrado)'),
+        (TYPE_ADMISION_AUTOMATICA_POSGRADO, 'Admisión automática (Posgrado)'),
+        (TYPE_EVALUADOR_ADICIONAL_POSGRADO, 'Evaluador adicional (Posgrado)'),
+        (TYPE_RECURSO_DE_REPOSICION_POSGRADO, 'Recurso de reposición (Posgrado)'),
+        (TYPE_CAMBIO_DE_PROYECTO_DE_TESIS, 'Cambio de proyecto de tesis (Posgrado)'),
+        (TYPE_TRANSITO_ENTRE_PROGRAMAS_POSGRADO, 'Tránsito entre programas (Posgrado)'),
+        (TYPE_DESIGNACION_DE_CODIRECTOR_POSGRADO, 'Designación de codirector (Posgrado)'),
+        (TYPE_RESERVA_DE_CUPO_ADICIONAL_POSGRADO, 'Reserva de cupo adicional (Posgrado)'),
+        (TYPE_CANCELACION_DE_ASIGNATURAS_POSGRADO, 'Cancelación de asignaturas (Posgrado)'),
+        (TYPE_INSCRIPCION_DE_ASIGNATURAS_POSGRADO, 'Inscripción de asignaturas (Posgrado)'),
+        (TYPE_INFORME_DE_AVANCE_DE_TESIS_POSGRADO, 'Informe de Avance de Tesis (Posgrado)'),
+        (TYPE_RETIRO_DEFINITIVO_DEL_PROGRAMA_POSGRADO, 'Retiro definitivo del programa (Posgrado)'),
+        (TYPE_EXCENCION_POR_MEJORES_SABER_PRO_POSGRADO, 'Exención por mejores SABER PRO (Posgrado)'),
+        (TYPE_CANCELACION_DE_PERIODO_ACADEMICO_POSGRADO, 'Cancelación de periodo académico (Posgrado)'),
+        (TYPE_GENERACION_DE_RECIBO_UNICO_DE_PAGO_POSGRADO, 'Generación de recibo único de pago (Posgrado)'),
+        (TYPE_MODIFICACION_DE_JURADOS_CALIFICADORES_POSGRADO, 'Modificación de jurados calificadores (Posgrado)'),
+        (TYPE_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD_POSGRADO, 'Registro de calificación de movilidad (Posgrado)'),
+        (TYPE_HOMOLOGACION_CONVALIDACION_Y_EQUIVALENCIA_POSGRADO, 'Homologación, convalidación y equivalencia (Posgrado)'),
+        (TYPE_MODIFICACION_DE_OBJETIVOS_DE_TESIS_PROPUESTA_POSGRADO, 'Modificación de objetivos de tesis / propuesta (Posgrado)'),
+        (TYPE_RECURSO_DE_REPOSICION_CON_SUBSIDIO_DE_APELACION_POSGRADO, 'Recurso de reposición con subsidio de apelación (Posgrado)'),
+        (TYPE_CAMBIO_DE_DIRECTIOR_CODIRECTOR_JURADO_O_EVALUADOR_POSGRADO, 'Cambio de director, codirector, jurado o evaluador (Posgrado)'),
+        (TYPE_EXENCION_DE_PAGO_POR_CREDITOS_SOBRANTES_DE_PREGRADO_POSGRADO, 'Exención de pago por créditos sobrantes de pregrado (Posgrado)'),
+        (TYPE_AMPLIACION_DE_LA_FECHA_DE_PAGO_DE_DERECHOS_ACADEMICOS_POSGRADO, 'Ampliación de fecha de pago de derechos académicos (Posgrado)'),
+        (TYPE_APROBACION_PROYECTO_PROPUESTA_Y_DESIGNACION_DE_DIRECTOR_POSGRADO, 'Aprobación proyecto/propuesta y designación de director (Posgrado)'),
+        (TYPE_REGISTRO_DE_CALIFICACION_DEL_PROYECTO_Y_EXAMEN_DOCTORAL_POSGRADO, 'Registro de calificación del proyecto y examen doctoral (Posgrado)'),
+        (TYPE_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO, 'Designación de jurados calificadores de tesis/trabajo final (Posgrado)'),
+        (TYPE_EXENCION_DE_PAGO_POR_CURSAR_TESIS_COMO_UNICA_ACTIVIDAD_ACADEMICA_POSGRADO, 'Exención de pago por cursar tesis como única actividad académica (Posgrado)'),
+        (TYPE_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO, 'Designación de jurados calificadores de proyecto de tesis de doctorado (Posgrado)'),
+    )
     APPROVAL_STATUS_APLAZA = 'AL'
     APPROVAL_STATUS_APRUEBA = 'AP'
     APPROVAL_STATUS_TRAMITA = 'TR'
@@ -83,41 +146,88 @@ class Request(DynamicDocument):
         (APPROVAL_STATUS_NO_TRAMITA, 'No Tramita'),
         (APPROVAL_STATUS_SE_INHIBE, 'Se Inhibe'),
     )
-    approval_status = StringField(cmax_length=255, choices=APPROVAL_STATUS_CHOICES) 
-    student_name = StringField(max_length=511)
     DNI_TYPE_CEDULA_DE_CIUDADANIA = 'CC'
     DNI_TYPE_PASAPORTE = 'PS'
     DNI_TYPE_TARJETA_DE_IDENTIDAD = 'TI'
     DNI_TYPE_CEDULA_DE_EXTRANJERIA = 'CE'
     DNI_TYPE_OTRO = 'OT'
-    #dni_types = ('Cédula', 'Pasaporte', 'More') #We have more choises, TODO: write the missing ones 
-    stud_dni_type = StringField(choices=dni_types)
-    stud_dni = StringField(max_length=22)
-    acad_peri = StringField(max_length=10)
-    cod_programs = ('BGCH','BGFA','BGFC','BGFD','BGFI','BGFM','2562','2577','2578','2698','2699','2700','2701','2702','2703','2704','2705','2706','2707','2708','2709','2710','2794','2856','2865','2882','2928','TGFI','2064','2113','2217','2278','2285','2573','2687','2691','2696','2792','2886','2896','2682','2683','2684','2685','2686','2838','2839','2880','2887')
-    PROG_ESTUDIANTES_VISITANTES = 'VISI'
-    PROG_INGENIERIA_AGRONOMICA = '2505'
-    PROG_INGENIERIA_ACRICOLA = '2541'
-    PROG_INGENIERIA_CIVIL = '2542'
-    PROG_INGENIERIA_ELECTRICA = '2544'
-    PROG_INGENIERIA_ELECTRONICA = '2545'
-    PROG_INGENIERIA_INDUSTRIAL = '2546'
-    PROG_INGENIERIA_MECANICA = '2547'
-    PROG_INGENIERIA_MECATRONICA = '2548'
-    PROG_INGENIERIA_QUIMICA = '2549'
-    PROG_INGENIERIA_DE_SISTEMAS_Y_COMPUTACION = '2879'
-    PROG_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_ARTES = 'BAPA'
-    PROG_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_CIENCIAS = 'BAPC'
-    PROG_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_DERECHO = 'BAPD'
-    PROG_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_ECONOMIA = 'BAPE'
-    PROG_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_AGRONOMIA = 'BAPG'
-    PROG_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_HUMANAS = 'BAPH'
-    PROG_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_INGENIERIA = 'BAPI'
-    PROG_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_MEDICINA = 'BAPM'
-    PROG_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_ENFERMERIA = 'BAPN'
-    PROG_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_ODONTOLOGIA = 'BAPO'
-    req_acad_prog = StringField(max_length=4, choices=cod_programs)
-    req_just = StringField(max_length = 255)
+    DNI_TYPE_CHOICES = (
+        (DNI_TYPE_OTRO, 'Otro'),
+        (DNI_TYPE_PASAPORTE, 'Pasaporte'),
+        (DNI_TYPE_CEDULA_DE_EXTRANJERIA, 'Cédula de extranjería'),
+        (DNI_TYPE_CEDULA_DE_CIUDADANIA, 'Cédula de Ciudadanía colombiana'),
+        (DNI_TYPE_TARJETA_DE_IDENTIDAD, 'Tarjeta de Identidad colombiana'),
+    )
+    PROGRAM_2492 = '2492'
+    PROGRAM_INGENIERIA_CIVIL = '2542'
+    PROGRAM_INGENIERIA_QUIMICA = '2549'
+    PROGRAM_INGENIERIA_MECANICA = '2547'
+    PROGRAM_INGENIERIA_AGRICOLA = '2541'
+    PROGRAM_INGENIERIA_ELECTRICA = '2544'
+    PROGRAM_INGENIERIA_INDUSTRIAL = '2546'
+    PROGRAM_INGENIERIA_MECATRONICA = '2548'
+    PROGRAM_INGENIERIA_ELECTRONICA = '2545'
+    PROGRAM_MAESTRIA_EN_BIOINFORMATICA = '2882'
+    PROGRAM_ESPECIALIZACION_EN_GEOTECNIA = '2217'
+    PROGRAM_ESPECIALIZACION_EN_TRANSPORTE = '2285'
+    PROGRAM_ESPECIALIZACION_EN_ESTRUCTURAS = '2886'
+    PROGRAM_MAESTRIA_EN_INGENIERIA_INDUSTRIAL = '2708'
+    PROGRAM_MAESTRIA_EN_INGENIERIA_GEOTECNIA = '2700'
+    PROGRAM_DOCTORADO_EN_INGENIERIA_GEOTECNIA = '2683'
+    PROGRAM_MAESTRIA_EN_INGENIERIA_TRANSPORTE = '2706'
+    PROGRAM_MAESTRIA_EN_INGENIERIA_ESTRUCTURAS = '2699'
+    PROGRAM_INGENIERIA_DE_SISTEMAS_Y_COMPUTACION = '2879'
+    PROGRAM_ESPECIALIZAION_EN_RECURSOS_HIDRAULICOS = '2278'
+    PROGRAM_ESPECIALIZACION_EN_INGENIERIA_AMBIENTAL = '2792'
+    PROGRAM_ESPECIALIZACION_EN_GOBIERNO_ELECTRONICO = '2896'
+    PROGRAM_ESPECIALIZACION_EN_INGENIERIA_ELECTRICA = '2113'
+    PROGRAM_ESPECIALIZACION_EN_CALIDAD_DE_LA_ENERGIA = '2064'
+    PROGRAM_DOCTORADO_EN_INGENIERIA_INGENIERIA_CIVIL = '2887'
+    PROGRAM_Maestría en Ingeniería - Telecomunicaciones = '2707'
+    PROGRAM_Especialización en Automatización Industrial = '2687'
+    PROGRAM_Maestría en Ingeniería - Ingeniería Química = '2704'
+    PROGRAM_Doctorado en Ingeniería - Ingeniería Química = '2686'
+    PROGRAM_Maestría en Ingeniería - Ingeniería Mecánica = '2709'
+    PROGRAM_Maestría en Ingeniería - Materiales y Procesos = '2710'
+    PROGRAM_Maestría en Ingeniería - Ingeniería Agrícola = '2701'
+    PROGRAM_Maestría en Ingeniería - Recursos Hidráulicos = '2705'
+    PROGRAM_Maestría en Ingeniería - Ingeniería Ambiental = '2562'
+    PROGRAM_Doctorado en Ingeniería - Ingeniería Eléctrica = '2685'
+    PROGRAM_Maestría en Ingeniería - Ingeniería Eléctrica = '2703'
+    PROGRAM_Doctorado en Ingeniería - Sistemas y Computación = '2684'
+    PROGRAM_Especialización en Iluminación Pública y Privada = '2691'
+    PROGRAM_Maestría en Ingeniería - Ingeniería Electrónica = '2865'
+    PROGRAM_Maestría en Ingeniería - Automatización Industrial = '2698'
+    PROGRAM_Doctorado en Ingeniería - Industria y Organizaciones = '2838'
+    PROGRAM_Especialización en Transito, Diseño y Seguridad Vial = '2696'
+    PROGRAM_Doctorado en Ingeniería - Ciencia y Tecnología de Materiales = '2682'
+    PROGRAM_Doctorado en Ingeniería - Ingeniería Mecánica y Mecatrónica = '2839'
+    PROGRAM_Maestría en Ingeniería - Ingeniería de Sistemas y Computación = '2702'
+    PROGRAM_Maestría en Ingeniería - Ingeniería Eléctrica Convenio Sede Manizales = '2794'
+    PROGRAM_Maestría en Ingeniería - Ingeniería de Sistemas y Computación - Conv UPC = '2856'
+    PROGRAM_Maestría en Ingeniería - Ingeniería de Sistemas y Computación - Conv Unillanos = '2928'
+    PROGRAM_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_ARTES = 'BAPA'
+    PROGRAM_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_CIENCIAS = 'BAPC'
+    PROGRAM_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_DERECHO = 'BAPD'
+    PROGRAM_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_ECONOMIA = 'BAPE'
+    PROGRAM_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_AGRONOMIA = 'BAPG'
+    PROGRAM_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_HUMANAS = 'BAPH'
+    PROGRAM_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_INGENIERIA = 'BAPI'
+    PROGRAM_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_MEDICINA = 'BAPM'
+    PROGRAM_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_ENFERMERIA = 'BAPN'
+    PROGRAM_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_ODONTOLOGIA = 'BAPO'
+    PROGRAM_CHOICES = (
+        
+    )
+    date = DateField(required=True)
+    type = StringField(max_length=256, required=True)
+    student_name = StringField(max_length=512, required=True)
+    approval_status = StringField(max_length=2, choices=APPROVAL_STATUS_CHOICES, required=True)
+    stud_dni = StringField(max_length=22, required=True)
+    stud_dni_type = StringField(choices=DNI_TYPE_CHOICES, required=True)
+    acad_peri = StringField(max_length=10, required=True)
+    req_acad_prog = StringField(max_length=4, choices=PROGRAM_CHOICES, required=True)
+    req_just = StringField(max_length = 255, required=True)
 
 class Test(DynamicDocument):
     hola = StringField()
