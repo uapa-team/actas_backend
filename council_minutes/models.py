@@ -138,6 +138,7 @@ class Request(DynamicDocument):
     APPROVAL_STATUS_NO_APRUEVA = 'NA'
     APPROVAL_STATUS_NO_TRAMITA = 'NT'
     APPROVAL_STATUS_SE_INHIBE = 'SI'
+    APPROVAL_STATUS_ACLARA = 'AC'
     APPROVAL_STATUS_CHOICES = (
         (APPROVAL_STATUS_APLAZA, 'Aplaza'),
         (APPROVAL_STATUS_APRUEBA, 'Aprueba'),
@@ -146,6 +147,7 @@ class Request(DynamicDocument):
         (APPROVAL_STATUS_NO_APRUEVA, 'No Aprueva'),
         (APPROVAL_STATUS_NO_TRAMITA, 'No Tramita'),
         (APPROVAL_STATUS_SE_INHIBE, 'Se Inhibe'),
+        (APPROVAL_STATUS_ACLARA, 'Aclara'),
     )
     DNI_TYPE_CEDULA_DE_CIUDADANIA = 'CC'
     DNI_TYPE_PASAPORTE = 'PS'
