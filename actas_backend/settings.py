@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'council_minutes.apps.CouncilMinutesConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -71,7 +72,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'actas_backend.wsgi.application'
 
 
-# Database
+# Database and MongoDB config
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 MONGODB_AUTH = os.environ.get('ACTAS_DB_AUTH')
