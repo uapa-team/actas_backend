@@ -1,4 +1,5 @@
 from mongoengine import *
+import datetime
 
 # Create your models here.
 class Request(DynamicDocument):
@@ -183,29 +184,29 @@ class Request(DynamicDocument):
     PROGRAM_ESPECIALIZACION_EN_INGENIERIA_ELECTRICA = '2113'
     PROGRAM_ESPECIALIZACION_EN_CALIDAD_DE_LA_ENERGIA = '2064'
     PROGRAM_DOCTORADO_EN_INGENIERIA_INGENIERIA_CIVIL = '2887'
-    PROGRAM_Maestría en Ingeniería - Telecomunicaciones = '2707'
-    PROGRAM_Especialización en Automatización Industrial = '2687'
-    PROGRAM_Maestría en Ingeniería - Ingeniería Química = '2704'
-    PROGRAM_Doctorado en Ingeniería - Ingeniería Química = '2686'
-    PROGRAM_Maestría en Ingeniería - Ingeniería Mecánica = '2709'
-    PROGRAM_Maestría en Ingeniería - Materiales y Procesos = '2710'
-    PROGRAM_Maestría en Ingeniería - Ingeniería Agrícola = '2701'
-    PROGRAM_Maestría en Ingeniería - Recursos Hidráulicos = '2705'
-    PROGRAM_Maestría en Ingeniería - Ingeniería Ambiental = '2562'
-    PROGRAM_Doctorado en Ingeniería - Ingeniería Eléctrica = '2685'
-    PROGRAM_Maestría en Ingeniería - Ingeniería Eléctrica = '2703'
-    PROGRAM_Doctorado en Ingeniería - Sistemas y Computación = '2684'
-    PROGRAM_Especialización en Iluminación Pública y Privada = '2691'
-    PROGRAM_Maestría en Ingeniería - Ingeniería Electrónica = '2865'
-    PROGRAM_Maestría en Ingeniería - Automatización Industrial = '2698'
-    PROGRAM_Doctorado en Ingeniería - Industria y Organizaciones = '2838'
-    PROGRAM_Especialización en Transito, Diseño y Seguridad Vial = '2696'
-    PROGRAM_Doctorado en Ingeniería - Ciencia y Tecnología de Materiales = '2682'
-    PROGRAM_Doctorado en Ingeniería - Ingeniería Mecánica y Mecatrónica = '2839'
-    PROGRAM_Maestría en Ingeniería - Ingeniería de Sistemas y Computación = '2702'
-    PROGRAM_Maestría en Ingeniería - Ingeniería Eléctrica Convenio Sede Manizales = '2794'
-    PROGRAM_Maestría en Ingeniería - Ingeniería de Sistemas y Computación - Conv UPC = '2856'
-    PROGRAM_Maestría en Ingeniería - Ingeniería de Sistemas y Computación - Conv Unillanos = '2928'
+    PROGRAM_MAESTRIA_EN_INGENIERIA_TELECOMUNICACIONES = '2707'
+    PROGRAM_ESPECIALIZACION_AUTOMATIZACION_INDUSTRIAL = '2687'
+    PROGRAM_MAESTRIA_EN_INGENIERIA_INGENIERIA_QUIMICA = '2704'
+    PROGRAM_DOCTORADO_EN_INGENIERIA_INGENIERIA_QUIMICA = '2686'
+    PROGRAM_MAESTRIA_EN_INGENIERIA_INGENIERIA_MECANICA = '2709'
+    PROGRAM_MAESTRIA_EN_INGENIERIA_MATERIALES_Y_PROCESOS = '2710'
+    PROGRAM_MAESTRIA_EN_INGENIERIA_INGENIERIA_AGRICOLA = '2701'
+    PROGRAM_MAESTRIA_EN_INGENIERIA_RECURSOS_HIDRAULICOS = '2705'
+    PROGRAM_MAESTRIA_EN_INGENIERIA_INGENIERIA_AMBIENTAL = '2562'
+    PROGRAM_DOCTORADO_EN_INGENIERIA_INGENIERIA_ELECTRICA = '2685'
+    PROGRAM_MAESTRIA_EN_INGENIERIA_INGENIERIA_ELECTRICA = '2703'
+    PROGRAM_DOCTORADO_EN_INGENIERIA_SISTEMAS_Y_COMPUTACION = '2684'
+    PROGRAM_ESPECIALIZACION_ILUMINACION_PUBLICA_Y_PRIVADA = '2691'
+    PROGRAM_MAESTRIA_EN_INGENIERIA_INGENIERIA_ELECTRONICA = '2865'
+    PROGRAM_MAESTRIA_EN_INGENIERIA_AUTOMATIZACION_INDUSTRIAL = '2698'
+    PROGRAM_DOCTORADO_EN_INGENIERIA_INDUSTRIA_Y_ORGANIZACIONES = '2838'
+    PROGRAM_ESPECIALIZACION_TRANSITO_DISEÑO_Y_SEGURIDAD_VIAL = '2696'
+    PROGRAM_DOCTORADO_EN_INGENIERIA_CIENCIA_Y_TECNOLOGIA_DE_MATERIALES = '2682'
+    PROGRAM_DOCTORADO_EN_INGENIERIA_INGENIERIA_MECANICA_Y_MECATRONICA = '2839'
+    PROGRAM_MAESTRIA_EN_INGENIERIA_INGENIERIA_DE_SISTEMAS_Y_COMPUTACION = '2702'
+    PROGRAM_MAESTRIA_EN_INGENIERIA_INGENIERIA_ELECTRICA_CONVENIO_SEDE_MANIZALES = '2794'
+    PROGRAM_MAESTRIA_EN_INGENIERIA_INGENIERIA_DE_SISTEMAS_Y_COMPUTACION_CONV_UPC = '2856'
+    PROGRAM_MAESTRIA_EN_INGENIERIA_INGENIERIA_DE_SISTEMAS_Y_COMPUTACION_CONV_UNILLANOS = '2928'
     PROGRAM_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_ARTES = 'BAPA'
     PROGRAM_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_CIENCIAS = 'BAPC'
     PROGRAM_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_DERECHO = 'BAPD'
@@ -217,17 +218,71 @@ class Request(DynamicDocument):
     PROGRAM_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_ENFERMERIA = 'BAPN'
     PROGRAM_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_ODONTOLOGIA = 'BAPO'
     PROGRAM_CHOICES = (
-        
+        (PROGRAM_2492, '2492'), ##TODO WHF?
+        (PROGRAM_INGENIERIA_CIVIL, 'Ingeniería Civil'),
+        (PROGRAM_INGENIERIA_QUIMICA, 'Ingeniería Química'),
+        (PROGRAM_INGENIERIA_MECANICA, 'Ingeniería Mecánica'),
+        (PROGRAM_INGENIERIA_AGRICOLA, 'Ingniería Agrícola'),
+        (PROGRAM_INGENIERIA_ELECTRICA, 'Ingeniería Eléctrica'),
+        (PROGRAM_INGENIERIA_INDUSTRIAL, 'Ingeniería Industrial'),
+        (PROGRAM_INGENIERIA_MECATRONICA, 'Ingeniería Mecatrónica'),
+        (PROGRAM_INGENIERIA_ELECTRONICA, 'Ingeniería Electrónica'),
+        (PROGRAM_MAESTRIA_EN_BIOINFORMATICA, 'Maestría en Bioinformática'),
+        (PROGRAM_ESPECIALIZACION_EN_GEOTECNIA, 'Especialización en Geotecnia'),
+        (PROGRAM_ESPECIALIZACION_EN_TRANSPORTE, 'Especialización en Transporte'),
+        (PROGRAM_ESPECIALIZACION_EN_ESTRUCTURAS, 'Especialización en Estructuras'),
+        (PROGRAM_MAESTRIA_EN_INGENIERIA_INDUSTRIAL, 'Maestría en Ingeniería Industrial'),
+        (PROGRAM_MAESTRIA_EN_INGENIERIA_GEOTECNIA, 'Maestría en Ingeniería - Geotecnia'),
+        (PROGRAM_DOCTORADO_EN_INGENIERIA_GEOTECNIA, 'Doctorado en Ingeniería - Geotecnia'), #Este programa ya no se ofrece
+        (PROGRAM_MAESTRIA_EN_INGENIERIA_TRANSPORTE, 'Maestría en Ingeniería - Transporte'),
+        (PROGRAM_MAESTRIA_EN_INGENIERIA_ESTRUCTURAS, 'Maestría en Ingeniería - Estructuras'),
+        (PROGRAM_INGENIERIA_DE_SISTEMAS_Y_COMPUTACION, 'Ingeniería de Sistemas y Computación'),
+        (PROGRAM_ESPECIALIZAION_EN_RECURSOS_HIDRAULICOS, 'Especialización en Recursos Hidráulicos'),
+        (PROGRAM_ESPECIALIZACION_EN_INGENIERIA_AMBIENTAL, 'Especialización en Ingeniería Ambiental'), ##Este programa ya no está ofertado
+        (PROGRAM_ESPECIALIZACION_EN_GOBIERNO_ELECTRONICO, 'Especialización en Gobierno Electrónico'),
+        (PROGRAM_ESPECIALIZACION_EN_INGENIERIA_ELECTRICA, 'Especialización en Ingeniería Eléctrica'),
+        (PROGRAM_ESPECIALIZACION_EN_CALIDAD_DE_LA_ENERGIA, 'Especialización en Calidad de la Energía'),
+        (PROGRAM_DOCTORADO_EN_INGENIERIA_INGENIERIA_CIVIL, 'Doctorado en Ingeniería - Ingeniería Civil'),
+        (PROGRAM_MAESTRIA_EN_INGENIERIA_TELECOMUNICACIONES, 'Maestría en Ingeniería - Telecomunicaciones'),
+        (PROGRAM_ESPECIALIZACION_AUTOMATIZACION_INDUSTRIAL, 'Especialización en Automatización Industrial'),
+        (PROGRAM_MAESTRIA_EN_INGENIERIA_INGENIERIA_QUIMICA, 'Maestría en Ingeniería - Ingeniería Química'),
+        (PROGRAM_DOCTORADO_EN_INGENIERIA_INGENIERIA_QUIMICA, 'Doctorado en Ingeniería - Ingeniería Química'),
+        (PROGRAM_MAESTRIA_EN_INGENIERIA_INGENIERIA_MECANICA, 'Maestría en Ingeniería - Ingeniería Mecánica'),
+        (PROGRAM_MAESTRIA_EN_INGENIERIA_MATERIALES_Y_PROCESOS, 'Maestría en Ingeniería - Materiales y Procesos'),
+        (PROGRAM_MAESTRIA_EN_INGENIERIA_INGENIERIA_AGRICOLA, 'Maestría en Ingeniería - Ingeniería Agrícola'),
+        (PROGRAM_MAESTRIA_EN_INGENIERIA_RECURSOS_HIDRAULICOS, 'Maestría en Ingeniería - Recursos Hidráulicos'),
+        (PROGRAM_MAESTRIA_EN_INGENIERIA_INGENIERIA_AMBIENTAL, 'Maestría en Ingeniería - Ingeniería Ambiental'),
+        (PROGRAM_DOCTORADO_EN_INGENIERIA_INGENIERIA_ELECTRICA, 'Doctorado en Ingeniería - Ingeniería Eléctrica'),
+        (PROGRAM_MAESTRIA_EN_INGENIERIA_INGENIERIA_ELECTRICA, 'Maestría en Ingeniería - Ingeniería Eléctrica'),
+        (PROGRAM_DOCTORADO_EN_INGENIERIA_SISTEMAS_Y_COMPUTACION, 'Doctorado en Ingeniería - Sistemas y Computación'),
+        (PROGRAM_ESPECIALIZACION_ILUMINACION_PUBLICA_Y_PRIVADA, 'Especialización en Iluminación Pública y Privada'),
+        (PROGRAM_MAESTRIA_EN_INGENIERIA_INGENIERIA_ELECTRONICA, 'Maestría en Ingeniería - Ingeniería Electrónica'),
+        (PROGRAM_MAESTRIA_EN_INGENIERIA_AUTOMATIZACION_INDUSTRIAL, 'Maestría en Ingeniería - Automatización Industrial'),
+        (PROGRAM_DOCTORADO_EN_INGENIERIA_INDUSTRIA_Y_ORGANIZACIONES, 'Doctorado en Ingeniería - Industria y Organizaciones'),
+        (PROGRAM_ESPECIALIZACION_TRANSITO_DISEÑO_Y_SEGURIDAD_VIAL, 'Especialización en Transito, Diseño y Seguridad Vial'),
+        (PROGRAM_DOCTORADO_EN_INGENIERIA_CIENCIA_Y_TECNOLOGIA_DE_MATERIALES, 'Doctorado en Ingeniería - Ciencia y Tecnología de Materiales'),
+        (PROGRAM_DOCTORADO_EN_INGENIERIA_INGENIERIA_MECANICA_Y_MECATRONICA, 'Doctorado en Ingeniería - Ingeniería Mecánica y Mecatrónica'),
+        (PROGRAM_MAESTRIA_EN_INGENIERIA_INGENIERIA_DE_SISTEMAS_Y_COMPUTACION, 'Maestría en Ingeniería - Ingeniería de Sistemas y Computación'),
+        (PROGRAM_MAESTRIA_EN_INGENIERIA_INGENIERIA_ELECTRICA_CONVENIO_SEDE_MANIZALES, 'Maestría en Ingeniería - Ingeniería Eléctrica Convenio Sede Manizales'),
+        (PROGRAM_MAESTRIA_EN_INGENIERIA_INGENIERIA_DE_SISTEMAS_Y_COMPUTACION_CONV_UPC, 'Maestría en Ingeniería - Ingeniería de Sistemas y Computación - Conv UPC'),
+        (PROGRAM_MAESTRIA_EN_INGENIERIA_INGENIERIA_DE_SISTEMAS_Y_COMPUTACION_CONV_UNILLANOS, 'Maestría en Ingeniería - Ingeniería de Sistemas y Computación - Conv Unillanos'),
+        (PROGRAM_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_ARTES, 'Modalidad de Asignaturas de Posgrado Facultad de Artes'),
+        (PROGRAM_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_CIENCIAS, 'Modalidad de Asignaturas de Posgrado Facultad de Ciencias'),
+        (PROGRAM_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_DERECHO, 'Modalidad de Asignaturas de Posgrado Facultad de Derecho'),
+        (PROGRAM_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_ECONOMIA, 'Modalidad de Asignaturas de Posgrado Facultad de Economía'),
+        (PROGRAM_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_AGRONOMIA, 'Modalidad de Asignaturas de Posgrado Facultad de Agronomía'),
+        (PROGRAM_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_HUMANAS, 'Modalidad de Asignaturas de Posgrado Facultad de Humanas'),
+        (PROGRAM_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_INGENIERIA, 'Modalidad de Asignaturas de Posgrado Facultad de Ingeniería'),
+        (PROGRAM_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_MEDICINA, 'Modalidad de Asignaturas de Posgrado Facultad de Medicina'),
+        (PROGRAM_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_ENFERMERIA, 'Modalidad de Asignaturas de Posgrado Facultad de Enfermería'),
+        (PROGRAM_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_ODONTOLOGIA, 'Modalidad de Asignaturas de Posgrado Facultad de Odontología'),
     )
-    date = DateField(required=True)
-    type = StringField(max_length=256, required=True)
-    student_name = StringField(max_length=512, required=True)
-    approval_status = StringField(max_length=2, choices=APPROVAL_STATUS_CHOICES, required=True)
-    stud_dni = StringField(max_length=22, required=True)
-    stud_dni_type = StringField(choices=DNI_TYPE_CHOICES, required=True)
-    acad_peri = StringField(max_length=10, required=True)
-    req_acad_prog = StringField(max_length=4, choices=PROGRAM_CHOICES, required=True)
-    req_just = StringField(max_length = 255, required=True)
-
-class Test(DynamicDocument):
-    hola = StringField()
+    date = DateField(required=True, default=datetime.date.today)
+    type = StringField(max_length=256, required=True, default='')
+    student_name = StringField(max_length=512, required=True, default='')
+    approval_status = StringField(min_length=2, max_length=2, choices=APPROVAL_STATUS_CHOICES, required=True, default='')
+    student_dni = StringField(max_length=22, required=True, default='')
+    student_dni_type = StringField(min_length=2, choices=DNI_TYPE_CHOICES, required=True, default='')
+    academic_period = StringField(max_length=10, required=True, default='')
+    academic_program = StringField(min_length=4, max_length=4, choices=PROGRAM_CHOICES, required=True, default='')
+    justification = StringField(max_length = 255, required=True, default='')
