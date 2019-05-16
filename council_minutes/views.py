@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from .models import Request
-from .helpers import QuerySetEncoder
+from .helpers import QuerySetEncoder, Translator
 import json
 from mongoengine.errors import ValidationError
 from django.views.decorators.csrf import csrf_exempt #Esto va solo para evitar la verificacion de django
@@ -26,7 +26,7 @@ def filter_request(request):
 @csrf_exempt #Esto va solo para evitar la verificacion de django
 def insert_request(request):
     if request.method == 'POST':
-        new_request = Request().from_json(request.body)
+        new_request = Request().from_json(Translator.translate(request.body))
         try:
             response = new_request.save()
             return HttpResponse(request.body, status=200)
