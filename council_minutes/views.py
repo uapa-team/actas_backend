@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from .models import Request
+from .docx import CouncilMinuteGenerator
 from .helpers import QuerySetEncoder
+import os
 import json
 from mongoengine.errors import ValidationError
 from django.views.decorators.csrf import csrf_exempt #Esto va solo para evitar la verificacion de django
@@ -36,3 +38,13 @@ def insert_request(request):
 
     else:
         return HttpResponse('Bad Request', status=400)
+
+@csrf_exempt
+def docx_gen_by_id(request):
+    body = json.loads(request.body)
+    filename = 'public/acta' + body["id"] + '.docx'
+    request__by_id = Request.objects.get(id = body["id"])
+    generator = CouncilMinuteGenerator()
+    generator.add_case_from_request(request__by_id)
+    generator.generate(filename)
+    return HttpResponse(filename)
