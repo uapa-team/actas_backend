@@ -287,4 +287,6 @@ class Request(DynamicDocument):
     student_dni_type = StringField(min_length=2, choices=DNI_TYPE_CHOICES, required=True, default=DNI_TYPE_CEDULA_DE_CIUDADANIA)
     academic_period = StringField(max_length=10, required=True)
     academic_program = StringField(min_length=4, max_length=4, choices=PROGRAM_CHOICES, required=True)
-    justification = StringField(max_length = 255, required=True, default='')
+    justification = StringField(max_length=255, required=True, default='')
+    user = StringField(max_length=255, required=True)
+    date_stamp = DateField(required=True, default=datetime.date.today)
