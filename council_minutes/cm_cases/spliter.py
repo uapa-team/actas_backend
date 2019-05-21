@@ -1,4 +1,4 @@
-from .case_HCEMPRE import HCEMPRE
+from .comp_cases.case_HOIDPRE import HOIDPRE
 
 class CasesSpliter():
 
@@ -11,6 +11,7 @@ class CasesSpliter():
             'CGRUPRE' : self.case_CAMBIO_DE_GRUPO_PREGRADO,
             'TGRAPRE' : self.case_TRABAJO_DE_GRADO_PREGADO,
             'DTITPRE' : self.case_DOBLE_TITULACION_PREGRADO,
+            'HOIDPRE' : self.case_HOMOLOGACION_INGLES_PREGRADO,
             'CTIPPRE' : self.case_CAMBIO_DE_TIPOLOGIA_PREGRADO,
             'REAPPRE' : self.case_RECURSO_DE_APELACION_PREGRADO,
             'EREPPRE' : self.case_EXPEDICION_DE_RECIBO_PREGRADO,
@@ -43,6 +44,7 @@ class CasesSpliter():
             'AAUTPOS' : self.case_ADMISION_AUTOMATICA_POSGRADO,
             'EVAAPOS' : self.case_EVALUADOR_ADICIONAL_POSGRADO,
             'CTIPPOS' : self.case_CAMBIO_DE_TIPOLOGIA_POSGRADO,
+            'HOIDPOS' : self.case_HOMOLOGACION_INGLES_POSGRADO,
             'REREPOS' : self.case_RECURSO_DE_REPOSICION_POSGRADO,
             'TEPRPOS' : self.case_TRANSITO_ENTRE_PROGRAMAS_POSGRADO,
             'DCODPOS' : self.case_DESIGNACION_DE_CODIRECTOR_POSGRADO,
@@ -69,7 +71,7 @@ class CasesSpliter():
             'DJCPOS'  : self.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO,
         }
 
-    def any_case(self, request, docx):
+    def request_case(self, request, docx):
         return self.cases[request.type](request, docx)
 
     def case_TRASLADO_PREGRADO(self, request, docx):
@@ -92,6 +94,9 @@ class CasesSpliter():
 
     def case_DOBLE_TITULACION_PREGRADO(self, request, docx):
         raise NotImplementedError
+
+    def case_HOMOLOGACION_INGLES_PREGRADO(self, request, docx):
+        HOIDPRE.case_HOMOLOGACION_INGLES_PREGRADO(request, docx)
 
     def case_CAMBIO_DE_TIPOLOGIA_PREGRADO(self, request, docx):
         raise NotImplementedError
@@ -142,8 +147,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_HOMOLOGACION_CONVALIDACION_EQUIVALENCIA_PREGRADO(self, request, docx):
-        hcempre = HCEMPRE()
-        hcempre.case_HOMOLOGACION_CONVALIDACION_EQUIVALENCIA_PREGRADO(request, docx)
+        raise NotImplementedError
 
     def case_ELIMINACION_DE_LA_HISTORIA_ACADEMICA_BAPI_PREGRADO(self, request, docx):
         raise NotImplementedError
@@ -173,6 +177,9 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_CAMBIO_DE_PROYECTO_DE_TESIS(self, request, docx):
+        raise NotImplementedError
+
+    def case_HOMOLOGACION_INGLES_POSGRADO(self, request, docx):
         raise NotImplementedError
 
     def case_APROBACION_PASANTIA_POSGRADO(self, request, docx):
