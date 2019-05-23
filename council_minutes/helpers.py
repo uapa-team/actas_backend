@@ -15,30 +15,27 @@ class QuerySetEncoder(DjangoJSONEncoder):
 
 class Translator:
 
-    def removeAccents(string_with_accent):
-        return str(string_with_accent).replace('á','a').replace('é','e').replace('í',
-        'i').replace('ó','o').replace('ú','u')
-
     def translate(data):
-        data_json = json.loads(str(data))
+        data_json = json.loads(str(data).encode('latin-1').decode('utf-8'))
+        print(data_json)
         translated_type = ''
         translated_status_approval = ''
         translated_dni_type = ''
         translated_program = ''
         for it in Request.TYPE_CHOICES:
-            if Translator.removeAccents(it[1]) == Translator.removeAccents(data_json['Tipo Solicitud']):
+            if it[1] == data_json['Tipo Solicitud']:
                 translated_type = it[0]
                 break
         for it in Request.APPROVAL_STATUS_CHOICES:
-            if Translator.removeAccents(it[1]) == Translator.removeAccents(data_json['Estado de Aprobacion']):
+            if it[1] == data_json['Estado de Aprobación']:
                 translated_status_approval = it[0]
                 break
         for it in Request.DNI_TYPE_CHOICES:
-            if Translator.removeAccents(it[1]) == Translator.removeAccents(data_json['Tipo Documento']):
+            if it[1] == data_json['Tipo Documento']:
                 translated_dni_type = it[0]
                 break
         for it in Request.PROGRAM_CHOICES:
-            if Translator.removeAccents(it[1]) == Translator.removeAccents(data_json['Programa']):
+            if it[1] == data_json['Programa']:
                 translated_program = it[0]
                 break
         data_json.update({'date': data_json["Fecha Solicitud"]})
@@ -46,18 +43,20 @@ class Translator:
         data_json.update({'type': translated_type})
         data_json.pop('Tipo Solicitud')
         data_json.update({'approval_status': translated_status_approval})
-        data_json.pop('Estado de Aprobacion')
+        data_json.pop('Estado de Aprobación')
         data_json.update({'student_name': data_json["Nombre Estudiante"]})
         data_json.pop('Nombre Estudiante')
         data_json.update({'student_dni_type': translated_dni_type})
         data_json.pop('Tipo Documento')
-        data_json.update({'student_dni': data_json["Documento de Identificacion"]})
-        data_json.pop('Documento de Identificacion')
+        data_json.update({'student_dni': data_json["Documento de Identificación"]})
+        data_json.pop('Documento de Identificación')
         data_json.update({'academic_period': data_json["Periodo"]})
         data_json.pop('Periodo')
+        data_json.update({'academic_program': translated_program})
+        data_json.pop('Programa')
         try:
-            data_json.update({'justification': data_json["Justificacion"]})
-            data_json.pop('Justificacion')
+            data_json.update({'justification': data_json["Justificación"]})
+            data_json.pop('Justificación')
         except KeyError:
             pass
         return json.dumps(data_json)
