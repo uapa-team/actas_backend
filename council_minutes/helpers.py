@@ -1,7 +1,9 @@
 from django.core.serializers.json import DjangoJSONEncoder
+from django.utils.encoding import smart_str
 import json
 from .models import Request
 import unicodedata
+from django.utils.dateparse import parse_date
 
 class QuerySetEncoder(DjangoJSONEncoder):
 
@@ -16,8 +18,9 @@ class QuerySetEncoder(DjangoJSONEncoder):
 class Translator:
 
     def translate(data):
-        data_json = json.loads(str(data).encode('latin-1').decode('utf-8'))
-        print(data_json)
+        data_decode = data.decode('utf-8')
+        data_json = json.loads(data_decode)
+        #print(data_json)
         translated_type = ''
         translated_status_approval = ''
         translated_dni_type = ''
@@ -38,7 +41,8 @@ class Translator:
             if it[1] == data_json['Programa']:
                 translated_program = it[0]
                 break
-        data_json.update({'date': data_json["Fecha Solicitud"]})
+        date = parse_date(data_json["Fecha Solicitud"])
+        data_json.update({'date': date})
         data_json.pop('Fecha Solicitud')
         data_json.update({'type': translated_type})
         data_json.pop('Tipo Solicitud')
@@ -59,5 +63,6 @@ class Translator:
             data_json.pop('Justificación')
         except KeyError:
             pass
+        #print(data_json)
         return json.dumps(data_json)
     
