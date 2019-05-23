@@ -41,20 +41,24 @@ class Translator:
             if Translator.removeAccents(it[1]) == Translator.removeAccents(data_json['Programa']):
                 translated_program = it[0]
                 break
-        response = {
-            "date": data_json["Fecha Solicitud"],
-            "type": translated_type,
-            "approval_status": translated_status_approval,
-            "student_name": data_json["Nombre Estudiante"],
-            "student_dni_type": translated_dni_type,
-            "student_dni": data_json["Documento de Identificacion"],
-            "academic_period": data_json["Periodo"],
-            "academic_program": translated_program,
-        }
+        data_json.update({'date': data_json["Fecha Solicitud"]})
+        data_json.pop('Fecha Solicitud')
+        data_json.update({'type': translated_type})
+        data_json.pop('Tipo Solicitud')
+        data_json.update({'approval_status': translated_status_approval})
+        data_json.pop('Estado de Aprobacion')
+        data_json.update({'student_name': data_json["Nombre Estudiante"]})
+        data_json.pop('Nombre Estudiante')
+        data_json.update({'student_dni_type': translated_dni_type})
+        data_json.pop('Tipo Documento')
+        data_json.update({'student_dni': data_json["Documento de Identificacion"]})
+        data_json.pop('Documento de Identificacion')
+        data_json.update({'academic_period': data_json["Periodo"]})
+        data_json.pop('Periodo')
         try:
-            justification = data_json["Justificacion"]
-            response.update({'justification': justification})
+            data_json.update({'justification': data_json["Justificacion"]})
+            data_json.pop('Justificacion')
         except KeyError:
             pass
-        return json.dumps(response)
+        return json.dumps(data_json)
     
