@@ -1,4 +1,5 @@
 from .comp_cases.case_HOIDPRE import HOIDPRE
+from .comp_cases.case_HCEMPRE import HCEMPRE
 
 class CasesSpliter():
 
@@ -147,7 +148,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_HOMOLOGACION_CONVALIDACION_EQUIVALENCIA_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        HCEMPRE.
 
     def case_ELIMINACION_DE_LA_HISTORIA_ACADEMICA_BAPI_PREGRADO(self, request, docx):
         raise NotImplementedError
