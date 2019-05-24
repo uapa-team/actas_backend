@@ -1,4 +1,5 @@
 from .comp_cases.case_HOIDPRE import HOIDPRE
+from .comp_cases.case_simple  import simple
 
 class CasesSpliter():
 
@@ -78,7 +79,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_REINGRESO_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_REINGRESO_PREGRADO(request, docx)
 
     def case_REEMBOLSO_PREGRADO(self, request, docx):
         raise NotImplementedError
@@ -141,7 +142,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO(request, docx)
 
     def case_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD_PREGRADO(self, request, docx):
         raise NotImplementedError
