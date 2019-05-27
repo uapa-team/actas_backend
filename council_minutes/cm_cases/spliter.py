@@ -116,7 +116,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_DEVOLUCION_DE_CREDITOS_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_DEVOLUCION_DE_CREDITOS_PREGRADO(request, docx)
 
     def case_DESISTIMIENTO_MOVILIDAD_PREGRADO(self, request, docx):
         raise NotImplementedError
