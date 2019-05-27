@@ -1,6 +1,5 @@
 from .comp_cases.case_HOIDPRE import HOIDPRE
 from .comp_cases.case_simple  import simple
-from .comp_cases.case_HCEMPRE import HCEMPRE
 
 
 class CasesSpliter():
@@ -141,7 +140,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_RETIRO_DEFINITIVO_DEL_PROGRAMA_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_RETIRO_DEFINITIVO_DEL_PROGRAMA_PREGRADO(request, docx)
 
     def case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO(self, request, docx):
         simple.case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO(request, docx)
