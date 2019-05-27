@@ -1,6 +1,5 @@
 from .comp_cases.case_HOIDPRE import HOIDPRE
 from .comp_cases.case_simple  import simple
-from .comp_cases.case_HCEMPRE import HCEMPRE
 
 
 class CasesSpliter():
@@ -135,7 +134,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO(request, docx)
 
     def case_INSCRIPCION_DE_ASIGNATURAS_PREGRADO(self, request, docx):
         raise NotImplementedError
