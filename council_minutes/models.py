@@ -65,7 +65,7 @@ class Request(DynamicDocument):
     TYPE_APROBACION_PROYECTO_PROPUESTA_Y_DESIGNACION_DE_DIRECTOR_POSGRADO = 'APGDPOS'
     TYPE_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO = 'DJCTPOS'
     TYPE_EXENCION_DE_PAGO_POR_CURSAR_TESIS_COMO_UNICA_ACTIVIDAD_ACADEMICA_POSGRADO = 'EPTUPOS'
-    TYPE_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO = 'DJCPOS'
+    TYPE_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO = 'DJCPPOS'
     TYPE_CHOICES = (
         (TYPE_TRASLADO_PREGRADO, 'Traslado (Pregrado)'),
         (TYPE_REINGRESO_PREGRADO, 'Reingreso (Pregrado)'),
@@ -288,11 +288,13 @@ class Request(DynamicDocument):
         (PROGRAM_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_ODONTOLOGIA, 'Modalidad de Asignaturas de Posgrado Facultad de Odontología'),
     )
     date = DateField(required=True, default=datetime.date.today)
-    type = StringField(max_length=256, required=True, default='')
-    student_name = StringField(max_length=512, required=True, default='')
-    approval_status = StringField(min_length=2, max_length=2, choices=APPROVAL_STATUS_CHOICES, required=True, default='')
-    student_dni = StringField(max_length=22, required=True, default='')
-    student_dni_type = StringField(min_length=2, choices=DNI_TYPE_CHOICES, required=True, default='')
-    academic_period = StringField(max_length=10, required=True, default='')
-    academic_program = StringField(min_length=4, max_length=4, choices=PROGRAM_CHOICES, required=True, default='')
-    justification = StringField(max_length = 255, required=True, default='')
+    type = StringField(max_length=7, choices=TYPE_CHOICES, required=True)
+    student_name = StringField(max_length=512, required=True)
+    approval_status = StringField(min_length=2, max_length=2, choices=APPROVAL_STATUS_CHOICES, required=True, default=APPROVAL_STATUS_CHOICES[4][1])
+    student_dni = StringField(max_length=22, required=True)
+    student_dni_type = StringField(min_length=2, choices=DNI_TYPE_CHOICES, required=True, default=DNI_TYPE_CEDULA_DE_CIUDADANIA)
+    academic_period = StringField(max_length=10, required=True)
+    academic_program = StringField(min_length=4, max_length=4, choices=PROGRAM_CHOICES, required=True)
+    justification = StringField(max_length=255, required=True, default='')
+    user = StringField(max_length=255, required=True)
+    date_stamp = DateField(required=True, default=datetime.date.today)
