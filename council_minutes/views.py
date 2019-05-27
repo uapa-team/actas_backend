@@ -1,7 +1,11 @@
+import mongoengine
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from .models import Request
 from .helpers import QuerySetEncoder, Translator
+from .docx import CouncilMinuteGenerator
+from .helpers import QuerySetEncoder
+import os
 import json
 from mongoengine.errors import ValidationError
 from django.views.decorators.csrf import csrf_exempt #Esto va solo para evitar la verificacion de django
@@ -39,3 +43,15 @@ def insert_request(request):
 
     else:
         return HttpResponse('Bad Request', status=400)
+
+@csrf_exempt
+def docx_gen_by_id(request, cm_id):
+    filename = 'public/acta' + cm_id + '.docx'
+    try:
+        request_by_id = Request.objects.get(id = cm_id)
+    except mongoengine.DoesNotExist:
+        return HttpResponse('Does not exist', status=404)
+    generator = CouncilMinuteGenerator()
+    generator.add_case_from_request(request_by_id)
+    generator.generate(filename)
+    return HttpResponse(filename)
