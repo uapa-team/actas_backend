@@ -12,11 +12,8 @@ class simple():
     def case_REINGRESO_PREGRADO(request, docx):
         raise NotImplementedError
 
-
     @staticmethod
     def case_EXENCION_DE_PAGO_POR_CREDITOS_SOBRANTES_DE_PREGRADO_POSGRADO(request, docx):
-        para = docx.add_paragraph()
-        para.add_run(request.student_name + '                       DNI: ' + request.student_dni).font.bold = True
         para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('El Consejo de Facultad ' )
