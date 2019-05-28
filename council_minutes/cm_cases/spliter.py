@@ -1,5 +1,5 @@
 from .comp_cases.case_HOIDPRE import HOIDPRE
-from .comp_cases.case_CASIPRE import CASIPOS
+from .comp_cases.case_CASIPRE import CASIPRE
 from .comp_cases.case_simple  import simple
 
 
@@ -132,7 +132,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_CANCELACION_DE_ASIGNATURAS_PREGRADO(self, request, docx):
-        CASIPOS.case_CANCELACION_DE_ASIGNATURAS_PREGRADO(request, docx)
+        CASIPRE.case_CANCELACION_DE_ASIGNATURAS_PREGRADO(request, docx)
 
     def case_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO(self, request, docx):
         raise NotImplementedError
