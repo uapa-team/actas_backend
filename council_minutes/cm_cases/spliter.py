@@ -254,7 +254,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_AMPLIACION_DE_LA_FECHA_DE_PAGO_DE_DERECHOS_ACADEMICOS_POSGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_AMPLIACION_DE_LA_FECHA_DE_PAGO_DE_DERECHOS_ACADEMICOS_POSGRADO(request, docx)
 
     def case_REGISTRO_DE_CALIFICACION_DEL_PROYECTO_Y_EXAMEN_DOCTORAL_POSGRADO(self, request, docx):
         raise NotImplementedError
