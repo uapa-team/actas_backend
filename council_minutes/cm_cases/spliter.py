@@ -1,4 +1,5 @@
 from .comp_cases.case_HOIDPRE import HOIDPRE
+from .comp_cases.case_REINPRE import REINPRE
 from .comp_cases.case_simple  import simple
 
 
@@ -80,7 +81,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_REINGRESO_PREGRADO(self, request, docx):
-        simple.case_REINGRESO_PREGRADO(request, docx)
+        REINPRE.case_REINGRESO_PREGRADO(request, docx)
 
     def case_REEMBOLSO_PREGRADO(self, request, docx):
         raise NotImplementedError
