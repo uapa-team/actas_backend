@@ -16,8 +16,6 @@ class simple():
     @staticmethod
     def case_DEVOLUCION_PROPORCIONAL_DEL_VALOR_PAGADO_POR_CONCEPTO_DE_DERECHOS_DE_MATRICULA_PREGRADO(request, docx):
         para = docx.add_paragraph()
-        para.add_run(request.student_name + '                       DNI: ' + request.student_dni).font.bold = True
-        para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('El Consejo de Facultad ' )
         if request.approval_status == 'AP':
