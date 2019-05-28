@@ -152,7 +152,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_ELIMINACION_DE_LA_HISTORIA_ACADEMICA_BAPI_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_ELIMINACION_DE_LA_HISTORIA_ACADEMICA_BAPI_PREGRADO(request, docx)
 
     def case_RECURSO_DE_REPOSICION_CON_SUBSIDIO_DE_APELACION_PREGRADO(self, request, docx):
         raise NotImplementedError
