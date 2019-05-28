@@ -4,15 +4,31 @@ import json
 from .models import Request
 import unicodedata
 from django.utils.dateparse import parse_date
+import copy
 
 class QuerySetEncoder(DjangoJSONEncoder):
 
     def default(self, querySet):
         json = {}
         for element in querySet:
-            json[str(element.id)] = {}
-            for field in element._fields_ordered[1:]:
-                json[str(element.id)][field] = str(element[field])
+
+            id_ = str(element.id) 
+            json[id_] = {}
+
+            json[id_]["Fecha Solicitud"] = str(element["date"])
+            json[id_]["Tipo Solicitud"] = element.get_type_display()
+            json[id_]["Nombre Estudiante"] = element["student_name"]
+            json[id_]["Estado Aprobación"] = element.get_approval_status_display()
+            json[id_]["Documento Identidad"] = element["student_dni"]
+            json[id_]["Tipo Documento"] = element.get_student_dni_type_display()
+            json[id_]["Periodo Academico"] = element["academic_period"]
+            json[id_]["Programa"] = element.get_academic_program_display()
+            json[id_]["Justificación"] = element["justification"]
+
+            #TODO: details_cm es un objeto que puede contener datos primitivos,
+            # listas u otros objetos (como las materias)
+            json[id_]["details_cm"] = {} 
+
         return json
 
 class Translator:
