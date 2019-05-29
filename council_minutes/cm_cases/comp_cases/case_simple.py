@@ -116,3 +116,15 @@ class simple():
         cellp = table.cell(index, 0).merge(table.cell(index, 1)).paragraphs[0]
         cellp.alignment = WD_ALIGN_PARAGRAPH.LEFT
         cellp.add_run('Total Créditos').font.bold = True
+
+    @staticmethod
+    def case_ELIMINACION_DE_LA_HISTORIA_ACADEMICA_BAPI_PREGRADO(request, docx):
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('El Consejo de Facultad ' )
+        if request.approval_status == 'AP':
+           para.add_run('APRUEBA').font.bold = True
+           para.add_run(' eliminar la historia académica BAPI, debido a que ' + request.justification +'.')
+        else:
+           para.add_run('NO APRUEBA').font.bold = True
+           para.add_run(' eliminar la historia académica BAPI, debido a que ' + request.justification+'.')
