@@ -16,6 +16,7 @@ class Request(DynamicDocument):
     TYPE_PRACTICA_ESTUDIANTIL_PREGRADO = 'PESTPRE'
     TYPE_RECURSO_DE_REPOSICION_PREGRADO = 'RREPPRE'
     TYPE_DEVOLUCION_DE_CREDITOS_PREGRADO = 'DCREPRE'
+    TYPE_HOMOLOGACION_DE_IDIOMA_PREGRADO = 'HOIDPRE'
     TYPE_DESISTIMIENTO_MOVILIDAD_PREGRADO = 'DMOVPRE'
     TYPE_CREDITOS_EXCEDENTES_MAPI_PREGRADO = 'CMAPPRE'
     TYPE_MODIFICACION_DE_DECISION_PREGRADO = 'MDECPRE'
@@ -80,6 +81,7 @@ class Request(DynamicDocument):
         (TYPE_RECURSO_DE_APELACION_PREGRADO, 'Recurso de apelación (Pregrado)'),
         (TYPE_RECURSO_DE_REPOSICION_PREGRADO, 'Recurso de reposición (Pregrado)'),
         (TYPE_DEVOLUCION_DE_CREDITOS_PREGRADO, 'Devolución de créditos (Pregrado)'),
+        (TYPE_HOMOLOGACION_DE_IDIOMA_PREGRADO, 'Homologación de idioma (Pregrado)'),
         (TYPE_DESISTIMIENTO_MOVILIDAD_PREGRADO, 'Desistimiento movilidad (Pregrado)'),
         (TYPE_CREDITOS_EXCEDENTES_MAPI_PREGRADO, 'Créditos excedentes MAPI (Pregrado)'),
         (TYPE_MODIFICACION_DE_DECISION_PREGRADO, 'Modificación de decisión (Pregrado)'),
@@ -282,7 +284,7 @@ class Request(DynamicDocument):
     date = DateField(required=True, default=datetime.date.today)
     type = StringField(max_length=7, choices=TYPE_CHOICES, required=True)
     student_name = StringField(max_length=512, required=True)
-    approval_status = StringField(min_length=2, max_length=2, choices=APPROVAL_STATUS_CHOICES, required=True, default=APPROVAL_STATUS_CHOICES[4][1])
+    approval_status = StringField(min_length=2, max_length=2, choices=APPROVAL_STATUS_CHOICES, required=True, default=APPROVAL_STATUS_EN_ESPERA)
     student_dni = StringField(max_length=22, required=True)
     student_dni_type = StringField(min_length=2, choices=DNI_TYPE_CHOICES, required=True, default=DNI_TYPE_CEDULA_DE_CIUDADANIA)
     academic_period = StringField(max_length=10, required=True)
