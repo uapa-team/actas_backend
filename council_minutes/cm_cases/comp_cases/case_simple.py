@@ -20,3 +20,4 @@ class simple():
         para.add_run(' presentar con concepto positivo a la División de Registro y Matrícula, el retiro ')
         para.add_run('voluntario del programa ' + request.get_academic_program_display() + ' (' + request.academic_program + ').')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        #No encuentro ningún caso en el que se presente un concepto negativo para este caso o que no se apruebe
