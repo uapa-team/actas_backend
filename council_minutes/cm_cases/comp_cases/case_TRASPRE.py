@@ -1,11 +1,20 @@
 from docx import Document
 from ...models import Request
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.shared import Pt
+from docx.enum.table import WD_ALIGN_VERTICAL, WD_ROW_HEIGHT_RULE
 
 class TRASPRE():
 
+
     @staticmethod
     def case_TRASLADO_PREGRADO(request, docx):
+        large_program = ''
+        for p in Request.PROGRAM_CHOICES:
+            if p[0] == request.academic_program:
+                large_program = p[1]
+                break
+        print(large_program)
         para = docx.add_paragraph()
         para.alignment=WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('El Consejo de Facultad ')
@@ -13,20 +22,23 @@ class TRASPRE():
             para.add_run('APRUEBA').font.bold = True
             para.add_run(' traslado ' + request.detail_cm['tras_type'] + ' del programa ' + request.detail_cm['origin'] +'(')
             para.add_run( request.detail_cm['cod_origin'] + ') de la Universidad Nacional de Colombia - Sede ' + request.detail_cm['campus_origin'])
-            para.add_run(', al programa ' + request.detail_cm['destination'] + ' (' + request.detail_cm['cod_destination'])
+            para.add_run(', al programa ' + large_program + ' (' + request.academic_program)
             para.add_run(') de la Universidad Nacional de Colombia - Sede Bogotá, en el periodo académico ' + request.detail_cm['since'])
             para.add_run(' condicionado a consevar la calidad de estudiante al finalizar el periodo académico ' + request.academic_period)
             para.add_run('. (Artículo 39 del Acuerdo 008 de 2008 del Consejo Superior Universitario y Acuerdo 089 de 2014 del Consejo Académico). ')
             para = docx.add_paragraph()
             para.add_run('1. Datos Generales').font.bold = True
-            table = docx.add_table(rows=9, cols=3, style='Table Grid')
+            table = docx.add_table(rows=9, cols=3)
+            table.style='Table Grid'
+            table.style.font.size=Pt(9)
             table.alignment=WD_ALIGN_PARAGRAPH.CENTER
             table.columns[0].width = 200000
             table.columns[1].width = 2600000
             table.columns[2].width = 2600000
             cellp = table.cell(0, 0).merge(table.cell(0, 2)).paragraphs[0]
             cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            cellp.add_run('TRASLADO\nNormativa Asociada: Artículo 39 del Acuerdo 008 de 2008 del CSU y Acuerdo 089 de 2014 del C.A.').font.bold = True
+            cellp.add_run('TRASLADO').font.bold = True
+            cellp.add_run('\nNormativa Asociada: Artículo 39 del Acuerdo 008 de 2008 del CSU y Acuerdo 089 de 2014 del C.A.')
             table.cell(1, 0).paragraphs[0].add_run('1')
             table.cell(1, 1).paragraphs[0].add_run('Estudiante')
             table.cell(1, 2).paragraphs[0].add_run(request.student_name)
@@ -41,10 +53,10 @@ class TRASPRE():
             table.cell(4, 2).paragraphs[0].add_run(request.detail_cm['cod_origin'])
             table.cell(5, 0).paragraphs[0].add_run('5')
             table.cell(5, 1).paragraphs[0].add_run('Plan de estudios destino (2° plan)')
-            table.cell(5, 2).paragraphs[0].add_run(request.detail_cm['destination'])
+            table.cell(5, 2).paragraphs[0].add_run(large_program)
             table.cell(6, 0).paragraphs[0].add_run('6')
             table.cell(6, 1).paragraphs[0].add_run('Código del plan de estudios destino (2° plan)')
-            table.cell(6, 2).paragraphs[0].add_run(request.detail_cm['cod_destination'])
+            table.cell(6, 2).paragraphs[0].add_run(request.academic_program)
             table.cell(7, 0).paragraphs[0].add_run('7')
             table.cell(7, 1).paragraphs[0].add_run('Fecha de la solicitud a través del SIA')
             table.cell(7, 2).paragraphs[0].add_run(request.detail_cm['sia_request'])
@@ -97,37 +109,39 @@ class TRASPRE():
             para = docx.add_paragraph()
             para.add_run('3. Resumen General de Créditos del Segundo Plan de Estudios').font.bold = True
             para = docx.add_paragraph()
-            table = docx.add_table(rows=5, cols=7, style='Table Grid')
+            table = docx.add_table(rows=5, cols=7)
+            table.style='Table Grid'
             table.alignment=WD_ALIGN_PARAGRAPH.CENTER
-            table.columns[0].width = 1350000
-            table.columns[1].width = 675000
-            table.columns[2].width = 675000
-            table.columns[3].width = 675000
-            table.columns[4].width = 675000
+            table.columns[0].width = 950000
+            table.columns[1].width = 820000
+            table.columns[2].width = 780000
+            table.columns[3].width = 820000
+            table.columns[4].width = 780000
             table.columns[5].width = 675000
-            table.columns[6].width = 675000
+            table.columns[6].width = 575000
             cellp = table.cell(0, 0).merge(table.cell(1, 0)).paragraphs[0]
+            cellp.vertical_alignement = WD_ALIGN_VERTICAL.CENTER
             cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            cellp.add_run('Créditos')
+            cellp.add_run('Créditos').font.bold = True
             cellp = table.cell(0, 1).merge(table.cell(0, 2)).paragraphs[0]
             cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            cellp.add_run('Fundamentación (B)')
+            cellp.add_run('Fundamentación (B)').font.bold = True
             cellp = table.cell(0, 3).merge(table.cell(0, 4)).paragraphs[0]
             cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            cellp.add_run('Disciplinar (C)')
+            cellp.add_run('Disciplinar (C)').font.bold = True
             cellp = table.cell(0, 5).merge(table.cell(1, 5)).paragraphs[0]
             cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            cellp.add_run('Libre Elección (L)')
+            cellp.add_run('Libre Elección (L)').font.bold = True
             cellp = table.cell(0, 6).merge(table.cell(1, 6)).paragraphs[0]
             cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            cellp.add_run('Total')
-            table.cell(2, 0).paragraphs[0].add_run('Exigidos*')
-            table.cell(3, 0).paragraphs[0].add_run('Convalidados/Equivalentes')
-            table.cell(4, 0).paragraphs[0].add_run('Pendientes')
-            table.cell(1, 1).paragraphs[0].add_run('Obligatorios')
-            table.cell(1, 2).paragraphs[0].add_run('Optativos')
-            table.cell(1, 3).paragraphs[0].add_run('Obligatorios')
-            table.cell(1, 4).paragraphs[0].add_run('Optativos')
+            cellp.add_run('Total').font.bold = True
+            table.cell(2, 0).paragraphs[0].add_run('Exigidos*').font.bold = True
+            table.cell(3, 0).paragraphs[0].add_run('Convalidados/Equivalentes').font.bold = True
+            table.cell(4, 0).paragraphs[0].add_run('Pendientes').font.bold = True
+            table.cell(1, 1).paragraphs[0].add_run('Obligatorios').font.bold = True
+            table.cell(1, 2).paragraphs[0].add_run('Optativos').font.bold = True
+            table.cell(1, 3).paragraphs[0].add_run('Obligatorios').font.bold = True
+            table.cell(1, 4).paragraphs[0].add_run('Optativos').font.bold = True
             table.cell(2, 1).paragraphs[0].add_run(request.detail_cm['resumen'][0][0])
             table.cell(2, 2).paragraphs[0].add_run(request.detail_cm['resumen'][0][1])
             table.cell(2, 3).paragraphs[0].add_run(request.detail_cm['resumen'][0][2])
@@ -146,6 +160,7 @@ class TRASPRE():
             table.cell(4, 4).paragraphs[0].add_run(request.detail_cm['resumen'][2][3])
             table.cell(4, 5).paragraphs[0].add_run(request.detail_cm['resumen'][2][4])
             table.cell(4, 6).paragraphs[0].add_run(str(int(request.detail_cm['resumen'][2][0])+int(request.detail_cm['resumen'][2][1])+int(request.detail_cm['resumen'][2][2])+int(request.detail_cm['resumen'][2][3])+int(request.detail_cm['resumen'][2][4])))
+            
             para = docx.add_paragraph()
             para.add_run('* Sin incluir los créditos correspondientes al cumplimiento del requisito de suficiencia en idioma extranjero.')
             para = docx.add_paragraph()
@@ -206,8 +221,9 @@ class TRASPRE():
             para = docx.add_paragraph()
             sum=0
             for i in request.detail_cm['pen_funda_obl']:
-               sum = sum + len(i)-1
-            table = docx.add_table(rows=sum+4, cols=5, style='Table Grid')
+                sum = sum+len(i['mat'])
+            sum2=len(request.detail_cm['pen_funda_opt'])
+            table = docx.add_table(rows=sum+7+sum2, cols=5, style='Table Grid')
             table.alignment=WD_ALIGN_PARAGRAPH.CENTER
             table.columns[0].width = 1300000
             table.columns[1].width = 700000
@@ -216,34 +232,157 @@ class TRASPRE():
             table.columns[4].width = 1000000
             cellp = table.cell(0, 0).merge(table.cell(0, 4)).paragraphs[0]
             cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            cellp.add_run('Componente de fundamentación').font.bold = True
+            cellp.add_run('Componente de fundamentación (B)').font.bold = True
             cellp = table.cell(1, 0).merge(table.cell(1, 4)).paragraphs[0]
             cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
             cellp.add_run('Obligatorias').font.bold = True
-            cellp = table.cell(1, 0).merge(table.cell(1, 4)).paragraphs[0]
+            cellp = table.cell(sum+3, 0).merge(table.cell(sum+3, 3)).paragraphs[0]
             cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            cellp.add_run('Obligatorias').font.bold = True
-            table.cell(1, 0).paragraphs[0].add_run('Agrupación')
-            table.cell(1, 1).paragraphs[0].add_run('Código')
-            table.cell(1, 2).paragraphs[0].add_run('Asignatura')
-            table.cell(1, 3).paragraphs[0].add_run('Créditos asignatura')
-            table.cell(1, 4).paragraphs[0].add_run('Créditos pendientes por cursar por el estudiante')
+            cellp.add_run('Total créditos pendientes').font.bold = True
+            cellp = table.cell(sum+4, 0).merge(table.cell(sum+4, 4)).paragraphs[0]
+            cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            cellp.add_run('Optativas').font.bold = True
+            cellp = table.cell(sum+5, 0).merge(table.cell(sum+5, 1)).paragraphs[0]
+            cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            cellp.add_run('Nombre de la Agrupación').font.bold = True
+            cellp = table.cell(sum+5, 2).merge(table.cell(sum+5, 3)).paragraphs[0]
+            cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            cellp.add_run('Créditos Requeridos').font.bold = True
+            cellp = table.cell(sum+sum2+6, 0).merge(table.cell(sum+sum2+6, 3)).paragraphs[0]
+            cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            cellp.add_run('Total créditos pendientes').font.bold = True
+            table.cell(2, 0).paragraphs[0].add_run('Agrupación')
+            table.cell(2, 1).paragraphs[0].add_run('Código')
+            table.cell(2, 2).paragraphs[0].add_run('Asignatura')
+            table.cell(2, 3).paragraphs[0].add_run('Créditos asignatura')
+            table.cell(2, 4).paragraphs[0].add_run('Créditos pendientes por cursar por el estudiante')
+            table.cell(sum+5, 4).paragraphs[0].add_run('Créditos pendientes por cursar por el estudiante').font.bold = True
             index=0
-            index2=1
-            for grupo in request.detail_cm['pen_funda_obl']:
-                print(grupo)
-                print(len(grupo))
-                cellp = table.cell(index+3, 0).merge(table.cell(index+3+len(grupo)-1, 0)).paragraphs[0]
-                cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                #cellp.add_run(request.detail_cm['pen_funda_obl'][grupo]['grup'])
-                index=index+len(grupo)
-                print(index)
+            creditosgrandes=0
+            for agrupacion in request.detail_cm['pen_funda_obl']:
+                if len(agrupacion['mat'])>=2:
+                    cellp = table.cell(index+3, 0).merge(table.cell(index+2+len(agrupacion['mat']), 0)).paragraphs[0]
+                    cellp.add_run(agrupacion['grup'])
+                    index1=0
+                    creditos=0
+                    for materia in agrupacion['mat']:
+                        table.cell(index+index1+3, 1).paragraphs[0].add_run(materia['cod'])
+                        table.cell(index+index1+3, 2).paragraphs[0].add_run(materia['mat'])
+                        table.cell(index+index1+3, 3).paragraphs[0].add_run(materia['cre'])
+                        index1=index1+1
+                        creditos=creditos+int(materia['cre'])
+                    cellp = table.cell(index+3, 4).merge(table.cell(index+2+len(agrupacion['mat']), 4)).paragraphs[0]
+                    cellp.add_run(str(creditos))
+                    creditosgrandes=creditosgrandes+creditos
+                else:
+                    table.cell(index+3, 0).paragraphs[0].add_run(agrupacion['grup'])
+                    table.cell(index+3, 1).paragraphs[0].add_run(agrupacion['mat'][0]['cod'])
+                    table.cell(index+3, 2).paragraphs[0].add_run(agrupacion['mat'][0]['mat'])
+                    table.cell(index+3, 3).paragraphs[0].add_run(agrupacion['mat'][0]['cre'])
+                    table.cell(index+3, 4).paragraphs[0].add_run(agrupacion['mat'][0]['cre'])
+                    creditosgrandes=creditosgrandes+int(agrupacion['mat'][0]['cre'])
+                index=index+len(agrupacion['mat'])
+            table.cell(sum+3, 4).paragraphs[0].add_run(str(creditosgrandes))
+            index=0
+            creditosgrandes=0
+            for agrupacion in request.detail_cm['pen_funda_opt']:
+                cellp = table.cell(sum+6+index, 0).merge(table.cell(sum+6+index, 1)).paragraphs[0]
+                cellp.add_run(agrupacion['agr'])
+                cellp = table.cell(sum+6+index, 2).merge(table.cell(sum+6+index, 3)).paragraphs[0]
+                cellp.add_run(agrupacion['req'])
+                table.cell(sum+6+index, 4).paragraphs[0].add_run(agrupacion['pen'])
+                index=index+1
+                creditosgrandes=creditosgrandes+int(agrupacion['pen'])
+            table.cell(sum+6+sum2, 4).paragraphs[0].add_run(str(creditosgrandes))
+            para = docx.add_paragraph()
 
-          #  table = docx.add_table(rows=len(request.detail_cm.pen_funda_obl['0'])+4, cols=5, style='Table Grid')
-           # table.alignment=WD_ALIGN_PARAGRAPH.CENTER
-            
-
-
-
+            sum=0
+            for i in request.detail_cm['pen_dis_obl']:
+                sum = sum+len(i['mat'])
+            sum2=len(request.detail_cm['pen_dis_opt'])
+            table = docx.add_table(rows=sum+7+sum2, cols=5, style='Table Grid')
+            table.alignment=WD_ALIGN_PARAGRAPH.CENTER
+            table.columns[0].width = 1300000
+            table.columns[1].width = 700000
+            table.columns[2].width = 1400000
+            table.columns[3].width = 1000000
+            table.columns[4].width = 1000000
+            cellp = table.cell(0, 0).merge(table.cell(0, 4)).paragraphs[0]
+            cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            cellp.add_run('Componente Disciplinar/Profesional (C)').font.bold = True
+            cellp = table.cell(1, 0).merge(table.cell(1, 4)).paragraphs[0]
+            cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            cellp.add_run('Obligatorias').font.bold = True
+            cellp = table.cell(sum+3, 0).merge(table.cell(sum+3, 3)).paragraphs[0]
+            cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            cellp.add_run('Total créditos pendientes').font.bold = True
+            cellp = table.cell(sum+4, 0).merge(table.cell(sum+4, 4)).paragraphs[0]
+            cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            cellp.add_run('Optativas').font.bold = True
+            cellp = table.cell(sum+5, 0).merge(table.cell(sum+5, 1)).paragraphs[0]
+            cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            cellp.add_run('Nombre de la Agrupación').font.bold = True
+            cellp = table.cell(sum+5, 2).merge(table.cell(sum+5, 3)).paragraphs[0]
+            cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            cellp.add_run('Créditos Requeridos').font.bold = True
+            cellp = table.cell(sum+sum2+6, 0).merge(table.cell(sum+sum2+6, 3)).paragraphs[0]
+            cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            cellp.add_run('Total créditos pendientes').font.bold = True
+            table.cell(2, 0).paragraphs[0].add_run('Agrupación')
+            table.cell(2, 1).paragraphs[0].add_run('Código')
+            table.cell(2, 2).paragraphs[0].add_run('Asignatura')
+            table.cell(2, 3).paragraphs[0].add_run('Créditos asignatura')
+            table.cell(2, 4).paragraphs[0].add_run('Créditos pendientes por cursar por el estudiante')
+            table.cell(sum+5, 4).paragraphs[0].add_run('Créditos pendientes por cursar por el estudiante').font.bold = True
+            index=0
+            creditosgrandes=0
+            for agrupacion in request.detail_cm['pen_dis_obl']:
+                if len(agrupacion['mat'])>=2:
+                    cellp = table.cell(index+3, 0).merge(table.cell(index+2+len(agrupacion['mat']), 0)).paragraphs[0]
+                    cellp.add_run(agrupacion['grup'])
+                    index1=0
+                    creditos=0
+                    for materia in agrupacion['mat']:
+                        table.cell(index+index1+3, 1).paragraphs[0].add_run(materia['cod'])
+                        table.cell(index+index1+3, 2).paragraphs[0].add_run(materia['mat'])
+                        table.cell(index+index1+3, 3).paragraphs[0].add_run(materia['cre'])
+                        index1=index1+1
+                        creditos=creditos+int(materia['cre'])
+                    cellp = table.cell(index+3, 4).merge(table.cell(index+2+len(agrupacion['mat']), 4)).paragraphs[0]
+                    cellp.add_run(str(creditos))
+                    creditosgrandes=creditosgrandes+creditos
+                else:
+                    table.cell(index+3, 0).paragraphs[0].add_run(agrupacion['grup'])
+                    table.cell(index+3, 1).paragraphs[0].add_run(agrupacion['mat'][0]['cod'])
+                    table.cell(index+3, 2).paragraphs[0].add_run(agrupacion['mat'][0]['mat'])
+                    table.cell(index+3, 3).paragraphs[0].add_run(agrupacion['mat'][0]['cre'])
+                    table.cell(index+3, 4).paragraphs[0].add_run(agrupacion['mat'][0]['cre'])
+                    creditosgrandes=creditosgrandes+int(agrupacion['mat'][0]['cre'])
+                index=index+len(agrupacion['mat'])
+            table.cell(sum+3, 4).paragraphs[0].add_run(str(creditosgrandes))
+            index=0
+            creditosgrandes=0
+            for agrupacion in request.detail_cm['pen_dis_opt']:
+                cellp = table.cell(sum+6+index, 0).merge(table.cell(sum+6+index, 1)).paragraphs[0]
+                cellp.add_run(agrupacion['agr'])
+                cellp = table.cell(sum+6+index, 2).merge(table.cell(sum+6+index, 3)).paragraphs[0]
+                cellp.add_run(agrupacion['req'])
+                table.cell(sum+6+index, 4).paragraphs[0].add_run(agrupacion['pen'])
+                index=index+1
+                creditosgrandes=creditosgrandes+int(agrupacion['pen'])
+            table.cell(sum+6+sum2, 4).paragraphs[0].add_run(str(creditosgrandes))
+            para = docx.add_paragraph()
+            table = docx.add_table(rows=1, cols=2, style='Table Grid')
+            table.alignment=WD_ALIGN_PARAGRAPH.CENTER
+            table.columns[0].width = 4300000
+            table.columns[1].width = 1000000
+            table.cell(0, 0).paragraphs[0].add_run('Componente de Libre Elección (L) (Créditos pendientes)').font.bold = True
+            table.cell(0, 1).paragraphs[0].add_run(request.detail_cm['pen_lib'])
+            para = docx.add_paragraph()
+            para.alignment=WD_ALIGN_PARAGRAPH.JUSTIFY
+            para.add_run('La oferta de asignaturas optativas en cada una de las agrupaciones y componentes ')
+            para.add_run('del plan de estudios del programa de ' + request.detail_cm['origin'] + ', la ')
+            para.add_run('encuentra en el Acuerdo ' + request.detail_cm['normativa'] + ', expedido por el ')
+            para.add_run('consejo de la Facultad de Ingeniería.')
         else:
            para.add_run('NO APRUEBA').font.bold = True
