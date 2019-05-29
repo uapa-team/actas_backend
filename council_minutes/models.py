@@ -236,7 +236,7 @@ class Request(DynamicDocument):
         (PROGRAM_INGENIERIA_CIVIL, 'Ingeniería Civil'),
         (PROGRAM_INGENIERIA_QUIMICA, 'Ingeniería Química'),
         (PROGRAM_INGENIERIA_MECANICA, 'Ingeniería Mecánica'),
-        (PROGRAM_INGENIERIA_AGRICOLA, 'Ingniería Agrícola'),
+        (PROGRAM_INGENIERIA_AGRICOLA, 'Ingeniería Agrícola'),
         (PROGRAM_INGENIERIA_ELECTRICA, 'Ingeniería Eléctrica'),
         (PROGRAM_INGENIERIA_INDUSTRIAL, 'Ingeniería Industrial'),
         (PROGRAM_INGENIERIA_MECATRONICA, 'Ingeniería Mecatrónica'),
