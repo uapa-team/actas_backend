@@ -128,3 +128,20 @@ class simple():
         else:
            para.add_run('NO APRUEBA').font.bold = True
            para.add_run(' eliminar la historia académica BAPI, debido a que ' + request.justification+'.')
+
+    @staticmethod    
+    def case_RESERVA_DE_CUPO_ADICIONAL_PREGRADO(request, docx):
+        para = docx.add_paragraph()
+        para.add_run('El Consejo de Facultad ')
+        if request.approval_status == 'AP':
+            para.add_run('APRUEBA ').font.bold = True
+        else:
+            para.add_run('NO APRUEBA ').font.bold = True
+        para.add_run(request.detail_cm['index'] + ' reserva de cupo adicional en el periodo académico ')
+        para.add_run(request.academic_period)
+        if request.approval_status == 'AP':
+            para.add_run(', debido a que justifica debidamente la solicitud.')
+        else:
+            para.add_run(', debido a que ' + request.justification)
+        para.add_run(' (Artículo 20 del Acuerdo 008 de 2008 del Consejo Superior Universitario.)')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY

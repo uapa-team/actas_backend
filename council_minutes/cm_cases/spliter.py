@@ -129,7 +129,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_RESERVA_DE_CUPO_ADICIONAL_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_RESERVA_DE_CUPO_ADICIONAL_PREGRADO(request, docx)
 
     def case_CANCELACION_DE_ASIGNATURAS_PREGRADO(self, request, docx):
         CASIPRE.case_CANCELACION_DE_ASIGNATURAS_PREGRADO(request, docx)
