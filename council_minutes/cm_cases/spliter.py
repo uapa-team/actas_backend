@@ -158,7 +158,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_DEVOLUCION_PROPORCIONAL_DEL_VALOR_PAGADO_POR_CONCEPTO_DE_DERECHOS_DE_MATRICULA_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_DEVOLUCION_PROPORCIONAL_DEL_VALOR_PAGADO_POR_CONCEPTO_DE_DERECHOS_DE_MATRICULA_PREGRADO(request, docx)
 
     def case_TRASLADO_POSGRADO(self, request, docx):
         raise NotImplementedError
