@@ -45,5 +45,17 @@ class simple():
         para.add_run(' derechos académicos y administrativos para el periodo académico ')
         para.add_run(request.academic_period + ' debido a que ')
         para.add_run(request.justification + '.')
+
+    @staticmethod
+    def case_REEMBOLSO_PREGRADO(request, docx):
+        para = docx.add_paragraph()
+        para.add_run('El Consejo de Facultad ')
+        if request.approval_status == 'AP':
+            para.add_run('APRUEBA').font.bold = True
+        else:
+            para.add_run('NO APRUEBA ').font.bold = True
+            para.add_run('reembolsar {} créditos al estudiante {}'.format(request.detail_cm['credits'], request.justification))
+
+
         
     

@@ -83,7 +83,7 @@ class CasesSpliter():
         simple.case_REINGRESO_PREGRADO(request, docx)
 
     def case_REEMBOLSO_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_REEMBOLSO_PREGRADO(request, docx)
 
     def case_CONCEPTO_CSU_PREGRADO(self, request, docx):
         raise NotImplementedError
