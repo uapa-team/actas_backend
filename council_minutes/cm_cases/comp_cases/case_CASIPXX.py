@@ -1,38 +1,49 @@
 from docx import Document
 from ...models import Request
+from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
-class CASIPRE():
+class CASIPXX():
 
     @staticmethod
-    def case_CANCELACION_DE_ASIGNATURAS_PREGRADO(request, docx):
+    def case_CANCELACION_DE_ASIGNATURAS(request, docx):
         para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
-            CASIPRE.case_CANCELACION_DE_ASIGNATURAS_PREGRADO_AP(request, docx, para)
+            CASIPXX.case_CANCELACION_DE_ASIGNATURAS_AP(request, docx, para)
         else:
-            CASIPRE.case_CANCELACION_DE_ASIGNATURAS_PREGRADO_NAP(request, docx, para)
+            CASIPXX.case_CANCELACION_DE_ASIGNATURAS_NAP(request, docx, para)
 
     @staticmethod
-    def case_CANCELACION_DE_ASIGNATURAS_PREGRADO_AP(request, docx, paragraph):
+    def case_CANCELACION_DE_ASIGNATURAS_AP(request, docx, paragraph):
         paragraph.add_run('APRUEBA').font.bold = True
         paragraph.add_run(' cancelar la(s) siguiente(s) asignatura(s) inscrita(s) del periodo académico ')
         paragraph.add_run(request.academic_period + ', porque justifica debidamente la solicitud.')
         paragraph.add_run(' (Artículo 15 Acuerdo 008 de 2008 del Consejo Superior Universitario).')
-        CASIPRE.case_CANCELACION_DE_ASIGNATURAS_PREGRADO_TABLE(request, docx)
+        CASIPXX.case_CANCELACION_DE_ASIGNATURAS_TABLE(request, docx)
 
     @staticmethod
-    def case_CANCELACION_DE_ASIGNATURAS_PREGRADO_NAP(request, docx, paragraph):
+    def case_CANCELACION_DE_ASIGNATURAS_NAP(request, docx, paragraph):
         paragraph.add_run('NO APRUEBA').font.bold = True
         paragraph.add_run(' cancelar la(s) siguiente(s) asignatura(s) inscrita(s) del periodo académico')
         paragraph.add_run(request.academic_period + ', porque ' + request.justification + '. ')
         paragraph.add_run('(Artículo 15 Acuerdo 008 de 2008 del Consejo Superior Universitario).')
-        CASIPRE.case_CANCELACION_DE_ASIGNATURAS_PREGRADO_TABLE(request, docx)
+        CASIPXX.case_CANCELACION_DE_ASIGNATURAS_TABLE(request, docx)
 
     @staticmethod
-    def case_CANCELACION_DE_ASIGNATURAS_PREGRADO_TABLE(request, docx):
-        table = docx.add_table(rows=len(request.detail_cm['subjects'])+1, cols=5, style='Table Grid')
+    def case_CANCELACION_DE_ASIGNATURAS_TABLE(request, docx):
+        table = docx.add_table(rows=len(request.detail_cm['subjects'])+1, cols=5)
+        table.style='Table Grid'
+        table.style.font.size = Pt(9)
+        table.alignment=WD_ALIGN_PARAGRAPH.CENTER
+        table.columns[0].width = 700000
+        table.columns[1].width = 2000000
+        table.columns[2].width = 900000
+        table.columns[3].width = 900000
+        table.columns[4].width = 900000
+
+
         cellp = table.cell(0, 0).paragraphs[0]
         cellp.add_run('Código SIA').font.bold = True
         cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -46,11 +57,11 @@ class CASIPRE():
         cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
         cellp = table.cell(0, 3).paragraphs[0]
-        cellp.add_run('T').font.bold = True
+        cellp.add_run('Tipología').font.bold = True
         cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
         cellp = table.cell(0, 4).paragraphs[0]
-        cellp.add_run('C').font.bold = True
+        cellp.add_run('Créditos').font.bold = True
         cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
         index = 0
