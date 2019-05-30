@@ -90,7 +90,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_CAMBIO_DE_GRUPO_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_CAMBIO_DE_GRUPO_PREGRADO(request, docx)
 
     def case_TRABAJO_DE_GRADO_PREGADO(self, request, docx):
         raise NotImplementedError
