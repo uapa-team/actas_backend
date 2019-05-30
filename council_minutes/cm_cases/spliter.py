@@ -1,5 +1,6 @@
 from .comp_cases.case_HOIDPRE import HOIDPRE
 from .comp_cases.case_CASIPRE import CASIPRE
+from .comp_cases.case_CGRUPXX import CGRUPXX
 from .comp_cases.case_simple  import simple
 
 
@@ -90,7 +91,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_CAMBIO_DE_GRUPO_PREGRADO(self, request, docx):
-        simple.case_CAMBIO_DE_GRUPO_PREGRADO(request, docx)
+        CGRUPXX.case_CAMBIO_DE_GRUPO(request, docx)
 
     def case_TRABAJO_DE_GRADO_PREGADO(self, request, docx):
         raise NotImplementedError
@@ -174,7 +175,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_CAMBIO_DE_GRUPO_POSGRADO(self, request, docx):
-        raise NotImplementedError
+        CGRUPXX.case_CAMBIO_DE_GRUPO(request, docx)
 
     def case_CAMBIO_DE_PERFIL_POSGRADO(self, request, docx):
         simple.case_CAMBIO_DE_PERFIL_POSGRADO(request, docx)
