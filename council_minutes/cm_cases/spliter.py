@@ -1,5 +1,6 @@
 from .comp_cases.case_HOIDPRE import HOIDPRE
 from .comp_cases.case_CASIPRE import CASIPRE
+from .comp_cases.case_IASIPRE import IASIPRE
 from .comp_cases.case_simple  import simple
 
 
@@ -138,7 +139,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_INSCRIPCION_DE_ASIGNATURAS_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        IASIPRE.case_INSCRIPCION_DE_ASIGNATURAS_PREGRADO(request, docx)
 
     def case_RETIRO_DEFINITIVO_DEL_PROGRAMA_PREGRADO(self, request, docx):
         raise NotImplementedError
