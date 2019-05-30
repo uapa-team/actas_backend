@@ -2,7 +2,7 @@ from docx import Document
 from docx.shared import Pt
 from ...models import Request
 from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_LINE_SPACING
-from docx.enum.table import WD_ALIGN_VERTICAL, WD_ROW_HEIGHT_RULE
+from docx.enum.table import WD_ALIGN_VERTICAL, WD_ROW_HEIGHT_RULE, WD_TABLE_ALIGNMENT
 
 class REINPRE():
 
@@ -98,38 +98,54 @@ class REINPRE():
         table.style.font.size = Pt(8)
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.columns[0].width = 400000
-        table.columns[1].width = 2800000
-        table.columns[2].width = 2000000
+        table.columns[1].width = 3200000
+        table.columns[2].width = 1600000
         table.cell(0, 0).merge(table.cell(0, 1)).paragraphs[0].add_run('Periodo para el cual fue admitido en este plan de estudios')
         table.cell(0, 2).paragraphs[0].add_run(request.detail_cm['per_admi'])
+        table.cell(0, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(1, 0).merge(table.cell(1, 1)).paragraphs[0].add_run('¿Se trata de un primer reingreso?')
         table.cell(1, 2).paragraphs[0].add_run(request.detail_cm['first_reingreso'])
+        table.cell(1, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(2, 0).merge(table.cell(2, 2)).paragraphs[0].add_run('Si la respuesta es NO, el Comité Asesor no debe recomendar al Consejo de Facultad el reingreso')
         table.cell(3, 0).merge(table.cell(3, 1)).paragraphs[0].add_run('Es caso de ser primer reingreso en ¿qué periodo académico perdió la calidad de estudiante?')
         table.cell(3, 2).paragraphs[0].add_run(request.detail_cm['per_perd'])
+        table.cell(3, 2).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+        table.cell(3, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(4, 0).merge(table.cell(4, 1)).paragraphs[0].add_run('Al momento de presentar la solicitud ¿cuántos periodos académicos (incluido el periodo académico en que presentó la solicitud) han transcurridos a partir del periodo académico en que registró su última matrícula?')
         table.cell(4, 2).paragraphs[0].add_run(request.detail_cm['per_transc'])
+        table.cell(4, 2).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+        table.cell(4, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(5, 0).merge(table.cell(5, 2)).paragraphs[0].add_run('En caso que la respuesta sea mayor de 6 periodos académicos no se debe recomendar el reingreso')
         table.cell(6, 0).merge(table.cell(6, 1)).paragraphs[0].add_run('P.A.P.A.')
         table.cell(6, 2).paragraphs[0].add_run(request.detail_cm['PAPA'])
+        table.cell(6, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(7, 0).merge(table.cell(7, 1)).paragraphs[0].add_run('Causa de la pérdida de la calidad de estudiante')
+        table.cell(7, 0).merge(table.cell(7, 1)).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         table.cell(7, 2).paragraphs[0].add_run(request.detail_cm['causa_perd'])
-        table.cell(8, 0).merge(table.cell(8, 2)).paragraphs[0].add_run('Estudios de créditos').font.bold = True
+        table.cell(7, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(8, 0).merge(table.cell(8, 2)).paragraphs[0].add_run('Estudio de créditos').font.bold = True
+        table.cell(9, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(9, 0).paragraphs[0].add_run('1').font.bold = True
+        table.cell(10, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(10, 0).paragraphs[0].add_run('2').font.bold = True
+        table.cell(11, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(11, 0).paragraphs[0].add_run('3').font.bold = True
+        table.cell(12, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(12, 0).paragraphs[0].add_run('4').font.bold = True
         table.cell(9, 1).paragraphs[0].add_run('Cupo de créditos menos créditos pendientes')
         table.cell(10, 1).paragraphs[0].add_run('Créditos pendientes por ser aprobados del plan de estudios')
         table.cell(11, 1).paragraphs[0].add_run('Créditos pendientes por ser aprobados de nivelación – Inglés')
         table.cell(12, 1).paragraphs[0].add_run('¿Cuántos créditos adicionales requiere para inscribir asignaturas?')
         table.cell(9, 2).paragraphs[0].add_run(request.detail_cm['creds_minus_remaining'])
+        table.cell(9, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(10, 2).paragraphs[0].add_run(request.detail_cm['creds_remaining'])
+        table.cell(10, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(11, 2).paragraphs[0].add_run(request.detail_cm['creds_ingl'])
+        table.cell(11, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(12, 2).paragraphs[0].add_run(request.detail_cm['creds_add'])
+        table.cell(12, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         para = docx.add_paragraph()
         para.paragraph_format.space_after = Pt(0)
-        para.add_run('\n')
         table = docx.add_table(rows=5, cols=2)
         table.style='Table Grid'
         table.style.font.size = Pt(8)
@@ -148,7 +164,6 @@ class REINPRE():
         table.cell(2, 1).paragraphs[0].add_run(REINPRE.compute_semestral_avg(approved, 15, request.detail_cm['PAPA']))
         table.cell(3, 1).paragraphs[0].add_run(REINPRE.compute_semestral_avg(approved, 18, request.detail_cm['PAPA']))
         table.cell(4, 1).paragraphs[0].add_run(REINPRE.compute_semestral_avg(approved, 21, request.detail_cm['PAPA']))
-        table.cell(1, 0).paragraphs[0].add_run(request.detail_cm['per_admi'])
         para = docx.add_paragraph()
         bullet = para.add_run('3. Resumen general de créditos del plan de estudios')
         para.paragraph_format.space_after = Pt(0)
