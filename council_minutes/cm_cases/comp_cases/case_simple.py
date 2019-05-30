@@ -1,6 +1,7 @@
 from docx import Document
 from ...models import Request
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.shared import Pt
 
 class simple():
 
@@ -158,3 +159,52 @@ class simple():
             para.add_run(', debido a que ' + request.justification)
         para.add_run(' (Artículo 20 del Acuerdo 008 de 2008 del Consejo Superior Universitario.)')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+
+    @staticmethod
+    def case_CAMBIO_DE_TIPOLOGIA_PREGRADO(request,docx):
+        large_program = ''
+        for p in Request.PROGRAM_CHOICES:
+            if p[0] == request.academic_program:
+                large_program = p[1]
+                break
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('El Consejo de Facultad ')
+        if request.approval_status == 'AP':
+            para.add_run('APRUEBA ').font.bold = True
+        else:
+            para.add_run('NO APRUEBA ').font.bold = True
+        para.add_run('cambiar de componente la(s) siguiente(s) asignatura(s) del programa ' + large_program)
+        if request.approval_status == 'AP':
+            para.add_run(', cursada en el periodo académico ')
+            para.add_run(request.detail_cm['periodo'] + ' así:')
+        else:
+            para.add_run(', debido a que ' +request.justification +'.')
+        table = docx.add_table(rows=len(request.detail_cm['subjects'])+1, cols=5)
+        table.alignment=WD_ALIGN_PARAGRAPH.CENTER
+        table.style='Table Grid'
+        table.style.font.size = Pt(9)
+        table.columns[0].width = 700000
+        table.columns[1].width = 2000000
+        table.columns[2].width = 600000
+        table.columns[3].width = 1050000
+        table.columns[4].width = 1050000
+        table.cell(0, 0).paragraphs[0].add_run('Código').font.bold = True
+        table.cell(0, 1).paragraphs[0].add_run('Asignatura').font.bold = True
+        table.cell(0, 2).paragraphs[0].add_run('Nota').font.bold = True
+        table.cell(0, 3).paragraphs[0].add_run('Componente Registrado').font.bold = True
+        if request.approval_status == 'AP':
+            table.cell(0, 4).paragraphs[0].add_run('Nuevo Componente').font.bold = True
+        else:
+            table.cell(0, 4).paragraphs[0].add_run('Componente Solicitado').font.bold = True
+        index = 0
+        for subject in request.detail_cm['subjects']:
+            table.cell(index+1, 0).paragraphs[0].add_run(subject['cod'])
+            table.cell(index+1, 1).paragraphs[0].add_run(subject['subject'])
+            table.cell(index+1, 2).paragraphs[0].add_run(subject['nota'])
+            table.cell(index+1, 3).paragraphs[0].add_run(subject['to'])
+            table.cell(index+1, 4).paragraphs[0].add_run(subject['td'])
+            index = index + 1
+        para = docx.add_paragraph()
+        
+        
