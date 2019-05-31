@@ -125,7 +125,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_CREDITOS_EXCEDENTES_MAPI_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_CREDITOS_EXCEDENTES_MAPI_PREGRADO(request, docx)
 
     def case_MODIFICACION_DE_DECISION_PREGRADO(self, request, docx):
         raise NotImplementedError

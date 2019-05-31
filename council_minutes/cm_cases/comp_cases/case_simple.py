@@ -324,3 +324,21 @@ class simple():
         para.add_run('voluntario del programa ' + request.get_academic_program_display() + ' (' + request.academic_program + ').')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         #No encuentro ningún caso en el que se presente un concepto negativo para este caso o que no se apruebe
+
+    @staticmethod
+    def case_CREDITOS_EXCEDENTES_MAPI_PREGRADO(request, docx):
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('El Consejo de Facultad ')
+        if request.approval_status == 'AP':
+            para.add_run('APRUEBA ').font.bold = True
+        else:
+            para.add_run('NO APRUEBA ').font.bold = True
+        para.add_run('trasladar ' + request.detail_cm['credits'] +' crédito(s) aprobado(s) en ')
+        para.add_run(request.detail_cm['program'])
+        if request.approval_status != 'AP':
+            para.add_run(' debido a que ' + request.justification)
+            return
+        para.add_run(' exigidos por la asignatura Trabajo de Grado, el cual se asumirá como crédito inscrito y aprobado del ')
+        para.add_run('componente de libre elección, si en este componente aún hay créditos por ser aprobados. ')
+        para.add_run('(Artículo 16 del Acuerdo 026 de 2012 del Consejo Académico)')
