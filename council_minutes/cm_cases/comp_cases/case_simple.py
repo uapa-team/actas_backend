@@ -164,13 +164,16 @@ class simple():
         para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('El Consejo de Facultad ')
-        #common = 'Cambiar objetivos de Tesis de {} a: “{}”'
+        common = 'cambiar objetivos de Tesis de {} a: “{}”'
         if request.approval_status == 'AP':
             para.add_run('APRUEBA ').font.bold = True
-            para.add_run('Cambiar objetivos de Tesis de {} a: “{}”'.format(request.get_academic_program_display(),request.detail_cm['title']))
+            para.add_run(common.format(request.get_academic_program_display(),request.detail_cm['title']))
+            if request.observation:
+                para.add_run(', ' + request.observation)
         else:
             para.add_run('NO APRUEBA ').font.bold = True
-            para.add_run('Cambiar objetivos de Tesis de {} a: “{}”, debido a que {}'.format(request.get_academic_program_display(),request.detail_cm['title'], request.justification))
-
+            para.add_run(common.format(request.get_academic_program_display(),request.detail_cm['title']))
+            para.add_run(', debido a que {}'.format(request.justification))
+        para.add_run('.')
         
         
