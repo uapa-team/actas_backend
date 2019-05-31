@@ -243,7 +243,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_MODIFICACION_DE_OBJETIVOS_DE_TESIS_PROPUESTA_POSGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_MODIFICACION_DE_OBJETIVOS_DE_TESIS_PROPUESTA_POSGRADO(request, docx)
 
     def case_RECURSO_DE_REPOSICION_CON_SUBSIDIO_DE_APELACION_POSGRADO(self, request, docx):
         raise NotImplementedError

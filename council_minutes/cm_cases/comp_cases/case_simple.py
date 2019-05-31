@@ -158,3 +158,19 @@ class simple():
             para.add_run(', debido a que ' + request.justification)
         para.add_run(' (Artículo 20 del Acuerdo 008 de 2008 del Consejo Superior Universitario.)')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+
+    @staticmethod
+    def case_MODIFICACION_DE_OBJETIVOS_DE_TESIS_PROPUESTA_POSGRADO(request, docx):
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('El Consejo de Facultad ')
+        #common = 'Cambiar objetivos de Tesis de {} a: “{}”'
+        if request.approval_status == 'AP':
+            para.add_run('APRUEBA ').font.bold = True
+            para.add_run('Cambiar objetivos de Tesis de {} a: “{}”'.format(request.get_academic_program_display(),request.detail_cm['title']))
+        else:
+            para.add_run('NO APRUEBA ').font.bold = True
+            para.add_run('Cambiar objetivos de Tesis de {} a: “{}”, debido a que {}'.format(request.get_academic_program_display(),request.detail_cm['title'], request.justification))
+
+        
+        
