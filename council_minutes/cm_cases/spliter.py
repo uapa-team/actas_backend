@@ -1,4 +1,6 @@
 from .comp_cases.case_HOIDPRE import HOIDPRE
+from .comp_cases.case_CASIPRE import CASIPRE
+from .comp_cases.case_REINPRE import REINPRE
 from .comp_cases.case_simple  import simple
 
 
@@ -80,7 +82,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_REINGRESO_PREGRADO(self, request, docx):
-        simple.case_REINGRESO_PREGRADO(request, docx)
+        REINPRE.case_REINGRESO_PREGRADO(request, docx)
 
     def case_REEMBOLSO_PREGRADO(self, request, docx):
         simple.case_REEMBOLSO_PREGRADO(request, docx)
@@ -116,7 +118,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_DEVOLUCION_DE_CREDITOS_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_DEVOLUCION_DE_CREDITOS_PREGRADO(request, docx)
 
     def case_DESISTIMIENTO_MOVILIDAD_PREGRADO(self, request, docx):
         raise NotImplementedError
@@ -128,10 +130,10 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_RESERVA_DE_CUPO_ADICIONAL_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_RESERVA_DE_CUPO_ADICIONAL_PREGRADO(request, docx)
 
     def case_CANCELACION_DE_ASIGNATURAS_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        CASIPRE.case_CANCELACION_DE_ASIGNATURAS_PREGRADO(request, docx)
 
     def case_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO(self, request, docx):
         raise NotImplementedError
@@ -146,25 +148,25 @@ class CasesSpliter():
         simple.case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO(request, docx)
 
     def case_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD_PREGRADO(request, docx)
 
     def case_HOMOLOGACION_CONVALIDACION_EQUIVALENCIA_PREGRADO(self, request, docx):
         raise NotImplementedError
 
     def case_ELIMINACION_DE_LA_HISTORIA_ACADEMICA_BAPI_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_ELIMINACION_DE_LA_HISTORIA_ACADEMICA_BAPI_PREGRADO(request, docx)
 
     def case_RECURSO_DE_REPOSICION_CON_SUBSIDIO_DE_APELACION_PREGRADO(self, request, docx):
         raise NotImplementedError
 
     def case_DEVOLUCION_PROPORCIONAL_DEL_VALOR_PAGADO_POR_CONCEPTO_DE_DERECHOS_DE_MATRICULA_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_DEVOLUCION_PROPORCIONAL_DEL_VALOR_PAGADO_POR_CONCEPTO_DE_DERECHOS_DE_MATRICULA_PREGRADO(request, docx)
 
     def case_TRASLADO_POSGRADO(self, request, docx):
         raise NotImplementedError
 
     def case_REEMBOLSO_POSGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_REEMBOLSO_POSGRADO(request, docx)
 
     def case_REINGRESO_POSGRADO(self, request, docx):
         raise NotImplementedError
@@ -191,7 +193,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_ADMISION_AUTOMATICA_POSGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_ADMISION_AUTOMATICA_POSGRADO(request, docx)
 
     def case_EVALUADOR_ADICIONAL_POSGRADO(self, request, docx):
         raise NotImplementedError
@@ -251,7 +253,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_EXENCION_DE_PAGO_POR_CREDITOS_SOBRANTES_DE_PREGRADO_POSGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_EXENCION_DE_PAGO_POR_CREDITOS_SOBRANTES_DE_PREGRADO_POSGRADO(request, docx)
 
     def case_AMPLIACION_DE_LA_FECHA_DE_PAGO_DE_DERECHOS_ACADEMICOS_POSGRADO(self, request, docx):
         simple.case_AMPLIACION_DE_LA_FECHA_DE_PAGO_DE_DERECHOS_ACADEMICOS_POSGRADO(request, docx)
