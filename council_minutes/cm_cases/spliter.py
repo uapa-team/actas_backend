@@ -105,7 +105,7 @@ class CasesSpliter():
         HOIDPRE.case_HOMOLOGACION_INGLES_PREGRADO(request, docx)
 
     def case_CAMBIO_DE_TIPOLOGIA_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_CAMBIO_DE_TIPOLOGIA_PREGRADO(request,docx)
 
     def case_RECURSO_DE_APELACION_PREGRADO(self, request, docx):
         raise NotImplementedError
