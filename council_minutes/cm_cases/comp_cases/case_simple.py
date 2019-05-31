@@ -483,3 +483,23 @@ class simple():
             para.add_run(common + information)
             para.add_run(', debido a que {}'.format(request.justification)) 
         para.add_run('.')
+
+    @staticmethod            
+    def case_EVALUADOR_ADICIONAL_POSGRADO(request, docx):
+        para = docx.add_paragraph()
+        para.add_run('El Consejo de Facultad ')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        common = 'designar evaluador adicional del Trabajo Final de {}, cuyo título es: “{}”, al profesor {}'.format(request.get_academic_program_display(),request.detail_cm['title'], request.detail_cm['professor_name'])
+        if request.detail_cm['professor_faculty']:
+            information = ' del Departamento {} de la Facultad de {}'.format(request.detail_cm['professor_department'], request.detail_cm['professor_faculty'])
+        if request.detail_cm['professor_university']:
+            information =  ' de la {}'.format(request.detail_cm['professor_university']) 
+        if request.approval_status == 'AP':
+            para.add_run('APRUEBA ').font.bold = True
+            para.add_run(common + information)
+            para.add_run(', quien deberá dirimir la diferencia calificando el trabajo final como aprobado o reprobado. (Acuerdo 56 de 2012 Consejo Superior Universitario)')
+        else:
+            para.add_run('NO APRUEBA ').font.bold = True
+            para.add_run(common + information)
+            para.add_run(', debido a que {}'.format(request.justification))
+        para.add_run('.')
