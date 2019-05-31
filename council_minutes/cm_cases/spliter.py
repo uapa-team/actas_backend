@@ -85,7 +85,7 @@ class CasesSpliter():
         REINPRE.case_REINGRESO_PREGRADO(request, docx)
 
     def case_REEMBOLSO_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_REEMBOLSO_PREGRADO(request, docx)
 
     def case_CONCEPTO_CSU_PREGRADO(self, request, docx):
         raise NotImplementedError
@@ -268,7 +268,7 @@ class CasesSpliter():
         simple.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO(request, docx)
 
     def case_EXENCION_DE_PAGO_POR_CURSAR_TESIS_COMO_UNICA_ACTIVIDAD_ACADEMICA_POSGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_EXENCION_DE_PAGO_POR_CURSAR_TESIS_COMO_UNICA_ACTIVIDAD_ACADEMICA_POSGRADO(request, docx)
 
     def case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO(self, request, docx):
         raise NotImplementedError
