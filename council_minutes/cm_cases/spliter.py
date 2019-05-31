@@ -1,6 +1,7 @@
 from .comp_cases.case_HOIDPRE import HOIDPRE
 from .comp_cases.case_CASIPRE import CASIPRE
 from .comp_cases.case_REINPRE import REINPRE
+from .comp_cases.case_PESTPRE import PESTPRE
 from .comp_cases.case_simple  import simple
 
 
@@ -112,7 +113,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_PRACTICA_ESTUDIANTIL_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        PESTPRE.case_PRACTICA_ESTUDIANTIL_PREGRADO(request, docx)
 
     def case_RECURSO_DE_REPOSICION_PREGRADO(self, request, docx):
         raise NotImplementedError
