@@ -71,15 +71,18 @@ class simple():
     @staticmethod
     def case_GENERACION_DE_RECIBO_UNICO_DE_PAGO_POSGRADO(request, docx):
         para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('El Consejo de Facultad ')
+        common = 'presentar con concepto {} al Comité de Matrículas de la Sede Bogotá, la expedición de un único recibo correspondiente a saldos pendientes de matrícula para el periodo académico {}'
         if request.approval_status == 'AP':
             para.add_run('APRUEBA ').font.bold = True
             #No se si siempre es "porque se justifica debidamente la solicitud" o si existen más casos
-            para.add_run('presentar con concepto {} al Comité de Matrículas de la Sede Bogotá, la expedición de un único recibo correspondiente a saldos pendientes de matrícula para el periodo académico {}, porque justifica debidamente la solicitud. {}'.format(request.detail_cm['concept'],request.academic_period, request.observation)) 
+            para.add_run(common.format(request.detail_cm['concept'],request.academic_period))
+            para.add_run(', porque justifica debidamente la solicitud. {}'.format(request.observation)) 
         else:
-            #¿Los NA van con concepto (presentar con concepto negativo o posito)?
             para.add_run('NO APRUEBA ').font.bold = True
-            para.add_run('la expedición de un único recibo correspondiente a saldos pendientes de matrícula para el periodo académico {}, debido a que {}.'.format(request.academic_period, request.justification))
+            para.add_run(common.format(request.detail_cm['concept'],request.academic_period))
+            para.add_run(', debido a que {}.'.format(request.justification))
         
     @staticmethod
     def case_EXENCION_DE_PAGO_POR_CREDITOS_SOBRANTES_DE_PREGRADO_POSGRADO(request, docx):
