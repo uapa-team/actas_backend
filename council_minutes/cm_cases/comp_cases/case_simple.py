@@ -158,3 +158,30 @@ class simple():
             para.add_run(', debido a que ' + request.justification)
         para.add_run(' (Artículo 20 del Acuerdo 008 de 2008 del Consejo Superior Universitario.)')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+
+    @staticmethod
+    def case_TRANSITO_ENTRE_PROGRAMAS_POSGRADO(request, docx):
+        large_program = ''
+        for p in Request.PROGRAM_CHOICES:
+            if p[0] == request.academic_program:
+                large_program = p[1]
+                break
+        large_program2 = ''
+        for p in Request.PROGRAM_CHOICES:
+            if p[0] == request.detail_cm['origen']:
+                large_program2 = p[1]
+                break
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('El Consejo de Facultad ')
+        if request.approval_status == 'AP':
+            para.add_run('APRUEBA ').font.bold = True
+        else:
+            para.add_run('NO APRUEBA ').font.bold = True
+        para.add_run('tránsito del programa ' + large_program2 + ' al programa de ' + large_program)
+        if request.approval_status == 'AP':
+            para.add_run(', a partir del periodo académico ' + request.detail_cm['desde'] + ' (Artículo 3, Resolución 241 de ')
+            para.add_run('2009 de la Vicerrectoría Académica).')
+        else:
+            para.add_run(' porque ' + request.justification + '.')
+
