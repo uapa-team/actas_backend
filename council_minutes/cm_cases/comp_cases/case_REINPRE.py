@@ -69,6 +69,11 @@ class REINPRE():
         cellp.add_run('REINGRESO\n').font.bold = True
         cellp.add_run('Normativa Asociada: Articulo 46 del Acuerdo 008 de 2008 del CSU')
         cellp.add_run(' y Resolución 012 de 2014 de VRA')
+        table.cell(1, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(2, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(3, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(4, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(5, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(1, 0).paragraphs[0].add_run('1').font.bold = True
         table.cell(1, 1).paragraphs[0].add_run('Estudiante')
         table.cell(1, 2).paragraphs[0].add_run(request.student_name)
