@@ -54,8 +54,19 @@ class simple():
             para.add_run('APRUEBA').font.bold = True
         else:
             para.add_run('NO APRUEBA ').font.bold = True
-            para.add_run('reembolsar {} créditos al estudiante {}'.format(request.detail_cm['credits'], request.justification))
+            para.add_run('reembolsar {} créditos al estudiante, debido a que {}'.format(request.detail_cm['credits'], request.justification))
 
+    @staticmethod
+    def case_EXENCION_DE_PAGO_POR_CURSAR_TESIS_COMO_UNICA_ACTIVIDAD_ACADEMICA_POSGRADO(request, docx):
+        para = docx.add_paragraph()
+        para.add_run('El Consejo de Facultad ')
+        if request.approval_status == 'AP':
+            para.add_run('APRUEBA').font.bold = True
+            # ¿Los dos periodos mencionados siempre son iguales?
+            para.add_run('pago de {} puntos por derechos académicos en el periodo académico {}, condicionado a la inscripción de trabajo final de {} como única actividad académica en el periodo {}.'.format(request.detail_cm['points'], request.academic_period,request.get_academic_program_display(), request.academic_period))
+        else:
+            para.add_run('NO APRUEBA ').font.bold = True
+            para.add_run('pago de {} puntos por derechos académicos en el periodo académico {}, condicionado a la inscripción de trabajo final de {} como única actividad académica en el periodo {}, debido a que {}.'.format(request.detail_cm['points'], request.academic_period,request.get_academic_program_display(), request.academic_period, request.justification))
 
         
     
