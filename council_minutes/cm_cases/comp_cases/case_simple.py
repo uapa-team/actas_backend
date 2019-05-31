@@ -21,4 +21,5 @@ class simple():
             para.add_run('designar codirector de Tesis de {} con título “{}” aprobado en el Acta No. {}, al profesor/a {} de la {}'.format(request.get_academic_program_display(),request.detail_cm['title'], request.detail_cm['minutes_approved'], request.detail_cm['professor_name'], request.detail_cm['professor_university']))
         else:
             para.add_run('NO APRUEBA ').font.bold = True
+            para.add_run('designar codirector de Tesis de {} con título “{}” aprobado en el Acta No. {}, al profesor/a {} de la {}, debido a que {}'.format(request.get_academic_program_display(),request.detail_cm['title'], request.detail_cm['minutes_approved'], request.detail_cm['professor_name'], request.detail_cm['professor_university'], request.justification))
             
