@@ -247,7 +247,12 @@ class simple():
         para.add_run(request.detail_cm['per_assig'] + '.')
 
     @staticmethod
-    def case_CREDITOS_EXCEDENTES_MAPI_PREGRADO(request, docx):
+    def case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO(request, docx):
+        large_program = ''
+        for p in Request.PROGRAM_CHOICES:
+            if p[0] == request.academic_program:
+                large_program = p[1]
+                break
         para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('El Consejo de Facultad ')
@@ -320,7 +325,11 @@ class simple():
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         #No encuentro ningún caso en el que se presente un concepto negativo para este caso o que no se apruebe
 
+<<<<<<< HEAD
      @staticmethod
+=======
+    @staticmethod
+>>>>>>> fb9f23f
     def case_CREDITOS_EXCEDENTES_MAPI_PREGRADO(request, docx):
         para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
@@ -336,4 +345,8 @@ class simple():
             return
         para.add_run(' exigidos por la asignatura Trabajo de Grado, el cual se asumirá como crédito inscrito y aprobado del ')
         para.add_run('componente de libre elección, si en este componente aún hay créditos por ser aprobados. ')
+<<<<<<< HEAD
         para.add_run('(Artículo 16 del Acuerdo 026 de 2012 del Consejo Académico)')
+=======
+        para.add_run('(Artículo 16 del Acuerdo 026 de 2012 del Consejo Académico)')
+>>>>>>> fb9f23f
