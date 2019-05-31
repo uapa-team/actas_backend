@@ -26,7 +26,7 @@ SECRET_KEY = '2d=v4-s%^4(#u+4o$wz*y*stng(i4pq)gv8k38gof=a(mcjzq_'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [os.environ.get('ACTAS_HOST')]
 
 
 # Application definition

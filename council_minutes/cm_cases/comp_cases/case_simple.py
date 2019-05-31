@@ -280,3 +280,20 @@ class simple():
             para.add_run(request.detail_cm['doc2_dep'])
         elif request.detail_cm['doc2_un'] == 'No':
             para.add_run(' de la ' + request.detail_cm['doc2_univ'] + '.')
+    
+    @staticmethod
+    def case_MODIFICACION_DE_OBJETIVOS_DE_TESIS_PROPUESTA_POSGRADO(request, docx):
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('El Consejo de Facultad ')
+        common = 'cambiar objetivos de Tesis de {} a: “{}”'
+        if request.approval_status == 'AP':
+            para.add_run('APRUEBA ').font.bold = True
+            para.add_run(common.format(request.get_academic_program_display(),request.detail_cm['title']))
+            if request.observation:
+                para.add_run(', ' + request.observation)
+        else:
+            para.add_run('NO APRUEBA ').font.bold = True
+            para.add_run(common.format(request.get_academic_program_display(),request.detail_cm['title']))
+            para.add_run(', debido a que {}'.format(request.justification))
+        para.add_run('.')

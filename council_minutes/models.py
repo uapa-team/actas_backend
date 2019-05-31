@@ -10,13 +10,13 @@ class Request(DynamicDocument):
     TYPE_CAMBIO_DE_GRUPO_PREGRADO = 'CGRUPRE'
     TYPE_TRABAJO_DE_GRADO_PREGADO = 'TGRAPRE'
     TYPE_DOBLE_TITULACION_PREGRADO = 'DTITPRE'
-    TYPE_HOMOLOGACION_INGLES_PREGRADO = 'HOIDPRE'
     TYPE_CAMBIO_DE_TIPOLOGIA_PREGRADO = 'CTIPPRE'
     TYPE_RECURSO_DE_APELACION_PREGRADO = 'REAPPRE'
     TYPE_EXPEDICION_DE_RECIBO_PREGRADO = 'EREPPRE'
     TYPE_PRACTICA_ESTUDIANTIL_PREGRADO = 'PESTPRE'
     TYPE_RECURSO_DE_REPOSICION_PREGRADO = 'RREPPRE'
     TYPE_DEVOLUCION_DE_CREDITOS_PREGRADO = 'DCREPRE'
+    TYPE_HOMOLOGACION_DE_IDIOMA_PREGRADO = 'HOIDPRE'
     TYPE_DESISTIMIENTO_MOVILIDAD_PREGRADO = 'DMOVPRE'
     TYPE_CREDITOS_EXCEDENTES_MAPI_PREGRADO = 'CMAPPRE'
     TYPE_MODIFICACION_DE_DECISION_PREGRADO = 'MDECPRE'
@@ -67,7 +67,7 @@ class Request(DynamicDocument):
     TYPE_APROBACION_PROYECTO_PROPUESTA_Y_DESIGNACION_DE_DIRECTOR_POSGRADO = 'APGDPOS'
     TYPE_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO = 'DJCTPOS'
     TYPE_EXENCION_DE_PAGO_POR_CURSAR_TESIS_COMO_UNICA_ACTIVIDAD_ACADEMICA_POSGRADO = 'EPTUPOS'
-    TYPE_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO = 'DJCPOS'
+    TYPE_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO = 'DJCPPOS'
     TYPE_CHOICES = (
         (TYPE_TRASLADO_PREGRADO, 'Traslado (Pregrado)'),
         (TYPE_REINGRESO_PREGRADO, 'Reingreso (Pregrado)'),
@@ -82,6 +82,7 @@ class Request(DynamicDocument):
         (TYPE_RECURSO_DE_APELACION_PREGRADO, 'Recurso de apelación (Pregrado)'),
         (TYPE_RECURSO_DE_REPOSICION_PREGRADO, 'Recurso de reposición (Pregrado)'),
         (TYPE_DEVOLUCION_DE_CREDITOS_PREGRADO, 'Devolución de créditos (Pregrado)'),
+        (TYPE_HOMOLOGACION_DE_IDIOMA_PREGRADO, 'Homologación de idioma (Pregrado)'),
         (TYPE_DESISTIMIENTO_MOVILIDAD_PREGRADO, 'Desistimiento movilidad (Pregrado)'),
         (TYPE_CREDITOS_EXCEDENTES_MAPI_PREGRADO, 'Créditos excedentes MAPI (Pregrado)'),
         (TYPE_MODIFICACION_DE_DECISION_PREGRADO, 'Modificación de decisión (Pregrado)'),
@@ -234,7 +235,7 @@ class Request(DynamicDocument):
         (PROGRAM_INGENIERIA_CIVIL, 'Ingeniería Civil'),
         (PROGRAM_INGENIERIA_QUIMICA, 'Ingeniería Química'),
         (PROGRAM_INGENIERIA_MECANICA, 'Ingeniería Mecánica'),
-        (PROGRAM_INGENIERIA_AGRICOLA, 'Ingniería Agrícola'),
+        (PROGRAM_INGENIERIA_AGRICOLA, 'Ingeniería Agrícola'),
         (PROGRAM_INGENIERIA_ELECTRICA, 'Ingeniería Eléctrica'),
         (PROGRAM_INGENIERIA_INDUSTRIAL, 'Ingeniería Industrial'),
         (PROGRAM_INGENIERIA_MECATRONICA, 'Ingeniería Mecatrónica'),
@@ -290,11 +291,13 @@ class Request(DynamicDocument):
         (PROGRAM_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_ODONTOLOGIA, 'Modalidad de Asignaturas de Posgrado Facultad de Odontología'),
     )
     date = DateField(required=True, default=datetime.date.today)
-    type = StringField(max_length=256, required=True, default='')
-    student_name = StringField(max_length=512, required=True, default='')
-    approval_status = StringField(min_length=2, max_length=2, choices=APPROVAL_STATUS_CHOICES, required=True, default='')
-    student_dni = StringField(max_length=22, required=True, default='')
-    student_dni_type = StringField(min_length=2, choices=DNI_TYPE_CHOICES, required=True, default='')
-    academic_period = StringField(max_length=10, required=True, default='')
-    academic_program = StringField(min_length=4, max_length=4, choices=PROGRAM_CHOICES, required=True, default='')
-    justification = StringField(max_length = 255, required=True, default='')
+    type = StringField(max_length=7, choices=TYPE_CHOICES, required=True)
+    student_name = StringField(max_length=512, required=True)
+    approval_status = StringField(min_length=2, max_length=2, choices=APPROVAL_STATUS_CHOICES, required=True, default=APPROVAL_STATUS_EN_ESPERA)
+    student_dni = StringField(max_length=22, required=True)
+    student_dni_type = StringField(min_length=2, choices=DNI_TYPE_CHOICES, required=True, default=DNI_TYPE_CEDULA_DE_CIUDADANIA)
+    academic_period = StringField(max_length=10, required=True)
+    academic_program = StringField(min_length=4, max_length=4, choices=PROGRAM_CHOICES, required=True)
+    justification = StringField(max_length=255, required=True, default='')
+    user = StringField(max_length=255, required=True)
+    date_stamp = DateField(required=True, default=datetime.date.today)
