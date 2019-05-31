@@ -158,3 +158,17 @@ class simple():
             para.add_run(', debido a que ' + request.justification)
         para.add_run(' (Artículo 20 del Acuerdo 008 de 2008 del Consejo Superior Universitario.)')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+
+
+    @staticmethod            
+    def case_EVALUADOR_ADICIONAL_POSGRADO(request, docx):
+        para = docx.add_paragraph()
+        para.add_run('El Consejo de Facultad ')
+        if request.approval_status == 'AP':
+            para.add_run('APRUEBA ').font.bold = True
+            # ¿Un evaluador puede ser de otra universidad?
+            para.add_run('designar evaluador adicional del Trabajo Final de {}, cuyo título es: “{}”, al profesor {} del {} de la Facultad de {}, quien deberá dirimir la diferencia calificando el trabajo final como aprobado o reprobado. (Acuerdo 56 de 2012 Consejo Superior Universitario)'.format(request.get_academic_program_display(),request.detail_cm['title'], request.detail_cm['professor_name'], request.detail_cm['professor_departament'], request.detail_cm['professor_faculty']))
+        else:
+            para.add_run('NO APRUEBA ').font.bold = True
+            para.add_run('designar evaluador adicional del Trabajo Final de {}, cuyo título es: “{}”, al profesor {} del {} de la Facultad de {}, debido a que {}'.format(request.get_academic_program_display(),request.detail_cm['title'], request.detail_cm['professor_name'], request.detail_cm['professor_departament'], request.detail_cm['professor_faculty'], request.justification))
+        

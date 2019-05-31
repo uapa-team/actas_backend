@@ -195,7 +195,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_EVALUADOR_ADICIONAL_POSGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_EVALUADOR_ADICIONAL_POSGRADO(request, docx)
 
     def case_CAMBIO_DE_TIPOLOGIA_POSGRADO(self, request, docx):
         raise NotImplementedError
