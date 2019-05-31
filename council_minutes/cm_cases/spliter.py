@@ -166,7 +166,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_REEMBOLSO_POSGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_REEMBOLSO_POSGRADO(request, docx)
 
     def case_REINGRESO_POSGRADO(self, request, docx):
         raise NotImplementedError

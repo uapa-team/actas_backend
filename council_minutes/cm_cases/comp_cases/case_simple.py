@@ -1,5 +1,6 @@
 from docx import Document
 from ...models import Request
+from num2words import num2words  ##pip install num2words
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 class simple():
@@ -32,6 +33,7 @@ class simple():
                 large_program = p[1]
                 break
         para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA').font.bold = True
@@ -47,6 +49,7 @@ class simple():
     @staticmethod
     def case_AMPLIACION_DE_LA_FECHA_DE_PAGO_DE_DERECHOS_ACADEMICOS_POSGRADO(request, docx):
         para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA').font.bold = True
@@ -145,6 +148,7 @@ class simple():
     @staticmethod    
     def case_RESERVA_DE_CUPO_ADICIONAL_PREGRADO(request, docx):
         para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA ').font.bold = True
@@ -158,3 +162,22 @@ class simple():
             para.add_run(', debido a que ' + request.justification)
         para.add_run(' (Artículo 20 del Acuerdo 008 de 2008 del Consejo Superior Universitario.)')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+
+    @staticmethod
+    def case_REEMBOLSO_POSGRADO(request, docx):
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('El Consejo de Facultad ')
+        if request.approval_status == 'AP':
+            para.add_run('APRUEBA ').font.bold = True
+        else:
+            para.add_run('NO APRUEBA ').font.bold = True
+        para.add_run('devolución proporcional del ' + num2words(float(request.detail_cm['percentaje']), lang='es'))
+        para.add_run(' por ciento (' + request.detail_cm['percentaje'] + '%) ')
+        para.add_run('del valor pagado por concepto de derechos de matrícula del periodo ')
+        para.add_run(request.detail_cm['period_cancel'])
+        para.add_run(', teniendo en cuenta la fecha de presentación de la solicitud y que le fue aprobada la cancelación de periodo en Acta 0')
+        para.add_run(request.detail_cm['acta_n'])
+        para.add_run(' de ' + request.detail_cm['acta_y'])
+        para.add_run(' de Consejo de Facultad. (Acuerdo 032 de 2010 del Consejo Superior ')
+        para.add_run('Universitario, Artículo 1 Resolución 1416 de 2013 de Rectoría).')
