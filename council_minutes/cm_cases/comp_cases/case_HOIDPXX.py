@@ -1,6 +1,7 @@
 from docx import Document
 from ...models import Request
-from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_LINE_SPACING
+from docx.enum.table import WD_ALIGN_VERTICAL, WD_ROW_HEIGHT_RULE, WD_TABLE_ALIGNMENT
 from docx.shared import Pt
 
 class HOIDPXX():
@@ -52,12 +53,27 @@ class HOIDPXX():
         cell = table.cell(1, 0).merge(table.cell(1, 4)).paragraphs[0]
         str_prog = 'Asignaturas a homologar en el plan de estudios {} ({})'
         cell.add_run(str_prog.format(request.get_academic_program_display(),request.academic_program)).font.bold = True
+
+        cellp = table.cell(1, 5).merge(table.cell(2, 5)).paragraphs[0]
+        cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(1, 5).merge(table.cell(2, 5)).paragraphs[0].add_run('Examen de inglés presentado').font.bold = True
-        table.cell(1, 6).merge(table.cell(2, 6)).paragraphs[0].add_run('Nota')
+        table.cell(1, 5).merge(table.cell(2, 5)).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+
+        cellp = table.cell(1, 6).merge(table.cell(2, 6)).paragraphs[0]
+        cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(1, 6).merge(table.cell(2, 6)).paragraphs[0].add_run('Nota').font.bold = True
+        table.cell(1, 6).merge(table.cell(2, 6)).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+
         cell = table.cell(3, 5).merge(table.cell(len(request.detail_cm['subjects'])+2, 5)).paragraphs[0]
+        cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
         cell.add_run(request.detail_cm['institution'])
+        table.cell(3, 5).merge(table.cell(len(request.detail_cm['subjects'])+2, 5)).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+
         cell= table.cell(3, 6).merge(table.cell(len(request.detail_cm['subjects'])+2, 6)).paragraphs[0]
+        cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
         cell.add_run(request.detail_cm['grade_got'])
+        table.cell(3, 6).merge(table.cell(len(request.detail_cm['subjects'])+2, 6)).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+        
         table.cell(2, 0).paragraphs[0].add_run('Código').font.bold = True
         table.cell(2, 1).paragraphs[0].add_run('Asignatura').font.bold = True
         table.cell(2, 2).paragraphs[0].add_run('C').font.bold = True
