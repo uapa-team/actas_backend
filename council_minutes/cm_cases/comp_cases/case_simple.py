@@ -431,3 +431,36 @@ class simple():
             para.add_run('2009 de la Vicerrectoría Académica).')
         else:
             para.add_run(' porque ' + request.justification + '.')
+
+    @staticmethod
+    def case_CAMBIO_DE_DIRECTIOR_CODIRECTOR_JURADO_O_EVALUADOR_POSGRADO(request, docx):
+        large_program = ''
+        for p in Request.PROGRAM_CHOICES:
+            if p[0] == request.academic_program:
+                large_program = p[1]
+                break
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('El Consejo de Facultad ')
+        if request.approval_status == 'AP':
+            para.add_run('APRUEBA ').font.bold = True
+        else:
+            para.add_run('NO APRUEBA ').font.bold = True
+        para.add_run('cambiar el(la) ' + request.detail_cm['rol'] + '(a) de')
+        if request.detail_cm['testra'] == 'Tesis':
+            para.add_run(' la Tesis de ')
+        else:
+            para.add_run('l Trabajo Final de ')
+        para.add_run(large_program + ', en reemplazo del(de la) profesor(a) ' + request.detail_cm['antiguo'])
+
+        if request.approval_status == 'AP':
+            para.add_run('; designa nuevo(a) ' + request.detail_cm['rol'] +'(a) de')
+            if request.detail_cm['testra'] == 'Tesis':
+                para.add_run(' la Tesis de ')
+            else:
+                para.add_run('l Trabajo Final de ')
+            para.add_run(large_program + ' cuyo título es: ')
+            para.add_run('"' + request.detail_cm['titulo'] + '"').font.italic = True
+            para.add_run(' al(a la) profesor(a) ' + request.detail_cm['nuevo'] + ' del ' + request.detail_cm['depto'] + '.')
+        else:
+            para.add_run(' porque ' + request.justification+ '.')
