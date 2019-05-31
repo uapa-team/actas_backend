@@ -34,10 +34,6 @@ class REINPRE():
             return ' de diciembre de '
 
     @staticmethod
-    def compute_semestral_avg(approved_c, creds_i, papa):
-        return str(round((3*(float(approved_c) + float(creds_i)) - float(papa) * float(approved_c)) / float(creds_i), 1))
-
-    @staticmethod
     def case_REINGRESO_PREGRADO(request, docx):
         large_program = ''
         for p in Request.PROGRAM_CHOICES:
@@ -147,68 +143,81 @@ class REINPRE():
         para = docx.add_paragraph()
         para.paragraph_format.space_after = Pt(0)
         table = docx.add_table(rows=5, cols=2)
-        table.style='Table Grid'
+        for col in table.columns:
+            for cell in col.cells:
+                cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.style = 'Table Grid'
         table.style.font.size = Pt(8)
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.columns[0].width = 3100000
         table.columns[1].width = 2100000
+        table.cell(0, 0).merge(table.cell(0, 1)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
         table.cell(0, 0).merge(table.cell(0, 1)).paragraphs[0].add_run('Al finalizar el semestre de reingreso para mantener la calidad de estudiante, deberá obtener un Promedio Semestral mínimo de:')
         table.cell(1, 0).paragraphs[0].add_run('Si inscribe 12 Créditos')
         table.cell(2, 0).paragraphs[0].add_run('Si inscribe 15 Créditos')
         table.cell(3, 0).paragraphs[0].add_run('Si inscribe 18 Créditos')
         table.cell(4, 0).paragraphs[0].add_run('Si inscribe 21 Créditos')
-        exiged = request.detail_cm['summary']['exiged']['fund_m'] + request.detail_cm['summary']['exiged']['fund_o'] + request.detail_cm['summary']['exiged']['disc_m'] + request.detail_cm['summary']['exiged']['disc_o'] + request.detail_cm['summary']['exiged']['free']
-        approved = request.detail_cm['summary']['approved']['fund_m'] + request.detail_cm['summary']['approved']['fund_o'] + request.detail_cm['summary']['approved']['disc_m'] + request.detail_cm['summary']['approved']['disc_o'] + request.detail_cm['summary']['approved']['free']
-        remaining = request.detail_cm['summary']['remaining']['fund_m'] + request.detail_cm['summary']['remaining']['fund_o'] + request.detail_cm['summary']['remaining']['disc_m'] + request.detail_cm['summary']['remaining']['disc_o'] + request.detail_cm['summary']['remaining']['free']
-        table.cell(1, 1).paragraphs[0].add_run(REINPRE.compute_semestral_avg(approved, 12, request.detail_cm['PAPA']))
-        table.cell(2, 1).paragraphs[0].add_run(REINPRE.compute_semestral_avg(approved, 15, request.detail_cm['PAPA']))
-        table.cell(3, 1).paragraphs[0].add_run(REINPRE.compute_semestral_avg(approved, 18, request.detail_cm['PAPA']))
-        table.cell(4, 1).paragraphs[0].add_run(REINPRE.compute_semestral_avg(approved, 21, request.detail_cm['PAPA']))
+        table.cell(1, 1).paragraphs[0].add_run(request.detail_cm['12c'])
+        table.cell(2, 1).paragraphs[0].add_run(request.detail_cm['15c'])
+        table.cell(3, 1).paragraphs[0].add_run(request.detail_cm['18c'])
+        table.cell(4, 1).paragraphs[0].add_run(request.detail_cm['21c'])
         para = docx.add_paragraph()
         bullet = para.add_run('3. Resumen general de créditos del plan de estudios')
         para.paragraph_format.space_after = Pt(0)
         bullet.font.bold = True
         bullet.font.size = Pt(8)
         table = docx.add_table(rows=5, cols=7)
-        table.style='Table Grid'
-        table.style.font.size = Pt(8)
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.columns[0].width = 400000
-        table.columns[1].width = 80000
-        table.columns[2].width = 80000
-        table.columns[3].width = 80000
-        table.columns[4].width = 80000
-        table.columns[5].width = 80000
-        table.columns[6].width = 80000
+        for col in table.columns:
+            for cell in col.cells:
+                cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.style = 'Table Grid'
+        table.style.font.size = Pt(8)
+        table.columns[0].width = 1610000
+        table.columns[1].width = 690000
+        table.columns[2].width = 610000
+        table.columns[3].width = 690000
+        table.columns[4].width = 610000
+        table.columns[5].width = 675000
+        table.columns[6].width = 375000
         table.cell(0, 0).merge(table.cell(1, 0)).paragraphs[0].add_run('Créditos')
+        table.cell(0, 0).merge(table.cell(1, 0)).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         table.cell(0, 1).merge(table.cell(0, 2)).paragraphs[0].add_run('Fundamentación (B)')
         table.cell(0, 3).merge(table.cell(0, 4)).paragraphs[0].add_run('Disciplinar (C)')
         table.cell(0, 5).merge(table.cell(1, 5)).paragraphs[0].add_run('Libre Elección (L)')
         table.cell(0, 6).merge(table.cell(1, 6)).paragraphs[0].add_run('Total')
-        table.cell(0, 0).paragraphs[0].add_run('Exigidos*')
-        table.cell(1, 0).paragraphs[0].add_run('Aprobados del plan de estudios')
-        table.cell(2, 0).paragraphs[0].add_run('Pendientes')
-        table.cell(0, 1).paragraphs[0].add_run(request.detail_cm['summary']['exiged']['fund_m'])
-        table.cell(1, 1).paragraphs[0].add_run(request.detail_cm['summary']['approved']['fund_m'])
-        table.cell(2, 1).paragraphs[0].add_run(request.detail_cm['summary']['remaining']['fund_m'])
-        table.cell(0, 2).paragraphs[0].add_run(request.detail_cm['summary']['exiged']['fund_o'])
-        table.cell(1, 2).paragraphs[0].add_run(request.detail_cm['summary']['approved']['fund_o'])
-        table.cell(2, 2).paragraphs[0].add_run(request.detail_cm['summary']['remaining']['fund_o'])
-        table.cell(0, 3).paragraphs[0].add_run(request.detail_cm['summary']['exiged']['disc_m'])
-        table.cell(1, 3).paragraphs[0].add_run(request.detail_cm['summary']['approved']['disc_m'])
-        table.cell(2, 3).paragraphs[0].add_run(request.detail_cm['summary']['remaining']['disc_m'])
-        table.cell(0, 4).paragraphs[0].add_run(request.detail_cm['summary']['exiged']['disc_o'])
-        table.cell(1, 4).paragraphs[0].add_run(request.detail_cm['summary']['approved']['disc_o'])
-        table.cell(2, 4).paragraphs[0].add_run(request.detail_cm['summary']['remaining']['disc_o'])
-        table.cell(0, 5).paragraphs[0].add_run(request.detail_cm['summary']['exiged']['free'])
-        table.cell(1, 5).paragraphs[0].add_run(request.detail_cm['summary']['approved']['free'])
-        table.cell(2, 5).paragraphs[0].add_run(request.detail_cm['summary']['remaining']['free'])
-        table.cell(0, 6).paragraphs[0].add_run(exiged)
-        table.cell(0, 6).paragraphs[0].add_run(approved)
-        table.cell(0, 6).paragraphs[0].add_run(remaining)
+        table.cell(0, 6).merge(table.cell(1, 6)).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+        table.cell(2, 0).paragraphs[0].add_run('Exigidos*')
+        table.cell(3, 0).paragraphs[0].add_run('Aprobados del plan de estudios')
+        table.cell(4, 0).paragraphs[0].add_run('Pendientes')
+        table.cell(1, 1).paragraphs[0].add_run('Obligatorios')
+        table.cell(1, 2).paragraphs[0].add_run('Optativos')
+        table.cell(1, 3).paragraphs[0].add_run('Obligatorios')
+        table.cell(1, 4).paragraphs[0].add_run('Optativos')
+        table.cell(2, 1).paragraphs[0].add_run(request.detail_cm['summary']['exiged']['fund_m'])
+        table.cell(3, 1).paragraphs[0].add_run(request.detail_cm['summary']['approved']['fund_m'])
+        table.cell(4, 1).paragraphs[0].add_run(request.detail_cm['summary']['remaining']['fund_m'])
+        table.cell(2, 2).paragraphs[0].add_run(request.detail_cm['summary']['exiged']['fund_o'])
+        table.cell(3, 2).paragraphs[0].add_run(request.detail_cm['summary']['approved']['fund_o'])
+        table.cell(4, 2).paragraphs[0].add_run(request.detail_cm['summary']['remaining']['fund_o'])
+        table.cell(2, 3).paragraphs[0].add_run(request.detail_cm['summary']['exiged']['disc_m'])
+        table.cell(3, 3).paragraphs[0].add_run(request.detail_cm['summary']['approved']['disc_m'])
+        table.cell(4, 3).paragraphs[0].add_run(request.detail_cm['summary']['remaining']['disc_m'])
+        table.cell(2, 4).paragraphs[0].add_run(request.detail_cm['summary']['exiged']['disc_o'])
+        table.cell(3, 4).paragraphs[0].add_run(request.detail_cm['summary']['approved']['disc_o'])
+        table.cell(4, 4).paragraphs[0].add_run(request.detail_cm['summary']['remaining']['disc_o'])
+        table.cell(2, 5).paragraphs[0].add_run(request.detail_cm['summary']['exiged']['free'])
+        table.cell(3, 5).paragraphs[0].add_run(request.detail_cm['summary']['approved']['free'])
+        table.cell(4, 5).paragraphs[0].add_run(request.detail_cm['summary']['remaining']['free'])
+        exiged = int(request.detail_cm['summary']['exiged']['fund_m']) + int(request.detail_cm['summary']['exiged']['fund_o']) + int(request.detail_cm['summary']['exiged']['disc_m']) + int(request.detail_cm['summary']['exiged']['disc_o']) + int(request.detail_cm['summary']['exiged']['free'])
+        approved = int(request.detail_cm['summary']['approved']['fund_m']) + int(request.detail_cm['summary']['approved']['fund_o']) + int(request.detail_cm['summary']['approved']['disc_m']) + int(request.detail_cm['summary']['approved']['disc_o']) + int(request.detail_cm['summary']['approved']['free'])
+        remaining = int(request.detail_cm['summary']['remaining']['fund_m']) + int(request.detail_cm['summary']['remaining']['fund_o']) + int(request.detail_cm['summary']['remaining']['disc_m']) + int(request.detail_cm['summary']['remaining']['disc_o']) + int(request.detail_cm['summary']['remaining']['free'])
+        table.cell(2, 6).paragraphs[0].add_run(str(exiged))
+        table.cell(3, 6).paragraphs[0].add_run(str(approved))
+        table.cell(4, 6).paragraphs[0].add_run(str(remaining))
         para = docx.add_paragraph()
         para.paragraph_format.space_after = Pt(0)
-        para.add_run('*Sin incluir los créditos correspondientes al cumplimiento del requisito de suficiencia en idioma.')
+        para.add_run('     *Sin incluir los créditos correspondientes al cumplimiento del requisito de suficiencia en idioma.').font.size = Pt(8)
         table = docx.add_table(rows=1, cols=5)
         table.style='Table Grid'
         table.style.font.size = Pt(8)
@@ -218,12 +227,17 @@ class REINPRE():
         table.columns[2].width = 300000
         table.columns[3].width = 800000
         table.columns[4].width = 300000
-        table.cell(0, 0).paragraphs[0].add_run('El Comité Asesor de Eléctrica en sesión del día ')
+        table.cell(0, 0).paragraphs[0].add_run('El Comité Asesor de ' + request.detail_cm['commite_name'] + ' en sesión del día ')
         table.cell(0, 0).paragraphs[0].add_run(str(request.detail_cm['comite_date'].day) + REINPRE.num_to_month(request.detail_cm['comite_date'].month) + str(request.detail_cm['comite_date'].year))
+        table.cell(0, 0).paragraphs[0].add_run('. Acta ' + request.detail_cm['comite_acta'] + '.')
         table.cell(0, 1).paragraphs[0].add_run('Recomienda')
+        table.cell(0, 1).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         table.cell(0, 3).paragraphs[0].add_run('No Recomienda')
+        table.cell(0, 3).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         if request.detail_cm['reccomend'] == 'true':
             table.cell(0, 2).paragraphs[0].add_run('X')
         else:
             table.cell(0, 4).paragraphs[0].add_run('X')
+        table.cell(0, 2).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+        table.cell(0, 4).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         
