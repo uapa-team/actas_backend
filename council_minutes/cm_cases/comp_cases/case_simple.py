@@ -200,3 +200,21 @@ class simple():
         para.add_run(' a partir del periodo académico ')
         para.add_run(request.detail_cm['ing_period'])
         para.add_run('. (Acuerdo 070 de 2009 de Consejo Académico y literal c, Artículo 57 del Acuerdo 008 de 2008 del Consejo Superior Universitario.).')
+
+    @staticmethod
+    def case_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD_PREGRADO(request, docx):
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('El Consejo de Facultad ')
+        if request.approval_status == 'AP':
+            para.add_run('APRUEBA ').font.bold = True
+        else:
+            para.add_run('NO APRUEBA ').font.bold = True
+        para.add_run('calificar ')
+        if request.detail_cm['cal'] == 'AP':
+            para.add_run('aprobada (AP) ')
+        else:
+            para.add_run('no aprobada (NA) ')
+        para.add_run('la asignatura ' + request.detail_cm['cod_assig'] + ' - ')
+        para.add_run(request.detail_cm['nomb_assig'] + ' en el periodo ')
+        para.add_run(request.detail_cm['per_assig'] + '.')
