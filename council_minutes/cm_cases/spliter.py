@@ -265,7 +265,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO(request, docx)
 
     def case_EXENCION_DE_PAGO_POR_CURSAR_TESIS_COMO_UNICA_ACTIVIDAD_ACADEMICA_POSGRADO(self, request, docx):
         raise NotImplementedError

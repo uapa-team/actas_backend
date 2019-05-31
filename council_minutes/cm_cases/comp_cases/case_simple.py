@@ -218,3 +218,38 @@ class simple():
         para.add_run('la asignatura ' + request.detail_cm['cod_assig'] + ' - ')
         para.add_run(request.detail_cm['nomb_assig'] + ' en el periodo ')
         para.add_run(request.detail_cm['per_assig'] + '.')
+
+    @staticmethod
+    def case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO(request, docx):
+        large_program = ''
+        for p in Request.PROGRAM_CHOICES:
+            if p[0] == request.academic_program:
+                large_program = p[1]
+                break
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('El Consejo de Facultad ')
+        if request.approval_status == 'AP':
+            para.add_run('APRUEBA ').font.bold = True
+        else:
+            para.add_run('NO APRUEBA ').font.bold = True
+        para.add_run('designar en el jurado calificador de')
+        if request.detail_cm['tesis_trabajo'] == 'Trabajo Final':
+            para.add_run('l Trabajo Final de ' + request.detail_cm['nivel_pos'] + ' de ')
+        elif request.detail_cm['tesis_trabajo'] == 'Tesis': 
+            para.add_run(' la Tesis de ' + request.detail_cm['nivel_pos'] + ' de ')
+        para.add_run(large_program)
+        para.add_run(', cuyo título es: "')
+        para.add_run(request.detail_cm['tittle']).font.italic = True
+        para.add_run('", al profesor(a) ' + request.detail_cm['doc1_nom'])
+        if request.detail_cm['doc1_un'] == 'Sí':
+            para.add_run(' de la Universidad Nacional de Colombia de la dependencia: ')
+            para.add_run(request.detail_cm['doc1_dep'])
+        elif request.detail_cm['doc1_un'] == 'No':
+            para.add_run(' de la' + request.detail_cm['doc1_univ'])
+        para.add_run(' y al profesor(a) ' + request.detail_cm['doc1_nom'])
+        if request.detail_cm['doc2_un'] == 'Sí':
+            para.add_run(' de la Universidad Nacional de Colombia de la dependencia: ')
+            para.add_run(request.detail_cm['doc2_dep'])
+        elif request.detail_cm['doc2_un'] == 'No':
+            para.add_run(' de la ' + request.detail_cm['doc2_univ'] + '.')
