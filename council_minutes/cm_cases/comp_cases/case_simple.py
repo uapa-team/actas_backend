@@ -503,3 +503,35 @@ class simple():
             para.add_run(common + information)
             para.add_run(', debido a que {}'.format(request.justification))
         para.add_run('.')
+
+    @staticmethod
+    def case_APROBACION_PROYECTO_PROPUESTA_Y_DESIGNACION_DE_DIRECTOR_POSGRADO(request, docx):
+        large_program = ''
+        for p in Request.PROGRAM_CHOICES:
+            if p[0] == request.academic_program:
+                large_program = p[1]
+                break
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('El Consejo de Facultad ')
+        if request.approval_status == 'AP':
+            para.add_run('APRUEBA: ').font.bold = True
+        else:
+            para.add_run('NO APRUEBA: ').font.bold = True
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('1. Calificación Aprobada (AP) a ' + request.detail_cm['testra'] + ' de ' + large_program + ', cuyo título es: ')
+        para.add_run('"' + request.detail_cm['titulo'] + '".').font.italic = True
+        if request.approval_status == 'AP':
+            para = docx.add_paragraph()
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            para.add_run('2. Designar director(a) de')
+            if request.detail_cm['testra']=='Tesis de Maestría':
+                para.add_run(' la Tesis de ')
+            else:
+                para.add_run('l Trabajo Final de ').font.bold = True
+            para.add_run(large_program + ' cuyo título es: ')
+            para.add_run('"' + request.detail_cm['titulo'] + '"').font.italic = True
+            para.add_run(' al(a la) profesor(a) ' + request.detail_cm['prof'] + ' del ' + request.detail_cm['depto'] + '.')
+
+        
