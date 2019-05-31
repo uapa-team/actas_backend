@@ -233,7 +233,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_GENERACION_DE_RECIBO_UNICO_DE_PAGO_POSGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_GENERACION_DE_RECIBO_UNICO_DE_PAGO_POSGRADO(request, docx)
 
     def case_MODIFICACION_DE_JURADOS_CALIFICADORES_POSGRADO(self, request, docx):
         raise NotImplementedError

@@ -87,6 +87,21 @@ class simple():
             para.add_run(', debido a que {}'.format(request.justification))
         para.add_run('.')
 
+    @staticmethod
+    def case_GENERACION_DE_RECIBO_UNICO_DE_PAGO_POSGRADO(request, docx):
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('El Consejo de Facultad ')
+        common = 'presentar con concepto {} al Comité de Matrículas de la Sede Bogotá, la expedición de un único recibo correspondiente a saldos pendientes de matrícula para el periodo académico {}'
+        if request.approval_status == 'AP':
+            para.add_run('APRUEBA ').font.bold = True
+            #No se si siempre es "porque se justifica debidamente la solicitud" o si existen más casos
+            para.add_run(common.format(request.detail_cm['concept'],request.academic_period))
+            para.add_run(', porque justifica debidamente la solicitud. {}'.format(request.observation)) 
+        else:
+            para.add_run('NO APRUEBA ').font.bold = True
+            para.add_run(common.format(request.detail_cm['concept'],request.academic_period))
+            para.add_run(', debido a que {}.'.format(request.justification))
         
     @staticmethod
     def case_EXENCION_DE_PAGO_POR_CREDITOS_SOBRANTES_DE_PREGRADO_POSGRADO(request, docx):
@@ -325,11 +340,7 @@ class simple():
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         #No encuentro ningún caso en el que se presente un concepto negativo para este caso o que no se apruebe
 
-<<<<<<< HEAD
-     @staticmethod
-=======
     @staticmethod
->>>>>>> fb9f23f
     def case_CREDITOS_EXCEDENTES_MAPI_PREGRADO(request, docx):
         para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
@@ -345,8 +356,4 @@ class simple():
             return
         para.add_run(' exigidos por la asignatura Trabajo de Grado, el cual se asumirá como crédito inscrito y aprobado del ')
         para.add_run('componente de libre elección, si en este componente aún hay créditos por ser aprobados. ')
-<<<<<<< HEAD
         para.add_run('(Artículo 16 del Acuerdo 026 de 2012 del Consejo Académico)')
-=======
-        para.add_run('(Artículo 16 del Acuerdo 026 de 2012 del Consejo Académico)')
->>>>>>> fb9f23f
