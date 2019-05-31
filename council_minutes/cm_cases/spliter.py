@@ -136,7 +136,7 @@ class CasesSpliter():
         CASIPRE.case_CANCELACION_DE_ASIGNATURAS_PREGRADO(request, docx)
 
     def case_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO(request, docx)
 
     def case_INSCRIPCION_DE_ASIGNATURAS_PREGRADO(self, request, docx):
         raise NotImplementedError
