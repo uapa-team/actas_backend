@@ -2,6 +2,7 @@ from .comp_cases.case_HOIDPRE import HOIDPRE
 from .comp_cases.case_CASIPRE import CASIPRE
 from .comp_cases.case_REINPRE import REINPRE
 from .comp_cases.case_PESTPRE import PESTPRE
+from .comp_cases.case_TRASPRE import TRASPRE
 from .comp_cases.case_simple  import simple
 
 
@@ -80,7 +81,7 @@ class CasesSpliter():
         return self.cases[request.type](request, docx)
 
     def case_TRASLADO_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        TRASPRE.case_TRASLADO_PREGRADO(request, docx)
 
     def case_REINGRESO_PREGRADO(self, request, docx):
         REINPRE.case_REINGRESO_PREGRADO(request, docx)
