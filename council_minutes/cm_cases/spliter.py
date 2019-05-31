@@ -212,7 +212,7 @@ class CasesSpliter():
         simple.case_TRANSITO_ENTRE_PROGRAMAS_POSGRADO(request, docx)
 
     def case_DESIGNACION_DE_CODIRECTOR_POSGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_DESIGNACION_DE_CODIRECTOR_POSGRADO(request, docx)
 
     def case_RESERVA_DE_CUPO_ADICIONAL_POSGRADO(self, request, docx):
         raise NotImplementedError
