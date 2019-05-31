@@ -3,6 +3,7 @@ from .comp_cases.case_CASIPRE import CASIPRE
 from .comp_cases.case_REINPRE import REINPRE
 from .comp_cases.case_PESTPRE import PESTPRE
 from .comp_cases.case_TRASPRE import TRASPRE
+from .comp_cases.case_IASIPRE import IASIPRE
 from .comp_cases.case_simple  import simple
 
 
@@ -141,7 +142,7 @@ class CasesSpliter():
         simple.case_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO(request, docx)
 
     def case_INSCRIPCION_DE_ASIGNATURAS_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        IASIPRE.case_INSCRIPCION_DE_ASIGNATURAS_PREGRADO(request, docx)
 
     def case_RETIRO_DEFINITIVO_DEL_PROGRAMA_PREGRADO(self, request, docx):
         simple.case_RETIRO_DEFINITIVO_DEL_PROGRAMA_PREGRADO(request, docx)
