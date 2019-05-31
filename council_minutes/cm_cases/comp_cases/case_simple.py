@@ -247,12 +247,7 @@ class simple():
         para.add_run(request.detail_cm['per_assig'] + '.')
 
     @staticmethod
-    def case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO(request, docx):
-        large_program = ''
-        for p in Request.PROGRAM_CHOICES:
-            if p[0] == request.academic_program:
-                large_program = p[1]
-                break
+    def case_CREDITOS_EXCEDENTES_MAPI_PREGRADO(request, docx):
         para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('El Consejo de Facultad ')
@@ -260,23 +255,11 @@ class simple():
             para.add_run('APRUEBA ').font.bold = True
         else:
             para.add_run('NO APRUEBA ').font.bold = True
-        para.add_run('designar en el jurado calificador de')
-        if request.detail_cm['tesis_trabajo'] == 'Trabajo Final':
-            para.add_run('l Trabajo Final de ' + request.detail_cm['nivel_pos'] + ' de ')
-        elif request.detail_cm['tesis_trabajo'] == 'Tesis': 
-            para.add_run(' la Tesis de ' + request.detail_cm['nivel_pos'] + ' de ')
-        para.add_run(large_program)
-        para.add_run(', cuyo título es: "')
-        para.add_run(request.detail_cm['tittle']).font.italic = True
-        para.add_run('", al profesor(a) ' + request.detail_cm['doc1_nom'])
-        if request.detail_cm['doc1_un'] == 'Sí':
-            para.add_run(' de la Universidad Nacional de Colombia de la dependencia: ')
-            para.add_run(request.detail_cm['doc1_dep'])
-        elif request.detail_cm['doc1_un'] == 'No':
-            para.add_run(' de la' + request.detail_cm['doc1_univ'])
-        para.add_run(' y al profesor(a) ' + request.detail_cm['doc1_nom'])
-        if request.detail_cm['doc2_un'] == 'Sí':
-            para.add_run(' de la Universidad Nacional de Colombia de la dependencia: ')
-            para.add_run(request.detail_cm['doc2_dep'])
-        elif request.detail_cm['doc2_un'] == 'No':
-            para.add_run(' de la ' + request.detail_cm['doc2_univ'] + '.')
+        para.add_run('trasladar ' + request.detail_cm['credits'] +' crédito(s) aprobado(s) en ')
+        para.add_run(request.detail_cm['program'])
+        if request.approval_status != 'AP':
+            para.add_run(' debido a que ' + request.justification)
+            return
+        para.add_run(' exigidos por la asignatura Trabajo de Grado, el cual se asumirá como crédito inscrito y aprobado del ')
+        para.add_run('componente de libre elección, si en este componente aún hay créditos por ser aprobados. ')
+        para.add_run('(Artículo 16 del Acuerdo 026 de 2012 del Consejo Académico)')
