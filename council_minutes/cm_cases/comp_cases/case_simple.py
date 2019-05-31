@@ -60,13 +60,17 @@ class simple():
     def case_EXENCION_DE_PAGO_POR_CURSAR_TESIS_COMO_UNICA_ACTIVIDAD_ACADEMICA_POSGRADO(request, docx):
         para = docx.add_paragraph()
         para.add_run('El Consejo de Facultad ')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        common = 'pago de {} puntos por derechos académicos en el periodo académico {}, condicionado a la inscripción de trabajo final de {} como única actividad académica en el periodo {}'
         if request.approval_status == 'AP':
-            para.add_run('APRUEBA').font.bold = True
+            para.add_run('APRUEBA ').font.bold = True
             # ¿Los dos periodos mencionados siempre son iguales?
-            para.add_run('pago de {} puntos por derechos académicos en el periodo académico {}, condicionado a la inscripción de trabajo final de {} como única actividad académica en el periodo {}.'.format(request.detail_cm['points'], request.academic_period,request.get_academic_program_display(), request.academic_period))
+            para.add_run(common.format(request.detail_cm['points'], request.academic_period,request.get_academic_program_display(), request.academic_period))
         else:
             para.add_run('NO APRUEBA ').font.bold = True
-            para.add_run('pago de {} puntos por derechos académicos en el periodo académico {}, condicionado a la inscripción de trabajo final de {} como única actividad académica en el periodo {}, debido a que {}.'.format(request.detail_cm['points'], request.academic_period,request.get_academic_program_display(), request.academic_period, request.justification))
+            para.add_run(common.format(request.detail_cm['points'], request.academic_period,request.get_academic_program_display(), request.academic_period, request.justification))
+            para.add_run(', debido a que {}'.format(request.justification))
+        para.add_run('.')
 
         
     
