@@ -3,6 +3,7 @@ from .comp_cases.case_CASIPRE import CASIPRE
 from .comp_cases.case_REINPRE import REINPRE
 from .comp_cases.case_PESTPRE import PESTPRE
 from .comp_cases.case_TRASPRE import TRASPRE
+from .comp_cases.case_TRASPOS import TRASPOS
 from .comp_cases.case_IASIPRE import IASIPRE
 from .comp_cases.case_CGRUPXX import CGRUPXX
 from .comp_cases.case_simple  import simple
@@ -167,7 +168,7 @@ class CasesSpliter():
         simple.case_DEVOLUCION_PROPORCIONAL_DEL_VALOR_PAGADO_POR_CONCEPTO_DE_DERECHOS_DE_MATRICULA_PREGRADO(request, docx)
 
     def case_TRASLADO_POSGRADO(self, request, docx):
-        raise NotImplementedError
+        TRASPOS.case_TRASLADO_POSGRADO(request, docx)
 
     def case_REEMBOLSO_POSGRADO(self, request, docx):
         simple.case_REEMBOLSO_POSGRADO(request, docx)
