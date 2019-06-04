@@ -503,3 +503,14 @@ class simple():
             para.add_run(common + information)
             para.add_run(', debido a que {}'.format(request.justification))
         para.add_run('.')
+
+    @staticmethod            
+    def case_MODIFICACION_DE_JURADOS_CALIFICADORES_POSGRADO(request, docx):
+        para = docx.add_paragraph()
+        para.add_run('El Consejo de Facultad ')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('designar en el jurado calificador de ' + request.detail_cm['subject'] + 'en ')
+        para.add_run(request.get_academic_program_display() + ', cuyo título es: "' + request.detail_cm['project_title']+'"')
+        para.add_run(', al(los) profesor(es) ')
+        for professor in request.detail_cm['professors']:
+            para.add_run(professor['name'] + " - " + professor['institution'] + " - " + professor['country'] + ". ")
