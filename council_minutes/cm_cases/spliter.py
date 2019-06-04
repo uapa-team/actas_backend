@@ -152,7 +152,7 @@ class CasesSpliter():
         simple.case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO(request, docx)
 
     def case_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD_PREGRADO(self, request, docx):
-        simple.case_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD_PREGRADO(request, docx)
+        simple.case_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD(request, docx)
 
     def case_HOMOLOGACION_CONVALIDACION_EQUIVALENCIA_PREGRADO(self, request, docx):
         raise NotImplementedError
@@ -242,7 +242,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD_POSGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD(request, docx)
 
     def case_HOMOLOGACION_CONVALIDACION_Y_EQUIVALENCIA_POSGRADO(self, request, docx):
         raise NotImplementedError
