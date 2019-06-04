@@ -503,3 +503,60 @@ class simple():
             para.add_run(common + information)
             para.add_run(', debido a que {}'.format(request.justification))
         para.add_run('.')
+
+    @staticmethod
+    def case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO(request,docx):
+        large_program = ''
+        for p in Request.PROGRAM_CHOICES:
+            if p[0] == request.academic_program:
+                large_program = p[1]
+                break
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('El Consejo de Facultad ')
+        if request.approval_status == 'AP':
+            para.add_run('APRUEBA ').font.bold = True
+        else:
+            para.add_run('NO APRUEBA ').font.bold = True
+        para.add_run('designar en el jurado calificador de la Tesis de {}, cuyo título es: '.format(large_program))
+        para.add_run('{}'.format(request.detail_cm['titulo'])).font.italic=True
+        index=1
+        if int(len(request.detail_cm['jury']))>=2:
+            for someone in request.detail_cm['jury']:
+                if index == len(request.detail_cm['jury']):
+                    para.add_run(' y ')
+                elif index < len(request.detail_cm['jury']):
+                    para.add_run(', ')   
+                if someone['per_sex']=='M':
+                    para.add_run('al {} {}'.format(someone['rol'],someone['name']))
+                else:
+                    para.add_run('a la {} {}'.format(someone['rol'],someone['name']))
+                if someone['department']:
+                    para.add_run(' del Departamento {} '.format(someone['department']))
+                if someone['faculty']:
+                    para.add_run(' de la Facultad de {}'.format(someone['faculty']))
+                if someone['institution']:
+                    if someone['ins_sex']=='M':
+                        para.add_run(' del {}'.format(someone['institution']))
+                    else:
+                        para.add_run(' de la {}'.format(someone['institution']))
+                if someone['country']:
+                    para.add_run(' ({})'.format(someone['country']))    
+                index=index+1
+        else:
+            if request.detail_cm['jury'][0]['per_sex']=='M':
+                para.add_run(' al {} {}'.format(request.detail_cm['jury'][0]['rol'], request.detail_cm['jury'][0]['name']))
+            else:
+                para.add_run(' a la {} {}'.format(request.detail_cm['jury'][0]['rol'], request.detail_cm['jury'][0]['name']))
+            if request.detail_cm['jury'][0]['department']:
+                para.add_run(' del Departamento de {}'.format(request.detail_cm['jury'][0]['department']))
+            if request.detail_cm['jury'][0]['faculty']:
+                para.add_run(' de la Facultad de {}'.format(request.detail_cm['jury'][0]['faculty']))
+            if request.detail_cm['jury'][0]['institution']:
+                if request.detail_cm['jury'][0]['ins_sex']=='M':
+                    para.add_run(' del {}'.format(request.detail_cm['jury'][0]['institution']))
+                else:
+                    para.add_run(' de la {}'.format(request.detail_cm['jury'][0]['institution']))
+            if request.detail_cm['jury'][0]['country']:
+                para.add_run(' ({})'.format(request.detail_cm['jury'][0]['country']))
+        para.add_run('.')
