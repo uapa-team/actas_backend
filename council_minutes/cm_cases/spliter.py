@@ -230,7 +230,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_EXCENCION_POR_MEJORES_SABER_PRO_POSGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_EXCENCION_POR_MEJORES_SABER_PRO_POSGRADO(request, docx)
 
     def case_CANCELACION_DE_PERIODO_ACADEMICO_POSGRADO(self, request, docx):
         raise NotImplementedError

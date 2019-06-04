@@ -503,3 +503,23 @@ class simple():
             para.add_run(common + information)
             para.add_run(', debido a que {}'.format(request.justification))
         para.add_run('.')
+
+    @staticmethod
+    def case_EXCENCION_POR_MEJORES_SABER_PRO_POSGRADO(request, docx):
+        large_program = ''
+        for p in Request.PROGRAM_CHOICES:
+            if p[0] == request.academic_program:
+                large_program = p[1]
+                break
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('El Consejo de Facultad ')
+        if request.approval_status == 'AP':
+            para.add_run('APRUEBA BECA EXCENCIÓN DE DERECHOS ACADÉMICOS ').font.bold = True
+        else:
+            para.add_run('NO APRUEBA BECA EXCENCIÓN DE DERECHOS ACADÉMICOS ').font.bold = True
+        para.add_run('del programa ' + large_program + ' por obtener un excelente resultado en el exámen de estado SABER-PRO')
+        if request.approval_status == 'AP':
+            para.add_run(' y otorga exención de derechos académicos. ')
+        else:
+            para.add_run('. ')       
