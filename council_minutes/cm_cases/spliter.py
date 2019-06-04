@@ -5,6 +5,7 @@ from .comp_cases.case_PESTPRE import PESTPRE
 from .comp_cases.case_TRASPRE import TRASPRE
 from .comp_cases.case_IASIPRE import IASIPRE
 from .comp_cases.case_CGRUPXX import CGRUPXX
+from .comp_cases.case_HCEMPOS import HCEMPOS
 from .comp_cases.case_simple  import simple
 
 
@@ -245,7 +246,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_HOMOLOGACION_CONVALIDACION_Y_EQUIVALENCIA_POSGRADO(self, request, docx):
-        raise NotImplementedError
+        HCEMPOS.case_HOMOLOGACION_CONVALIDACION_Y_EQUIVALENCIA_POSGRADO(request, docx)
 
     def case_MODIFICACION_DE_OBJETIVOS_DE_TESIS_PROPUESTA_POSGRADO(self, request, docx):
         simple.case_MODIFICACION_DE_OBJETIVOS_DE_TESIS_PROPUESTA_POSGRADO(request, docx)
