@@ -284,14 +284,27 @@ class simple():
         para.add_run(large_program)
         para.add_run(', cuyo título es: "')
         para.add_run(request.detail_cm['tittle']).font.italic = True
-        para.add_run('", al profesor(a) ' + request.detail_cm['doc1_nom'])
-        if request.detail_cm['doc1_un'] == 'Sí':
-            para.add_run(' de la Universidad Nacional de Colombia de la dependencia: ')
-            para.add_run(request.detail_cm['doc1_dep'])
-        elif request.detail_cm['doc1_un'] == 'No':
-            para.add_run(' de la' + request.detail_cm['doc1_univ'])
-        para.add_run(' y al profesor(a) ' + request.detail_cm['doc1_nom'])
-        if request.detail_cm['doc2_un'] == 'Sí':
+        para.add_run('", a los docentes ')
+        count = len(request.detail_cm['doc'])
+        for doc in request.detail_cm['doc']:
+            count = count - 1
+            para.add_run(doc['nomb'])
+            if doc['un'] == 'Y':
+                para.add_run(' de la Universidad Nacional de Colombia de la dependencia: ')
+                para.add_run(doc['dep'])
+            elif doc['un'] == 'N':
+                para.add_run(' de la ' + doc['univ'])
+            if count == 0:
+                para.add_run('.')
+                return
+            elif count == 1:
+                para.add_run(' y ')
+                break
+            else:
+                para.add_run(', ')
+        length = len(request.detail_cm['doc']) - 1
+        para.add_run(request.detail_cm['doc'][length]['nomb'])
+        if request.detail_cm['doc'][length]['un'] == 'Y':
             para.add_run(' de la Universidad Nacional de Colombia de la dependencia: ')
             para.add_run(request.detail_cm['doc2_dep'])
         elif request.detail_cm['doc2_un'] == 'No':
