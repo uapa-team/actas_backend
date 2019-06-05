@@ -61,9 +61,12 @@ class REINPRE():
         table.style='Table Grid'
         table.style.font.size = Pt(8)
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.columns[0].width = 400000
-        table.columns[1].width = 2400000
-        table.columns[2].width = 2400000
+        for cell in table.columns[0].cells:
+            cell.width = 400000
+        for cell in table.columns[1].cells:
+            cell.width = 2400000
+        for cell in table.columns[2].cells:
+            cell.width = 2400000
         cellp = table.cell(0, 0).merge(table.cell(0, 2)).paragraphs[0]
         cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
         cellp.add_run('REINGRESO\n').font.bold = True
@@ -98,9 +101,12 @@ class REINPRE():
         table.style='Table Grid'
         table.style.font.size = Pt(8)
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.columns[0].width = 400000
-        table.columns[1].width = 3200000
-        table.columns[2].width = 1600000
+        for cell in table.columns[0].cells:
+            cell.width = 400000
+        for cell in table.columns[1].cells:
+            cell.width = 3200000
+        for cell in table.columns[2].cells:
+            cell.width = 1600000
         table.cell(0, 0).merge(table.cell(0, 1)).paragraphs[0].add_run('Periodo para el cual fue admitido en este plan de estudios')
         table.cell(0, 2).paragraphs[0].add_run(request.detail_cm['per_admi'])
         table.cell(0, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -154,8 +160,10 @@ class REINPRE():
         table.style = 'Table Grid'
         table.style.font.size = Pt(8)
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.columns[0].width = 3100000
-        table.columns[1].width = 2100000
+        for cell in table.columns[0].cells:
+            cell.width = 3100000
+        for cell in table.columns[1].cells:
+            cell.width = 2100000
         table.cell(0, 0).merge(table.cell(0, 1)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
         table.cell(0, 0).merge(table.cell(0, 1)).paragraphs[0].add_run('Al finalizar el semestre de reingreso para mantener la calidad de estudiante, deberá obtener un Promedio Semestral mínimo de:')
         table.cell(1, 0).paragraphs[0].add_run('Si inscribe 12 Créditos')
@@ -178,13 +186,20 @@ class REINPRE():
                 cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.style = 'Table Grid'
         table.style.font.size = Pt(8)
-        table.columns[0].width = 1610000
-        table.columns[1].width = 690000
-        table.columns[2].width = 610000
-        table.columns[3].width = 690000
-        table.columns[4].width = 610000
-        table.columns[5].width = 675000
-        table.columns[6].width = 375000
+        for cell in table.columns[0].cells:
+            cell.width = 1610000
+        for cell in table.columns[1].cells:
+            cell.width = 690000
+        for cell in table.columns[2].cells:
+            cell.width = 610000
+        for cell in table.columns[3].cells:
+            cell.width = 690000
+        for cell in table.columns[4].cells:
+            cell.width = 610000
+        for cell in table.columns[5].cells:
+            cell.width = 675000
+        for cell in table.columns[5].cells:
+            cell.width = 375000
         table.cell(0, 0).merge(table.cell(1, 0)).paragraphs[0].add_run('Créditos')
         table.cell(0, 0).merge(table.cell(1, 0)).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         table.cell(0, 1).merge(table.cell(0, 2)).paragraphs[0].add_run('Fundamentación (B)')
@@ -227,11 +242,16 @@ class REINPRE():
         table.style='Table Grid'
         table.style.font.size = Pt(8)
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.columns[0].width = 3000000
-        table.columns[1].width = 800000
-        table.columns[2].width = 300000
-        table.columns[3].width = 800000
-        table.columns[4].width = 300000
+        for cell in table.columns[0].cells:
+            cell.width = 3000000
+        for cell in table.columns[1].cells:
+            cell.width = 800000
+        for cell in table.columns[2].cells:
+            cell.width = 300000
+        for cell in table.columns[3].cells:
+            cell.width = 800000
+        for cell in table.columns[4].cells:
+            cell.width = 300000
         table.cell(0, 0).paragraphs[0].add_run('El Comité Asesor de ' + request.detail_cm['commite_name'] + ' en sesión del día ')
         table.cell(0, 0).paragraphs[0].add_run(str(request.detail_cm['comite_date'].day) + REINPRE.num_to_month(request.detail_cm['comite_date'].month) + str(request.detail_cm['comite_date'].year))
         table.cell(0, 0).paragraphs[0].add_run('. Acta ' + request.detail_cm['comite_acta'] + '.')
