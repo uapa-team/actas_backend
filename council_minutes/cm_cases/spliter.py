@@ -233,7 +233,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_CANCELACION_DE_PERIODO_ACADEMICO_POSGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_CANCELACION_DE_PERIODO_ACADEMICO_POSGRADO(request, docx)
 
     def case_GENERACION_DE_RECIBO_UNICO_DE_PAGO_POSGRADO(self, request, docx):
         simple.case_GENERACION_DE_RECIBO_UNICO_DE_PAGO_POSGRADO(request, docx)

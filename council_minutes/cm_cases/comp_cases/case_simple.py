@@ -7,6 +7,28 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 class simple():
 
     @staticmethod
+    def case_CANCELACION_DE_PERIODO_ACADEMICO_POSGRADO(request, docx):
+        large_program = ''
+        for p in Request.PROGRAM_CHOICES:
+            if p[0] == request.academic_program:
+                large_program = p[1]
+                break
+        para = docx.add_paragraph()
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('El Consejo de Facultad ')
+        if request.approval_status == 'AP':
+            para.add_run('APRUEBA ').font.bold = True
+        else:
+            para.add_run('NO APRUEBA ').font.bold = True
+        para.add_run('cancelar la totalidad de las asignaturas en el periodo ')
+        para.add_run(request.detail_cm['period_cancel'])
+        para.add_run(', en el programa de ' + large_program)
+        para.add_run(' teniendo en cuenta que ')
+        para.add_run(request.justification)
+        para.add_run(' (Artículo 18 del Acuerdo 008 del Consejo Superior Universitario).')
+
+    @staticmethod
     def case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO(request, docx):
         para = docx.add_paragraph()
         para.add_run('El Consejo de Facultad ')
