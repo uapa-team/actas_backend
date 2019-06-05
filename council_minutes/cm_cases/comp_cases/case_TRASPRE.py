@@ -14,7 +14,6 @@ class TRASPRE():
             if p[0] == request.academic_program:
                 large_program = p[1]
                 break
-        print(large_program)
         para = docx.add_paragraph()
         para.alignment=WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('El Consejo de Facultad ')
