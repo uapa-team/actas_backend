@@ -6,6 +6,7 @@ from .comp_cases.case_TRASPRE import TRASPRE
 from .comp_cases.case_TRASPOS import TRASPOS
 from .comp_cases.case_IASIPRE import IASIPRE
 from .comp_cases.case_CGRUPXX import CGRUPXX
+from .comp_cases.case_IASIPOS import IASIPOS
 from .comp_cases.case_simple  import simple
 
 
@@ -222,7 +223,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_INSCRIPCION_DE_ASIGNATURAS_POSGRADO(self, request, docx):
-        raise NotImplementedError
+        IASIPOS.case_INSCRIPCION_DE_ASIGNATURAS_POSGRADO(request, docx)
 
     def case_INFORME_DE_AVANCE_DE_TESIS_POSGRADO(self, request, docx):
         raise NotImplementedError
