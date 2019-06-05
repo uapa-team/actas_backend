@@ -1,5 +1,4 @@
 from .comp_cases.case_HOIDPXX import HOIDPXX
-from .comp_cases.case_CASIPRE import CASIPRE
 from .comp_cases.case_REINPRE import REINPRE
 from .comp_cases.case_PESTPRE import PESTPRE
 from .comp_cases.case_TRASPRE import TRASPRE
@@ -7,6 +6,8 @@ from .comp_cases.case_TRASPOS import TRASPOS
 from .comp_cases.case_IASIPRE import IASIPRE
 from .comp_cases.case_CGRUPXX import CGRUPXX
 from .comp_cases.case_IASIPOS import IASIPOS
+from .comp_cases.case_HOIDPRE import HOIDPRE
+from .comp_cases.case_CASIPXX import CASIPXX
 from .comp_cases.case_simple  import simple
 
 
@@ -139,7 +140,7 @@ class CasesSpliter():
         simple.case_RESERVA_DE_CUPO_ADICIONAL_PREGRADO(request, docx)
 
     def case_CANCELACION_DE_ASIGNATURAS_PREGRADO(self, request, docx):
-        CASIPRE.case_CANCELACION_DE_ASIGNATURAS_PREGRADO(request, docx)
+        CASIPXX.case_CANCELACION_DE_ASIGNATURAS(request, docx)
 
     def case_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO(self, request, docx):
         simple.case_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO(request, docx)
@@ -220,7 +221,7 @@ class CasesSpliter():
         simple.case_RESERVA_DE_CUPO_ADICIONAL_PREGRADO(request, docx)
 
     def case_CANCELACION_DE_ASIGNATURAS_POSGRADO(self, request, docx):
-        raise NotImplementedError
+        CASIPXX.case_CANCELACION_DE_ASIGNATURAS(request, docx)
 
     def case_INSCRIPCION_DE_ASIGNATURAS_POSGRADO(self, request, docx):
         IASIPOS.case_INSCRIPCION_DE_ASIGNATURAS_POSGRADO(request, docx)
