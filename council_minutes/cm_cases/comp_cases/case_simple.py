@@ -1,5 +1,6 @@
 from docx import Document
 from ...models import Request
+from docx.shared import Pt
 from num2words import num2words  ##pip install num2words
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -43,10 +44,6 @@ class simple():
             para.add_run(', debido a que ' + request.justification)
         para.add_run(' (Artículo 18 del Acuerdo 008 del Consejo Superior Universitario).')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-
-    @staticmethod
-    def case_REINGRESO_PREGRADO(request, docx):
-        raise NotImplementedError
 
     @staticmethod
     def case_CAMBIO_DE_PERFIL_POSGRADO(request, docx):
@@ -237,7 +234,7 @@ class simple():
             para.add_run('APRUEBA ').font.bold = True
         else:
             para.add_run('NO APRUEBA ').font.bold = True
-        para.add_run('devolución proporcional del ' + num2words(float(request.detail_cm['percentaje']), lang='es'))
+        para.add_run('devolución proporcional del ' + num2words(float(request.detail_cm['percentage']), lang='es'))
         para.add_run(' por ciento (' + request.detail_cm['percentaje'] + '%) ')
         para.add_run('del valor pagado por concepto de derechos de matrícula del periodo ')
         para.add_run(request.detail_cm['period_cancel'])
@@ -303,6 +300,8 @@ class simple():
             para.add_run('l Trabajo Final de ' + request.detail_cm['nivel_pos'] + ' de ')
         elif request.detail_cm['tesis_trabajo'] == 'Tesis': 
             para.add_run(' la Tesis de ' + request.detail_cm['nivel_pos'] + ' de ')
+        else:
+            raise AttributeError
         para.add_run(large_program)
         para.add_run(', cuyo título es: "')
         para.add_run(request.detail_cm['tittle']).font.italic = True
@@ -331,6 +330,8 @@ class simple():
             para.add_run(request.detail_cm['doc2_dep'])
         elif request.detail_cm['doc2_un'] == 'No':
             para.add_run(' de la ' + request.detail_cm['doc2_univ'] + '.')
+        else:
+            raise AttributeError
     
     @staticmethod
     def case_MODIFICACION_DE_OBJETIVOS_DE_TESIS_PROPUESTA_POSGRADO(request, docx):
@@ -538,3 +539,56 @@ class simple():
             para.add_run(common + information)
             para.add_run(', debido a que {}'.format(request.justification))
         para.add_run('.')
+
+    @staticmethod
+    def case_TRABAJO_DE_GRADO_PREGADO(request, docx):
+        para = docx.add_paragraph()
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('El Consejo de Facultad ')
+        if request.approval_status == 'AP':
+            para.add_run('APRUEBA ').font.bold = True
+        else:
+            para.add_run('NO APRUEBA ').font.bold = True
+        para.add_run('inscribir la(s) siguiente(s) asignatura(s) en el periodo académico ')
+        para.add_run(request.detail_cm['per_insc'])
+        cod_assig = ''
+        nom_assig = ''
+        if request.detail_cm['modalidad'] == 'pasantia':
+            para.add_run(', modalidad pasantía en "')
+            para.add_run(request.detail_cm['empresa'])
+            cod_assig = '2015289'
+            nom_assig = 'Trabajo de grado'
+        elif request.detail_cm['modalidad'] == 'trabajo':
+            para.add_run(', modalidad trabajo investigativo titulado "')
+            para.add_run(request.detail_cm['titulo']).font.italic = True
+            cod_assig = '2025990'
+            nom_assig = 'Trabajo de grado - Modalidad Trabajos Investigativos'
+        else:
+            raise AttributeError
+        para.add_run('", dirigida por el profesor ')
+        para.add_run(request.detail_cm['docente'])
+        para.add_run(', debido a que ')
+        para.add_run(request.justification + '.')
+        table = docx.add_table(rows=2, cols=5)
+        table.style='Table Grid'
+        table.style.font.size = Pt(8)
+        table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.columns[0].width = 600000
+        table.columns[1].width = 2800000
+        table.columns[2].width = 600000
+        table.columns[3].width = 600000
+        table.columns[4].width = 600000
+        for col in table.columns:
+            for cell in col.cells:
+                cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(0, 0).paragraphs[0].add_run('Código SIA').font.bold = True
+        table.cell(0, 1).paragraphs[0].add_run('Nombre Asignatura').font.bold = True
+        table.cell(0, 2).paragraphs[0].add_run('Grupo').font.bold = True
+        table.cell(0, 3).paragraphs[0].add_run('T').font.bold = True
+        table.cell(0, 4).paragraphs[0].add_run('C').font.bold = True
+        table.cell(1, 0).paragraphs[0].add_run(cod_assig)
+        table.cell(1, 1).paragraphs[0].add_run(nom_assig)
+        table.cell(1, 2).paragraphs[0].add_run(request.detail_cm['group'])
+        table.cell(1, 3).paragraphs[0].add_run('P')
+        table.cell(1, 4).paragraphs[0].add_run('6')

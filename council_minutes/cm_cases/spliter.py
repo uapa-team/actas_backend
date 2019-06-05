@@ -98,7 +98,7 @@ class CasesSpliter():
         CGRUPXX.case_CAMBIO_DE_GRUPO(request, docx)
 
     def case_TRABAJO_DE_GRADO_PREGADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_TRABAJO_DE_GRADO_PREGADO(request, docx)
 
     def case_DOBLE_TITULACION_PREGRADO(self, request, docx):
         raise NotImplementedError
