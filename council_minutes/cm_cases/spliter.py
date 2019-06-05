@@ -195,7 +195,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_BECA_MEJOR_PROMEDIO_POSGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_BECA_MEJOR_PROMEDIO_POSGRADO(request, docx)
 
     def case_ADMISION_AUTOMATICA_POSGRADO(self, request, docx):
         simple.case_ADMISION_AUTOMATICA_POSGRADO(request, docx)

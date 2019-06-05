@@ -633,3 +633,25 @@ class simple():
         para.add_run(', al(los) profesor(es) ')
         for professor in request.detail_cm['professors']:
             para.add_run(professor['name'] + " - " + professor['institution'] + " - " + professor['country'] + ". ")
+
+    @staticmethod
+    def case_BECA_MEJOR_PROMEDIO_POSGRADO(request, docx):
+        large_program = ''
+        for p in Request.PROGRAM_CHOICES:
+            if p[0] == request.academic_program:
+                large_program = p[1]
+                break
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('El Consejo de Facultad ')
+        if request.approval_status == 'AP':
+            para.add_run('APRUEBA BECA EXCENCIÓN DE DERECHOS ACADÉMICOS ').font.bold = True
+        else:
+            para.add_run('NO APRUEBA BECA EXCENCIÓN DE DERECHOS ACADÉMICOS ').font.bold = True
+        para.add_run('del programa ' + large_program + ' por obtener el promedio académico ponderado más alto del semestre en las ')
+        para.add_run('asignaturas cursadas durante el periodo académico inmediatamente anterior')
+        if request.approval_status == 'AP':
+            para.add_run(', y otorga exención de derechos académicos. ')
+        else:
+            para.add_run('. ')       
+        para.add_run('(Artículo 8 Acuerdo 02 de 2012 de Consejo de Facultad). ')
