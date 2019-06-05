@@ -227,7 +227,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_RETIRO_DEFINITIVO_DEL_PROGRAMA_POSGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_RETIRO_DEFINITIVO_DEL_PROGRAMA_PREGRADO(request, docx)
 
     def case_EXCENCION_POR_MEJORES_SABER_PRO_POSGRADO(self, request, docx):
         raise NotImplementedError
