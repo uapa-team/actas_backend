@@ -1,4 +1,4 @@
-from .comp_cases.case_HOIDPRE import HOIDPRE
+from .comp_cases.case_HOIDPXX import HOIDPXX
 from .comp_cases.case_CASIPRE import CASIPRE
 from .comp_cases.case_REINPRE import REINPRE
 from .comp_cases.case_PESTPRE import PESTPRE
@@ -104,7 +104,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_HOMOLOGACION_INGLES_PREGRADO(self, request, docx):
-        HOIDPRE.case_HOMOLOGACION_INGLES_PREGRADO(request, docx)
+        HOIDPXX.case_HOMOLOGACION_INGLES(request, docx)
 
     def case_CAMBIO_DE_TIPOLOGIA_PREGRADO(self, request, docx):
         simple.case_CAMBIO_DE_TIPOLOGIA_PREGRADO(request,docx)
@@ -188,7 +188,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_HOMOLOGACION_INGLES_POSGRADO(self, request, docx):
-        raise NotImplementedError
+        HOIDPXX.case_HOMOLOGACION_INGLES(request, docx)
 
     def case_APROBACION_PASANTIA_POSGRADO(self, request, docx):
         raise NotImplementedError
