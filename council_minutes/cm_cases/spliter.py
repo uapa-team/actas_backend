@@ -5,6 +5,7 @@ from .comp_cases.case_PESTPRE import PESTPRE
 from .comp_cases.case_TRASPRE import TRASPRE
 from .comp_cases.case_IASIPRE import IASIPRE
 from .comp_cases.case_CGRUPXX import CGRUPXX
+from .comp_cases.case_DTITPRE import DTITPRE
 from .comp_cases.case_simple  import simple
 
 
@@ -101,7 +102,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_DOBLE_TITULACION_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        DTITPRE.case_DOBLE_TITULACION_PREGRADO(request, docx)
 
     def case_HOMOLOGACION_INGLES_PREGRADO(self, request, docx):
         HOIDPRE.case_HOMOLOGACION_INGLES_PREGRADO(request, docx)
