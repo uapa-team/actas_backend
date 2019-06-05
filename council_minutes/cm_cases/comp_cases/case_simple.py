@@ -264,7 +264,7 @@ class simple():
         para.add_run('. (Acuerdo 070 de 2009 de Consejo Académico y literal c, Artículo 57 del Acuerdo 008 de 2008 del Consejo Superior Universitario.).')
 
     @staticmethod
-    def case_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD(request, docx):
+    def case_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD_PREGRADO(request, docx):
         para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('El Consejo de Facultad ')
@@ -623,7 +623,6 @@ class simple():
             para.add_run('"' + request.detail_cm['titulo'] + '"').font.italic = True
             para.add_run(' al(a la) profesor(a) ' + request.detail_cm['prof'] + ' del ' + request.detail_cm['depto'] + '.')
 
-        
     @staticmethod            
     def case_MODIFICACION_DE_JURADOS_CALIFICADORES_POSGRADO(request, docx):
         para = docx.add_paragraph()
