@@ -79,19 +79,24 @@ class simple():
             para.add_run(
                 ' puntos de Derechos Académicos, a partir del periodo ' + request.academic_period)
             para.add_run(
-                ', y durante el siguiente periodo académico, por tener créditos disponibles al finalizar ')
+                ', y durante el siguiente periodo académico,' +
+                ' por tener créditos disponibles al finalizar ')
             para.add_run('estudios del programa de pregrado ' +
                          request.detail_cm['program'] + ', Sede ')
             para.add_run(
-                request.detail_cm['campus'] + '. El cálculo de los créditos disponibles se realiza con base')
+                request.detail_cm['campus'] + '. El cálculo de los ' +
+                'créditos disponibles se realiza con base')
             para.add_run(
-                ' en el cupo de créditos establecido en el Artículo 2 del acuerdo 014 de 2008 del Consejo Académico. ')
+                ' en el cupo de créditos establecido en el Artículo ' +
+                '2 del acuerdo 014 de 2008 del Consejo Académico. ')
         else:
             para.add_run('NO APRUEBA').font.bold = True
             para.add_run(
-                ' otorgar excención del pago de  Derechos Académicos a partir del periodo ' + request.academic_period)
+                ' otorgar excención del pago de  Derechos Académicos ' +
+                'a partir del periodo ' + request.academic_period)
             para.add_run(
-                ', por tener créditos disponibles al finalizar estudios en el programa de pregrado de ')
+                ', por tener créditos disponibles al finalizar estudios ' +
+                'en el programa de pregrado de ')
             para.add_run(request.detail_cm['program'] + ', Sede ' +
                          request.detail_cm['campus'] + ' porque ' + request.justification)
             para.add_run(
@@ -113,7 +118,8 @@ class simple():
             para.add_run(
                 'fue aprobada la cancelación de periodo en Acta ' + request.detail_cm['acta'])
             para.add_run(
-                ' de Consejo de Facultad. (Acuerdo 032 de 2010 del Consejo Superior Universitario, Artículo 1 ')
+                ' de Consejo de Facultad. (Acuerdo 032 de 2010 del ' +
+                'Consejo Superior Universitario, Artículo 1 ')
             para.add_run(' Resolución 1416 de 2013 de Rectoría). ')
         else:
             para.add_run('NO APRUEBA').font.bold = True
@@ -136,10 +142,12 @@ class simple():
         else:
             para.add_run('NO APRUEBA').font.bold = True
         para.add_run(
-            ' reintegrar al cupo, los créditos descontados por la cancelación de la(s) sugiente(s) asignatura(s) ')
+            ' reintegrar al cupo, los créditos descontados por la ' +
+            'cancelación de la(s) sugiente(s) asignatura(s) ')
         para.add_run('en el periodo académico ' + request.academic_period)
         para.add_run(
-            '. (Circular 001 de 2019 de Vicerrectoría de Sede Bogotá, Acuerdo 230 de 2016 de Consejo Superior Universitario).')
+            '. (Circular 001 de 2019 de Vicerrectoría de Sede Bogotá, Acuerdo 230 de 2016 de ' +
+            'Consejo Superior Universitario).')
         table = docx.add_table(
             rows=len(request.detail_cm['subjects'])+2, cols=3, style='Table Grid')
         table.cell(0, 0).paragraphs[0].add_run('Código SIA').font.bold = True
@@ -209,7 +217,8 @@ class simple():
             'del valor pagado por concepto de derechos de matrícula del periodo ')
         para.add_run(request.detail_cm['period_cancel'])
         para.add_run(
-            ', teniendo en cuenta la fecha de presentación de la solicitud y que le fue aprobada la cancelación de periodo en Acta 0')
+            ', teniendo en cuenta la fecha de presentación de la solicitud y que le fue ' +
+            'aprobada la cancelación de periodo en Acta 0')
         para.add_run(request.detail_cm['acta_n'])
         para.add_run(' de ' + request.detail_cm['acta_y'])
         para.add_run(
@@ -235,7 +244,8 @@ class simple():
         para.add_run(' a partir del periodo académico ')
         para.add_run(request.detail_cm['ing_period'])
         para.add_run(
-            '. (Acuerdo 070 de 2009 de Consejo Académico y literal c, Artículo 57 del Acuerdo 008 de 2008 del Consejo Superior Universitario.).')
+            '. (Acuerdo 070 de 2009 de Consejo Académico y literal c, Artículo 57 del Acuerdo' +
+            ' 008 de 2008 del Consejo Superior Universitario.).')
 
     @staticmethod
     def case_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD_PREGRADO(request, docx):
