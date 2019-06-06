@@ -1,6 +1,5 @@
 from docx.shared import Pt
-from docx.enum.text import WD_ALIGN_PARAGRAPH  # , WD_LINE_SPACING
-# , WD_ROW_HEIGHT_RULE, WD_TABLE_ALIGNMENT
+from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
 from ...models import Request
 
@@ -31,7 +30,7 @@ class HCEMPOS():
             para2.add_run(request.detail_cm['node'])
             para2.add_run(', las siguientes asignaturas cursadas en ')
             para2.add_run(
-                request.detail_cm['homologation']['institution'] + ' así:')
+                request.detail_cm['homologation']['institution'] + ', así:')
             table_rows = len(request.detail_cm['homologation']['subjects'])+2
             table = docx.add_table(rows=table_rows, cols=7)
             table.style = 'Table Grid'
@@ -105,7 +104,7 @@ class HCEMPOS():
             if 'institution' in request.detail_cm["recognition"]:
                 para3.add_run(' en el(la) ' +
                               request.detail_cm['recognition']['institution'] + ' ')
-            para3.add_run(' así:')
+            para3.add_run(', así:')
             table_rows = len(request.detail_cm['recognition']['subjects']) + 2
             table = docx.add_table(rows=table_rows, cols=7)
             table.style = 'Table Grid'
@@ -177,7 +176,7 @@ class HCEMPOS():
                 para4.add_run(' plan de estudios ')
                 para4.add_run(
                     request.detail_cm["equivalence"]['node'])
-            para4.add_run(' así:')
+            para4.add_run(', así:')
             table_rows = len(request.detail_cm['equivalence']['subjects'])+2
             table = docx.add_table(rows=table_rows, cols=7)
             table.style = 'Table Grid'
