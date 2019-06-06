@@ -72,6 +72,25 @@ class DTITPRE():
         bullet.font.bold = True
         bullet.font.size = Pt(8)
         DTITPRE.case_DOBLE_TITULACION_PREGRADO_TABLE_ASIGNATURAS_PENDIENTES(request, docx)
+        para = docx.add_paragraph()
+        para.paragraph_format.space_before = Pt(8)
+        bullet = para.add_run('La oferta de asignaturas optativas en cada una de las agrupaciones y componentes del plan de' 
+        + 'estudios del programa curricular de Ingeniería Industrial, la encuentra en el Acuerdo No. 024 del año 2014, expedido' 
+        + 'por Consejo de facultad de Ingeniería.')
+        para.paragraph_format.space_after = Pt(0)
+        bullet.font.size = Pt(8)
+        bullet.font.underline = True
+        bullet.font.italic = True
+        
+        para = docx.add_paragraph()
+        para.paragraph_format.space_before = Pt(8)
+        bullet = para.add_run('5. Resumen general de créditos del segundo plan de estudios:')
+        para.paragraph_format.space_after = Pt(0)
+        bullet.font.size = Pt(8)
+        bullet.font.bold = True
+        DTITPRE.case_DOBLE_TITULACION_PREGRADO_TABLE_RESUMEN_GENERAL(request, docx)
+
+
     
     @staticmethod
     def case_DOBLE_TITULACION_PREGRADO_TABLE_DATOS_PERSONALES(request, docx):
@@ -350,18 +369,18 @@ class DTITPRE():
         table = docx.add_table(rows=cant_rows + 3, cols=5, style='Table Grid')
         table.style.font.size = Pt(8)
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER 
-        table.allow_autofit = False
+
         for cell in table.columns[0].cells:
-            cell.width = 2000000
+            cell.width = 970000
         for cell in table.columns[1].cells:
-            cell.width = 400000
+            cell.width = 900000
         for cell in table.columns[2].cells:
-            cell.width = 2000000
+            cell.width = 1300000
         for cell in table.columns[3].cells:
-            cell.width = 700000
+            cell.width = 1000000
         for cell in table.columns[4].cells:
-            cell.width = 400000
-        
+            cell.width = 1000000
+
         for column in table.columns:
             for cell in column.cells:
                 cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
@@ -400,6 +419,15 @@ class DTITPRE():
         table = docx.add_table(rows=cant_rows + 3, cols=3, style='Table Grid')
         table.style.font.size = Pt(8)
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER  
+        
+        for cell in table.columns[0].cells:
+            cell.width = 1900000
+        for cell in table.columns[1].cells:
+            cell.width = 1630000
+        for cell in table.columns[2].cells:
+            cell.width = 1630000
+
+
         for column in table.columns:
             for cell in column.cells:
                 cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
@@ -434,6 +462,18 @@ class DTITPRE():
         table = docx.add_table(rows=cant_rows + 3, cols=5, style='Table Grid')
         table.style.font.size = Pt(8)
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER  
+
+        for cell in table.columns[0].cells:
+            cell.width = 970000
+        for cell in table.columns[1].cells:
+            cell.width = 900000
+        for cell in table.columns[2].cells:
+            cell.width = 1300000
+        for cell in table.columns[3].cells:
+            cell.width = 1000000
+        for cell in table.columns[4].cells:
+            cell.width = 1000000
+
         for column in table.columns:
             for cell in column.cells:
                 cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
@@ -472,6 +512,15 @@ class DTITPRE():
         table = docx.add_table(rows=cant_rows + 3, cols=3, style='Table Grid')
         table.style.font.size = Pt(8)
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER  
+
+        for cell in table.columns[0].cells:
+            cell.width = 1900000
+        for cell in table.columns[1].cells:
+            cell.width = 1630000
+        for cell in table.columns[2].cells:
+            cell.width = 1630000
+
+
         for column in table.columns:
             for cell in column.cells:
                 cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
@@ -493,27 +542,103 @@ class DTITPRE():
         cellp.add_run('Total créditos pendientes').font.bold = True
         table.cell(row_m, 2).paragraphs[0].add_run(request.detail_cm['asignaturas_pendientes']['T_C']['total_pendientes'])
 
-        # row_o = row_a + 2
-        # table.cell(row_o, 0).paragraphs[0].add_run('Agrupación')
-        # table.cell(row_o, 1).paragraphs[0].add_run('Código')
-        # table.cell(row_o, 2).paragraphs[0].add_run('Asignatura')
-        # table.cell(row_o, 3).paragraphs[0].add_run('Créditos asignatura')
-        # table.cell(row_o, 4).paragraphs[0].add_run('Créditos pendientes por cursar por el estudiante')
-        # row_a = row_o + 1
-        # row_m = row_o + 1
-        # for i in range (0, len(request.detail_cm['asignaturas_pendientes']['T_C']['obligatorias']['categorias'])):
-        #     cellp = table.cell(row_a, 0).merge(table.cell(row_a + len(request.detail_cm['asignaturas_pendientes']['T_C']['obligatorias']['categorias'][i]['materias']) - 1,0)).paragraphs[0]
-        #     cellp.add_run(request.detail_cm['asignaturas_pendientes']['T_C']['obligatorias']['categorias'][i]['agrupacion'])
-        #     cellp = table.cell(row_a, 4).merge(table.cell(row_a + len(request.detail_cm['asignaturas_pendientes']['T_C']['obligatorias']['categorias'][i]['materias']) - 1,4)).paragraphs[0]
-        #     cellp.add_run(request.detail_cm['asignaturas_pendientes']['T_C']['obligatorias']['categorias'][i]['creditos_pendientes'])
-        #     for j in range (0, len(request.detail_cm['asignaturas_pendientes']['T_C']['obligatorias']['categorias'][i]['materias'])):
-        #         table.cell(row_m, 1).paragraphs[0].add_run(request.detail_cm['asignaturas_pendientes']['T_C']['obligatorias']['categorias'][i]['materias'][j]['codigo'])
-        #         table.cell(row_m, 2).paragraphs[0].add_run(request.detail_cm['asignaturas_pendientes']['T_C']['obligatorias']['categorias'][i]['materias'][j]['asignatura'])
-        #         table.cell(row_m, 3).paragraphs[0].add_run(request.detail_cm['asignaturas_pendientes']['T_C']['obligatorias']['categorias'][i]['materias'][j]['creditos'])
-        #         row_m = row_m + 1
-        #     row_a = row_m
-        
-        # cellp = table.cell(row_a, 0).merge(table.cell(row_a, 3)).paragraphs[0]
-        # cellp.add_run('Total créditos pendientes')
-        # table.cell(row_a, 4).paragraphs[0].add_run(request.detail_cm['asignaturas_pendientes']['T_C']['total_pendientes'])
+        #ELECTIVAS
+        para = docx.add_paragraph()
+        para.paragraph_format.space_before = Pt(0)
+        para.add_run(' ').font.size = Pt(8)
+        para.paragraph_format.space_after = Pt(0)
+        table = docx.add_table(rows=1, cols=2, style='Table Grid')
+        table.style.font.size = Pt(8)
+        table.alignment = WD_ALIGN_PARAGRAPH.CENTER  
+        for cell in table.columns[0].cells:
+            cell.width = 4000000
+        for cell in table.columns[1].cells:
+            cell.width = 1200000
+        table.cell(0, 0).paragraphs[0].add_run('Componente de Libre Elección (L) (Créditos pendientes)').font.bold = True
+        table.cell(0, 1).paragraphs[0].add_run(request.detail_cm['asignaturas_pendientes']['electivas']).font.bold = True
+
+    @staticmethod
+    def case_DOBLE_TITULACION_PREGRADO_TABLE_RESUMEN_GENERAL(request, docx):
+        table = docx.add_table(rows=5, cols=7, style='Table Grid')
+        table.style.font.size = Pt(8)
+        table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        for cell in table.columns[0].cells:
+            cell.width = 720000
+        for cell in table.columns[1].cells:
+            cell.width = 300000
+        for cell in table.columns[2].cells:
+            cell.width = 300000
+        for cell in table.columns[3].cells:
+            cell.width = 300000
+        for cell in table.columns[4].cells:
+            cell.width = 300000
+        for cell in table.columns[5].cells:
+            cell.width = 900000
+        for cell in table.columns[6].cells:
+            cell.width = 700000
+
+        for column in table.columns:
+            for cell in column.cells:
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+
+        cellp = table.cell(0, 0).merge(table.cell(1, 0)).paragraphs[0] 
+        cellp.add_run('Créditos')
+        cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(2, 0).paragraphs[0].add_run('Exigidos*')
+        table.cell(3, 0).paragraphs[0].add_run('Convalidados/equivalentes**')
+        table.cell(4, 0).paragraphs[0].add_run('Pendientes')
+        cellp = table.cell(0, 1).merge(table.cell(0, 2)).paragraphs[0] 
+        cellp.add_run('Fundamentación (B)')
+        cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER  
+        table.cell(1, 1).paragraphs[0].add_run('Obligatorios')
+        table.cell(1, 1).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER 
+        table.cell(1, 2).paragraphs[0].add_run('Optativos')
+        table.cell(1, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER 
+        cellp = table.cell(0, 3).merge(table.cell(0, 4)).paragraphs[0] 
+        cellp.add_run('Disciplinar (C)')
+        cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(1, 3).paragraphs[0].add_run('Obligatorios')
+        table.cell(1, 3).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER 
+        table.cell(1, 4).paragraphs[0].add_run('Optativos')
+        table.cell(1, 4).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER 
+        cellp = table.cell(0, 5).merge(table.cell(1, 5)).paragraphs[0] 
+        cellp.add_run('Libre Elección (L)')
+        cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        cellp = table.cell(0, 6).merge(table.cell(1, 6)).paragraphs[0] 
+        cellp.add_run('Total')
+        cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(2, 1).paragraphs[0].add_run(request.detail_cm['resumen_general']['exigidos']['B']['ob'])
+        table.cell(2, 2).paragraphs[0].add_run(request.detail_cm['resumen_general']['exigidos']['B']['op'])
+        table.cell(2, 3).paragraphs[0].add_run(request.detail_cm['resumen_general']['exigidos']['C']['ob'])
+        table.cell(2, 4).paragraphs[0].add_run(request.detail_cm['resumen_general']['exigidos']['C']['op'])
+        table.cell(2, 5).paragraphs[0].add_run(request.detail_cm['resumen_general']['exigidos']['L'])
+        suma = int(request.detail_cm['resumen_general']['exigidos']['B']['ob']) 
+        suma = suma + int(request.detail_cm['resumen_general']['exigidos']['B']['op'])
+        suma = suma + int(request.detail_cm['resumen_general']['exigidos']['C']['ob'])
+        suma = suma + int(request.detail_cm['resumen_general']['exigidos']['C']['op'])
+        suma = suma + int(request.detail_cm['resumen_general']['exigidos']['L'])
+        table.cell(2, 6).paragraphs[0].add_run(str(suma))
+        table.cell(3, 1).paragraphs[0].add_run(request.detail_cm['resumen_general']['equiv_conv']['B']['ob'])
+        table.cell(3, 2).paragraphs[0].add_run(request.detail_cm['resumen_general']['equiv_conv']['B']['op'])
+        table.cell(3, 3).paragraphs[0].add_run(request.detail_cm['resumen_general']['equiv_conv']['C']['ob'])
+        table.cell(3, 4).paragraphs[0].add_run(request.detail_cm['resumen_general']['equiv_conv']['C']['op'])
+        table.cell(3, 5).paragraphs[0].add_run(request.detail_cm['resumen_general']['equiv_conv']['L'])
+        suma = int(request.detail_cm['resumen_general']['equiv_conv']['B']['ob']) 
+        suma = suma + int(request.detail_cm['resumen_general']['equiv_conv']['B']['op'])
+        suma = suma + int(request.detail_cm['resumen_general']['equiv_conv']['C']['ob'])
+        suma = suma + int(request.detail_cm['resumen_general']['equiv_conv']['C']['op'])
+        suma = suma + int(request.detail_cm['resumen_general']['equiv_conv']['L'])
+        table.cell(3, 6).paragraphs[0].add_run(str(suma))
+        table.cell(4, 1).paragraphs[0].add_run(request.detail_cm['resumen_general']['pendientes']['B']['ob'])
+        table.cell(4, 2).paragraphs[0].add_run(request.detail_cm['resumen_general']['pendientes']['B']['op'])
+        table.cell(4, 3).paragraphs[0].add_run(request.detail_cm['resumen_general']['pendientes']['C']['ob'])
+        table.cell(4, 4).paragraphs[0].add_run(request.detail_cm['resumen_general']['pendientes']['C']['op'])
+        table.cell(4, 5).paragraphs[0].add_run(request.detail_cm['resumen_general']['pendientes']['L'])
+        suma = int(request.detail_cm['resumen_general']['pendientes']['B']['ob']) 
+        suma = suma + int(request.detail_cm['resumen_general']['pendientes']['B']['op'])
+        suma = suma + int(request.detail_cm['resumen_general']['pendientes']['C']['ob'])
+        suma = suma + int(request.detail_cm['resumen_general']['pendientes']['C']['op'])
+        suma = suma + int(request.detail_cm['resumen_general']['pendientes']['L'])
+        table.cell(4, 6).paragraphs[0].add_run(str(suma))
         
