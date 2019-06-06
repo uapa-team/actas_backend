@@ -102,7 +102,7 @@ class simple():
             para.add_run(
                 '. (Artículo 58 del acuerdo 008 de 2008 del Consejo Superior Universitario. ')
 
-    @staticmethod
+    @staticmethod  # TODO: LINE TOO LONG
     def case_DEVOLUCION_PROPORCIONAL_DEL_VALOR_PAGADO_POR_CONCEPTO_DE_DERECHOS_DE_MATRICULA_PREGRADO(request, docx):
         para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
@@ -294,12 +294,14 @@ class simple():
         for doc in request.detail_cm['doc']:
             count = count - 1
             para.add_run(doc['nomb'])
-            if doc['un'] == 'Y':
+            if 'dep' in doc:
                 para.add_run(
                     ' de la Universidad Nacional de Colombia de la dependencia: ')
                 para.add_run(doc['dep'])
-            elif doc['un'] == 'N':
+            elif 'univ' in doc:
                 para.add_run(' de la ' + doc['univ'])
+            else:
+                raise AttributeError
             if count == 0:
                 para.add_run('.')
                 return
@@ -310,10 +312,10 @@ class simple():
                 para.add_run(', ')
         length = len(request.detail_cm['doc']) - 1
         para.add_run(request.detail_cm['doc'][length]['nomb'])
-        if request.detail_cm['doc'][length]['un'] == 'Y':
+        if 'dep' in request.detail_cm['doc'][length]:
             para.add_run(
                 ' de la Universidad Nacional de Colombia de la dependencia: ')
             para.add_run(request.detail_cm['doc'][length]['dep'])
-        elif request.detail_cm['doc'][length]['un'] == 'N':
+        elif 'univ' in request.detail_cm['doc'][length]:
             para.add_run(' de la ' + request.detail_cm['doc'][length]['univ'])
         para.add_run('.')
