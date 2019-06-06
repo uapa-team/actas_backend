@@ -6,7 +6,6 @@ from .comp_cases.case_TRASPOS import TRASPOS
 from .comp_cases.case_IASIPRE import IASIPRE
 from .comp_cases.case_CGRUPXX import CGRUPXX
 from .comp_cases.case_IASIPOS import IASIPOS
-from .comp_cases.case_HOIDPRE import HOIDPRE
 from .comp_cases.case_CASIPXX import CASIPXX
 from .comp_cases.case_HCEMPOS import HCEMPOS
 from .comp_cases.case_simple import simple
@@ -156,7 +155,8 @@ class CasesSpliter():
         simple.case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO(request, docx)
 
     def case_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD_PREGRADO(self, request, docx):
-        simple.case_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD(request, docx)
+        simple.case_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD_PREGRADO(
+            request, docx)
 
     def case_HOMOLOGACION_CONVALIDACION_EQUIVALENCIA_PREGRADO(self, request, docx):
         raise NotImplementedError
@@ -249,7 +249,8 @@ class CasesSpliter():
             request, docx)
 
     def case_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD_POSGRADO(self, request, docx):
-        simple.case_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD(request, docx)
+        simple.case_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD_PREGRADO(
+            request, docx)
 
     def case_HOMOLOGACION_CONVALIDACION_Y_EQUIVALENCIA_POSGRADO(self, request, docx):
         HCEMPOS.case_HOMOLOGACION_CONVALIDACION_Y_EQUIVALENCIA_POSGRADO(
@@ -290,5 +291,5 @@ class CasesSpliter():
             request, docx)
 
     def case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO(self, request, docx):
-        simple.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO(
+        simple.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO(
             request, docx)
