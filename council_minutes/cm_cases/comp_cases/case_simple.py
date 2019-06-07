@@ -654,8 +654,9 @@ class simple():
             nom_assig = 'Trabajo de grado - Modalidad Trabajos Investigativos'
         else:
             raise AttributeError
-        para.add_run('", dirigida por el profesor ')
-        para.add_run(request.detail_cm['docente'])
+        if 'docente' in request.detail_cm:
+            para.add_run('", dirigida por el profesor ')
+            para.add_run(request.detail_cm['docente'])
         para.add_run(', debido a que ')
         para.add_run(request.justification + '.')
         table = docx.add_table(rows=2, cols=5)
