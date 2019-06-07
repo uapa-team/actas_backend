@@ -785,3 +785,25 @@ class simple():
             para.add_run('NO APRUEBA ').font.bold = True
             para.add_run(common + ', debido a que {}'.format(request.justification))
         para.add_run('.')
+
+    @staticmethod
+    def case_REGISTRO_DE_CALIFICACION_DEL_PROYECTO_Y_EXAMEN_DOCTORAL_POSGRADO(request, docx):
+        para = docx.add_paragraph()
+        para.add_run('El Consejo de Facultad ')
+        if request.approval_status == 'AP':
+            para.add_run('APRUEBA:\n').font.bold = True
+        else:
+            para.add_run('NO APRUEBA:\n').font.bold = True
+        numeral = 1
+        calificacion = {'AP': 'aprobado', 'NA': 'no aprobado'}
+        for i in range (0, len(request.detail_cm['casos'])):
+            if request.detail_cm['casos'][i]['caso'] == 'examen':
+                para.add_run(str(numeral) + '. Calificar {} ({})'.format(calificacion[request.detail_cm['casos'][i]['calificacion']], request.detail_cm['casos'][i]['calificacion'])
+                + ' el Examen de calificación con código {}'.format(request.detail_cm['casos'][i]['codigo'])  
+                + ' en el periodo académico {}\n'.format(request.academic_period))
+                numeral += 1
+            else:
+                para.add_run(str(numeral) + '. Calificar {} ({})'.format(calificacion[request.detail_cm['casos'][i]['calificacion']], request.detail_cm['casos'][i]['calificacion'])
+                + ' el Proyecto de Tesis de {} con código {}'.format(request.get_academic_program_display(), request.detail_cm['casos'][i]['codigo'])
+                + ' en el periodo académico {}, cuyo título es: “{}”\n'.format(request.academic_period, request.detail_cm['casos'][i]['titulo']))
+
