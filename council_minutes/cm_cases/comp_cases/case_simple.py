@@ -813,3 +813,16 @@ class simple():
                 para = docx.add_paragraph(Item, style='List Number')
                 para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
                 para.paragraph_format.space_after = Pt(0)
+    
+    @staticmethod
+    def case_CAMBIO_DE_PROYECTO_DE_TESIS(request, docx):
+        para = docx.add_paragraph()
+        para.add_run('El Consejo de Facultad ')
+        common = 'cambiar título de Tesis de {} a: “{}”'.format(request.get_academic_program_display(), request.detail_cm['titulo'])
+        if request.approval_status == 'AP':
+            para.add_run('APRUEBA ').font.bold = True
+            para.add_run(common)
+        else:
+            para.add_run('NO APRUEBA ').font.bold = True
+            para.add_run(common + ', debido a que {}'.format(request.justification))
+        para.add_run('.')
