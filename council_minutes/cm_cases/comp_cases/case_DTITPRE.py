@@ -74,9 +74,9 @@ class DTITPRE():
         DTITPRE.case_DOBLE_TITULACION_PREGRADO_TABLE_ASIGNATURAS_PENDIENTES(request, docx)
         para = docx.add_paragraph()
         para.paragraph_format.space_before = Pt(8)
-        bullet = para.add_run('La oferta de asignaturas optativas en cada una de las agrupaciones y componentes del plan de' 
-        + 'estudios del programa curricular de Ingeniería Industrial, la encuentra en el Acuerdo No. 024 del año 2014, expedido' 
-        + 'por Consejo de facultad de Ingeniería.')
+        bullet = para.add_run('La oferta de asignaturas optativas en cada una de las agrupaciones y componentes del plan de' + 
+        ' estudios del programa curricular de {}, la encuentra en el {} del año {}, expedido'.format(request.get_academic_program_display(), '<acuerdo del programa>', '<año del acuerdo>') 
+        + ' por Consejo de facultad de Ingeniería.')
         para.paragraph_format.space_after = Pt(0)
         bullet.font.size = Pt(8)
         bullet.font.underline = True
@@ -89,8 +89,33 @@ class DTITPRE():
         bullet.font.size = Pt(8)
         bullet.font.bold = True
         DTITPRE.case_DOBLE_TITULACION_PREGRADO_TABLE_RESUMEN_GENERAL(request, docx)
-
-
+        para = docx.add_paragraph()
+        para.paragraph_format.space_before = Pt(0)
+        bullet = para.add_run('*Sin incluir los créditos correspondientes al cumplimiento del requisito de suficiencia en idioma extranjero (Circular 09 de 2013 de la División de Registro).\n**Aprobados del plan de estudios, sin excedentes.')
+        para.paragraph_format.space_after = Pt(0)
+        bullet.font.size = Pt(6)
+        table = docx.add_table(rows=1, cols=5, style='Table Grid')
+        table.style.font.size = Pt(8)
+        table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        for cell in table.columns[0].cells:
+            cell.width = 3000000
+        for cell in table.columns[1].cells:
+            cell.width = 650000
+        for cell in table.columns[2].cells:
+            cell.width = 450000
+        for cell in table.columns[3].cells:
+            cell.width = 650000
+        for cell in table.columns[4].cells:
+            cell.width = 450000
+        table.cell(0, 0).paragraphs[0].add_run('El Consejo de la Facultad de Ingeniería en sesión del día {} Acta {}'.format(str(request.detail_cm['fecha_sesion'].day) + REINPRE.num_to_month(request.detail_cm['fecha_sesion'].month) + str(request.detail_cm['fecha_sesion'].year), request.detail_cm['acta']))
+        table.cell(0, 1).paragraphs[0].add_run('Recomienda')
+        table.cell(0, 3).paragraphs[0].add_run('No recomienda')
+        if request.detail_cm['recomienda'] == 'Si':
+            table.cell(0, 2).paragraphs[0].add_run('X')
+            table.cell(0, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        else:
+            table.cell(0, 4).paragraphs[0].add_run('X')
+            table.cell(0, 4).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
     
     @staticmethod
     def case_DOBLE_TITULACION_PREGRADO_TABLE_DATOS_PERSONALES(request, docx):
@@ -361,6 +386,7 @@ class DTITPRE():
 
     @staticmethod
     def case_DOBLE_TITULACION_PREGRADO_TABLE_ASIGNATURAS_PENDIENTES(request, docx):
+        total_pendientes = 0
         cant_rows = 0
         for i in range (0, len(request.detail_cm['asignaturas_pendientes']['T_B']['obligatorias']['categorias'])):
             for m in request.detail_cm['asignaturas_pendientes']['T_B']['obligatorias']['categorias'][i]['materias']:
@@ -398,12 +424,12 @@ class DTITPRE():
         table.cell(2, 4).paragraphs[0].add_run('Créditos pendientes por cursar por el estudiante').font.bold = True
         row_a = 3
         row_m = 3
-
         for i in range (0, len(request.detail_cm['asignaturas_pendientes']['T_B']['obligatorias']['categorias'])):
             cellp = table.cell(row_a, 0).merge(table.cell(row_a + len(request.detail_cm['asignaturas_pendientes']['T_B']['obligatorias']['categorias'][i]['materias']) - 1,0)).paragraphs[0]
             cellp.add_run(request.detail_cm['asignaturas_pendientes']['T_B']['obligatorias']['categorias'][i]['agrupacion'])
             cellp = table.cell(row_a, 4).merge(table.cell(row_a + len(request.detail_cm['asignaturas_pendientes']['T_B']['obligatorias']['categorias'][i]['materias']) - 1,4)).paragraphs[0]
             cellp.add_run(request.detail_cm['asignaturas_pendientes']['T_B']['obligatorias']['categorias'][i]['creditos_pendientes'])
+            total_pendientes = total_pendientes + int(request.detail_cm['asignaturas_pendientes']['T_B']['obligatorias']['categorias'][i]['creditos_pendientes'])
             for j in range (0, len(request.detail_cm['asignaturas_pendientes']['T_B']['obligatorias']['categorias'][i]['materias'])):
                 table.cell(row_m, 1).paragraphs[0].add_run(request.detail_cm['asignaturas_pendientes']['T_B']['obligatorias']['categorias'][i]['materias'][j]['codigo'])
                 table.cell(row_m, 2).paragraphs[0].add_run(request.detail_cm['asignaturas_pendientes']['T_B']['obligatorias']['categorias'][i]['materias'][j]['asignatura'])
@@ -411,11 +437,10 @@ class DTITPRE():
                 row_m = row_m + 1
             row_a = row_m
         
+        #OPTATIVAS T_B
         cant_rows = 0
         for i in request.detail_cm['asignaturas_pendientes']['T_B']['optativas']:
             cant_rows = cant_rows + 1
-
-        #OPTATIVAS T_B
         table = docx.add_table(rows=cant_rows + 3, cols=3, style='Table Grid')
         table.style.font.size = Pt(8)
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER  
@@ -443,11 +468,13 @@ class DTITPRE():
             table.cell(row_m, 0).paragraphs[0].add_run(request.detail_cm['asignaturas_pendientes']['T_B']['optativas'][j]['agrupacion'])
             table.cell(row_m, 1).paragraphs[0].add_run(request.detail_cm['asignaturas_pendientes']['T_B']['optativas'][j]['cred_requeridos'])
             table.cell(row_m, 2).paragraphs[0].add_run(request.detail_cm['asignaturas_pendientes']['T_B']['optativas'][j]['cred_pendientes'])
+            total_pendientes =  total_pendientes + int(request.detail_cm['asignaturas_pendientes']['T_B']['optativas'][j]['cred_pendientes'])
             row_m = row_m + 1
+        
         
         cellp = table.cell(row_m, 0).merge(table.cell(row_m, 1)).paragraphs[0]
         cellp.add_run('Total créditos pendientes').font.bold = True
-        table.cell(row_m, 2).paragraphs[0].add_run(request.detail_cm['asignaturas_pendientes']['T_B']['total_pendientes'])
+        table.cell(row_m, 2).paragraphs[0].add_run(str(total_pendientes))
 
         cant_rows = 0
         for i in range (0, len(request.detail_cm['asignaturas_pendientes']['T_B']['obligatorias']['categorias'])):
@@ -455,6 +482,7 @@ class DTITPRE():
                 cant_rows = cant_rows + 1
 
         #T_C
+        total_pendientes = 0
         para = docx.add_paragraph()
         para.paragraph_format.space_before = Pt(0)
         para.add_run(' ').font.size = Pt(8)
@@ -464,7 +492,7 @@ class DTITPRE():
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER  
 
         for cell in table.columns[0].cells:
-            cell.width = 970000
+            cell.width = 1000000
         for cell in table.columns[1].cells:
             cell.width = 900000
         for cell in table.columns[2].cells:
@@ -497,18 +525,20 @@ class DTITPRE():
             cellp.add_run(request.detail_cm['asignaturas_pendientes']['T_C']['obligatorias']['categorias'][i]['agrupacion'])
             cellp = table.cell(row_a, 4).merge(table.cell(row_a + len(request.detail_cm['asignaturas_pendientes']['T_C']['obligatorias']['categorias'][i]['materias']) - 1,4)).paragraphs[0]
             cellp.add_run(request.detail_cm['asignaturas_pendientes']['T_C']['obligatorias']['categorias'][i]['creditos_pendientes'])
+            total_pendientes = total_pendientes + int(request.detail_cm['asignaturas_pendientes']['T_C']['obligatorias']['categorias'][i]['creditos_pendientes'])
             for j in range (0, len(request.detail_cm['asignaturas_pendientes']['T_C']['obligatorias']['categorias'][i]['materias'])):
                 table.cell(row_m, 1).paragraphs[0].add_run(request.detail_cm['asignaturas_pendientes']['T_C']['obligatorias']['categorias'][i]['materias'][j]['codigo'])
                 table.cell(row_m, 2).paragraphs[0].add_run(request.detail_cm['asignaturas_pendientes']['T_C']['obligatorias']['categorias'][i]['materias'][j]['asignatura'])
                 table.cell(row_m, 3).paragraphs[0].add_run(request.detail_cm['asignaturas_pendientes']['T_C']['obligatorias']['categorias'][i]['materias'][j]['creditos'])
                 row_m = row_m + 1
             row_a = row_m
+
         
+        #OPTATIVAS T_C
         cant_rows = 0
         for i in request.detail_cm['asignaturas_pendientes']['T_C']['optativas']:
             cant_rows = cant_rows + 1
 
-        #OPTATIVAS T_C
         table = docx.add_table(rows=cant_rows + 3, cols=3, style='Table Grid')
         table.style.font.size = Pt(8)
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER  
@@ -516,9 +546,9 @@ class DTITPRE():
         for cell in table.columns[0].cells:
             cell.width = 1900000
         for cell in table.columns[1].cells:
-            cell.width = 1630000
+            cell.width = 1650000
         for cell in table.columns[2].cells:
-            cell.width = 1630000
+            cell.width = 1650000
 
 
         for column in table.columns:
@@ -536,11 +566,12 @@ class DTITPRE():
             table.cell(row_m, 0).paragraphs[0].add_run(request.detail_cm['asignaturas_pendientes']['T_C']['optativas'][j]['agrupacion'])
             table.cell(row_m, 1).paragraphs[0].add_run(request.detail_cm['asignaturas_pendientes']['T_C']['optativas'][j]['cred_requeridos'])
             table.cell(row_m, 2).paragraphs[0].add_run(request.detail_cm['asignaturas_pendientes']['T_C']['optativas'][j]['cred_pendientes'])
+            total_pendientes =  total_pendientes + int(request.detail_cm['asignaturas_pendientes']['T_C']['optativas'][j]['cred_pendientes'])
             row_m = row_m + 1
         
         cellp = table.cell(row_m, 0).merge(table.cell(row_m, 1)).paragraphs[0]
         cellp.add_run('Total créditos pendientes').font.bold = True
-        table.cell(row_m, 2).paragraphs[0].add_run(request.detail_cm['asignaturas_pendientes']['T_C']['total_pendientes'])
+        table.cell(row_m, 2).paragraphs[0].add_run(str(total_pendientes))
 
         #ELECTIVAS
         para = docx.add_paragraph()
