@@ -192,7 +192,7 @@ class CasesSpliter():
         simple.case_CAMBIO_DE_PERFIL_POSGRADO(request, docx)
 
     def case_CAMBIO_DE_PROYECTO_DE_TESIS(self, request, docx):
-        raise NotImplementedError
+        simple.case_CAMBIO_DE_PROYECTO_DE_TESIS(request, docx)
 
     def case_HOMOLOGACION_INGLES_POSGRADO(self, request, docx):
         HOIDPXX.case_HOMOLOGACION_INGLES(request, docx)
