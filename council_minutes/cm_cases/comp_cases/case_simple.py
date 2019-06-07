@@ -769,3 +769,19 @@ class simple():
             para.add_run(' y otorga exención de derechos académicos. ')
         else:
             para.add_run('. ')
+
+    @staticmethod
+    def case_REINGRESO_POSGRADO(request, docx):
+        para = docx.add_paragraph()
+        para.add_run('El Consejo de Facultad ')
+        common = 'reingreso por única vez en el programa de {}, a partir del periodo {}'.format(request.get_academic_program_display(), request.academic_period)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        if request.approval_status == 'AP':
+            para.add_run('APRUEBA ').font.bold = True
+            para.add_run(common + '. El reingreso del estudiante estará regido por el Acuerdo 008 de 2008 del Consejo Superior Universitario')
+            if request.observation:
+                para.add_run('. {}'.format(request.observation))
+        else:
+            para.add_run('NO APRUEBA ').font.bold = True
+            para.add_run(common + ', debido a que {}'.format(request.justification))
+        para.add_run('.')

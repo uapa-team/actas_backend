@@ -180,7 +180,7 @@ class CasesSpliter():
         simple.case_REEMBOLSO_POSGRADO(request, docx)
 
     def case_REINGRESO_POSGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_REINGRESO_POSGRADO(request, docx)
 
     def case_APOYO_ECONOMICO_POSGRADO(self, request, docx):
         raise NotImplementedError
