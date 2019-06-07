@@ -65,8 +65,10 @@ def docx_gen_by_date(request):
     except (json.decoder.JSONDecodeError):
         return HttpResponse("Bad Request", status=400)
     filename = 'public/acta' + start_date.split(':')[0] + '_' + end_date.split(':')[0] + '.docx'
-    print(filename)
     generator = CouncilMinuteGenerator()
-    generator.add_cases_from_date(start_date, end_date)
+    try:
+        generator.add_cases_from_date(start_date, end_date)
+    except IndexError:
+        return HttpResponse('No cases in date range specified', status=401)
     generator.generate(filename)
     return HttpResponse(filename)
