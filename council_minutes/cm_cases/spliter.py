@@ -8,6 +8,7 @@ from .comp_cases.case_CGRUPXX import CGRUPXX
 from .comp_cases.case_IASIPOS import IASIPOS
 from .comp_cases.case_CASIPXX import CASIPXX
 from .comp_cases.case_HCEMPOS import HCEMPOS
+from .comp_cases.case_DTITPRE import DTITPRE
 from .comp_cases.case_simple import simple
 
 
@@ -104,7 +105,7 @@ class CasesSpliter():
         simple.case_TRABAJO_DE_GRADO_PREGADO(request, docx)
 
     def case_DOBLE_TITULACION_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        DTITPRE.case_DOBLE_TITULACION_PREGRADO(request, docx)
 
     def case_HOMOLOGACION_INGLES_PREGRADO(self, request, docx):
         HOIDPXX.case_HOMOLOGACION_INGLES(request, docx)
