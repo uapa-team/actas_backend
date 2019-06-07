@@ -235,7 +235,7 @@ class simple():
         else:
             para.add_run('NO APRUEBA ').font.bold = True
         para.add_run('devolución proporcional del ' + num2words(float(request.detail_cm['percentage']), lang='es'))
-        para.add_run(' por ciento (' + request.detail_cm['percentaje'] + '%) ')
+        para.add_run(' por ciento (' + request.detail_cm['percentage'] + '%) ')
         para.add_run('del valor pagado por concepto de derechos de matrícula del periodo ')
         para.add_run(request.detail_cm['period_cancel'])
         para.add_run(', teniendo en cuenta la fecha de presentación de la solicitud y que le fue aprobada la cancelación de periodo en Acta 0')

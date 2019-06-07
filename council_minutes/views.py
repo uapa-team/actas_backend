@@ -55,3 +55,18 @@ def docx_gen_by_id(request, cm_id):
     generator.add_case_from_request(request_by_id)
     generator.generate(filename)
     return HttpResponse(filename)
+
+@csrf_exempt
+def docx_gen_by_date(request):
+    try:
+        body = json.loads(request.body)
+        start_date=body['cm']['start_date']
+        end_date=body['cm']['end_date']
+    except (json.decoder.JSONDecodeError):
+        return HttpResponse("Bad Request", status=400)
+    filename = 'public/acta' + start_date.split(':')[0] + '_' + end_date.split(':')[0] + '.docx'
+    print(filename)
+    generator = CouncilMinuteGenerator()
+    generator.add_cases_from_date(start_date, end_date)
+    generator.generate(filename)
+    return HttpResponse(filename)
