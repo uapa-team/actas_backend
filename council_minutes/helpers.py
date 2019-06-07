@@ -1,36 +1,27 @@
-from django.core.serializers.json import DjangoJSONEncoder
-from django.utils.encoding import smart_str
 import json
-from .models import Request
-import unicodedata
+from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.dateparse import parse_date
-import copy
+from .models import Request
 
 
 class QuerySetEncoder(DjangoJSONEncoder):
 
-    def default(self, querySet):
-        json = {}
-        for element in querySet:
-
+    def default(self, o):
+        for element in o:
+            json_obj = {}
             id_ = str(element.id)
-            json[id_] = {}
-
-            json[id_]["Fecha Solicitud"] = str(element["date"])
-            json[id_]["Tipo Solicitud"] = element.get_type_display()
-            json[id_]["Nombre Estudiante"] = element["student_name"]
-            json[id_]["Estado Aprobación"] = element.get_approval_status_display()
-            json[id_]["Documento Identidad"] = element["student_dni"]
-            json[id_]["Tipo Documento"] = element.get_student_dni_type_display()
-            json[id_]["Periodo Academico"] = element["academic_period"]
-            json[id_]["Programa"] = element.get_academic_program_display()
-            json[id_]["Justificación"] = element["justification"]
-
-            # TODO: details_cm es un objeto que puede contener datos primitivos,
-            # listas u otros objetos (como las materias)
-            json[id_]["details_cm"] = {}
-
-        return json
+            json_obj[id_] = {}
+            json_obj[id_]["Fecha Solicitud"] = str(element["date"])
+            json_obj[id_]["Tipo Solicitud"] = element.get_type_display()
+            json_obj[id_]["Nombre Estudiante"] = element["student_name"]
+            json_obj[id_]["Estado Aprobación"] = element.get_approval_status_display()
+            json_obj[id_]["Documento Identidad"] = element["student_dni"]
+            json_obj[id_]["Tipo Documento"] = element.get_student_dni_type_display()
+            json_obj[id_]["Periodo Academico"] = element["academic_period"]
+            json_obj[id_]["Programa"] = element.get_academic_program_display()
+            json_obj[id_]["Justificación"] = element["justification"]
+            json_obj[id_]["details_cm"] = {}
+        return json_obj
 
 
 class Translator:
@@ -39,7 +30,6 @@ class Translator:
     def translate(data):
         data_decode = data.decode('utf-8')
         data_json = json.loads(data_decode)
-        # print(data_json)
         translated_type = ''
         translated_status_approval = ''
         translated_dni_type = ''
