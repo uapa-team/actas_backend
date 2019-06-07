@@ -791,19 +791,24 @@ class simple():
         para = docx.add_paragraph()
         para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
-            para.add_run('APRUEBA:\n').font.bold = True
+            para.add_run('APRUEBA:').font.bold = True
         else:
-            para.add_run('NO APRUEBA:\n').font.bold = True
-        numeral = 1
+            para.add_run('NO APRUEBA:').font.bold = True
         calificacion = {'AP': 'aprobado', 'NA': 'no aprobado'}
         for i in range (0, len(request.detail_cm['casos'])):
             if request.detail_cm['casos'][i]['caso'] == 'examen':
-                para.add_run(str(numeral) + '. Calificar {} ({})'.format(calificacion[request.detail_cm['casos'][i]['calificacion']], request.detail_cm['casos'][i]['calificacion'])
-                + ' el Examen de calificación con código {}'.format(request.detail_cm['casos'][i]['codigo'])  
-                + ' en el periodo académico {}\n'.format(request.academic_period))
-                numeral += 1
+                Item1 = 'Calificar {} ({})'.format(calificacion[request.detail_cm['casos'][i]['calificacion']], request.detail_cm['casos'][i]['calificacion'])
+                Item2 = ' el Examen de calificación con código {}'.format(request.detail_cm['casos'][i]['codigo'])  
+                Item3 =  ' en el periodo académico {}.'.format(request.academic_period)
+                Item = Item1 + Item2 + Item3
+                para = docx.add_paragraph(Item, style='List Number')
+                para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+                para.paragraph_format.space_after = Pt(0)
             else:
-                para.add_run(str(numeral) + '. Calificar {} ({})'.format(calificacion[request.detail_cm['casos'][i]['calificacion']], request.detail_cm['casos'][i]['calificacion'])
-                + ' el Proyecto de Tesis de {} con código {}'.format(request.get_academic_program_display(), request.detail_cm['casos'][i]['codigo'])
-                + ' en el periodo académico {}, cuyo título es: “{}”\n'.format(request.academic_period, request.detail_cm['casos'][i]['titulo']))
-
+                Item1 = 'Calificar {} ({})'.format(calificacion[request.detail_cm['casos'][i]['calificacion']], request.detail_cm['casos'][i]['calificacion'])
+                Item2 = ' el Proyecto de Tesis de {} con código {}'.format(request.get_academic_program_display(), request.detail_cm['casos'][i]['codigo'])
+                Item3 = ' en el periodo académico {}, cuyo título es: “{}”.'.format(request.academic_period, request.detail_cm['casos'][i]['titulo'])
+                Item = Item1 + Item2 + Item3
+                para = docx.add_paragraph(Item, style='List Number')
+                para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+                para.paragraph_format.space_after = Pt(0)
