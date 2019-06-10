@@ -231,7 +231,7 @@ class CasesSpliter():
         IASIPOS.case_INSCRIPCION_DE_ASIGNATURAS_POSGRADO(request, docx)
 
     def case_INFORME_DE_AVANCE_DE_TESIS_POSGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_INFORME_DE_AVANCE_DE_TESIS_POSGRADO(request, docx)
 
     def case_RETIRO_DEFINITIVO_DEL_PROGRAMA_POSGRADO(self, request, docx):
         simple.case_RETIRO_DEFINITIVO_DEL_PROGRAMA_PREGRADO(request, docx)
