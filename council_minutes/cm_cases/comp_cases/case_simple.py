@@ -826,3 +826,17 @@ class simple():
             para.add_run('NO APRUEBA ').font.bold = True
             para.add_run(common + ', debido a que {}'.format(request.justification))
         para.add_run('.')
+
+    @staticmethod
+    def case_INFORME_DE_AVANCE_DE_TESIS_POSGRADO(request, docx):
+        para = docx.add_paragraph()
+        para.add_run('El Consejo de Facultad ')
+        common = '{} de Doctorado ({}) en {}, en el periodo {}'.format(request.detail_cm['caso'], request.detail_cm['codigo'], request.get_academic_program_display(), request.academic_period)
+        if request.approval_status == 'AP':
+            para.add_run('APRUEBA ').font.bold = True
+            para.add_run('calificación avance satisfactorio (AS) a ' + common +
+            ', teniendo en cuenta que el estudiante entregó el documento para nombramiento de jurados.')
+        else:
+            para.add_run('NO APRUEBA ').font.bold = True
+            para.add_run('calificación avance satisfactorio (AS) a '+ common + ', debido a que {}'.format(request.justification))
+        para.add_run('.')
