@@ -790,6 +790,7 @@ class simple():
     @staticmethod
     def case_REGISTRO_DE_CALIFICACION_DEL_PROYECTO_Y_EXAMEN_DOCTORAL_POSGRADO(request, docx):
         para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA:').font.bold = True
@@ -817,6 +818,7 @@ class simple():
     @staticmethod
     def case_CAMBIO_DE_PROYECTO_DE_TESIS(request, docx):
         para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('El Consejo de Facultad ')
         common = 'cambiar título de Tesis de {} a: “{}”'.format(request.get_academic_program_display(), request.detail_cm['titulo'])
         if request.approval_status == 'AP':
@@ -830,12 +832,13 @@ class simple():
     @staticmethod
     def case_INFORME_DE_AVANCE_DE_TESIS_POSGRADO(request, docx):
         para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('El Consejo de Facultad ')
         common = '{} de Doctorado ({}) en {}, en el periodo {}'.format(request.detail_cm['caso'], request.detail_cm['codigo'], request.get_academic_program_display(), request.academic_period)
         if request.approval_status == 'AP':
             para.add_run('APRUEBA ').font.bold = True
             para.add_run('calificación avance satisfactorio (AS) a ' + common +
-            ', teniendo en cuenta que el estudiante entregó el documento para nombramiento de jurados.')
+            ', teniendo en cuenta que el estudiante entregó el documento para nombramiento de jurados')
         else:
             para.add_run('NO APRUEBA ').font.bold = True
             para.add_run('calificación avance satisfactorio (AS) a '+ common + ', debido a que {}'.format(request.justification))
