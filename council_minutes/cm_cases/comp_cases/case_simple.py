@@ -826,3 +826,21 @@ class simple():
             para.add_run('NO APRUEBA ').font.bold = True
             para.add_run(common + ', debido a que {}'.format(request.justification))
         para.add_run('.')
+
+    @staticmethod
+    def case_EXPEDICION_DE_RECIBO_PREGRADO(request, docx):
+        para = docx.add_paragraph()
+        para.add_run('El Consejo de Facultad ')
+        if request.detail_cm['caso'] == 'nuevo':
+            common = 'expedir un nuevo recibo de pago de derechos de matrícula con cambio de fecha, para el periodo académico {}'.format(request.academic_period)
+        if request.detail_cm['caso'] == 'unico':
+            common = 'la expedición de un único recibo correspondiente a los derechos académicos y administrativos para el periodo académico {}'.format(request.academic_period)
+        if request.approval_status == 'AP':
+            para.add_run('APRUEBA ').font.bold = True
+            para.add_run(common)
+            if request.observation:
+                para.add_run(', {}'.format(request.observation))
+        else:
+            para.add_run('NO APRUEBA ').font.bold = True
+            para.add_run(common + ', debido a que {}'.format(request.justification))
+        para.add_run('.')

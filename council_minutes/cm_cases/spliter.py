@@ -117,7 +117,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_EXPEDICION_DE_RECIBO_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_EXPEDICION_DE_RECIBO_PREGRADO(request, docx)
 
     def case_PRACTICA_ESTUDIANTIL_PREGRADO(self, request, docx):
         PESTPRE.case_PRACTICA_ESTUDIANTIL_PREGRADO(request, docx)
