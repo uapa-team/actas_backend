@@ -9,6 +9,7 @@ from .comp_cases.case_IASIPOS import IASIPOS
 from .comp_cases.case_CASIPXX import CASIPXX
 from .comp_cases.case_HCEMPOS import HCEMPOS
 from .comp_cases.case_DTITPRE import DTITPRE
+from .comp_cases.case_HCEMPRE import HCEMPRE
 from .comp_cases.case_simple import simple
 
 
@@ -160,7 +161,7 @@ class CasesSpliter():
             request, docx)
 
     def case_HOMOLOGACION_CONVALIDACION_EQUIVALENCIA_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        HCEMPRE.case_HOMOLOGACION_CONVALIDACION_EQUIVALENCIA_PREGRADO(request, docx)
 
     def case_ELIMINACION_DE_LA_HISTORIA_ACADEMICA_BAPI_PREGRADO(self, request, docx):
         simple.case_ELIMINACION_DE_LA_HISTORIA_ACADEMICA_BAPI_PREGRADO(
