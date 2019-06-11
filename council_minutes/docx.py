@@ -3,6 +3,7 @@ from docx import Document
 from docx.shared import Inches
 from docx.shared import Pt
 from .models import Request
+from docx.shared import RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from .cm_cases.spliter import CasesSpliter
 
@@ -12,14 +13,18 @@ class CouncilMinuteGenerator():
         self.spliter = CasesSpliter()
         self.document = Document()
         for style in self.document.styles:
-            style.font.name = 'Ancizar Sans'
+            try:
+                self.document.styles[style.name].font.name = 'Ancizar Sans'
+                self.document.styles[style.name].font.color.rgb=RGBColor(0x00, 0x00, 0x00)
+            except:
+                pass
         self.case_count = 0
 
     def add_case_from_request(self, request):
         self.spliter.request_case(request, self.document)
 
     def add_cases_from_date(self, start_date, end_date):
-        request_by_date = Request.objects(date__gte=dateparser.parse(start_date))
+        request_by_date = Request.objects(date__gte=dateparser.parse(start_date), date__lte=dateparser.parse(end_date))
         request_by_date_ordered = request_by_date.order_by('academic_program', 'type')
         requests_pre = [request for request in request_by_date_ordered if request.is_pre()]
         requests_pos = [request for request in request_by_date_ordered if not request.is_pre()]
@@ -28,25 +33,31 @@ class CouncilMinuteGenerator():
 
     def __add_cases_from_date_pre_pos(self, requests, pre_pos):
         actual_academic_program = requests[0].academic_program
-        actual_case = requests[0].type
-        para = self.document.add_paragraph(style='List Continue')
-        run = para.add_run('ASUNTOS ESTUDIANTILES DE {}'.format(pre_pos))
+        para = self.document.add_paragraph(style='Heading 1')
+        list_level_1 = 9 if pre_pos == 'PREGRADO' else 10
+        list_level_2 = 0
+        list_level_3 = 0
+        run = para.add_run('{}. ASUNTOS ESTUDIANTILES DE {}'.format(list_level_1, pre_pos))
         run.font.bold = True
         run.font.size = Pt(12)
-        para = self.document.add_paragraph()
-        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run(requests[0].get_academic_program_display().upper()).font.bold = True
+        actual_academic_program = 'dummy'
+        actual_case = 'dummy'
         for request in requests:
             if actual_academic_program != request.academic_program:
+                list_level_2 = list_level_2 + 1
                 actual_academic_program = request.academic_program
-                self.document.add_paragraph()
-                para = self.document.add_paragraph()
-                para.add_run(request.get_academic_program_display().upper())
+                para = self.document.add_paragraph(style='Heading 2')
+                run = para.add_run('{}.{} {}'.format(list_level_1, list_level_2, request.get_academic_program_display().upper()))
+                run.font.bold = True
+                run.font.size = Pt(12)
+                list_level_3 = 0
             if actual_case != request.type:
+                list_level_3 = list_level_3 + 1
                 actual_case = request.type
-                self.document.add_paragraph()
-                para = self.document.add_paragraph()
-                para.add_run(request.get_type_display().upper())
+                para = self.document.add_paragraph(style='Heading 3')
+                run = para.add_run('{}.{}.{} {}'.format(list_level_1, list_level_2, list_level_3, request.get_type_display().upper()))
+                run.font.bold = True
+                run.font.size = Pt(12)
             para = self.document.add_paragraph()
             para.add_run(request.student_name + '\t DNI.' + request.student_dni).font.bold = True
             try:
@@ -54,6 +65,11 @@ class CouncilMinuteGenerator():
             except NotImplementedError:
                 self.document.add_paragraph()
                 self.document.add_paragraph('Not Implemented case {}'.format(request.type))
+                self.document.add_paragraph()
+            except Exception as err:
+                self.document.add_paragraph()
+                self.document.add_paragraph('Error en el acta {}'.format(request.id))
+                self.document.add_paragraph('Trace: {}'.format(err))
                 self.document.add_paragraph()
     
     def generate(self, filename):
