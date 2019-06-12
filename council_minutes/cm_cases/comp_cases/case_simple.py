@@ -719,7 +719,7 @@ class simple():
         para = docx.add_paragraph()
         para.add_run('El Consejo de Facultad ')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('designar en el jurado calificador de ' + request.detail_cm['subject'] + 'en ')
+        para.add_run('designar en el jurado calificador de ' + request.detail_cm['subject'] + ' en ')
         para.add_run(request.get_academic_program_display() + ', cuyo título es: "' +
                      request.detail_cm['project_title']+'"')
         para.add_run(', al(los) profesor(es) ')
