@@ -392,3 +392,6 @@ class Request(DynamicDocument):
     user = StringField(max_length=255, required=True)
     date_stamp = DateField(required=True, default=datetime.date.today)
     observation = StringField(default='')
+
+    def is_pre(self):
+        return self.academic_program in ('2541', '2542', '2544', '2545', '2546', '2547', '2548', '2549', '2879')

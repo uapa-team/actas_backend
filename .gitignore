@@ -105,3 +105,6 @@ venv.bak/
 
 # Public council minutes
 public/*
+
+# Visual code
+.vscode/

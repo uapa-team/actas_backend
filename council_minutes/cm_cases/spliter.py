@@ -6,8 +6,10 @@ from .comp_cases.case_TRASPOS import TRASPOS
 from .comp_cases.case_IASIPRE import IASIPRE
 from .comp_cases.case_CGRUPXX import CGRUPXX
 from .comp_cases.case_IASIPOS import IASIPOS
-from .comp_cases.case_HOIDPRE import HOIDPRE
 from .comp_cases.case_CASIPXX import CASIPXX
+from .comp_cases.case_HCEMPOS import HCEMPOS
+from .comp_cases.case_DTITPRE import DTITPRE
+from .comp_cases.case_HCEMPRE import HCEMPRE
 from .comp_cases.case_simple import simple
 
 
@@ -104,7 +106,7 @@ class CasesSpliter():
         simple.case_TRABAJO_DE_GRADO_PREGADO(request, docx)
 
     def case_DOBLE_TITULACION_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        DTITPRE.case_DOBLE_TITULACION_PREGRADO(request, docx)
 
     def case_HOMOLOGACION_INGLES_PREGRADO(self, request, docx):
         HOIDPXX.case_HOMOLOGACION_INGLES(request, docx)
@@ -116,7 +118,7 @@ class CasesSpliter():
         raise NotImplementedError
 
     def case_EXPEDICION_DE_RECIBO_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_EXPEDICION_DE_RECIBO_PREGRADO(request, docx)
 
     def case_PRACTICA_ESTUDIANTIL_PREGRADO(self, request, docx):
         PESTPRE.case_PRACTICA_ESTUDIANTIL_PREGRADO(request, docx)
@@ -155,10 +157,11 @@ class CasesSpliter():
         simple.case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO(request, docx)
 
     def case_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD_PREGRADO(self, request, docx):
-        simple.case_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD(request, docx)
+        simple.case_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD_PREGRADO(
+            request, docx)
 
     def case_HOMOLOGACION_CONVALIDACION_EQUIVALENCIA_PREGRADO(self, request, docx):
-        raise NotImplementedError
+        HCEMPRE.case_HOMOLOGACION_CONVALIDACION_EQUIVALENCIA_PREGRADO(request, docx)
 
     def case_ELIMINACION_DE_LA_HISTORIA_ACADEMICA_BAPI_PREGRADO(self, request, docx):
         simple.case_ELIMINACION_DE_LA_HISTORIA_ACADEMICA_BAPI_PREGRADO(
@@ -178,7 +181,7 @@ class CasesSpliter():
         simple.case_REEMBOLSO_POSGRADO(request, docx)
 
     def case_REINGRESO_POSGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_REINGRESO_POSGRADO(request, docx)
 
     def case_APOYO_ECONOMICO_POSGRADO(self, request, docx):
         raise NotImplementedError
@@ -190,7 +193,7 @@ class CasesSpliter():
         simple.case_CAMBIO_DE_PERFIL_POSGRADO(request, docx)
 
     def case_CAMBIO_DE_PROYECTO_DE_TESIS(self, request, docx):
-        raise NotImplementedError
+        simple.case_CAMBIO_DE_PROYECTO_DE_TESIS(request, docx)
 
     def case_HOMOLOGACION_INGLES_POSGRADO(self, request, docx):
         HOIDPXX.case_HOMOLOGACION_INGLES(request, docx)
@@ -229,7 +232,7 @@ class CasesSpliter():
         IASIPOS.case_INSCRIPCION_DE_ASIGNATURAS_POSGRADO(request, docx)
 
     def case_INFORME_DE_AVANCE_DE_TESIS_POSGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_INFORME_DE_AVANCE_DE_TESIS_POSGRADO(request, docx)
 
     def case_RETIRO_DEFINITIVO_DEL_PROGRAMA_POSGRADO(self, request, docx):
         simple.case_RETIRO_DEFINITIVO_DEL_PROGRAMA_PREGRADO(request, docx)
@@ -248,10 +251,12 @@ class CasesSpliter():
             request, docx)
 
     def case_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD_POSGRADO(self, request, docx):
-        simple.case_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD(request, docx)
+        simple.case_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD_PREGRADO(
+            request, docx)
 
     def case_HOMOLOGACION_CONVALIDACION_Y_EQUIVALENCIA_POSGRADO(self, request, docx):
-        raise NotImplementedError
+        HCEMPOS.case_HOMOLOGACION_CONVALIDACION_Y_EQUIVALENCIA_POSGRADO(
+            request, docx)
 
     def case_MODIFICACION_DE_OBJETIVOS_DE_TESIS_PROPUESTA_POSGRADO(self, request, docx):
         simple.case_MODIFICACION_DE_OBJETIVOS_DE_TESIS_PROPUESTA_POSGRADO(
@@ -273,7 +278,7 @@ class CasesSpliter():
             request, docx)
 
     def case_REGISTRO_DE_CALIFICACION_DEL_PROYECTO_Y_EXAMEN_DOCTORAL_POSGRADO(self, request, docx):
-        raise NotImplementedError
+        simple.case_REGISTRO_DE_CALIFICACION_DEL_PROYECTO_Y_EXAMEN_DOCTORAL_POSGRADO(request, docx)
 
     def case_APROBACION_PROYECTO_PROPUESTA_Y_DESIGNACION_DE_DIRECTOR_POSGRADO(self, request, docx):
         simple.case_APROBACION_PROYECTO_PROPUESTA_Y_DESIGNACION_DE_DIRECTOR_POSGRADO(
@@ -288,5 +293,5 @@ class CasesSpliter():
             request, docx)
 
     def case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO(self, request, docx):
-        simple.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO(
+        simple.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO(
             request, docx)

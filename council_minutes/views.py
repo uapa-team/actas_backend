@@ -113,3 +113,20 @@ def update_cm(request, cm_id):
             acta.save()
             return HttpResponse('Changes updated successfully', status=200)
         return HttpResponse('No changes detected', status=204)
+        
+@csrf_exempt
+def docx_gen_by_date(request):
+    try:
+        body = json.loads(request.body)
+        start_date=body['cm']['start_date']
+        end_date=body['cm']['end_date']
+    except (json.decoder.JSONDecodeError):
+        return HttpResponse("Bad Request", status=400)
+    filename = 'public/acta' + start_date.split(':')[0] + '_' + end_date.split(':')[0] + '.docx'
+    generator = CouncilMinuteGenerator()
+    try:
+        generator.add_cases_from_date(start_date, end_date)
+    except IndexError:
+        return HttpResponse('No cases in date range specified', status=401)
+    generator.generate(filename)
+    return HttpResponse(filename)
