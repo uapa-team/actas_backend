@@ -54,12 +54,14 @@ class CouncilMinuteGenerator():
             if actual_case != request.type:
                 list_level_3 = list_level_3 + 1
                 actual_case = request.type
-                para = self.document.add_paragraph(style='Heading 3')
-                run = para.add_run('{}.{}.{} {}'.format(list_level_1, list_level_2, list_level_3, request.get_type_display().upper()))
+                para = self.document.add_paragraph(style='Heading 2')
+                run = para.add_run(request.get_type_display().upper())
                 run.font.bold = True
                 run.font.size = Pt(12)
-            para = self.document.add_paragraph()
-            para.add_run(request.student_name + '\t DNI.' + request.student_dni).font.bold = True
+            para = self.document.add_paragraph(style='Heading 3')
+            run = para.add_run('{}.{}.{} {} \t DNI. {}'.format(list_level_1, list_level_2, list_level_3, request.student_name, request.student_dni))
+            run.font.bold = True
+            run.font.size = Pt(12)
             try:
                 self.spliter.request_case(request, self.document)
             except NotImplementedError:
