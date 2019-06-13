@@ -69,42 +69,56 @@ def update_cm(request, cm_id):
             old = []
         old_obj = {}
         some_change = False
-        if acta.type != json_body['type']:
-            some_change = some_change or True
-            old_obj.update({'type': acta.type})
-            acta.type = json_body['type']
-        if acta.student_name != json_body['student_name']:
-            some_change = some_change or True
-            old_obj.update({'student_name': acta.student_name})
-            acta.student_name = json_body['student_name']
-        if acta.approval_status != json_body['approval_status']:
-            some_change = some_change or True
-            old_obj.update({'approval_status': acta.approval_status})
-            acta.approval_status = json_body['approval_status']
-        if acta.student_dni != json_body['student_dni']:
-            some_change = some_change or True
-            old_obj.update({'student_dni': acta.student_dni})
-            acta.student_dni = json_body['student_dni']
-        if acta.student_dni_type != json_body['student_dni_type']:
-            some_change = some_change or True
-            old_obj.update({'student_dni_type': acta.student_dni_type})
-            acta.student_dni_type = json_body['student_dni_type']
-        if acta.academic_period != json_body['academic_period']:
-            some_change = some_change or True
-            old_obj.update({'academic_period': acta.academic_period})
-            acta.academic_period = json_body['academic_period']
-        if acta.academic_program != json_body['academic_program']:
-            some_change = some_change or True
-            old_obj.update({'academic_program': acta.academic_program})
-            acta.academic_program = json_body['academic_program']
-        if acta.justification != json_body['justification']:
-            some_change = some_change or True
-            old_obj.update({'justification': acta.justification})
-            acta.justification = json_body['justification']
-        if acta.detail_cm != json_body['detail_cm']:
-            some_change = some_change or True
-            old_obj.update({'detail_cm': acta.detail_cm})
-            acta.detail_cm = json_body['detail_cm']
+        if 'type' in json_body:
+            if acta.type != json_body['type']:
+                some_change = some_change or True
+                old_obj.update({'type': acta.type})
+                acta.type = json_body['type']
+        if 'student_name' in json_body:
+            if acta.student_name != json_body['student_name']:
+                some_change = some_change or True
+                old_obj.update({'student_name': acta.student_name})
+                acta.student_name = json_body['student_name']
+        if 'approval_status' in json_body:
+            if acta.approval_status != json_body['approval_status']:
+                some_change = some_change or True
+                old_obj.update({'approval_status': acta.approval_status})
+                acta.approval_status = json_body['approval_status']
+        if 'student_dni' in json_body:
+            if acta.student_dni != json_body['student_dni']:
+                some_change = some_change or True
+                old_obj.update({'student_dni': acta.student_dni})
+                acta.student_dni = json_body['student_dni']
+        if 'student_dni_type' in json_body:
+            if acta.student_dni_type != json_body['student_dni_type']:
+                some_change = some_change or True
+                old_obj.update({'student_dni_type': acta.student_dni_type})
+                acta.student_dni_type = json_body['student_dni_type']
+        if 'academic_period' in json_body:
+            if acta.academic_period != json_body['academic_period']:
+                some_change = some_change or True
+                old_obj.update({'academic_period': acta.academic_period})
+                acta.academic_period = json_body['academic_period']
+        if 'academic_program' in json_body:
+            if acta.academic_program != json_body['academic_program']:
+                some_change = some_change or True
+                old_obj.update({'academic_program': acta.academic_program})
+                acta.academic_program = json_body['academic_program']
+        if 'justification' in json_body:
+            if acta.justification != json_body['justification']:
+                some_change = some_change or True
+                old_obj.update({'justification': acta.justification})
+                acta.justification = json_body['justification']
+        if 'user' in json_body:
+            if acta.user != json_body['user']:
+                some_change = some_change or True
+                old_obj.update({'user': acta.user})
+                acta.user = json_body['user']
+        if 'detail_cm' in json_body:
+            if acta.detail_cm != json_body['detail_cm']:
+                some_change = some_change or True
+                old_obj.update({'detail_cm': acta.detail_cm})
+                acta.detail_cm = json_body['detail_cm']
         if some_change:
             old_obj.update({'user_who_update': acta.user})
             old_obj.update({'datetime_update': datetime.datetime.now()})
@@ -113,16 +127,18 @@ def update_cm(request, cm_id):
             acta.save()
             return HttpResponse('Changes updated successfully', status=200)
         return HttpResponse('No changes detected', status=204)
-        
+
+
 @csrf_exempt
 def docx_gen_by_date(request):
     try:
         body = json.loads(request.body)
-        start_date=body['cm']['start_date']
-        end_date=body['cm']['end_date']
+        start_date = body['cm']['start_date']
+        end_date = body['cm']['end_date']
     except (json.decoder.JSONDecodeError):
         return HttpResponse("Bad Request", status=400)
-    filename = 'public/acta' + start_date.split(':')[0] + '_' + end_date.split(':')[0] + '.docx'
+    filename = 'public/acta' + \
+        start_date.split(':')[0] + '_' + end_date.split(':')[0] + '.docx'
     generator = CouncilMinuteGenerator()
     try:
         generator.add_cases_from_date(start_date, end_date)

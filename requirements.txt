@@ -1,4 +1,4 @@
-dateparser=0.7.1
+dateparser==0.7.1
 Django==2.1.7
 djongo==1.2.32
 mongoengine==0.17.0
