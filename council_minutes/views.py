@@ -62,7 +62,7 @@ def update_cm(request, cm_id):
             acta = Request.objects.get(id=cm_id)
         except mongoengine.DoesNotExist:
             return HttpResponse('Does not exist', status=404)
-        json_body = json.loads(request.body.decode('utf-8'))
+        json_body = json.loads(Translator.translate(request.body))
         if hasattr(acta, 'old'):
             old = acta.old
         else:
