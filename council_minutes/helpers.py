@@ -20,7 +20,11 @@ class QuerySetEncoder(DjangoJSONEncoder):
             json_obj[id_]["Periodo Academico"] = element["academic_period"]
             json_obj[id_]["Programa"] = element.get_academic_program_display()
             json_obj[id_]["Justificación"] = element["justification"]
-            json_obj[id_]["details_cm"] = {}
+            json_obj[id_]["detail_cm"] = {}
+
+            for detail in element["detail_cm"]:
+                json_obj[id_]["detail_cm"][detail] = str(element["detail_cm"][detail])
+
         return json_obj
 
 
