@@ -20,12 +20,21 @@ class QuerySetEncoder(DjangoJSONEncoder):
             json_obj[id_]["Periodo Academico"] = element["academic_period"]
             json_obj[id_]["Programa"] = element.get_academic_program_display()
             json_obj[id_]["Justificación"] = element["justification"]
-            json_obj[id_]["detail_cm"] = {}
-
-            for detail in element["detail_cm"]:
-                json_obj[id_]["detail_cm"][detail] = str(element["detail_cm"][detail])
+            json_obj[id_]["detail_cm"] = QuerySetEncoder.encode_dict(element["detail_cm"])
 
         return json_obj
+
+    @staticmethod
+    def encode_dict(obj):
+        data = {}
+        
+        for key in obj:
+            if(isinstance(obj[key], dict)):
+                data[key] = QuerySetEncoder.encode_dict(obj[key])
+            else:
+                data[key] = str(obj[key])
+
+        return data
 
 
 class Translator:
