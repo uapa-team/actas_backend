@@ -176,6 +176,7 @@ class Request(DynamicDocument):
     )
     APPROVAL_STATUS_APLAZA = 'AL'
     APPROVAL_STATUS_APRUEBA = 'AP'
+    APPROVAL_STATUS_EN_TRAMITE = 'ET'
     APPROVAL_STATUS_TRAMITA = 'TR'
     APPROVAL_STATUS_EN_ESPERA = 'EE'
     APPROVAL_STATUS_NO_APRUEBA = 'NA'
@@ -189,6 +190,7 @@ class Request(DynamicDocument):
     APPROVAL_STATUS_CHOICES = (
         (APPROVAL_STATUS_APLAZA, 'Aplaza'),
         (APPROVAL_STATUS_APRUEBA, 'Aprueba'),
+        (APPROVAL_STATUS_EN_TRAMITE, 'En trámite'),
         (APPROVAL_STATUS_TRAMITA, 'Tramita'),
         (APPROVAL_STATUS_EN_ESPERA, 'En espera'),
         (APPROVAL_STATUS_NO_APRUEBA, 'No Aprueba'),
