@@ -7,10 +7,10 @@ from .models import Request
 class QuerySetEncoder(DjangoJSONEncoder):
 
     def default(self, o):
+        json_obj = {}
         for element in o:
-            json_obj = {}
             id_ = str(element.id)
-            json_obj[id_] = {}
+            json_obj[id_] = {}  
             json_obj[id_]["Fecha Solicitud"] = str(element["date"])
             json_obj[id_]["Tipo Solicitud"] = element.get_type_display()
             json_obj[id_]["Nombre Estudiante"] = element["student_name"]
