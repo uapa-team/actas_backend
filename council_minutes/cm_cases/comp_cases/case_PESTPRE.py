@@ -1,46 +1,55 @@
-from docx import Document
-from ...models import Request
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+
 
 class PESTPRE():
 
     @staticmethod
-    def case_PRACTICA_ESTUDIANTIL_PREGRADO(request, docx):
-        para = docx.add_paragraph()
+    def case_PRACTICA_ESTUDIANTIL_PREGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             PESTPRE.case_PRACTICA_ESTUDIANTIL_PREGRADO_AP(request, docx, para)
         else:
             PESTPRE.case_PRACTICA_ESTUDIANTIL_PREGRADO_NP(request, docx, para)
-        
 
     @staticmethod
     def case_PRACTICA_ESTUDIANTIL_PREGRADO_AP(request, docx, paragraph):
         paragraph.add_run('APRUEBA').font.bold = True
-        paragraph.add_run(' inscribir la siguiente asignatura en el periódo académico ')
-        paragraph.add_run(request.academic_period + ', a desarrollar en la empresa ')
-        paragraph.add_run(request.detail_cm['institution'] + ', a cargo del ' + request.detail_cm['charge_un'])
-        paragraph.add_run(' ' + request.detail_cm['person_un'] + ' por parte de la Universidad ')
+        paragraph.add_run(
+            ' inscribir la siguiente asignatura en el periódo académico ')
+        paragraph.add_run(request.academic_period +
+                          ', a desarrollar en la empresa ')
+        paragraph.add_run(
+            request.detail_cm['institution'] + ', a cargo del ' + request.detail_cm['charge_un'])
+        paragraph.add_run(
+            ' ' + request.detail_cm['person_un'] + ' por parte de la Universidad ')
         paragraph.add_run('Nacional de Colombia y')
         if request.detail_cm['title_ins'] == 'Sr.':
             paragraph.add_run(' el ')
         else:
             paragraph.add_run(' la ')
-        paragraph.add_run(request.detail_cm['title_ins'] + ' ' + request.detail_cm['person_ins'])
+        paragraph.add_run(
+            request.detail_cm['title_ins'] + ' ' + request.detail_cm['person_ins'])
         paragraph.add_run(' por parte de la entidad.')
-        paragraph.add_run(' (Artículo 15 Acuerdo 008 de 2008 del Consejo Superior Universitario).')
+        paragraph.add_run(
+            ' (Artículo 15 Acuerdo 008 de 2008 del Consejo Superior Universitario).')
         PESTPRE.case_PRACTICA_ESTUDIANTIL_PREGRADO_TABLE(request, docx)
 
     @staticmethod
     def case_PRACTICA_ESTUDIANTIL_PREGRADO_NP(request, docx, paragraph):
         paragraph.add_run('NO APRUEBA').font.bold = True
-        paragraph.add_run(' inscribir la asignatura Práctica estudianti debido a que  {}'.format(request.justification))
-        paragraph.add_run(' (Acuerdo 102 de 2013 del Consejo Superior Universitario).')
-        
+        paragraph.add_run(' inscribir la asignatura Práctica estudianti debido a que  {}'.format(
+            request.justification))
+        paragraph.add_run(
+            ' (Acuerdo 102 de 2013 del Consejo Superior Universitario).')
+
     @staticmethod
     def case_PRACTICA_ESTUDIANTIL_PREGRADO_TABLE(request, docx):
-        table = docx.add_table(rows=len(request.detail_cm['subjects'])+1, cols=5, style='Table Grid')
+        table = docx.add_table(
+            rows=len(request.detail_cm['subjects'])+1, cols=5, style='Table Grid')
         cellp = table.cell(0, 0).paragraphs[0]
         cellp.add_run('Código SIA').font.bold = True
         cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER

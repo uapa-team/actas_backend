@@ -19,17 +19,19 @@ class DTITPRE():
                 large_program = p[1]
                 break
         return large_program
-    
+
     @staticmethod
-    def case_DOBLE_TITULACION_PREGRADO(request, docx):
-        para = docx.add_paragraph()
+    def case_DOBLE_TITULACION_PREGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             DTITPRE.case_DOBLE_TITULACION_PREGRADO_AP(request, docx, para)
         else:
             DTITPRE.case_DOBLE_TITULACION_PREGRADO_NA(request, docx, para)
-        
+
     @staticmethod
     def case_DOBLE_TITULACION_PREGRADO_AP(request, docx, paragraph):
         paragraph.add_run('APRUEBA').font.bold = True
