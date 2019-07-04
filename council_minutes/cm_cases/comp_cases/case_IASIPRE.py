@@ -1,34 +1,38 @@
-from docx import Document
-from ...models import Request
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from ...models import Request
+
 
 class IASIPRE():
 
     @staticmethod
-    def case_INSCRIPCION_DE_ASIGNATURAS_PREGRADO(request, docx):
+    def case_INSCRIPCION_DE_ASIGNATURAS_PREGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         large_program = ''
         for p in Request.PROGRAM_CHOICES:
             if p[0] == request.academic_program:
                 large_program = p[1]
                 break
-        para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA ').font.bold = True
         else:
             para.add_run('NO APRUEBA ').font.bold = True
-        para.add_run('inscribir la(s) siguiente(s) asignatura(s) del programa ' + large_program )
+        para.add_run(
+            'inscribir la(s) siguiente(s) asignatura(s) del programa ' + large_program)
         para.add_run(', en el periodo académico ' + request.academic_period)
         if request.approval_status == 'AP':
             para.add_run(':')
         else:
             para.add_run(', debido a que ' + request.justification + '.')
-        table = docx.add_table(rows=len(request.detail_cm['subjects'])+1, cols=5)
-        table.style='Table Grid'
-        table.style.font.size=Pt(9)
-        table.alignment=WD_ALIGN_PARAGRAPH.CENTER
+        table = docx.add_table(
+            rows=len(request.detail_cm['subjects'])+1, cols=5)
+        table.style = 'Table Grid'
+        table.style.font.size = Pt(9)
+        table.alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.columns[0].width = 700000
         table.columns[1].width = 2300000
         table.columns[2].width = 800000
@@ -48,5 +52,3 @@ class IASIPRE():
             table.cell(index+1, 4).paragraphs[0].add_run(subject['cre'])
             index = index + 1
         para = docx.add_paragraph()
-
-

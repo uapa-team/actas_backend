@@ -1,26 +1,28 @@
 from docx import Document
-from ...models import Request
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
 from docx.enum.table import WD_ALIGN_VERTICAL, WD_ROW_HEIGHT_RULE
+from ...models import Request
 
 class TRASPRE():
 
 
     @staticmethod
-    def case_TRASLADO_PREGRADO(request, docx):
+    def case_TRASLADO_PREGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         large_program = ''
         for p in Request.PROGRAM_CHOICES:
             if p[0] == request.academic_program:
                 large_program = p[1]
                 break
-        para = docx.add_paragraph()
-        para.alignment=WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         if request.approval_status == 'AP':
             para.add_run('APRUEBA').font.bold = True
             para.add_run(' traslado ' + request.detail_cm['tras_type'] + ' del programa ' + request.detail_cm['origin'] +'(')
-            para.add_run( request.detail_cm['cod_origin'] + ') de la Universidad Nacional de Colombia - Sede ' + request.detail_cm['campus_origin'])
+            para.add_run(request.detail_cm['cod_origin'] + ') de la Universidad Nacional de Colombia - Sede ' + request.detail_cm['campus_origin'])
             para.add_run(', al programa ' + large_program + ' (' + request.academic_program)
             para.add_run(') de la Universidad Nacional de Colombia - Sede Bogotá, en el periodo académico ' + request.detail_cm['since'])
             para.add_run(' condicionado a consevar la calidad de estudiante al finalizar el periodo académico ' + request.academic_period)
@@ -29,7 +31,7 @@ class TRASPRE():
         else:
             para.add_run('NO APRUEBA').font.bold = True
             para.add_run(' traslado ' + request.detail_cm['tras_type'] + ' del programa ' + request.detail_cm['origin'] +'(')
-            para.add_run( request.detail_cm['cod_origin'] + ') de la Universidad Nacional de Colombia - Sede ' + request.detail_cm['campus_origin'])
+            para.add_run(request.detail_cm['cod_origin'] + ') de la Universidad Nacional de Colombia - Sede ' + request.detail_cm['campus_origin'])
             para.add_run(', al programa ' + large_program + ' (' + request.academic_program)
             para.add_run(') de la Universidad Nacional de Colombia - Sede Bogotá, en el periodo académico ' + request.detail_cm['since'])
             para.add_run(', porque ' + request.justification +'.')

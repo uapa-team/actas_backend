@@ -7,16 +7,44 @@ from ...models import Request
 class simple():
 
     @staticmethod
-    def case_CANCELACION_DE_PERIODO_ACADEMICO_POSGRADO(request, docx):
+    def case_RECURSO_DE_APELACION_PREGRADO(request, docx, redirected=False):
+        from ..spliter import CasesSpliter
+        para = docx.add_paragraph()
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('El Consejo de Facultad en atención al recurso de')
+        para.add_run(' reposición, ')
+        large_app_st = ''
+        for app_st in Request.APPROVAL_STATUS_CHOICES:
+            if app_st[0] == request.approval_status:
+                large_app_st = app_st[1]
+                break
+        ap_st = para.add_run(large_app_st)
+        ap_st.font.bold = True
+        ap_st.font.all_caps = True
+        para.add_run(' la decisión del Acta ')
+        para.add_run(request.detail_cm['acta_ref'])
+        para.add_run(', en consecuencia, ')
+        modified_request = request
+        modified_request.approval_status = request.detail_cm['approval_status']
+        modified_request.type = request.detail_cm['origin_case']
+        spliter = CasesSpliter()
+        print(modified_request.approval_status)
+        spliter.request_case(modified_request, docx, True)
+
+    @staticmethod
+    def case_CANCELACION_DE_PERIODO_ACADEMICO_POSGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         large_program = ''
         for p in Request.PROGRAM_CHOICES:
             if p[0] == request.academic_program:
                 large_program = p[1]
                 break
-        para = docx.add_paragraph()
         para.paragraph_format.space_after = Pt(0)
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA ').font.bold = True
         else:
@@ -29,9 +57,11 @@ class simple():
         para.add_run(' (Artículo 18 del Acuerdo 008 del Consejo Superior Universitario).')
 
     @staticmethod
-    def case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO(request, docx):
-        para = docx.add_paragraph()
-        para.add_run('El Consejo de Facultad ')
+    def case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA').font.bold = True
         else:
@@ -48,15 +78,17 @@ class simple():
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
 
     @staticmethod
-    def case_CAMBIO_DE_PERFIL_POSGRADO(request, docx):
+    def case_CAMBIO_DE_PERFIL_POSGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         large_program = ''
         for p in Request.PROGRAM_CHOICES:
             if p[0] == request.academic_program:
                 large_program = p[1]
                 break
-        para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA').font.bold = True
         else:
@@ -69,10 +101,12 @@ class simple():
         para.add_run(request.justification + '.')
 
     @staticmethod
-    def case_AMPLIACION_DE_LA_FECHA_DE_PAGO_DE_DERECHOS_ACADEMICOS_POSGRADO(request, docx):
-        para = docx.add_paragraph()
+    def case_AMPLIACION_DE_LA_FECHA_DE_PAGO_DE_DERECHOS_ACADEMICOS_POSGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA').font.bold = True
         else:
@@ -87,9 +121,12 @@ class simple():
         para.add_run(request.justification + '.')
 
     @staticmethod
-    def case_REEMBOLSO_PREGRADO(request, docx):
-        para = docx.add_paragraph()
-        para.add_run('El Consejo de Facultad ')
+    def case_REEMBOLSO_PREGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA').font.bold = True
         else:
@@ -99,9 +136,11 @@ class simple():
 
     @staticmethod
     def case_EXENCION_DE_PAGO_POR_CURSAR_TESIS_COMO_UNICA_ACTIVIDAD_ACADEMICA_POSGRADO(
-            request, docx):
-        para = docx.add_paragraph()
-        para.add_run('El Consejo de Facultad ')
+            request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         common = 'pago de {} puntos por derechos académicos en el periodo académico {},'
         common = common + ' condicionado a la inscripción de trabajo final de {} como única '
@@ -122,10 +161,12 @@ class simple():
         para.add_run('.')
 
     @staticmethod
-    def case_GENERACION_DE_RECIBO_UNICO_DE_PAGO_POSGRADO(request, docx):
-        para = docx.add_paragraph()
+    def case_GENERACION_DE_RECIBO_UNICO_DE_PAGO_POSGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
         common = 'presentar con concepto {} al Comité de Matrículas de la Sede Bogotá,'
         common = common + ' la expedición de un único recibo correspondiente a saldos pendientes '
         common = common + 'de matrícula para el periodo académico {}'
@@ -142,10 +183,12 @@ class simple():
             para.add_run(', debido a que {}.'.format(request.justification))
 
     @staticmethod
-    def case_EXENCION_DE_PAGO_POR_CREDITOS_SOBRANTES_DE_PREGRADO_POSGRADO(request, docx):
-        para = docx.add_paragraph()
+    def case_EXENCION_DE_PAGO_POR_CREDITOS_SOBRANTES_DE_PREGRADO_POSGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA').font.bold = True
             para.add_run(' otorgar excención del pago de ' +
@@ -176,11 +219,13 @@ class simple():
             para.add_run(
                 '. (Artículo 58 del acuerdo 008 de 2008 del Consejo Superior Universitario. ')
 
-    @staticmethod  # TODO: LINE TOO LONG
-    def case_DEVOLUCION_PROPORCIONAL_DEL_VALOR_PAGADO_POR_CONCEPTO_DE_DERECHOS_DE_MATRICULA_PREGRADO(request, docx):
-        para = docx.add_paragraph()
+    @staticmethod
+    def case_DEVOLUCION_PROPORCIONAL_DEL_VALOR_PAGADO_POR_CONCEPTO_DE_DERECHOS_DE_MATRICULA_PREGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA').font.bold = True
             para.add_run(' la devolución proporcional del ' +
@@ -207,10 +252,12 @@ class simple():
             para.add_run(' Resolución 1416 de 2013 de Rectoría). ')
 
     @staticmethod
-    def case_DEVOLUCION_DE_CREDITOS_PREGRADO(request, docx):
-        para = docx.add_paragraph()
+    def case_DEVOLUCION_DE_CREDITOS_PREGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA').font.bold = True
         else:
@@ -242,10 +289,12 @@ class simple():
         cellp.add_run('Total Créditos').font.bold = True
 
     @staticmethod
-    def case_ELIMINACION_DE_LA_HISTORIA_ACADEMICA_BAPI_PREGRADO(request, docx):
-        para = docx.add_paragraph()
+    def case_ELIMINACION_DE_LA_HISTORIA_ACADEMICA_BAPI_PREGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA').font.bold = True
             para.add_run(
@@ -256,10 +305,12 @@ class simple():
                 ' eliminar la historia académica BAPI, debido a que ' + request.justification+'.')
 
     @staticmethod
-    def case_RESERVA_DE_CUPO_ADICIONAL_PREGRADO(request, docx):
-        para = docx.add_paragraph()
+    def case_RESERVA_DE_CUPO_ADICIONAL_PREGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA ').font.bold = True
         else:
@@ -276,10 +327,12 @@ class simple():
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
 
     @staticmethod
-    def case_REEMBOLSO_POSGRADO(request, docx):
-        para = docx.add_paragraph()
+    def case_REEMBOLSO_POSGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA ').font.bold = True
         else:
@@ -301,15 +354,17 @@ class simple():
             'Universitario, Artículo 1 Resolución 1416 de 2013 de Rectoría).')
 
     @staticmethod
-    def case_ADMISION_AUTOMATICA_POSGRADO(request, docx):
+    def case_ADMISION_AUTOMATICA_POSGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         large_program = ''
         for p in Request.PROGRAM_CHOICES:
             if p[0] == request.academic_program:
                 large_program = p[1]
                 break
-        para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA ').font.bold = True
         else:
@@ -322,10 +377,12 @@ class simple():
             ' 008 de 2008 del Consejo Superior Universitario.).')
 
     @staticmethod
-    def case_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD_PREGRADO(request, docx):
-        para = docx.add_paragraph()
+    def case_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD_PREGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA ').font.bold = True
         else:
@@ -340,15 +397,17 @@ class simple():
         para.add_run(request.detail_cm['per_assig'] + '.')
 
     @staticmethod
-    def case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO(request, docx):
+    def case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         large_program = ''
         for p in Request.PROGRAM_CHOICES:
             if p[0] == request.academic_program:
                 large_program = p[1]
                 break
-        para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA ').font.bold = True
         else:
@@ -397,10 +456,12 @@ class simple():
             raise AttributeError
 
     @staticmethod
-    def case_MODIFICACION_DE_OBJETIVOS_DE_TESIS_PROPUESTA_POSGRADO(request, docx):
-        para = docx.add_paragraph()
+    def case_MODIFICACION_DE_OBJETIVOS_DE_TESIS_PROPUESTA_POSGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
         common = 'cambiar objetivos de Tesis de {} a: “{}”'
         if request.approval_status == 'AP':
             para.add_run('APRUEBA ').font.bold = True
@@ -416,13 +477,15 @@ class simple():
         para.add_run('.')
 
     @staticmethod
-    def case_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO(request, docx):
-        para = docx.add_paragraph()
-        para.add_run('El Consejo de Facultad ')
+    def case_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA').font.bold = True
         else:
-            para.add_run('APRUEBA').font.bold = True
+            para.add_run('NO APRUEBA').font.bold = True
         para.add_run(' cursar el periodo académico ' + request.academic_period)
         para.add_run(' con un número de créditos inferior al mínimo exigido, debido a que ')
         if request.approval_status == 'AP':
@@ -433,9 +496,11 @@ class simple():
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
 
     @staticmethod
-    def case_RETIRO_DEFINITIVO_DEL_PROGRAMA_PREGRADO(request, docx):
-        para = docx.add_paragraph()
-        para.add_run('El Consejo de Facultad ')
+    def case_RETIRO_DEFINITIVO_DEL_PROGRAMA_PREGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         para.add_run('APRUEBA').font.bold = True
         para.add_run(' presentar con concepto positivo a la ' +
                      'División de Registro y Matrícula, el retiro ')
@@ -446,10 +511,12 @@ class simple():
         #negativo para este caso o que no se apruebe
 
     @staticmethod
-    def case_CREDITOS_EXCEDENTES_MAPI_PREGRADO(request, docx):
-        para = docx.add_paragraph()
+    def case_CREDITOS_EXCEDENTES_MAPI_PREGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA ').font.bold = True
         else:
@@ -466,15 +533,17 @@ class simple():
         para.add_run('(Artículo 16 del Acuerdo 026 de 2012 del Consejo Académico)')
 
     @staticmethod
-    def case_CAMBIO_DE_TIPOLOGIA_PREGRADO(request, docx):
+    def case_CAMBIO_DE_TIPOLOGIA_PREGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         large_program = ''
         for p in Request.PROGRAM_CHOICES:
             if p[0] == request.academic_program:
                 large_program = p[1]
                 break
-        para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA ').font.bold = True
         else:
@@ -514,7 +583,11 @@ class simple():
         para = docx.add_paragraph()
 
     @staticmethod
-    def case_TRANSITO_ENTRE_PROGRAMAS_POSGRADO(request, docx):
+    def case_TRANSITO_ENTRE_PROGRAMAS_POSGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         large_program = ''
         for p in Request.PROGRAM_CHOICES:
             if p[0] == request.academic_program:
@@ -525,9 +598,7 @@ class simple():
             if p[0] == request.detail_cm['origen']:
                 large_program2 = p[1]
                 break
-        para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA ').font.bold = True
         else:
@@ -541,15 +612,17 @@ class simple():
             para.add_run(' porque ' + request.justification + '.')
 
     @staticmethod
-    def case_CAMBIO_DE_DIRECTIOR_CODIRECTOR_JURADO_O_EVALUADOR_POSGRADO(request, docx):
+    def case_CAMBIO_DE_DIRECTIOR_CODIRECTOR_JURADO_O_EVALUADOR_POSGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         large_program = ''
         for p in Request.PROGRAM_CHOICES:
             if p[0] == request.academic_program:
                 large_program = p[1]
                 break
-        para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA ').font.bold = True
         else:
@@ -576,9 +649,11 @@ class simple():
             para.add_run(' porque ' + request.justification+ '.')
 
     @staticmethod
-    def case_DESIGNACION_DE_CODIRECTOR_POSGRADO(request, docx):
-        para = docx.add_paragraph()
-        para.add_run('El Consejo de Facultad ')
+    def case_DESIGNACION_DE_CODIRECTOR_POSGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         common = 'designar codirector de Tesis de {} con título “{}” '
         common = common + 'aprobado en el Acta No. {}, al profesor/a {}'
@@ -601,9 +676,11 @@ class simple():
             para.add_run(', debido a que {}'.format(request.justification))
 
     @staticmethod
-    def case_EVALUADOR_ADICIONAL_POSGRADO(request, docx):
-        para = docx.add_paragraph()
-        para.add_run('El Consejo de Facultad ')
+    def case_EVALUADOR_ADICIONAL_POSGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         common = 'designar evaluador adicional del Trabajo Final de {}, '
         common = common + 'cuyo título es: “{}”, al profesor {}'
@@ -629,11 +706,13 @@ class simple():
         para.add_run('.')
 
     @staticmethod
-    def case_TRABAJO_DE_GRADO_PREGADO(request, docx):
-        para = docx.add_paragraph()
+    def case_TRABAJO_DE_GRADO_PREGADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         para.paragraph_format.space_after = Pt(0)
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA ').font.bold = True
         else:
@@ -683,15 +762,17 @@ class simple():
         table.cell(1, 4).paragraphs[0].add_run('6')
 
     @staticmethod
-    def case_APROBACION_PROYECTO_PROPUESTA_Y_DESIGNACION_DE_DIRECTOR_POSGRADO(request, docx):
+    def case_APROBACION_PROYECTO_PROPUESTA_Y_DESIGNACION_DE_DIRECTOR_POSGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         large_program = ''
         for p in Request.PROGRAM_CHOICES:
             if p[0] == request.academic_program:
                 large_program = p[1]
                 break
-        para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA: ').font.bold = True
         else:
@@ -715,9 +796,11 @@ class simple():
                          ' del ' + request.detail_cm['depto'] + '.')
 
     @staticmethod
-    def case_MODIFICACION_DE_JURADOS_CALIFICADORES_POSGRADO(request, docx):
-        para = docx.add_paragraph()
-        para.add_run('El Consejo de Facultad ')
+    def case_MODIFICACION_DE_JURADOS_CALIFICADORES_POSGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('designar en el jurado calificador de ' + request.detail_cm['subject'] + ' en ')
         para.add_run(request.get_academic_program_display() + ', cuyo título es: "' +
@@ -728,15 +811,17 @@ class simple():
                          " - " + professor['country'] + ". ")
 
     @staticmethod
-    def case_BECA_MEJOR_PROMEDIO_POSGRADO(request, docx):
+    def case_BECA_MEJOR_PROMEDIO_POSGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         large_program = ''
         for p in Request.PROGRAM_CHOICES:
             if p[0] == request.academic_program:
                 large_program = p[1]
                 break
-        para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA BECA EXCENCIÓN DE DERECHOS ACADÉMICOS ').font.bold = True
         else:
@@ -751,15 +836,17 @@ class simple():
         para.add_run('(Artículo 8 Acuerdo 02 de 2012 de Consejo de Facultad). ')
 
     @staticmethod
-    def case_EXCENCION_POR_MEJORES_SABER_PRO_POSGRADO(request, docx):
+    def case_EXCENCION_POR_MEJORES_SABER_PRO_POSGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         large_program = ''
         for p in Request.PROGRAM_CHOICES:
             if p[0] == request.academic_program:
                 large_program = p[1]
                 break
-        para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA BECA EXCENCIÓN DE DERECHOS ACADÉMICOS ').font.bold = True
         else:
@@ -772,9 +859,11 @@ class simple():
             para.add_run('. ')
 
     @staticmethod
-    def case_REINGRESO_POSGRADO(request, docx):
-        para = docx.add_paragraph()
-        para.add_run('El Consejo de Facultad ')
+    def case_REINGRESO_POSGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         common = 'reingreso por única vez en el programa de {}, a partir del periodo {}'.format(request.get_academic_program_display(), request.academic_period)
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         if request.approval_status == 'AP':
@@ -788,10 +877,12 @@ class simple():
         para.add_run('.')
 
     @staticmethod
-    def case_REGISTRO_DE_CALIFICACION_DEL_PROYECTO_Y_EXAMEN_DOCTORAL_POSGRADO(request, docx):
-        para = docx.add_paragraph()
+    def case_REGISTRO_DE_CALIFICACION_DEL_PROYECTO_Y_EXAMEN_DOCTORAL_POSGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA:').font.bold = True
         else:
@@ -816,10 +907,12 @@ class simple():
                 para.paragraph_format.space_after = Pt(0)
     
     @staticmethod
-    def case_CAMBIO_DE_PROYECTO_DE_TESIS(request, docx):
-        para = docx.add_paragraph()
+    def case_CAMBIO_DE_PROYECTO_DE_TESIS(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
         common = 'cambiar título de Tesis de {} a: “{}”'.format(request.get_academic_program_display(), request.detail_cm['titulo'])
         if request.approval_status == 'AP':
             para.add_run('APRUEBA ').font.bold = True
@@ -830,9 +923,11 @@ class simple():
         para.add_run('.')
 
     @staticmethod
-    def case_EXPEDICION_DE_RECIBO_PREGRADO(request, docx):
-        para = docx.add_paragraph()
-        para.add_run('El Consejo de Facultad ')
+    def case_EXPEDICION_DE_RECIBO_PREGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         if request.detail_cm['caso'] == 'nuevo':
             common = 'expedir un nuevo recibo de pago de derechos de matrícula con cambio de fecha, para el periodo académico {}'.format(request.academic_period)
         if request.detail_cm['caso'] == 'unico':
@@ -848,10 +943,12 @@ class simple():
         para.add_run('.')
 
     @staticmethod
-    def case_INFORME_DE_AVANCE_DE_TESIS_POSGRADO(request, docx):
-        para = docx.add_paragraph()
+    def case_INFORME_DE_AVANCE_DE_TESIS_POSGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('El Consejo de Facultad ')
         common = '{} de Doctorado ({}) en {}, en el periodo {}'.format(request.detail_cm['caso'], request.detail_cm['codigo'], request.get_academic_program_display(), request.academic_period)
         if request.approval_status == 'AP':
             para.add_run('APRUEBA ').font.bold = True

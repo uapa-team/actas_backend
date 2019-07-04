@@ -7,15 +7,17 @@ from ...models import Request
 class HCEMPOS():
 
     @staticmethod
-    def case_HOMOLOGACION_CONVALIDACION_Y_EQUIVALENCIA_POSGRADO(request, docx):
+    def case_HOMOLOGACION_CONVALIDACION_Y_EQUIVALENCIA_POSGRADO(request, docx, redirected=False):
+        para = docx.paragraphs[-1]
+        if not redirected:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
         large_program = ''
         for p in Request.PROGRAM_CHOICES:
             if p[0] == request.academic_program:
                 large_program = p[1]
                 break
-        para = docx.add_paragraph()
         para.paragraph_format.space_after = Pt(4)
-        para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA:').font.bold = True
         else:
