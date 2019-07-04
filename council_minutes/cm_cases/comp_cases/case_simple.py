@@ -7,13 +7,65 @@ from ...models import Request
 class simple():
 
     @staticmethod
-    def case_RECURSO_DE_APELACION_PREGRADO(request, docx, redirected=False):
+    def case_RECURSO_DE_APELACION(request, docx, redirected=False):
+        from ..spliter import CasesSpliter
+        para = docx.add_paragraph()
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('El Consejo de Facultad en atención al recurso de')
+        para.add_run(' apelación, ')
+        large_app_st = ''
+        for app_st in Request.APPROVAL_STATUS_CHOICES:
+            if app_st[0] == request.approval_status:
+                large_app_st = app_st[1]
+                break
+        ap_st = para.add_run(large_app_st)
+        ap_st.font.bold = True
+        ap_st.font.all_caps = True
+        para.add_run(' la decisión del Acta ')
+        para.add_run(request.detail_cm['acta_ref'])
+        para.add_run(', en consecuencia, ')
+        modified_request = request
+        modified_request.approval_status = request.detail_cm['approval_status']
+        modified_request.type = request.detail_cm['origin_case']
+        spliter = CasesSpliter()
+        print(modified_request.approval_status)
+        spliter.request_case(modified_request, docx, True)
+
+    @staticmethod
+    def case_RECURSO_DE_REPOSICION(request, docx, redirected=False):
         from ..spliter import CasesSpliter
         para = docx.add_paragraph()
         para.paragraph_format.space_after = Pt(0)
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('El Consejo de Facultad en atención al recurso de')
         para.add_run(' reposición, ')
+        large_app_st = ''
+        for app_st in Request.APPROVAL_STATUS_CHOICES:
+            if app_st[0] == request.approval_status:
+                large_app_st = app_st[1]
+                break
+        ap_st = para.add_run(large_app_st)
+        ap_st.font.bold = True
+        ap_st.font.all_caps = True
+        para.add_run(' la decisión del Acta ')
+        para.add_run(request.detail_cm['acta_ref'])
+        para.add_run(', en consecuencia, ')
+        modified_request = request
+        modified_request.approval_status = request.detail_cm['approval_status']
+        modified_request.type = request.detail_cm['origin_case']
+        spliter = CasesSpliter()
+        print(modified_request.approval_status)
+        spliter.request_case(modified_request, docx, True)
+
+    @staticmethod
+    def case_RECURSO_DE_REPOSICION_CON_SUBSIDIO_DE_APELACION(request, docx, redirected=False):
+        from ..spliter import CasesSpliter
+        para = docx.add_paragraph()
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('El Consejo de Facultad en atención al recurso de')
+        para.add_run(' reposición con subsidio de apelación, ')
         large_app_st = ''
         for app_st in Request.APPROVAL_STATUS_CHOICES:
             if app_st[0] == request.approval_status:

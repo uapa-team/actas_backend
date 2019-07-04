@@ -115,7 +115,7 @@ class CasesSpliter():
         simple.case_CAMBIO_DE_TIPOLOGIA_PREGRADO(request, docx, redirected)
 
     def case_RECURSO_DE_APELACION_PREGRADO(self, request, docx, redirected):
-        simple.case_RECURSO_DE_APELACION_PREGRADO(request, docx, redirected)
+        simple.case_RECURSO_DE_APELACION(request, docx, redirected)
 
     def case_EXPEDICION_DE_RECIBO_PREGRADO(self, request, docx, redirected):
         simple.case_EXPEDICION_DE_RECIBO_PREGRADO(request, docx, redirected)
@@ -124,7 +124,7 @@ class CasesSpliter():
         PESTPRE.case_PRACTICA_ESTUDIANTIL_PREGRADO(request, docx, redirected)
 
     def case_RECURSO_DE_REPOSICION_PREGRADO(self, request, docx, redirected):
-        raise NotImplementedError
+        simple.case_RECURSO_DE_REPOSICION(request, docx, redirected)
 
     def case_DEVOLUCION_DE_CREDITOS_PREGRADO(self, request, docx, redirected):
         simple.case_DEVOLUCION_DE_CREDITOS_PREGRADO(request, docx, redirected)
@@ -175,7 +175,8 @@ class CasesSpliter():
             request, docx, redirected)
 
     def case_RECURSO_DE_REPOSICION_CON_SUBSIDIO_DE_APELACION_PREGRADO(self, request, docx, redirected):
-        raise NotImplementedError
+        simple.case_RECURSO_DE_REPOSICION_CON_SUBSIDIO_DE_APELACION(
+            request, docx, redirected)
 
     def case_DEVOLUCION_PROPORCIONAL_DEL_VALOR_PAGADO_POR_CONCEPTO_DE_DERECHOS_DE_MATRICULA_PREGRADO(self, request, docx, redirected):
         simple.case_DEVOLUCION_PROPORCIONAL_DEL_VALOR_PAGADO_POR_CONCEPTO_DE_DERECHOS_DE_MATRICULA_PREGRADO(
@@ -221,7 +222,7 @@ class CasesSpliter():
         simple.case_CAMBIO_DE_TIPOLOGIA_PREGRADO(request, docx, redirected)
 
     def case_RECURSO_DE_REPOSICION_POSGRADO(self, request, docx, redirected):
-        raise NotImplementedError
+        simple.case_RECURSO_DE_REPOSICION(request, docx, redirected)
 
     def case_TRANSITO_ENTRE_PROGRAMAS_POSGRADO(self, request, docx, redirected):
         simple.case_TRANSITO_ENTRE_PROGRAMAS_POSGRADO(
@@ -279,7 +280,8 @@ class CasesSpliter():
             request, docx, redirected)
 
     def case_RECURSO_DE_REPOSICION_CON_SUBSIDIO_DE_APELACION_POSGRADO(self, request, docx, redirected):
-        raise NotImplementedError
+        simple.case_RECURSO_DE_REPOSICION_CON_SUBSIDIO_DE_APELACION(
+            request, docx, redirected)
 
     def case_CAMBIO_DE_DIRECTIOR_CODIRECTOR_JURADO_O_EVALUADOR_POSGRADO(self, request, docx, redirected):
         simple.case_CAMBIO_DE_DIRECTIOR_CODIRECTOR_JURADO_O_EVALUADOR_POSGRADO(
