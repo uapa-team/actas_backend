@@ -9,5 +9,6 @@ urlpatterns = [
     path('insert', views.insert_request, name='insert_request'),
     path('generate/<cm_id>', views.docx_gen_by_id, name='docx_gen'),
     path('update/<cm_id>', views.update_cm, name='update_request'),
-    path('generate', views.docx_gen_by_date, name='docx_gen'),
+    path('generate_pre', views.pre_cm_gen_by_date, name='docx_gen'),
+    path('generate', views.cm_gen_by_date, name='docx_gen'),
 ] + static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)

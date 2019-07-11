@@ -35,6 +35,17 @@ class CouncilMinuteGenerator():
         self.__add_cases_from_date_pre_pos(requests_pre, 'PREGRADO')
         self.__add_cases_from_date_pre_pos(requests_pos, 'POSGRADO')
 
+    def add_cases_from_date_except_app_status(self, start_date, end_date, app_status):
+        request_by_date = Request.objects(
+            date__gte=dateparser.parse(start_date), 
+            date__lte=dateparser.parse(end_date), 
+            approval_status__ne=app_status)
+        request_by_date_ordered = request_by_date.order_by('academic_program', 'type')
+        requests_pre = [request for request in request_by_date_ordered if request.is_pre()]
+        requests_pos = [request for request in request_by_date_ordered if not request.is_pre()]
+        self.__add_cases_from_date_pre_pos(requests_pre, 'PREGRADO')
+        self.__add_cases_from_date_pre_pos(requests_pos, 'POSGRADO')
+
     def __add_cases_from_date_pre_pos(self, requests, pre_pos):
         actual_academic_program = requests[0].academic_program
         para = self.document.add_paragraph(style='Heading 1')
