@@ -324,9 +324,12 @@ class simple():
         table = docx.add_table(
             rows=len(request.detail_cm['subjects'])+2, cols=3, style='Table Grid')
         table.cell(0, 0).paragraphs[0].add_run('Código SIA').font.bold = True
+        table.cell(0, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(0, 1).paragraphs[0].add_run(
             'Nombre Asignatura').font.bold = True
+        table.cell(0, 1).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER    
         table.cell(0, 2).paragraphs[0].add_run('Créditos').font.bold = True
+        table.cell(0, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         index = 1
         credits_sum = 0
         for subject in request.detail_cm['subjects']:
@@ -339,6 +342,14 @@ class simple():
         cellp = table.cell(index, 0).merge(table.cell(index, 1)).paragraphs[0]
         cellp.alignment = WD_ALIGN_PARAGRAPH.LEFT
         cellp.add_run('Total Créditos').font.bold = True
+        table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        for cell in table.columns[0].cells:
+            cell.width = 1500000
+        for cell in table.columns[1].cells:
+            cell.width = 3050000
+        for cell in table.columns[2].cells:
+            cell.width = 900000
+            cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
 
     @staticmethod
     def case_ELIMINACION_DE_LA_HISTORIA_ACADEMICA_BAPI_PREGRADO(request, docx, redirected=False):
