@@ -7,8 +7,9 @@ class HOIDPXX():
 
     @staticmethod
     def case_HOMOLOGACION_INGLES(request, docx, redirected=False):
-        para = docx.paragraphs[-1]
-        if not redirected:
+        if redirected:
+            para = docx.paragraphs[-1]
+        else:
             para = docx.add_paragraph()
             para.add_run('El Consejo de Facultad ')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY

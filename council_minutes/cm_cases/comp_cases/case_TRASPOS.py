@@ -7,8 +7,9 @@ class TRASPOS():
 
     @staticmethod
     def case_TRASLADO_POSGRADO(request, docx, redirected=False):
-        para = docx.paragraphs[-1]
-        if not redirected:
+        if redirected:
+            para = docx.paragraphs[-1]
+        else:
             para = docx.add_paragraph()
             para.add_run('El Consejo de Facultad ')
         large_program = ''
