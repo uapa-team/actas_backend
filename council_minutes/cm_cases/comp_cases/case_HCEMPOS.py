@@ -50,36 +50,38 @@ class HCEMPOS():
             table.columns[4].width = 440000
             table.columns[5].width = 440000
             table.columns[6].width = 550000
+
             for cell in table.columns[0].cells:
                 cell.width = 1400000
             for cell in table.columns[1].cells:
-                cell.width = 530000
+                cell.width = 580000
             for cell in table.columns[2].cells:
                 cell.width = 1400000
             for cell in table.columns[3].cells:
-                cell.width = 440000
+                cell.width = 490000
             for cell in table.columns[4].cells:
-                cell.width = 440000
+                cell.width = 490000
             for cell in table.columns[5].cells:
-                cell.width = 440000
+                cell.width = 490000
             for cell in table.columns[6].cells:
-                cell.width = 550000
+                cell.width = 600000
+            
             for col in table.columns:
                 for cell in col.cells:
                     cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
             table.cell(0, 0).paragraphs[0].add_run(
-                'ASIGNATURA QUE SE HOMOLOGA').font.bold = True
+                'Asignatura que se homologa').font.bold = True
             merge1 = table.cell(0, 1).merge(table.cell(0, 6))
             merge1.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
             merge1.paragraphs[0].add_run(
-                'ASIGNATURA POR LA QUE SE HOMOLOGA').font.bold = True
-            table.cell(1, 0).paragraphs[0].add_run('NOMBRE').font.bold = True
-            table.cell(1, 1).paragraphs[0].add_run('CÓDIGO').font.bold = True
-            table.cell(1, 2).paragraphs[0].add_run('NOMBRE').font.bold = True
-            table.cell(1, 3).paragraphs[0].add_run('NOTA').font.bold = True
+                'Asignatura por la que se homologa').font.bold = True
+            table.cell(1, 0).paragraphs[0].add_run('Nombre').font.bold = True
+            table.cell(1, 1).paragraphs[0].add_run('Código').font.bold = True
+            table.cell(1, 2).paragraphs[0].add_run('Nombre').font.bold = True
+            table.cell(1, 3).paragraphs[0].add_run('Nota').font.bold = True
             table.cell(1, 4).paragraphs[0].add_run('C').font.bold = True
             table.cell(1, 5).paragraphs[0].add_run('T').font.bold = True
-            table.cell(1, 6).paragraphs[0].add_run('PERIODO').font.bold = True
+            table.cell(1, 6).paragraphs[0].add_run('Periodo').font.bold = True
             row = 2
             for subjet in request.detail_cm['homologation']['subjects']:
                 table.cell(row, 0).paragraphs[0].add_run(subjet['subject'])
@@ -128,36 +130,38 @@ class HCEMPOS():
             table.columns[4].width = 440000
             table.columns[5].width = 440000
             table.columns[6].width = 550000
+
             for cell in table.columns[0].cells:
                 cell.width = 1400000
             for cell in table.columns[1].cells:
-                cell.width = 530000
+                cell.width = 580000
             for cell in table.columns[2].cells:
                 cell.width = 1400000
             for cell in table.columns[3].cells:
-                cell.width = 440000
+                cell.width = 490000
             for cell in table.columns[4].cells:
-                cell.width = 440000
+                cell.width = 490000
             for cell in table.columns[5].cells:
-                cell.width = 440000
+                cell.width = 490000
             for cell in table.columns[6].cells:
-                cell.width = 550000
+                cell.width = 600000
+            
             for col in table.columns:
                 for cell in col.cells:
                     cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
             table.cell(0, 0).paragraphs[0].add_run(
-                'ASIGNATURA QUE SE CONVALIDA').font.bold = True
+                'Asignatura que se convalida').font.bold = True
             merge1 = table.cell(0, 1).merge(table.cell(0, 6))
             merge1.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
             merge1.paragraphs[0].add_run(
-                'ASIGNATURA POR LA QUE SE CONVALIDA').font.bold = True
-            table.cell(1, 0).paragraphs[0].add_run('NOMBRE').font.bold = True
-            table.cell(1, 1).paragraphs[0].add_run('CÓDIGO').font.bold = True
-            table.cell(1, 2).paragraphs[0].add_run('NOMBRE').font.bold = True
-            table.cell(1, 3).paragraphs[0].add_run('NOTA').font.bold = True
+                'Asignatura por la que se convalida').font.bold = True
+            table.cell(1, 0).paragraphs[0].add_run('Nombre').font.bold = True
+            table.cell(1, 1).paragraphs[0].add_run('Código').font.bold = True
+            table.cell(1, 2).paragraphs[0].add_run('Nombre').font.bold = True
+            table.cell(1, 3).paragraphs[0].add_run('Nota').font.bold = True
             table.cell(1, 4).paragraphs[0].add_run('C').font.bold = True
             table.cell(1, 5).paragraphs[0].add_run('T').font.bold = True
-            table.cell(1, 6).paragraphs[0].add_run('PERIODO').font.bold = True
+            table.cell(1, 6).paragraphs[0].add_run('Periodo').font.bold = True
             row = 2
             for subjet in request.detail_cm['recognition']['subjects']:
                 print(request.detail_cm['recognition']['subjects'])
@@ -204,36 +208,38 @@ class HCEMPOS():
             table.columns[4].width = 440000
             table.columns[5].width = 440000
             table.columns[6].width = 550000
+        
             for cell in table.columns[0].cells:
                 cell.width = 1400000
             for cell in table.columns[1].cells:
-                cell.width = 530000
+                cell.width = 580000
             for cell in table.columns[2].cells:
                 cell.width = 1400000
             for cell in table.columns[3].cells:
-                cell.width = 440000
+                cell.width = 490000
             for cell in table.columns[4].cells:
-                cell.width = 440000
+                cell.width = 490000
             for cell in table.columns[5].cells:
-                cell.width = 440000
+                cell.width = 490000
             for cell in table.columns[6].cells:
-                cell.width = 550000
+                cell.width = 600000
+            
             for col in table.columns:
                 for cell in col.cells:
                     cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
             table.cell(0, 0).paragraphs[0].add_run(
-                'ASIGNATURA QUE SE EQUIVALE').font.bold = True
+                'Asignatura que se equivale').font.bold = True
             merge1 = table.cell(0, 1).merge(table.cell(0, 6))
             merge1.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
             merge1.paragraphs[0].add_run(
-                'ASIGNATURA POR LA QUE SE EQUIVALE').font.bold = True
-            table.cell(1, 0).paragraphs[0].add_run('NOMBRE').font.bold = True
-            table.cell(1, 1).paragraphs[0].add_run('CÓDIGO').font.bold = True
-            table.cell(1, 2).paragraphs[0].add_run('NOMBRE').font.bold = True
-            table.cell(1, 3).paragraphs[0].add_run('NOTA').font.bold = True
+                'Asignatura por la que se equivale').font.bold = True
+            table.cell(1, 0).paragraphs[0].add_run('Nombre').font.bold = True
+            table.cell(1, 1).paragraphs[0].add_run('Código').font.bold = True
+            table.cell(1, 2).paragraphs[0].add_run('Nombre').font.bold = True
+            table.cell(1, 3).paragraphs[0].add_run('Nota').font.bold = True
             table.cell(1, 4).paragraphs[0].add_run('C').font.bold = True
             table.cell(1, 5).paragraphs[0].add_run('T').font.bold = True
-            table.cell(1, 6).paragraphs[0].add_run('PERIODO').font.bold = True
+            table.cell(1, 6).paragraphs[0].add_run('Periodo').font.bold = True
             row = 2
             for subjet in request.detail_cm['equivalence']['subjects']:
                 table.cell(row, 0).paragraphs[0].add_run(subjet['subject'])

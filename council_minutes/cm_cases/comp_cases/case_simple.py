@@ -344,6 +344,12 @@ class simple():
         cellp.alignment = WD_ALIGN_PARAGRAPH.LEFT
         cellp.add_run('Total Créditos').font.bold = True
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        
+        for column in table.columns:
+            for cell in column.cells:
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+
         for cell in table.columns[0].cells:
             cell.width = 1500000
         for cell in table.columns[1].cells:
