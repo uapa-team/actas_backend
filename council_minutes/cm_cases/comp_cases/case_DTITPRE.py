@@ -95,7 +95,7 @@ class DTITPRE():
         para.paragraph_format.space_before = Pt(0)
         bullet = para.add_run('*Sin incluir los créditos correspondientes al cumplimiento del requisito de suficiencia en idioma extranjero (Circular 09 de 2013 de la División de Registro).\n**Aprobados del plan de estudios, sin excedentes.')
         para.paragraph_format.space_after = Pt(0)
-        bullet.font.size = Pt(6)
+        bullet.font.size = Pt(8)
         table = docx.add_table(rows=1, cols=5, style='Table Grid')
         table.style.font.size = Pt(8)
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER

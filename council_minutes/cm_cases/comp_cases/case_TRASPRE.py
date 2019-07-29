@@ -38,49 +38,71 @@ class TRASPRE():
             para.add_run('(Artículo 39 del Acuerdo 008 de 2008 del Consejo Superior Universitario y Acuerdo 089 de 2014 del Consejo Académico). ')
             para = docx.add_paragraph()
 
-        para.add_run('1. Datos Generales').font.bold = True
+        para.paragraph_format.space_after = Pt(0)
+        bullet = para.add_run('1. Datos Generales')
+        bullet.font.bold = True
+        bullet.font.size = Pt(8)
         table = docx.add_table(rows=9, cols=3)
         table.style='Table Grid'
-        table.style.font.size=Pt(9)
         table.alignment=WD_ALIGN_PARAGRAPH.CENTER
-        table.columns[0].width = 200000
-        table.columns[1].width = 2600000
-        table.columns[2].width = 2600000
+        # table.columns[0].width = 200000
+        # table.columns[1].width = 2600000
+        # table.columns[2].width = 2600000
+        table.style.font.size = Pt(8)
+        for cell in table.columns[0].cells:
+            cell.width = 450000
+        for cell in table.columns[1].cells:
+            cell.width = 2500000
+        for cell in table.columns[2].cells:
+            cell.width = 2500000
+        
+        for i in range(1,9):
+            table.cell(i, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+
         cellp = table.cell(0, 0).merge(table.cell(0, 2)).paragraphs[0]
         cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
         cellp.add_run('TRASLADO').font.bold = True
         cellp.add_run('\nNormativa Asociada: Artículo 39 del Acuerdo 008 de 2008 del CSU y Acuerdo 089 de 2014 del C.A.')
-        table.cell(1, 0).paragraphs[0].add_run('1')
+        table.cell(1, 0).paragraphs[0].add_run('1').font.bold = True
         table.cell(1, 1).paragraphs[0].add_run('Estudiante')
         table.cell(1, 2).paragraphs[0].add_run(request.student_name)
-        table.cell(2, 0).paragraphs[0].add_run('2')
+        table.cell(2, 0).paragraphs[0].add_run('2').font.bold = True
         table.cell(2, 1).paragraphs[0].add_run('DNI')
         table.cell(2, 2).paragraphs[0].add_run(request.student_dni)
-        table.cell(3, 0).paragraphs[0].add_run('3')
+        table.cell(3, 0).paragraphs[0].add_run('3').font.bold = True
         table.cell(3, 1).paragraphs[0].add_run('Plan de estudios origen (1er plan)')
         table.cell(3, 2).paragraphs[0].add_run(request.detail_cm['origin'])
-        table.cell(4, 0).paragraphs[0].add_run('4')
+        table.cell(4, 0).paragraphs[0].add_run('4').font.bold = True
         table.cell(4, 1).paragraphs[0].add_run('Código del plan de estudios origen (1er plan)')
         table.cell(4, 2).paragraphs[0].add_run(request.detail_cm['cod_origin'])
-        table.cell(5, 0).paragraphs[0].add_run('5')
+        table.cell(5, 0).paragraphs[0].add_run('5').font.bold = True
         table.cell(5, 1).paragraphs[0].add_run('Plan de estudios destino (2° plan)')
         table.cell(5, 2).paragraphs[0].add_run(large_program)
-        table.cell(6, 0).paragraphs[0].add_run('6')
+        table.cell(6, 0).paragraphs[0].add_run('6').font.bold = True
         table.cell(6, 1).paragraphs[0].add_run('Código del plan de estudios destino (2° plan)')
         table.cell(6, 2).paragraphs[0].add_run(request.academic_program)
-        table.cell(7, 0).paragraphs[0].add_run('7')
+        table.cell(7, 0).paragraphs[0].add_run('7').font.bold = True
         table.cell(7, 1).paragraphs[0].add_run('Fecha de la solicitud a través del SIA')
         table.cell(7, 2).paragraphs[0].add_run(request.detail_cm['sia_request'])
-        table.cell(8, 0).paragraphs[0].add_run('8')
+        table.cell(8, 0).paragraphs[0].add_run('8').font.bold = True
         table.cell(8, 1).paragraphs[0].add_run('¿Estos planes de estudio conducen al mismo título?')
         table.cell(8, 2).paragraphs[0].add_run(request.detail_cm['same_degree'])
         para = docx.add_paragraph()
-        para = docx.add_paragraph()
-        para.add_run('2. Información Académica').font.bold = True
+        para.paragraph_format.space_before = Pt(8)
+        bullet = para.add_run('2. Información Académica:')
+        para.paragraph_format.space_after = Pt(0)
+        bullet.font.bold = True
+        bullet.font.size = Pt(8)
         table = docx.add_table(rows=4, cols=2, style='Table Grid')
         table.alignment=WD_ALIGN_PARAGRAPH.CENTER
-        table.columns[0].width = 4600000
-        table.columns[1].width = 800000
+        # table.columns[0].width = 4600000
+        # table.columns[1].width = 800000
+
+        for cell in table.columns[0].cells:
+            cell.width = 4600000
+        for cell in table.columns[1].cells:
+            cell.width = 850000
+
         table.cell(0, 0).paragraphs[0].add_run('Periodo para el cual fue admitido')
         table.cell(0, 1).paragraphs[0].add_run(request.detail_cm['info_acad'][0]['per_adm'])
         table.cell(1, 0).paragraphs[0].add_run('¿El solicitante se encuentra matriculado en el semestre de presentar la solicitud?')            
@@ -89,13 +111,18 @@ class TRASPRE():
         table.cell(2, 1).paragraphs[0].add_run(request.detail_cm['info_acad'][0]['ant_plan'])
         table.cell(3, 0).paragraphs[0].add_run('Porcentaje de créditos aprobados en el plan de estudios origen (1er plan)')            
         table.cell(3, 1).paragraphs[0].add_run(request.detail_cm['info_acad'][0]['aprob']+'%')
-        para = docx.add_paragraph()
 
         if float(request.detail_cm['info_acad'][0]['aprob']) <= 30:
             table = docx.add_table(rows=2, cols=2, style='Table Grid')
             table.alignment=WD_ALIGN_PARAGRAPH.CENTER
-            table.columns[0].width = 4600000
-            table.columns[1].width = 800000
+            # table.columns[0].width = 4600000
+            # table.columns[1].width = 800000
+
+            for cell in table.columns[0].cells:
+                cell.width = 4600000
+            for cell in table.columns[1].cells:
+                cell.width = 850000
+
             table.cell(0, 0).paragraphs[0].add_run('¿Cuál fue el puntaje de admisión del solicitante?')
             table.cell(0, 1).paragraphs[0].add_run(request.detail_cm['info_acad'][1]['pun'])
             table.cell(1, 0).paragraphs[0].add_run('Puntaje de admisión del último admitido regular al plan destino (2° plan) en la misma prueba de ingreso del solicitante*')
@@ -105,8 +132,12 @@ class TRASPRE():
             para = docx.add_paragraph()
             table = docx.add_table(rows=3, cols=2, style='Table Grid')
             table.alignment=WD_ALIGN_PARAGRAPH.CENTER
-            table.columns[0].width = 4600000
-            table.columns[1].width = 800000
+            # table.columns[0].width = 4600000
+            # table.columns[1].width = 800000
+            for cell in table.columns[0].cells:
+                cell.width = 4600000
+            for cell in table.columns[1].cells:
+                cell.width = 850000
             table.cell(0, 0).paragraphs[0].add_run('Cupo de créditos menos créditos pendientes en el plan de estudios origen (1er plan)')
             table.cell(0, 1).paragraphs[0].add_run(request.detail_cm['info_acad'][2]['cupo_pend'])
             table.cell(1, 0).paragraphs[0].add_run('Cupo de créditos para traslado (literal d del artículo 3 de la resolución 089 de 2015 de Consejo Académico)')
@@ -120,19 +151,41 @@ class TRASPRE():
             para.add_run('* en caso que el plan de destino tenga convocatoria anual el puntaje será con la anterior convocatoria.')
             para = docx.add_paragraph()
             
-        if request.approval_status == 'AP':    
-            para.add_run('3. Resumen General de Créditos del Segundo Plan de Estudios').font.bold = True
-            para = docx.add_paragraph()
+        if request.approval_status == 'AP':
+            para = docx.add_paragraph() 
+            para.paragraph_format.space_before = Pt(8)
+            bullet = para.add_run('3. Resumen General de Créditos del Segundo Plan de Estudios')
+            para.paragraph_format.space_after = Pt(0)
+            bullet.font.bold = True
+            bullet.font.size = Pt(8)
             table = docx.add_table(rows=5, cols=7)
             table.style='Table Grid'
             table.alignment=WD_ALIGN_PARAGRAPH.CENTER
-            table.columns[0].width = 950000
-            table.columns[1].width = 820000
-            table.columns[2].width = 780000
-            table.columns[3].width = 820000
-            table.columns[4].width = 780000
-            table.columns[5].width = 675000
-            table.columns[6].width = 575000
+            # table.columns[0].width = 950000
+            # table.columns[1].width = 820000
+            # table.columns[2].width = 780000
+            # table.columns[3].width = 820000
+            # table.columns[4].width = 780000
+            # table.columns[5].width = 675000
+            # table.columns[6].width = 575000
+            for column in table.columns:
+                for cell in column.cells:
+                    cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+
+            for cell in table.columns[0].cells:
+                cell.width = 1250000
+            for cell in table.columns[1].cells:
+                cell.width = 700000
+            for cell in table.columns[2].cells:
+                cell.width = 700000
+            for cell in table.columns[3].cells:
+                cell.width = 700000
+            for cell in table.columns[4].cells:
+                cell.width = 700000
+            for cell in table.columns[5].cells:
+                cell.width = 850000
+            for cell in table.columns[6].cells:
+                cell.width = 550000
             cellp = table.cell(0, 0).merge(table.cell(1, 0)).paragraphs[0]
             cellp.vertical_alignement = WD_ALIGN_VERTICAL.CENTER
             cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -175,24 +228,57 @@ class TRASPRE():
             table.cell(4, 5).paragraphs[0].add_run(request.detail_cm['resumen'][2][4])
             table.cell(4, 6).paragraphs[0].add_run(str(int(request.detail_cm['resumen'][2][0])+int(request.detail_cm['resumen'][2][1])+int(request.detail_cm['resumen'][2][2])+int(request.detail_cm['resumen'][2][3])+int(request.detail_cm['resumen'][2][4])))
             
+            para = docx.add_paragraph() 
+            para.paragraph_format.space_before = Pt(0)
+            bullet = para.add_run('*Sin incluir los créditos correspondientes al cumplimiento del requisito de suficiencia en idioma extranjero.')
+            para.paragraph_format.space_after = Pt(0)
+            bullet.font.size = Pt(8)
             para = docx.add_paragraph()
-            para.add_run('* Sin incluir los créditos correspondientes al cumplimiento del requisito de suficiencia en idioma extranjero.')
-            para = docx.add_paragraph()
+            para.paragraph_format.space_before = Pt(8)
             para.alignment=WD_ALIGN_PARAGRAPH.CENTER
-            para.add_run('CUADRO EQUIVALENCIA Y CONVALIDACIONES DE ASIGNATURAS CURSADAS Y APROBADAS HASTA LA FECHA DE PRESENTACIÓN DE LA SOLICITUD POR PARTE DEL ESTUDIANTE').font.bold = True
-            para = docx.add_paragraph()
+            bullet = para.add_run('CUADRO EQUIVALENCIA Y CONVALIDACIONES DE ASIGNATURAS CURSADAS Y APROBADAS HASTA LA FECHA DE PRESENTACIÓN DE LA SOLICITUD POR PARTE DEL ESTUDIANTE')
+            para.paragraph_format.space_after = Pt(0)
+            bullet.font.bold = True
+            bullet.font.size = Pt(8)
+            bullet.font.underline = True
             table = docx.add_table(rows=len(request.detail_cm['equivalencia'])+3, cols=10, style='Table Grid')
             table.alignment=WD_ALIGN_PARAGRAPH.CENTER
-            table.columns[0].width = 700000
-            table.columns[1].width = 900000
-            table.columns[2].width = 700000
-            table.columns[3].width = 900000
-            table.columns[4].width = 225000
-            table.columns[5].width = 225000
-            table.columns[6].width = 225000
-            table.columns[7].width = 900000
-            table.columns[8].width = 225000
-            table.columns[9].width = 400000
+            # table.columns[0].width = 700000
+            # table.columns[1].width = 900000
+            # table.columns[2].width = 700000
+            # table.columns[3].width = 900000
+            # table.columns[4].width = 225000
+            # table.columns[5].width = 225000
+            # table.columns[6].width = 225000
+            # table.columns[7].width = 900000
+            # table.columns[8].width = 225000
+            # table.columns[9].width = 400000
+            for column in table.columns:
+                for cell in column.cells:
+                    cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                    cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.allow_autofit = False
+            for cell in table.columns[0].cells:
+                cell.width = 650000
+            for cell in table.columns[1].cells:
+                cell.width = 900000
+            for cell in table.columns[2].cells:
+                cell.width = 650000
+            for cell in table.columns[3].cells:
+                cell.width = 900000
+            for cell in table.columns[4].cells:
+                cell.width = 250000
+            for cell in table.columns[5].cells:
+                cell.width = 250000
+            for cell in table.columns[6].cells:
+                cell.width = 250000
+            for cell in table.columns[7].cells:
+                cell.width = 900000
+            for cell in table.columns[8].cells:
+                cell.width = 250000
+            for cell in table.columns[9].cells:
+                cell.width = 300000
+            
             cellp = table.cell(0, 0).merge(table.cell(0, 1)).paragraphs[0]
             cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
             cellp.add_run('Plan de estudios 1').font.bold = True
@@ -227,26 +313,55 @@ class TRASPRE():
                 table.cell(index+2, 8).paragraphs[0].add_run(subject['C']) 
                 table.cell(index+2, 9).paragraphs[0].add_run(subject['nota'])            
                 index = index + 1
-            table.cell(len(request.detail_cm['equivalencia'])+2, 8).paragraphs[0].add_run(str(credits_sum)) 
+            cellp = table.cell(len(request.detail_cm['equivalencia'])+2, 8).merge(table.cell(len(request.detail_cm['equivalencia'])+2, 9)).paragraphs[0]
+            cellp.add_run(str(credits_sum)) 
+    
             para = docx.add_paragraph()
-
-
-
-
-            para.add_run('CUADRO EQUIVALENCIA Y CONVALIDACIONES DE ASIGNATURAS CURSADAS Y NO APROBADAS HASTA LA FECHA DE PRESENTACIÓN DE LA SOLICITUD POR PARTE DEL ESTUDIANTE').font.bold = True
-            para = docx.add_paragraph()
+            para.paragraph_format.space_before = Pt(8)
+            para.alignment=WD_ALIGN_PARAGRAPH.CENTER
+            bullet = para.add_run('CUADRO EQUIVALENCIA Y CONVALIDACIONES DE ASIGNATURAS CURSADAS Y NO APROBADAS HASTA LA FECHA DE PRESENTACIÓN DE LA SOLICITUD POR PARTE DEL ESTUDIANTE')
+            para.paragraph_format.space_after = Pt(0)
+            bullet.font.bold = True
+            bullet.font.size = Pt(8)
+            bullet.font.underline = True
             table = docx.add_table(rows=len(request.detail_cm['eq_na'])+3, cols=10, style='Table Grid')
             table.alignment=WD_ALIGN_PARAGRAPH.CENTER
-            table.columns[0].width = 700000
-            table.columns[1].width = 900000
-            table.columns[2].width = 700000
-            table.columns[3].width = 900000
-            table.columns[4].width = 225000
-            table.columns[5].width = 225000
-            table.columns[6].width = 225000
-            table.columns[7].width = 900000
-            table.columns[8].width = 225000
-            table.columns[9].width = 400000
+            # table.columns[0].width = 700000
+            # table.columns[1].width = 900000
+            # table.columns[2].width = 700000
+            # table.columns[3].width = 900000
+            # table.columns[4].width = 225000
+            # table.columns[5].width = 225000
+            # table.columns[6].width = 225000
+            # table.columns[7].width = 900000
+            # table.columns[8].width = 225000
+            # table.columns[9].width = 400000
+            for column in table.columns:
+                for cell in column.cells:
+                    cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                    cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.allow_autofit = False
+            for cell in table.columns[0].cells:
+                cell.width = 650000
+            for cell in table.columns[1].cells:
+                cell.width = 900000
+            for cell in table.columns[2].cells:
+                cell.width = 650000
+            for cell in table.columns[3].cells:
+                cell.width = 900000
+            for cell in table.columns[4].cells:
+                cell.width = 250000
+            for cell in table.columns[5].cells:
+                cell.width = 250000
+            for cell in table.columns[6].cells:
+                cell.width = 250000
+            for cell in table.columns[7].cells:
+                cell.width = 900000
+            for cell in table.columns[8].cells:
+                cell.width = 250000
+            for cell in table.columns[9].cells:
+                cell.width = 300000
+
             cellp = table.cell(0, 0).merge(table.cell(0, 1)).paragraphs[0]
             cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
             cellp.add_run('Plan de estudios 1').font.bold = True
@@ -283,27 +398,48 @@ class TRASPRE():
                 index = index + 1
             table.cell(len(request.detail_cm['eq_na'])+2, 8).paragraphs[0].add_run(str(credits_sum)) 
 
-
-
-
-
-
             para = docx.add_paragraph()
-            para.add_run('*T:tipología(C/B/L). Ob: obligatoria. Op: optativa. C: créditos')
+            para.paragraph_format.space_before = Pt(0)
+            para.paragraph_format.space_after = Pt(8)
+            bullet = para.add_run('*T:tipología(C/B/L). Ob: obligatoria. Op: optativa. C: créditos')
+            bullet.font.underline = True
+            bullet.font.italic = True
+            bullet.font.size =  Pt(8)
             para = docx.add_paragraph()
-            para.add_run('ASIGNATURAS PENDIENTES POR CURSAR EN EL SEGUNDO PLAN DE ESTUDIOS').font.bold = True
-            para = docx.add_paragraph()
+            para.alignment=WD_ALIGN_PARAGRAPH.CENTER
+            bullet = para.add_run('ASIGNATURAS PENDIENTES POR CURSAR EN EL SEGUNDO PLAN DE ESTUDIOS')
+            bullet.font.size = Pt(8)
+            para.paragraph_format.space_after = Pt(0)
+            bullet.font.bold = True
+            bullet.font.underline = True
             sum=0
             for i in request.detail_cm['pen_funda_obl']:
                 sum = sum+len(i['mat'])
             sum2=len(request.detail_cm['pen_funda_opt'])
             table = docx.add_table(rows=sum+7+sum2, cols=5, style='Table Grid')
             table.alignment=WD_ALIGN_PARAGRAPH.CENTER
-            table.columns[0].width = 1300000
-            table.columns[1].width = 700000
-            table.columns[2].width = 1400000
-            table.columns[3].width = 1000000
-            table.columns[4].width = 1000000
+            # table.columns[0].width = 1300000
+            # table.columns[1].width = 700000
+            # table.columns[2].width = 1400000
+            # table.columns[3].width = 1000000
+            # table.columns[4].width = 1000000
+
+            for cell in table.columns[0].cells:
+                cell.width = 1000000
+            for cell in table.columns[1].cells:
+                cell.width = 1050000
+            for cell in table.columns[2].cells:
+                cell.width = 1400000
+            for cell in table.columns[3].cells:
+                cell.width = 1000000
+            for cell in table.columns[4].cells:
+                cell.width = 1000000
+            
+            for column in table.columns:
+                for cell in column.cells:
+                    cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                    cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+
             cellp = table.cell(0, 0).merge(table.cell(0, 4)).paragraphs[0]
             cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
             cellp.add_run('Componente de fundamentación (B)').font.bold = True
@@ -374,33 +510,46 @@ class TRASPRE():
             for i in request.detail_cm['pen_dis_obl']:
                 sum = sum+len(i['mat'])
             sum2=len(request.detail_cm['pen_dis_opt'])
+            para.paragraph_format.space_before = Pt(0)
+            para.add_run(' ').font.size = Pt(8)
+            para.paragraph_format.space_after = Pt(0)
             table = docx.add_table(rows=sum+7+sum2, cols=5, style='Table Grid')
             table.alignment=WD_ALIGN_PARAGRAPH.CENTER
-            table.columns[0].width = 1300000
-            table.columns[1].width = 700000
-            table.columns[2].width = 1400000
-            table.columns[3].width = 1000000
-            table.columns[4].width = 1000000
+            # table.columns[0].width = 1300000
+            # table.columns[1].width = 700000
+            # table.columns[2].width = 1400000
+            # table.columns[3].width = 1000000
+            # table.columns[4].width = 1000000
+
+            for cell in table.columns[0].cells:
+                cell.width = 1000000
+            for cell in table.columns[1].cells:
+                cell.width = 1050000
+            for cell in table.columns[2].cells:
+                cell.width = 1400000
+            for cell in table.columns[3].cells:
+                cell.width = 1000000
+            for cell in table.columns[4].cells:
+                cell.width = 1000000
+            
+            for column in table.columns:
+                for cell in column.cells:
+                    cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                    cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER  
+
             cellp = table.cell(0, 0).merge(table.cell(0, 4)).paragraphs[0]
-            cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
             cellp.add_run('Componente Disciplinar/Profesional (C)').font.bold = True
             cellp = table.cell(1, 0).merge(table.cell(1, 4)).paragraphs[0]
-            cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
             cellp.add_run('Obligatorias').font.bold = True
             cellp = table.cell(sum+3, 0).merge(table.cell(sum+3, 3)).paragraphs[0]
-            cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
             cellp.add_run('Total créditos pendientes').font.bold = True
             cellp = table.cell(sum+4, 0).merge(table.cell(sum+4, 4)).paragraphs[0]
-            cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
             cellp.add_run('Optativas').font.bold = True
             cellp = table.cell(sum+5, 0).merge(table.cell(sum+5, 1)).paragraphs[0]
-            cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
             cellp.add_run('Nombre de la Agrupación').font.bold = True
             cellp = table.cell(sum+5, 2).merge(table.cell(sum+5, 3)).paragraphs[0]
-            cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
             cellp.add_run('Créditos Requeridos').font.bold = True
             cellp = table.cell(sum+sum2+6, 0).merge(table.cell(sum+sum2+6, 3)).paragraphs[0]
-            cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
             cellp.add_run('Total créditos pendientes').font.bold = True
             table.cell(2, 0).paragraphs[0].add_run('Agrupación').font.bold = True
             table.cell(2, 1).paragraphs[0].add_run('Código').font.bold = True
@@ -446,10 +595,17 @@ class TRASPRE():
                 creditosgrandes=creditosgrandes+int(agrupacion['pen'])
             table.cell(sum+6+sum2, 4).paragraphs[0].add_run(str(creditosgrandes))
             para = docx.add_paragraph()
+            para.paragraph_format.space_before = Pt(0)
+            para.add_run(' ').font.size = Pt(8)
+            para.paragraph_format.space_after = Pt(0)
             table = docx.add_table(rows=1, cols=2, style='Table Grid')
             table.alignment=WD_ALIGN_PARAGRAPH.CENTER
-            table.columns[0].width = 4300000
-            table.columns[1].width = 1000000
+            # table.columns[0].width = 4300000
+            # table.columns[1].width = 1000000
+            for cell in table.columns[0].cells:
+                cell.width = 4000000
+            for cell in table.columns[1].cells:
+                cell.width = 1450000
             table.cell(0, 0).paragraphs[0].add_run('Componente de Libre Elección (L) (Créditos pendientes)').font.bold = True
             table.cell(0, 1).paragraphs[0].add_run(request.detail_cm['pen_lib'])
             para = docx.add_paragraph()
