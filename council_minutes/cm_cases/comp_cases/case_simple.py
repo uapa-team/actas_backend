@@ -829,14 +829,30 @@ class simple():
         table.style = 'Table Grid'
         table.style.font.size = Pt(8)
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.columns[0].width = 600000
-        table.columns[1].width = 2800000
-        table.columns[2].width = 600000
-        table.columns[3].width = 600000
-        table.columns[4].width = 600000
-        for col in table.columns:
-            for cell in col.cells:
+        # table.columns[0].width = 600000
+        # table.columns[1].width = 2800000
+        # table.columns[2].width = 600000
+        # table.columns[3].width = 600000
+        # table.columns[4].width = 600000
+        
+        for column in table.columns:
+            for cell in column.cells:
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
                 cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        for cell in table.columns[0].cells:
+            cell.width = 750000
+        for cell in table.columns[1].cells:
+            cell.width = 2300000
+        for cell in table.columns[2].cells:
+            cell.width = 800000
+        for cell in table.columns[3].cells:
+            cell.width = 800000
+        for cell in table.columns[4].cells:
+            cell.width = 800000
+
+        table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
         table.cell(0, 0).paragraphs[0].add_run('Código SIA').font.bold = True
         table.cell(0, 1).paragraphs[0].add_run('Nombre Asignatura').font.bold = True
         table.cell(0, 2).paragraphs[0].add_run('Grupo').font.bold = True
