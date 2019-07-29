@@ -1,5 +1,6 @@
 from num2words import num2words
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.enum.table import WD_ALIGN_VERTICAL
 from docx.shared import Pt
 from ...models import Request
 
@@ -621,12 +622,29 @@ class simple():
         table = docx.add_table(rows=len(request.detail_cm['subjects'])+1, cols=5)
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.style = 'Table Grid'
-        table.style.font.size = Pt(9)
-        table.columns[0].width = 700000
-        table.columns[1].width = 2000000
-        table.columns[2].width = 600000
-        table.columns[3].width = 1050000
-        table.columns[4].width = 1050000
+        table.style.font.size = Pt(8)
+
+        for column in table.columns:
+            for cell in column.cells:
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+                
+        # table.columns[0].width = 700000
+        # table.columns[1].width = 2000000
+        # table.columns[2].width = 600000
+        # table.columns[3].width = 1050000
+        # table.columns[4].width = 1050000
+        for cell in table.columns[0].cells:
+            cell.width = 750000
+        for cell in table.columns[1].cells:
+            cell.width = 2000000
+        for cell in table.columns[2].cells:
+            cell.width = 600000
+        for cell in table.columns[3].cells:
+            cell.width = 1050000
+        for cell in table.columns[4].cells:
+            cell.width = 1050000
+            
         table.cell(0, 0).paragraphs[0].add_run('Código').font.bold = True
         table.cell(0, 1).paragraphs[0].add_run('Asignatura').font.bold = True
         table.cell(0, 2).paragraphs[0].add_run('Nota').font.bold = True
