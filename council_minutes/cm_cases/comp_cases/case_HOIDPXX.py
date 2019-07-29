@@ -46,6 +46,10 @@ class HOIDPXX():
     def case_HOMOLOGACION_INGLES_TABLE(request, docx):
         table = docx.add_table(
             rows=len(request.detail_cm['subjects'])+5, cols=7)
+        for column in table.columns:
+            for cell in column.cells:
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.style = 'Table Grid'
         table.style.font.size = Pt(8)
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -56,6 +60,22 @@ class HOIDPXX():
         table.columns[4].width = 400000
         table.columns[5].width = 1400000
         table.columns[6].width = 400000
+
+        for cell in table.columns[0].cells:
+            cell.width = 850000
+        for cell in table.columns[1].cells:
+            cell.width = 1800000
+        for cell in table.columns[2].cells:
+            cell.width = 300000
+        for cell in table.columns[3].cells:
+            cell.width = 300000
+        for cell in table.columns[4].cells:
+            cell.width = 400000
+        for cell in table.columns[5].cells:
+            cell.width = 1400000
+        for cell in table.columns[6].cells:
+            cell.width = 400000
+
         cell = table.cell(0, 0).merge(table.cell(0, 6)).paragraphs[0]
         cell.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         cell.add_run(request.student_name + '\t\tDNI. ' +
@@ -108,8 +128,12 @@ class HOIDPXX():
             table.cell(index+3, 3).paragraphs[0].add_run(subject['tipology'])
             table.cell(index+3, 4).paragraphs[0].add_run(subject['grade'])
             index = index + 1
-        table.cell(index+3, 1).paragraphs[0].add_run('Créditos homologados P')
-        table.cell(index+3, 2).paragraphs[0].add_run(str(credits_sum))
-        table.cell(
-            index+4, 1).paragraphs[0].add_run('Total créditos que se homologan')
-        table.cell(index+4, 2).paragraphs[0].add_run(str(credits_sum))
+        cellp = table.cell(index+3, 0).merge(table.cell(index+3, 3)).paragraphs[0]
+        cellp.add_run('Créditos homologados P')
+        cellp = table.cell(index+3, 4).merge(table.cell(index+3, 6)).paragraphs[0]
+        cellp.add_run(str(credits_sum))
+        cellp = table.cell(index+4, 0).merge(table.cell(index+4, 3)).paragraphs[0]
+        cellp.add_run('Total créditos que se homologan')
+        cellp = table.cell(index+4, 4).merge(table.cell(index+4, 6)).paragraphs[0]
+        cellp.add_run(str(credits_sum))
+          
