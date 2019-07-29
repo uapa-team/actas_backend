@@ -1,5 +1,6 @@
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.enum.table import WD_ALIGN_VERTICAL
 
 
 class CASIPXX():
@@ -42,14 +43,29 @@ class CASIPXX():
     def case_CANCELACION_DE_ASIGNATURAS_TABLE(request, docx):
         table = docx.add_table(
             rows=len(request.detail_cm['subjects'])+1, cols=5)
+        for column in table.columns:
+            for cell in column.cells:
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.style = 'Table Grid'
-        table.style.font.size = Pt(9)
+        table.style.font.size = Pt(8)
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.columns[0].width = 700000
         table.columns[1].width = 2000000
         table.columns[2].width = 900000
         table.columns[3].width = 900000
         table.columns[4].width = 900000
+
+        for cell in table.columns[0].cells:
+            cell.width = 750000
+        for cell in table.columns[1].cells:
+            cell.width = 2000000
+        for cell in table.columns[2].cells:
+            cell.width = 900000
+        for cell in table.columns[3].cells:
+            cell.width = 900000
+        for cell in table.columns[4].cells:
+            cell.width = 900000
 
         cellp = table.cell(0, 0).paragraphs[0]
         cellp.add_run('Código SIA').font.bold = True
