@@ -36,9 +36,9 @@ class DTITPRE():
     def case_DOBLE_TITULACION_PREGRADO_AP(request, docx, paragraph):
         paragraph.add_run('APRUEBA').font.bold = True
         paragraph.add_run(' recomendar al Consejo de Sede que formalice la admisión y ubicación')
-        paragraph.add_run('en el programa de pregrado {} – {}, '.format(request.get_academic_program_display(), request.academic_program))
-        paragraph.add_run('teniendo en cuenta que el estudiante cuenta con un cupo de créditos suficiente para culminar')
-        paragraph.add_run('el segundo plan de estudios. (Acuerdo 155 de 2014 del Consejo Superior Universitario).\n')
+        paragraph.add_run(' en el programa de pregrado {} – {}, '.format(request.get_academic_program_display(), request.academic_program))
+        paragraph.add_run(' teniendo en cuenta que el estudiante cuenta con un cupo de créditos suficiente para culminar')
+        paragraph.add_run(' el segundo plan de estudios. (Acuerdo 155 de 2014 del Consejo Superior Universitario).\n')
         DTITPRE.case_DOBLE_TITULACION_PREGRADO_TABLES(request, docx, paragraph)
 
     @staticmethod
@@ -100,15 +100,15 @@ class DTITPRE():
         table.style.font.size = Pt(8)
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER
         for cell in table.columns[0].cells:
-            cell.width = 3000000
+            cell.width = 3050000
         for cell in table.columns[1].cells:
-            cell.width = 650000
+            cell.width = 700000
         for cell in table.columns[2].cells:
-            cell.width = 450000
+            cell.width = 500000
         for cell in table.columns[3].cells:
-            cell.width = 650000
+            cell.width = 700000
         for cell in table.columns[4].cells:
-            cell.width = 450000
+            cell.width = 500000
         table.cell(0, 0).paragraphs[0].add_run('El Consejo de la Facultad de Ingeniería en sesión del día {} Acta {}'.format(str(request.detail_cm['fecha_sesion'].day) + REINPRE.num_to_month(request.detail_cm['fecha_sesion'].month) + str(request.detail_cm['fecha_sesion'].year), request.detail_cm['acta']))
         table.cell(0, 1).paragraphs[0].add_run('Recomienda')
         table.cell(0, 3).paragraphs[0].add_run('No recomienda')
@@ -124,13 +124,12 @@ class DTITPRE():
         table = docx.add_table(rows=8, cols=3, style='Table Grid')
         table.style.font.size = Pt(8)
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER  
-        # table.allow_autofit = False
         for cell in table.columns[0].cells:
-            cell.width = 400000
+            cell.width = 450000
         for cell in table.columns[1].cells:
-            cell.width = 2400000
+            cell.width = 2500000
         for cell in table.columns[2].cells:
-            cell.width = 2400000
+            cell.width = 2500000
         cellp = table.cell(0, 0).merge(table.cell(0, 2)).paragraphs[0]
         cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
         cellp.add_run('DOBLE TITULACIÓN\n').font.bold = True
@@ -170,15 +169,15 @@ class DTITPRE():
         table.style.font.size = Pt(8)
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER  
         for cell in table.columns[0].cells:
-            cell.width = 4000000
+            cell.width = 4050000
         for cell in table.columns[1].cells:
-            cell.width = 300000
+            cell.width = 350000
         for cell in table.columns[2].cells:
-            cell.width = 300000
+            cell.width = 350000
         for cell in table.columns[3].cells:
-            cell.width = 300000
+            cell.width = 350000
         for cell in table.columns[4].cells:
-            cell.width = 300000
+            cell.width = 350000
         table.cell(0, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(0, 4).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(1, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -214,12 +213,17 @@ class DTITPRE():
         table = docx.add_table(rows=len(request.detail_cm['equivalencias_convalidaciones']['T_B'])+2, cols=9, style='Table Grid')
         table.style.font.size = Pt(8)
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER  
+        for column in table.columns:
+            for cell in column.cells:
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.allow_autofit = False
         for cell in table.columns[0].cells:
-            cell.width = 720000
+            cell.width = 800000
         for cell in table.columns[1].cells:
             cell.width = 900000
         for cell in table.columns[2].cells:
-            cell.width = 600000
+            cell.width = 700000
         for cell in table.columns[3].cells:
             cell.width = 900000
         for cell in table.columns[4].cells:
@@ -232,10 +236,6 @@ class DTITPRE():
             cell.width = 200000
         for cell in table.columns[8].cells:
             cell.width = 300000
-        for column in table.columns:
-            for cell in column.cells:
-                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-                cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         cellp = table.cell(0, 0).merge(table.cell(0, 1)).paragraphs[0]
         cellp.add_run('PLAN DE ESTUDIOS (1)').font.bold = True
         cellp = table.cell(0, 2).merge(table.cell(0, 8)).paragraphs[0]   
@@ -278,12 +278,13 @@ class DTITPRE():
         table = docx.add_table(rows=len(request.detail_cm['equivalencias_convalidaciones']['T_C'])+2, cols=9, style='Table Grid')
         table.style.font.size = Pt(8)
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER  
+
         for cell in table.columns[0].cells:
-            cell.width = 720000
+            cell.width = 800000
         for cell in table.columns[1].cells:
             cell.width = 900000
         for cell in table.columns[2].cells:
-            cell.width = 600000
+            cell.width = 700000
         for cell in table.columns[3].cells:
             cell.width = 900000
         for cell in table.columns[4].cells:
@@ -296,6 +297,7 @@ class DTITPRE():
             cell.width = 200000
         for cell in table.columns[8].cells:
             cell.width = 300000
+
         for column in table.columns:
             for cell in column.cells:
                 cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
@@ -343,18 +345,20 @@ class DTITPRE():
         table = docx.add_table(rows=len(request.detail_cm['equivalencias_convalidaciones']['T_L'])+2, cols=6, style='Table Grid')
         table.style.font.size = Pt(8)
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER  
+
         for cell in table.columns[0].cells:
             cell.width = 900000
         for cell in table.columns[1].cells:
-            cell.width = 1400000
+            cell.width = 1450000
         for cell in table.columns[2].cells:
-            cell.width = 700000
+            cell.width = 750000
         for cell in table.columns[3].cells:
-            cell.width = 1400000
+            cell.width = 1450000
         for cell in table.columns[4].cells:
-            cell.width = 400000
+            cell.width = 450000
         for cell in table.columns[5].cells:
-            cell.width = 400000
+            cell.width = 450000
+
         for column in table.columns:
             for cell in column.cells:
                 cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
@@ -399,11 +403,11 @@ class DTITPRE():
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER 
 
         for cell in table.columns[0].cells:
-            cell.width = 970000
+            cell.width = 1000000
         for cell in table.columns[1].cells:
-            cell.width = 900000
+            cell.width = 1050000
         for cell in table.columns[2].cells:
-            cell.width = 1300000
+            cell.width = 1400000
         for cell in table.columns[3].cells:
             cell.width = 1000000
         for cell in table.columns[4].cells:
@@ -448,12 +452,11 @@ class DTITPRE():
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER  
         
         for cell in table.columns[0].cells:
-            cell.width = 1900000
+            cell.width = 1950000
         for cell in table.columns[1].cells:
-            cell.width = 1630000
+            cell.width = 1750000
         for cell in table.columns[2].cells:
-            cell.width = 1630000
-
+            cell.width = 1750000
 
         for column in table.columns:
             for cell in column.cells:
@@ -473,7 +476,6 @@ class DTITPRE():
             total_pendientes =  total_pendientes + int(request.detail_cm['asignaturas_pendientes']['T_B']['optativas'][j]['cred_pendientes'])
             row_m = row_m + 1
         
-        
         cellp = table.cell(row_m, 0).merge(table.cell(row_m, 1)).paragraphs[0]
         cellp.add_run('Total créditos pendientes').font.bold = True
         table.cell(row_m, 2).paragraphs[0].add_run(str(total_pendientes))
@@ -492,13 +494,13 @@ class DTITPRE():
         table = docx.add_table(rows=cant_rows + 3, cols=5, style='Table Grid')
         table.style.font.size = Pt(8)
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER  
-
+        
         for cell in table.columns[0].cells:
             cell.width = 1000000
         for cell in table.columns[1].cells:
-            cell.width = 900000
+            cell.width = 1050000
         for cell in table.columns[2].cells:
-            cell.width = 1300000
+            cell.width = 1400000
         for cell in table.columns[3].cells:
             cell.width = 1000000
         for cell in table.columns[4].cells:
@@ -546,12 +548,11 @@ class DTITPRE():
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER  
 
         for cell in table.columns[0].cells:
-            cell.width = 1900000
+            cell.width = 1950000
         for cell in table.columns[1].cells:
-            cell.width = 1650000
+            cell.width = 1750000
         for cell in table.columns[2].cells:
-            cell.width = 1650000
-
+            cell.width = 1750000
 
         for column in table.columns:
             for cell in column.cells:
@@ -583,10 +584,12 @@ class DTITPRE():
         table = docx.add_table(rows=1, cols=2, style='Table Grid')
         table.style.font.size = Pt(8)
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER  
+
         for cell in table.columns[0].cells:
             cell.width = 4000000
         for cell in table.columns[1].cells:
-            cell.width = 1200000
+            cell.width = 1450000
+
         table.cell(0, 0).paragraphs[0].add_run('Componente de Libre Elección (L) (Créditos pendientes)').font.bold = True
         table.cell(0, 1).paragraphs[0].add_run(request.detail_cm['asignaturas_pendientes']['electivas']).font.bold = True
 
@@ -596,24 +599,26 @@ class DTITPRE():
         table.style.font.size = Pt(8)
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
-        for cell in table.columns[0].cells:
-            cell.width = 720000
-        for cell in table.columns[1].cells:
-            cell.width = 300000
-        for cell in table.columns[2].cells:
-            cell.width = 300000
-        for cell in table.columns[3].cells:
-            cell.width = 300000
-        for cell in table.columns[4].cells:
-            cell.width = 300000
-        for cell in table.columns[5].cells:
-            cell.width = 900000
-        for cell in table.columns[6].cells:
-            cell.width = 700000
-
         for column in table.columns:
             for cell in column.cells:
                 cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+
+        table.allow_autofit = False
+        
+        for cell in table.columns[0].cells:
+            cell.width = 1250000
+        for cell in table.columns[1].cells:
+            cell.width = 700000
+        for cell in table.columns[2].cells:
+            cell.width = 700000
+        for cell in table.columns[3].cells:
+            cell.width = 700000
+        for cell in table.columns[4].cells:
+            cell.width = 700000
+        for cell in table.columns[5].cells:
+            cell.width = 800000
+        for cell in table.columns[6].cells:
+            cell.width = 400000
 
         cellp = table.cell(0, 0).merge(table.cell(1, 0)).paragraphs[0] 
         cellp.add_run('Créditos')
@@ -674,4 +679,5 @@ class DTITPRE():
         suma = suma + int(request.detail_cm['resumen_general']['pendientes']['C']['op'])
         suma = suma + int(request.detail_cm['resumen_general']['pendientes']['L'])
         table.cell(4, 6).paragraphs[0].add_run(str(suma))
+    
         
