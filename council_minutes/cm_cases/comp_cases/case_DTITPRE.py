@@ -218,12 +218,13 @@ class DTITPRE():
                 cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
                 cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.allow_autofit = False
+
         for cell in table.columns[0].cells:
-            cell.width = 800000
+            cell.width = 750000
         for cell in table.columns[1].cells:
             cell.width = 900000
         for cell in table.columns[2].cells:
-            cell.width = 700000
+            cell.width = 800000
         for cell in table.columns[3].cells:
             cell.width = 900000
         for cell in table.columns[4].cells:
@@ -233,9 +234,10 @@ class DTITPRE():
         for cell in table.columns[6].cells:
             cell.width = 900000
         for cell in table.columns[7].cells:
-            cell.width = 200000
+            cell.width = 250000
         for cell in table.columns[8].cells:
             cell.width = 300000
+
         cellp = table.cell(0, 0).merge(table.cell(0, 1)).paragraphs[0]
         cellp.add_run('PLAN DE ESTUDIOS (1)').font.bold = True
         cellp = table.cell(0, 2).merge(table.cell(0, 8)).paragraphs[0]   
@@ -280,11 +282,11 @@ class DTITPRE():
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER  
 
         for cell in table.columns[0].cells:
-            cell.width = 800000
+            cell.width = 750000
         for cell in table.columns[1].cells:
             cell.width = 900000
         for cell in table.columns[2].cells:
-            cell.width = 700000
+            cell.width = 800000
         for cell in table.columns[3].cells:
             cell.width = 900000
         for cell in table.columns[4].cells:
@@ -294,7 +296,7 @@ class DTITPRE():
         for cell in table.columns[6].cells:
             cell.width = 900000
         for cell in table.columns[7].cells:
-            cell.width = 200000
+            cell.width = 250000
         for cell in table.columns[8].cells:
             cell.width = 300000
 
@@ -616,9 +618,9 @@ class DTITPRE():
         for cell in table.columns[4].cells:
             cell.width = 700000
         for cell in table.columns[5].cells:
-            cell.width = 800000
+            cell.width = 850000
         for cell in table.columns[6].cells:
-            cell.width = 400000
+            cell.width = 500000
 
         cellp = table.cell(0, 0).merge(table.cell(1, 0)).paragraphs[0] 
         cellp.add_run('Créditos')
