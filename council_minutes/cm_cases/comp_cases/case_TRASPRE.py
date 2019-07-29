@@ -609,9 +609,13 @@ class TRASPRE():
             table.cell(0, 0).paragraphs[0].add_run('Componente de Libre Elección (L) (Créditos pendientes)').font.bold = True
             table.cell(0, 1).paragraphs[0].add_run(request.detail_cm['pen_lib'])
             para = docx.add_paragraph()
+            para.paragraph_format.space_before = Pt(8)
             para.alignment=WD_ALIGN_PARAGRAPH.JUSTIFY
-            para.add_run('La oferta de asignaturas optativas en cada una de las agrupaciones y componentes ')
-            para.add_run('del plan de estudios del programa de ' + request.detail_cm['origin'] + ', la ')
-            para.add_run('encuentra en el Acuerdo ' + request.detail_cm['normativa'] + ', expedido por el ')
-            para.add_run('consejo de la Facultad de Ingeniería.')
+            bullet = 'La oferta de asignaturas optativas en cada una de las agrupaciones y componentes '
+            bullet += 'del plan de estudios del programa de ' + request.detail_cm['origin'] + ', la '
+            bullet += 'encuentra en el Acuerdo ' + request.detail_cm['normativa'] + ', expedido por el '
+            bullet += 'consejo de la Facultad de Ingeniería.'
+            bullet = para.add_run(bullet)
+            bullet.font.italic = True
+            bullet.font.underline = True
 
