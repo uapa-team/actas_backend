@@ -13,7 +13,7 @@ from .comp_cases.case_HCEMPRE import HCEMPRE
 from .comp_cases.case_simple import simple
 
 
-class CasesSpliter():
+class PreCasesSpliter():
 
     def __init__(self):
         self.cases = {

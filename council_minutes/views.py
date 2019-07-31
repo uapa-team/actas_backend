@@ -146,3 +146,22 @@ def docx_gen_by_date(request):
         return HttpResponse('No cases in date range specified', status=401)
     generator.generate(filename)
     return HttpResponse(filename)
+
+
+@csrf_exempt
+def docx_gen_pre_by_id(request):
+    try:
+        body = json.loads(request.body)
+        start_date = body['cm']['start_date']
+        end_date = body['cm']['end_date']
+    except (json.decoder.JSONDecodeError):
+        return HttpResponse("Bad Request", status=400)
+    filename = 'public/preacta' + \
+        start_date.split(':')[0] + '_' + end_date.split(':')[0] + '.docx'
+    generator = PreCouncilMinuteGenerator()
+    try:
+        generator.add_cases_from_date(start_date, end_date)
+    except IndexError:
+        return HttpResponse('No cases in date range specified', status=401)
+    generator.generate(filename)
+    return HttpResponse(filename)
