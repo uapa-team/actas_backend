@@ -150,6 +150,18 @@ def docx_gen_by_date(request):
 
 @csrf_exempt
 def docx_gen_pre_by_id(request):
+    filename = 'public/preacta' + cm_id + '.docx'
+    try:
+        request_by_id = Request.objects.get(id=cm_id)
+    except mongoengine.DoesNotExist:
+        return HttpResponse('Does not exist', status=404)
+    generator = PreCouncilMinuteGenerator()
+    generator.add_case_from_request(request_by_id)
+    generator.generate(filename)
+    return HttpResponse(filename)
+
+@csrf_exempt
+def docx_gen_by_date(request):
     try:
         body = json.loads(request.body)
         start_date = body['cm']['start_date']
