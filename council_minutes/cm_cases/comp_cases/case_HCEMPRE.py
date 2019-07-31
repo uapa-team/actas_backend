@@ -105,6 +105,29 @@ class HCEMPRE():
         table.style.font.size = Pt(8)
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
+        table.columns[0].width = 600000
+        table.columns[1].width = 1800000
+        table.columns[2].width = 300000
+        table.columns[3].width = 300000
+        table.columns[4].width = 400000
+        table.columns[5].width = 1400000
+        table.columns[6].width = 400000
+
+        for cell in table.columns[0].cells:
+            cell.width = 850000
+        for cell in table.columns[1].cells:
+            cell.width = 1800000
+        for cell in table.columns[2].cells:
+            cell.width = 300000
+        for cell in table.columns[3].cells:
+            cell.width = 300000
+        for cell in table.columns[4].cells:
+            cell.width = 400000
+        for cell in table.columns[5].cells:
+            cell.width = 1400000
+        for cell in table.columns[6].cells:
+            cell.width = 400000
+
         cellp = table.cell(0, 0).merge(table.cell(0, 6)).paragraphs[0]
         cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
         cellp.add_run('{}\t\t\tDNI.{}'.format(
@@ -208,19 +231,18 @@ class HCEMPRE():
         # table = docx.add_table(rows=cant_rows+1, cols=3, style='Table Grid')
         # table.style.font.size = Pt(8)
         # table.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        cellp = table.cell(row_a, 0).merge(table.cell(row_a, 1)).paragraphs[0]
+        cellp = table.cell(row_a, 0).merge(table.cell(row_a, 3)).paragraphs[0]
         cellp.add_run('Total créditos')
-        table.cell(row_a, 2).paragraphs[0].add_run(str(num_credits['total']))
+        cellp = table.cell(row_a, 4).merge(table.cell(row_a, 6)).paragraphs[0]
+        cellp.add_run(str(num_credits['total']))
         row_a += 1
         for i in range(0, cant_rows):
             cellp = table.cell(
-                i + row_a, 0).merge(table.cell(i + row_a, 1)).paragraphs[0]
+                i + row_a, 0).merge(table.cell(i + row_a, 3)).paragraphs[0]
             cellp.add_run('Créditos homologados ' + appear[i-1] + ':')
-            table.cell(
-                i + row_a, 2).paragraphs[0].add_run(str(num_credits[appear[i-1]]))
-
-        cellp = table.cell(
-            row_a - 1, 3).merge(table.cell(cant_rows - 1 + row_a, 6)).paragraphs[0]
+            cellp = table.cell(i + row_a, 4).merge(table.cell(i + row_a, 6)).paragraphs[0]
+            cellp.add_run(str(num_credits[appear[i-1]]))
+        
         for column in table.columns:
             for cell in column.cells:
                 cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
@@ -243,6 +265,18 @@ class HCEMPRE():
             for cell in column.cells:
                 cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
                 cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        for cell in table.columns[0].cells:
+            cell.width = 1325000
+        for cell in table.columns[1].cells:
+            cell.width = 1325000
+        for cell in table.columns[2].cells:
+            cell.width = 2000000
+        for cell in table.columns[3].cells:
+            cell.width = 400000
+        for cell in table.columns[4].cells:
+            cell.width = 400000
+      
         cellp = table.cell(0, 0).merge(table.cell(0, 4)).paragraphs[0]
         cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
         cellp.add_run('{}\t\t\tDNI.{}'.format(
