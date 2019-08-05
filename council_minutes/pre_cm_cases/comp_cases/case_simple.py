@@ -2,7 +2,7 @@ from num2words import num2words
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
 from ...models import Request
-
+from .case_utils import *
 
 class simple():
 
@@ -24,7 +24,16 @@ class simple():
 
     @staticmethod
     def case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO(request, docx, redirected=False):
-        raise NotImplementedError
+        analysis1_format = 'El comité asesor de {} lo considera fuerza mayor o caso fortuito documentado.'
+        analysis1 = analysis1_format.format(request['pre_cm']['detail_pre_cm']['advisory_committee'])
+        analysis2_format = 'Información del SIA:\n\t'
+        analysis2_format += 'Porcentaje de avance del plan: {}\n\tNúmero de matrículas{}\n\tPAPA:{}.'
+        advance = request['pre_cm']['detail_pre_cm']['advance']
+        enrolled_academic_periods = request['pre_cm']['detail_pre_cm']['enrolled_academic_periods']
+        papa = request['pre_cm']['detail_pre_cm']['papa']
+        analysis2 = analysis2_format.format(advance, enrolled_academic_periods, papa)
+        analysis_list = [analysis1, analysis2] + request['pre_cm']['extra_analysis']
+
 
     @staticmethod
     def case_CAMBIO_DE_PERFIL_POSGRADO(request, docx, redirected=False):

@@ -150,7 +150,7 @@ def docx_gen_by_date(request):
 
 
 @csrf_exempt
-def docx_gen_pre_by_id(request):
+def docx_gen_pre_by_id(request, cm_id):
     filename = 'public/preacta' + cm_id + '.docx'
     try:
         request_by_id = Request.objects.get(id=cm_id)
