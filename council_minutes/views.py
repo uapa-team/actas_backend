@@ -7,6 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import Request
 from .helpers import QuerySetEncoder, Translator
 from .docx import CouncilMinuteGenerator
+from .docx import PreCouncilMinuteGenerator
 # Esto va solo para evitar la verificacion de django
 
 
@@ -161,7 +162,7 @@ def docx_gen_pre_by_id(request):
     return HttpResponse(filename)
 
 @csrf_exempt
-def docx_gen_by_date(request):
+def docx_gen_pre_by_date(request):
     try:
         body = json.loads(request.body)
         start_date = body['cm']['start_date']

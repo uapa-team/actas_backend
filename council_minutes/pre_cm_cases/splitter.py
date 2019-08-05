@@ -11,7 +11,7 @@ from .comp_cases.case_HCEMPOS import HCEMPOS
 from .comp_cases.case_DTITPRE import DTITPRE
 from .comp_cases.case_HCEMPRE import HCEMPRE
 from .comp_cases.case_simple import simple
-
+from .comp_cases.case_utils import *
 
 class PreCasesSpliter():
 
@@ -85,6 +85,7 @@ class PreCasesSpliter():
         }
 
     def request_case(self, request, docx, redirected=False):
+        header(request, docx)
         return self.cases[request.type](request, docx, redirected)
 
     def case_TRASLADO_PREGRADO(self, request, docx, redirected):

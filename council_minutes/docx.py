@@ -4,7 +4,7 @@ from docx.shared import RGBColor
 from docx.shared import Pt
 from .models import Request
 from .cm_cases.spliter import CasesSpliter
-from .pre_cm_cases.spliter import PreCasesSpliter
+from .pre_cm_cases.splitter import PreCasesSpliter
 
 
 class CouncilMinuteGenerator():
