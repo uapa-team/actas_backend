@@ -44,7 +44,8 @@ class CasesSpliter():
             'HCEMPRE': self.case_HOMOLOGACION_CONVALIDACION_EQUIVALENCIA_PREGRADO,
             'EBAPPRE': self.case_ELIMINACION_DE_LA_HISTORIA_ACADEMICA_BAPI_PREGRADO,
             'RRSAPRE': self.case_RECURSO_DE_REPOSICION_CON_SUBSIDIO_DE_APELACION_PREGRADO,
-            'DPVPPRE': self.case_DEVOLUCION_PROPORCIONAL_DEL_VALOR_PAGADO_POR_CONCEPTO_DE_DERECHOS_DE_MATRICULA_PREGRADO,
+            'DPVPPRE':
+            self.case_DEVOLUCION_PROPORCIONAL_DEL_VALOR_PAGADO_POR_CONCEPTO_DE_DERECHOS_DE_MATRICULA_PREGRADO,
             'TRASPOS': self.case_TRASLADO_POSGRADO,
             'REEMPOS': self.case_REEMBOLSO_POSGRADO,
             'REINPOS': self.case_REINGRESO_POSGRADO,
@@ -79,9 +80,6 @@ class CasesSpliter():
             'AFPDPOS': self.case_AMPLIACION_DE_LA_FECHA_DE_PAGO_DE_DERECHOS_ACADEMICOS_POSGRADO,
             'RCPEPOS': self.case_REGISTRO_DE_CALIFICACION_DEL_PROYECTO_Y_EXAMEN_DOCTORAL_POSGRADO,
             'APGDPOS': self.case_APROBACION_PROYECTO_PROPUESTA_Y_DESIGNACION_DE_DIRECTOR_POSGRADO,
-            'DJCTPOS': self.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO,
-            'EPTUPOS': self.case_EXENCION_DE_PAGO_POR_CURSAR_TESIS_COMO_UNICA_ACTIVIDAD_ACADEMICA_POSGRADO,
-            'DJCPOS': self.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO,
             'CAIMPRE': self.case_CANCELACION_DE_ASIGNATURAS_CON_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO,
             'HAIAPRE': self.case_HOMOLOGACION_DE_ASIGNATURAS_INTERCAMBIO_ACADEMICO_INTERNACIONAL_PREGRADO,
             'HAUAPRE': self.case_HOMOLOGACION_DE_ASIGNATURAS_CONVENIO_CON_UNIVERSIDAD_ANDES_PREGRADO,
@@ -92,6 +90,12 @@ class CasesSpliter():
             'BEDAPOS': self.case_BECA_EXENSION_DERECHOS_ACADEMICOS,
             'PRTMPOS': self.case_PROYECTO_DE_TESIS_O_TRABAJO_FINAL_DE_MAESTRIA_POSGRADO,
             'PRTDPOS': self.case_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO,
+            'DJCTPOS':
+            self.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO,
+            'EPTUPOS':
+            self.case_EXENCION_DE_PAGO_POR_CURSAR_TESIS_COMO_UNICA_ACTIVIDAD_ACADEMICA_POSGRADO,
+            'DJCPOS':
+            self.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO,
         }
 
     def request_case(self, request, docx, redirected=False):
@@ -184,11 +188,13 @@ class CasesSpliter():
         simple.case_ELIMINACION_DE_LA_HISTORIA_ACADEMICA_BAPI_PREGRADO(
             request, docx, redirected)
 
-    def case_RECURSO_DE_REPOSICION_CON_SUBSIDIO_DE_APELACION_PREGRADO(self, request, docx, redirected):
+    def case_RECURSO_DE_REPOSICION_CON_SUBSIDIO_DE_APELACION_PREGRADO(
+            self, request, docx, redirected):
         simple.case_RECURSO_DE_REPOSICION_CON_SUBSIDIO_DE_APELACION(
             request, docx, redirected)
 
-    def case_DEVOLUCION_PROPORCIONAL_DEL_VALOR_PAGADO_POR_CONCEPTO_DE_DERECHOS_DE_MATRICULA_PREGRADO(self, request, docx, redirected):
+    def case_DEVOLUCION_PROPORCIONAL_DEL_VALOR_PAGADO_POR_CONCEPTO_DE_DERECHOS_DE_MATRICULA_PREGRADO(
+            self, request, docx, redirected):
         simple.case_DEVOLUCION_PROPORCIONAL_DEL_VALOR_PAGADO_POR_CONCEPTO_DE_DERECHOS_DE_MATRICULA_PREGRADO(
             request, docx, redirected)
 
@@ -289,38 +295,92 @@ class CasesSpliter():
         simple.case_MODIFICACION_DE_OBJETIVOS_DE_TESIS_PROPUESTA_POSGRADO(
             request, docx, redirected)
 
-    def case_RECURSO_DE_REPOSICION_CON_SUBSIDIO_DE_APELACION_POSGRADO(self, request, docx, redirected):
+    def case_RECURSO_DE_REPOSICION_CON_SUBSIDIO_DE_APELACION_POSGRADO(
+            self, request, docx, redirected):
         simple.case_RECURSO_DE_REPOSICION_CON_SUBSIDIO_DE_APELACION(
             request, docx, redirected)
 
-    def case_CAMBIO_DE_DIRECTIOR_CODIRECTOR_JURADO_O_EVALUADOR_POSGRADO(self, request, docx, redirected):
+    def case_CAMBIO_DE_DIRECTIOR_CODIRECTOR_JURADO_O_EVALUADOR_POSGRADO(
+            self, request, docx, redirected):
         simple.case_CAMBIO_DE_DIRECTIOR_CODIRECTOR_JURADO_O_EVALUADOR_POSGRADO(
             request, docx, redirected)
 
-    def case_EXENCION_DE_PAGO_POR_CREDITOS_SOBRANTES_DE_PREGRADO_POSGRADO(self, request, docx, redirected):
+    def case_EXENCION_DE_PAGO_POR_CREDITOS_SOBRANTES_DE_PREGRADO_POSGRADO(
+            self, request, docx, redirected):
         simple.case_EXENCION_DE_PAGO_POR_CREDITOS_SOBRANTES_DE_PREGRADO_POSGRADO(
             request, docx, redirected)
 
-    def case_AMPLIACION_DE_LA_FECHA_DE_PAGO_DE_DERECHOS_ACADEMICOS_POSGRADO(self, request, docx, redirected):
+    def case_AMPLIACION_DE_LA_FECHA_DE_PAGO_DE_DERECHOS_ACADEMICOS_POSGRADO(
+            self, request, docx, redirected):
         simple.case_AMPLIACION_DE_LA_FECHA_DE_PAGO_DE_DERECHOS_ACADEMICOS_POSGRADO(
             request, docx, redirected)
 
-    def case_REGISTRO_DE_CALIFICACION_DEL_PROYECTO_Y_EXAMEN_DOCTORAL_POSGRADO(self, request, docx, redirected):
+    def case_REGISTRO_DE_CALIFICACION_DEL_PROYECTO_Y_EXAMEN_DOCTORAL_POSGRADO(
+            self, request, docx, redirected):
         simple.case_REGISTRO_DE_CALIFICACION_DEL_PROYECTO_Y_EXAMEN_DOCTORAL_POSGRADO(
             request, docx, redirected)
 
-    def case_APROBACION_PROYECTO_PROPUESTA_Y_DESIGNACION_DE_DIRECTOR_POSGRADO(self, request, docx, redirected):
+    def case_APROBACION_PROYECTO_PROPUESTA_Y_DESIGNACION_DE_DIRECTOR_POSGRADO(
+            self, request, docx, redirected):
         simple.case_APROBACION_PROYECTO_PROPUESTA_Y_DESIGNACION_DE_DIRECTOR_POSGRADO(
             request, docx, redirected)
 
-    def case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO(self, request, docx, redirected):
+    def case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO(
+            self, request, docx, redirected):
         simple.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO(
             request, docx, redirected)
 
-    def case_EXENCION_DE_PAGO_POR_CURSAR_TESIS_COMO_UNICA_ACTIVIDAD_ACADEMICA_POSGRADO(self, request, docx, redirected):
+    def case_EXENCION_DE_PAGO_POR_CURSAR_TESIS_COMO_UNICA_ACTIVIDAD_ACADEMICA_POSGRADO(
+            self, request, docx, redirected):
         simple.case_EXENCION_DE_PAGO_POR_CURSAR_TESIS_COMO_UNICA_ACTIVIDAD_ACADEMICA_POSGRADO(
             request, docx, redirected)
 
-    def case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO(self, request, docx, redirected):
+    def case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO(
+            self, request, docx, redirected):
         simple.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO(
+            request, docx, redirected)
+
+    def case_CANCELACION_DE_ASIGNATURAS_CON_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO(
+            self, request, docx, redirected):
+        simple.case_CANCELACION_DE_ASIGNATURAS_CON_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO(
+            request, docx, redirected)
+
+    def case_HOMOLOGACION_DE_ASIGNATURAS_INTERCAMBIO_ACADEMICO_INTERNACIONAL_PREGRADO(
+            self, request, docx, redirected):
+        simple.case_HOMOLOGACION_DE_ASIGNATURAS_INTERCAMBIO_ACADEMICO_INTERNACIONAL_PREGRADO(
+            request, docx, redirected)
+
+    def case_HOMOLOGACION_DE_ASIGNATURAS_CONVENIO_CON_UNIVERSIDAD_ANDES_PREGRADO(
+            self, request, docx, redirected):
+        simple.case_HOMOLOGACION_DE_ASIGNATURAS_CONVENIO_CON_UNIVERSIDAD_ANDES_PREGRADO(
+            request, docx, redirected)
+
+    def case_HOMOLOGACION_DE_ASIGNATURAS_CONVENIO_CON_UNIVERSIDAD_ANDES_POSGRADO(
+            self, request, docx, redirected):
+        simple.case_HOMOLOGACION_DE_ASIGNATURAS_CONVENIO_CON_UNIVERSIDAD_ANDES_POSGRADO(
+            request, docx, redirected)
+
+    def case_ACLARACION_DE_DECISION_PREGRADO(self, request, docx, redirected):
+        simple.case_ACLARACION_DE_DECISION_PREGRADO(
+            request, docx, redirected)
+
+    def case_ACLARACION_DE_DECISION_POSGRADO(self, request, docx, redirected):
+        simple.case_ACLARACION_DE_DECISION_POSGRADO(
+            request, docx, redirected)
+
+    def case_ADICION_DE_CODIRECTOR_POSGRADO(self, request, docx, redirected):
+        simple.case_ADICION_DE_CODIRECTOR_POSGRADO(
+            request, docx, redirected)
+
+    def case_BECA_EXENSION_DERECHOS_ACADEMICOS(self, request, docx, redirected):
+        simple.case_BECA_EXENSION_DERECHOS_ACADEMICOS(
+            request, docx, redirected)
+
+    def case_PROYECTO_DE_TESIS_O_TRABAJO_FINAL_DE_MAESTRIA_POSGRADO(
+            self, request, docx, redirected):
+        simple.case_PROYECTO_DE_TESIS_O_TRABAJO_FINAL_DE_MAESTRIA_POSGRADO(
+            request, docx, redirected)
+
+    def case_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO(self, request, docx, redirected):
+        simple.case_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO(
             request, docx, redirected)
