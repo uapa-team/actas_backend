@@ -1096,3 +1096,39 @@ class simple():
             para.add_run('NO APRUEBA ').font.bold = True
             para.add_run('calificación avance satisfactorio (AS) a '+ common + ', debido a que {}'.format(request.justification))
         para.add_run('.')
+    
+    @staticmethod
+    def case_CANCELACION_DE_ASIGNATURAS_CON_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO(request, docx, redirected=False):
+        raise NotImplementedError
+
+    @staticmethod
+    def case_HOMOLOGACION_DE_ASIGNATURAS_INTERCAMBIO_ACADEMICO_INTERNACIONAL_PREGRADO(request, docx, redirected=False):
+        raise NotImplementedError
+
+    @staticmethod
+    def case_HOMOLOGACION_DE_ASIGNATURAS_CONVENIO_CON_UNIVERSIDAD_ANDES_PREGRADO(request, docx, redirected=False):
+        raise NotImplementedError
+
+    @staticmethod
+    def case_ACLARACION_DE_DECISION_PREGRADO(request, docx, redirected=False):
+        raise NotImplementedError
+
+    @staticmethod
+    def case_ACLARACION_DE_DECISION_POSGRADO(request, docx, redirected=False):
+        raise NotImplementedError
+
+    @staticmethod
+    def case_ADICION_DE_CODIRECTOR_POSGRADO(request, docx, redirected=False):
+        raise NotImplementedError
+
+    @staticmethod
+    def case_BECA_EXENSION_DERECHOS_ACADEMICOS(request, docx, redirected=False):
+        raise NotImplementedError
+
+    @staticmethod
+    def case_PROYECTO_DE_TESIS_O_TRABAJO_FINAL_DE_MAESTRIA_POSGRADO(request, docx, redirected=False):
+        raise NotImplementedError
+
+    @staticmethod
+    def case_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO(request, docx, redirected=False):
+        raise NotImplementedError
