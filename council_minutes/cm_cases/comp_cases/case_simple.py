@@ -1116,6 +1116,8 @@ class simple():
             para.add_run('El Consejo de Facultad ')
         if request.approval_status == 'AP':
             para.add_run('APRUEBA:').font.bold = True
+        else:
+            para.add_run('NO APRUEBA: ').font.bold = True
         item = 'Calificación '
         item += 'aprobada (AP) ' if request.detail_cm['cal_movilidad'] == 'AP' else 'no aprobada (NA) '
         item += 'a la asignatura ' + assign[int(request.detail_cm['index']) - 1] +\

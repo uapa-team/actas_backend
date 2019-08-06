@@ -199,7 +199,7 @@ class Request(DynamicDocument):
          'Adición de codirector (Posgrado)'),
         (TYPE_BECA_EXENSION_DERECHOS_ACADEMICOS_POSGRADO,
          'Beca exensión de pago de derechos académicos (Posgrado)'),
-        (TYPE_PROYECTO_DE_TESIS_DE_MAESTRIA_POSGRADO,
+        (TYPE_PROYECTO_DE_TESIS_O_TRABAJO_FINAL_DE_MAESTRIA_POSGRADO,
          'Propuesta de tesis o trabajo final de maestría (Posgrado)'),
         (TYPE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO,
          'Propuesta de tesis de doctorado (Posgrado)'),
