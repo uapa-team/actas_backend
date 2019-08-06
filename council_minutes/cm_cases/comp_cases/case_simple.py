@@ -1103,7 +1103,118 @@ class simple():
 
     @staticmethod
     def case_HOMOLOGACION_DE_ASIGNATURAS_INTERCAMBIO_ACADEMICO_INTERNACIONAL_PREGRADO(request, docx, redirected=False):
-        raise NotImplementedError
+        assign = ['2011183 - Intercambio Académico Internacional',
+                  '2014269 - Intercambio Académico Internacional Prórroga',
+                  '2026630 - Intercambio Académico Internacional II',
+                  '2026631 - Intercambio Académico Internacional II Prórroga']
+        if redirected:
+            para = docx.paragraphs[-1]
+        else:
+            para = docx.add_paragraph()
+            para.add_run('El Consejo de Facultad ')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        if request.approval_status == 'AP':
+            para.add_run('APRUEBA:').font.bold = True
+        else:
+            para.add_run('NO APRUEBA: ').font.bold = True
+        item = 'Homologar las siguientes asignaturas cursadas en Intercambio Académico Internacional en '+\
+            request.detail_cm['inst'] + ' de la siguiente manera (Asrtículo 35, Acuerdo 008 de 2008 ' +\
+                'del Consejo Superior Universitario y Resolución 105 de 2017 de Vicerrectoría Académica):'
+        para = docx.add_paragraph(item, style='List Number')
+        para.paragraph_format.space_after = Pt(0)
+        asign_number = len(request.detail_cm['subjects'])
+        tipology = {}
+        periods = []
+        for asign in request.detail_cm['subjects']:
+            if asign['tipo_asig'] in tipology:
+                tipology.update({asign['tipo_asig']: tipology[asign['tipo_asig']] + int(asign['creds_asig'])})
+            else:
+                tipology.update({asign['tipo_asig']: int(asign['creds_asig'])})
+            if asign['per_asig'] not in periods:
+                periods.append(asign['per_asig'])
+        tipology_number = len(tipology.keys())
+        table = docx.add_table(rows=(4+asign_number+tipology_number), cols=8, style='Table Grid')
+        table.style.font.size = Pt(8)
+        table.columns[0].width = 500000
+        table.columns[1].width = 550000
+        table.columns[2].width = 1600000
+        table.columns[3].width = 300000
+        table.columns[4].width = 300000
+        table.columns[5].width = 400000
+        table.columns[6].width = 1400000
+        table.columns[7].width = 400000
+        for cell in table.columns[0].cells:
+            cell.width = 500000
+        for cell in table.columns[1].cells:
+            cell.width = 550000
+        for cell in table.columns[2].cells:
+            cell.width = 1600000
+        for cell in table.columns[3].cells:
+            cell.width = 300000
+        for cell in table.columns[4].cells:
+            cell.width = 300000
+        for cell in table.columns[5].cells:
+            cell.width = 400000
+        for cell in table.columns[6].cells:
+            cell.width = 1400000
+        for cell in table.columns[7].cells:
+            cell.width = 400000
+        cellp = table.cell(0, 0).merge(table.cell(0, 7)).paragraphs[0]
+        cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        cellp.add_run('{}\t\t\tDNI.{}'.format(
+            request.student_name, request.student_dni)).font.bold = True
+        cellp = table.cell(1, 0).merge(table.cell(1, 5)).paragraphs[0]
+        cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        cellp.add_run('Asignaturas a homologar en el plan de estudios de {} ({})'.format(
+            request.get_academic_program_display(), request.academic_program)).font.bold = True
+        cellp = table.cell(1, 6).merge(table.cell(1, 7)).paragraphs[0]
+        cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        cellp.add_run('Asignaturas cursadas en {}'.format(request.detail_cm['inst'])).font.bold = True
+        for i in range(2, asign_number + 3):
+            for j in range(8):
+                table.cell(i, j).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(2, 0).paragraphs[0].add_run('Periodo').font.bold = True
+        table.cell(2, 1).paragraphs[0].add_run('Código').font.bold = True
+        table.cell(2, 2).paragraphs[0].add_run('Asignatura').font.bold = True
+        table.cell(2, 3).paragraphs[0].add_run('C').font.bold = True
+        table.cell(2, 4).paragraphs[0].add_run('T').font.bold = True
+        table.cell(2, 5).paragraphs[0].add_run('Nota').font.bold = True
+        table.cell(2, 6).paragraphs[0].add_run('Asignatura').font.bold = True
+        table.cell(2, 7).paragraphs[0].add_run('Nota').font.bold = True
+        count = 3
+        for subject in request.detail_cm['subjects']:
+            table.cell(count, 0).paragraphs[0].add_run(subject['per_asig'])
+            table.cell(count, 1).paragraphs[0].add_run(subject['cod_asig'])
+            table.cell(count, 2).paragraphs[0].add_run(subject['new_name_asig'])
+            table.cell(count, 3).paragraphs[0].add_run(subject['creds_asig'])
+            table.cell(count, 4).paragraphs[0].add_run(subject['tipo_asig'])
+            table.cell(count, 5).paragraphs[0].add_run(subject['new_cal_asig'])
+            table.cell(count, 6).paragraphs[0].add_run(subject['old_name_asig'])
+            table.cell(count, 7).paragraphs[0].add_run(subject['old_cal_asig'])
+            count += 1
+        total_homologated = 0
+        for tip in tipology:
+            text = 'Céditos homologados ' + str(tip)
+            table.cell(count, 0).merge(table.cell(count, 5)).paragraphs[0].add_run(text)
+            table.cell(count, 0).merge(table.cell(count, 5)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.cell(count, 6).merge(table.cell(count, 7)).paragraphs[0].add_run(str(tipology[tip]))
+            table.cell(count, 6).merge(table.cell(count, 7)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            total_homologated += int(tipology[tip])
+            count += 1
+        table.cell(count, 0).merge(table.cell(count, 5)).paragraphs[0].add_run('Total créditos que se homologan')
+        table.cell(count, 0).merge(table.cell(count, 5)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(count, 6).merge(table.cell(count, 7)).paragraphs[0].add_run(str(total_homologated))
+        table.cell(count, 6).merge(table.cell(count, 7)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        para = docx.add_paragraph(style='List Number')
+        final_text = 'Calificar'
+        other_count = 0
+        for _ in periods:
+            final_text += ' aprobada (AP)' if request.detail_cm['califications'][other_count] == 'AP' else 'no aprobada (NA)'
+            final_text += ' la asignatura ' + assign[other_count] + ' en el periodo ' + periods[other_count]
+            other_count += 1
+            if other_count + 1 == len(periods):
+                final_text += ' y'
+        para.add_run(final_text)
 
     @staticmethod
     def case_HOMOLOGACION_DE_ASIGNATURAS_CONVENIO_CON_UNIVERSIDAD_ANDES_PREGRADO(request, docx, redirected=False):
