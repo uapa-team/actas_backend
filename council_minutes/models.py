@@ -68,6 +68,16 @@ class Request(DynamicDocument):
     TYPE_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO = 'DJCTPOS'
     TYPE_EXENCION_DE_PAGO_POR_CURSAR_TESIS_COMO_UNICA_ACTIVIDAD_ACADEMICA_POSGRADO = 'EPTUPOS'
     TYPE_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO = 'DJCPPOS'
+    TYPE_CANCELACION_DE_ASIGNATURAS_CON_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO = 'CAIMPRE'
+    TYPE_HOMOLOGACION_DE_ASIGNATURAS_INTERCAMBIO_ACADEMICO_INTERNACIONAL_PREGRADO = 'HAIAPRE'
+    TYPE_HOMOLOGACION_DE_ASIGNATURAS_CONVENIO_CON_UNIVERSIDAD_ANDES_PREGRADO = 'HAUAPRE'
+    TYPE_HOMOLOGACION_DE_ASIGNATURAS_CONVENIO_CON_UNIVERSIDAD_ANDES_POSGRADO = 'HAUAPOS'
+    TYPE_ACLARACION_DE_DECISION_PREGRADO = 'ACDEPRE'
+    TYPE_ACLARACION_DE_DECISION_POSGRADO = 'ACDEPOS'
+    TYPE_ADICION_DE_CODIRECTOR_POSGRADO = 'ADICPOS'
+    TYPE_BECA_EXENSION_DERECHOS_ACADEMICOS_POSGRADO = 'BEDAPOS'
+    TYPE_PROYECTO_DE_TESIS_DE_MAESTRIA_POSGRADO = 'PRTMPOS'
+    TYPE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO = 'PRTDPOS'
     TYPE_CHOICES = (
         (TYPE_TRASLADO_PREGRADO, 'Traslado (Pregrado)'),
         (TYPE_REINGRESO_PREGRADO, 'Reingreso (Pregrado)'),
@@ -173,6 +183,26 @@ class Request(DynamicDocument):
          'Exención de pago por cursar tesis como única actividad académica (Posgrado)'),
         (TYPE_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO,
          'Designación de jurados calificadores de proyecto de tesis de doctorado (Posgrado)'),
+        (TYPE_CANCELACION_DE_ASIGNATURAS_CON_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO,
+         'Cancelación de asignaturas con carga inferior a la mínima (Pregrado)'),
+        (TYPE_HOMOLOGACION_DE_ASIGNATURAS_INTERCAMBIO_ACADEMICO_INTERNACIONAL_PREGRADO,
+         'Homologación de asignaturas de intercambio académica internacional (Pregrado)'),
+        (TYPE_HOMOLOGACION_DE_ASIGNATURAS_CONVENIO_CON_UNIVERSIDAD_ANDES_PREGRADO,
+         'Homologación de asignaturas del convenio con Universidad de los Andes (Pregrado)'),
+        (TYPE_HOMOLOGACION_DE_ASIGNATURAS_CONVENIO_CON_UNIVERSIDAD_ANDES_POSGRADO,
+         'Homologación de asignaturas del convenio con Universidad de los Andes (Posgrado)'),
+        (TYPE_ACLARACION_DE_DECISION_PREGRADO,
+         'Aclaración de decisión (Pregrado)'),
+        (TYPE_ACLARACION_DE_DECISION_POSGRADO,
+         'Aclaración de decisión (Posgrado)'),
+        (TYPE_ADICION_DE_CODIRECTOR_POSGRADO,
+         'Adición de codirector (Posgrado)'),
+        (TYPE_BECA_EXENSION_DERECHOS_ACADEMICOS_POSGRADO,
+         'Beca exensión de pago de derechos académicos (Posgrado)'),
+        (TYPE_PROYECTO_DE_TESIS_DE_MAESTRIA_POSGRADO,
+         'Propuesta de tesis o trabajo final de maestría (Posgrado)'),
+        (TYPE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO,
+         'Propuesta de tesis de doctorado (Posgrado)'),
     )
     APPROVAL_STATUS_APLAZA = 'AL'
     APPROVAL_STATUS_APRUEBA = 'AP'
@@ -396,4 +426,5 @@ class Request(DynamicDocument):
     observation = StringField(default='')
 
     def is_pre(self):
-        return self.academic_program in ('2541', '2542', '2544', '2545', '2546', '2547', '2548', '2549', '2879')
+        return self.academic_program in ('2541', '2542', '2544', '2545', '2546',
+                                         '2547', '2548', '2549', '2879')
