@@ -24,6 +24,20 @@ class simple():
 
     @staticmethod
     def case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO(request, docx, redirected=False):
+        subjects = [
+            ['2023533', 'Inglés', '3', 'L', '4'],
+            ['2023533', 'Inglés', '3', 'L', '4'],
+            ['2023533', 'Inglés', '3', 'L', '4']
+        ]
+        details = [
+            'Deutsche als Fremdsprache',
+            'B+',
+            'Toño',
+            '1020831500',
+            'Ingeniería de Sistemas y computación',
+            '2879'
+        ]
+        table_english(docx, subjects, details)
         analysis_list = simple.case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO_Analysis(request)
         answers_list = simple.case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO_Answers(request)
         para = docx.add_paragraph()
