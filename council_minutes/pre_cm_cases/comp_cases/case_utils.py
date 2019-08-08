@@ -10,4 +10,20 @@ def header(request, docx):
     para.add_run('Soportes:\t\t{}\n'.format(request['pre_cm']['supports']))
     para.add_run('Fecha radicación:\t{}\n'.format(request['date']))
 
-    
+def table_general_data():
+    raise NotImplementedError
+
+def table_subjects():
+    raise NotImplementedError
+
+def table_approvals():
+    raise NotImplementedError
+
+def table_credits_summary():
+    raise NotImplementedError
+
+def table_recommend():
+    raise NotImplementedError
+
+def table_change_typology():
+    raise NotImplementedError
