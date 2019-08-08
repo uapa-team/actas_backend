@@ -52,6 +52,20 @@ def table_english(docx, subjects, details):
     table.columns[4].width = 400000
     table.columns[5].width = 1400000
     table.columns[6].width = 400000
+    for cell in table.columns[0].cells:
+        cell.width = 600000
+    for cell in table.columns[1].cells:
+        cell.width = 1800000
+    for cell in table.columns[2].cells:
+        cell.width = 300000
+    for cell in table.columns[3].cells:
+        cell.width = 300000
+    for cell in table.columns[4].cells:
+        cell.width = 400000
+    for cell in table.columns[5].cells:
+        cell.width = 1400000
+    for cell in table.columns[6].cells:
+        cell.width = 400000
     cell = table.cell(0, 0).merge(table.cell(0, 6)).paragraphs[0]
     cell.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
     cell.add_run(details[2] + '\t\tDNI. ' +details[3]).font.bold = True
