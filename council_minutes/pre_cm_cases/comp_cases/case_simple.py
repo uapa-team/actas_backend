@@ -24,16 +24,58 @@ class simple():
 
     @staticmethod
     def case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO(request, docx, redirected=False):
-        analysis1_format = 'El comité asesor de {} lo considera fuerza mayor o caso fortuito documentado.'
-        analysis1 = analysis1_format.format(request['pre_cm']['detail_pre_cm']['advisory_committee'])
-        analysis2_format = 'Información del SIA:\n\t'
-        analysis2_format += 'Porcentaje de avance del plan: {}\n\tNúmero de matrículas{}\n\tPAPA:{}.'
+        analysis_list = simple.case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO_Analysis(request)
+        answers_list = simple.case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO_Answers(request)
+        para = docx.add_paragraph()
+        para.add_run('Analisis:')
+        analysis_para = docx.add_paragraph()
+        analysis_para.paragraph_format.left_indent = Pt(36)
+        count = 1
+        for analysis in analysis_list:
+            analysis_para.add_run(str(count) + '. ' + analysis + '\n')
+            count = count + 1
+        para = docx.add_paragraph()
+        para.add_run('Concepto:')
+        answer_para = docx.add_paragraph()
+        answer_para.paragraph_format.left_indent = Pt(36)
+        count = 1
+        for answer in answers_list:
+            answer_para.add_run(str(count) + '. ' + answer + '\n')
+            count = count + 1
+
+    @staticmethod    
+    def case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO_Analysis(request):
+        a1_f = 'El comité asesor de {}{} lo considera fuerza mayor o caso fortuito documentado.'
+        analysis1 = a1_f.format(request['pre_cm']['detail_pre_cm']['advisory_committee'],
+                                '' if request['pre_cm']['pre_approval_status'] == 'AP' else ' NO')
+        a2_f = 'Información del SIA:\n\t'
+        a2_f += 'Porcentaje de avance del plan: {}\n\tNúmero de matrículas{}\n\tPAPA:{}.'
         advance = request['pre_cm']['detail_pre_cm']['advance']
         enrolled_academic_periods = request['pre_cm']['detail_pre_cm']['enrolled_academic_periods']
         papa = request['pre_cm']['detail_pre_cm']['papa']
-        analysis2 = analysis2_format.format(advance, enrolled_academic_periods, papa)
-        analysis_list = [analysis1, analysis2] + request['pre_cm']['extra_analysis']
+        analysis2 = a2_f.format(advance, enrolled_academic_periods, papa)
+        return [analysis1, analysis2] + request['pre_cm']['extra_analysis']
 
+    @staticmethod    
+    def case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO_Answers(request):
+        c1_f1 = '{}ancelar el periodo académico {}, porque {}justifica documentalmente la fuerza mayor '
+        c1_f2 = 'o caso fortuito. (Artículo 18 del Acuerdo 008 del Consejo Superior Universitario).'
+        if request['pre_cm']['pre_approval_status'] == 'AP':
+            c1 = c1_f1.format('C', request['academic_period'],'') + c1_f2
+            c2_f1 = 'Devolución proporcional del {} por ciento ({} %) del valor pagado por concepto de derechos'
+            c2_f2 = ' de matrícula del periodo {}, teniendo en cuenta la fecha de presentación de la solicitud y'
+            c2_f3 = ' que le fue aprobada la cancelación de periodo en el {} de Consejo de Facultad.'
+            c2_f1_ = c2_f1.format(num2words(request['pre_cm']['devolution'], lang='es'), request['pre_cm']['devolution'])
+            c2_f2_ = c2_f2.format(request['academic_period'])
+            c2_f2_ = c2_f3.format(request['pre_cm']['cm_cancelation'])
+            c2_f4_ = ' (Acuerdo 032 de 2010 del Consejo Superior Universitario, Artículo 1 Resolución 1416 de 2013 de Rectoría)'
+            c2 = c2_f1_ + c2_f2_ + c2_f2_ + c2_f4_
+            return [c1, c2]
+        else:
+            c1 = c1_f1.format('No c', request['academic_period'],'no ') + c1_f2
+            c2 = 'La situación expuesta no constituye causa extraña (no es una situación intempestiva, insuperable o irresistible), '
+            c22 = 'por tanto, no es una situación de fuerza mayor o caso fortuito que implique la cancelación del periodo académico.'
+            return [c1, c2+c22]
 
     @staticmethod
     def case_CAMBIO_DE_PERFIL_POSGRADO(request, docx, redirected=False):
