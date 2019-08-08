@@ -112,8 +112,8 @@ class simple():
 
     @staticmethod
     def case_ELIMINACION_DE_LA_HISTORIA_ACADEMICA_BAPI_PREGRADO(request, docx, redirected=False):
-        analysis_list = simple.case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO_Analysis(request)
-        answers_list = simple.case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO_Answers(request)
+        analysis_list = simple.case_ELIMINACION_DE_LA_HISTORIA_ACADEMICA_BAPI_PREGRADO_Analysis(request)
+        answers_list = simple.case_ELIMINACION_DE_LA_HISTORIA_ACADEMICA_BAPI_PREGRADO_Answers(request)
         para = docx.add_paragraph()
         para.add_run('Analisis:')
         analysis_para = docx.add_paragraph()
@@ -132,15 +132,14 @@ class simple():
             count = count + 1
             
     @staticmethod    
-    def case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO_Analysis(request):
+    def case_ELIMINACION_DE_LA_HISTORIA_ACADEMICA_BAPI_PREGRADO_Analysis(request):
         a1_f = 'Modalidad de trabajo de grado: {}. {}.'
-        analysis1 = a1_f.format(request['pre_cm']['detail_pre_cm']['advisory_committee'],
-                                request['pre_cm']['detail_pre_cm']['cm_cancelation'],
-                                request['pre_cm']['detail_pre_cm']['year'])
+        analysis1 = a1_f.format(request['pre_cm']['detail_pre_cm']['advisory_comitte'],
+                                request['pre_cm']['cm_cancelation'])
         return [analysis1] + request['pre_cm']['extra_analysis']
         
     @staticmethod    
-    def case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO_Answers(request):
+    def case_ELIMINACION_DE_LA_HISTORIA_ACADEMICA_BAPI_PREGRADO_Answers(request):
         c1 = 'El Comité Asesor recomienda al Consejo de Facultad {} APROBAR eliminar la historia académica de BAPI '
         c2 = 'del periodo {}, porque {} justifica adecuadamente la solicitud.'
         if request['pre_cm']['pre_approval_status'] == 'AP':
@@ -149,7 +148,7 @@ class simple():
         else:
             c1 = c1_f1.format('NO')
             c2 = c2.format(request['pre_cm']['academic_period'], 'no')
-        return [c1, c2+c22]
+        return [c1, c2]
             
     @staticmethod
     def case_RESERVA_DE_CUPO_ADICIONAL_PREGRADO(request, docx, redirected=False):
