@@ -16,6 +16,9 @@ def table_general_data():
 def table_subjects():
     raise NotImplementedError
 
+def table_english():
+    raise NotImplementedError
+
 def table_approvals():
     raise NotImplementedError
 
