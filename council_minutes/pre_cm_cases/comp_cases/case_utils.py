@@ -1,4 +1,5 @@
 from num2words import num2words
+from docx.enum.table import WD_ALIGN_VERTICAL
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
 from ...models import Request
@@ -40,28 +41,57 @@ def table_english(docx, subjects, details):
             IndexError: All lists must have same size
         
     '''
-    table = docx.add_table(rows=len(subjects)+5, cols=7, style='Table Grid')
-    cellp = table.cell(0, 0).merge(table.cell(0, 6)).paragraphs[0]
-    cellp.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-    cellp.add_run(details[2] + '\t\tDNI. ' + details[3]).font.bold = True
-    cellp = table.cell(1, 0).merge(table.cell(1, 4)).paragraphs[0]
-    cellp.add_run('Asignaturas a homologar en el plan de estudios ' 
-                    + details[4] + ' (' + details[5] + ')')
+    table = docx.add_table(rows=len(subjects)+5, cols=7)
+    table.style = 'Table Grid'
+    table.style.font.size = Pt(8)
+    table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    table.columns[0].width = 600000
+    table.columns[1].width = 1800000
+    table.columns[2].width = 300000
+    table.columns[3].width = 300000
+    table.columns[4].width = 400000
+    table.columns[5].width = 1400000
+    table.columns[6].width = 400000
+    cell = table.cell(0, 0).merge(table.cell(0, 6)).paragraphs[0]
+    cell.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    cell.add_run(details[2] + '\t\tDNI. ' +details[3]).font.bold = True
+    cell = table.cell(1, 0).merge(table.cell(1, 4)).paragraphs[0]
+    str_prog = 'Asignaturas a homologar en el plan de estudios {} ({})'
+    cell.add_run(str_prog.format(details[4], details[5])).font.bold = True
+
     cellp = table.cell(1, 5).merge(table.cell(2, 5)).paragraphs[0]
-    cellp.add_run('Examen de inglés presentado')
+    cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    table.cell(1, 5).merge(table.cell(2, 5)).paragraphs[0].add_run(
+        'Examen de inglés presentado').font.bold = True
+    table.cell(1, 5).merge(table.cell(2, 5)
+                            ).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+
     cellp = table.cell(1, 6).merge(table.cell(2, 6)).paragraphs[0]
-    cellp.add_run('Nota')
-    cellp = table.cell(3, 5).merge(table.cell(len(subjects)+2, 5)).paragraphs[0]
-    cellp.add_run(details[0])
-    cellp = table.cell(3, 6).merge(table.cell(len(subjects)+2, 6)).paragraphs[0]
-    cellp.add_run(details[1])
+    cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    table.cell(1, 6).merge(table.cell(2, 6)).paragraphs[0].add_run(
+        'Nota').font.bold = True
+    table.cell(1, 6).merge(table.cell(2, 6)
+                            ).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
 
-    table.cell(2, 0).paragraphs[0].add_run('Código')
-    table.cell(2, 1).paragraphs[0].add_run('Asignatura')
-    table.cell(2, 2).paragraphs[0].add_run('C')
-    table.cell(2, 3).paragraphs[0].add_run('T')
-    table.cell(2, 4).paragraphs[0].add_run('Nota')
+    cell = table.cell(3, 5).merge(table.cell(
+        len(subjects)+2, 5)).paragraphs[0]
+    cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    cell.add_run(details[0])
+    table.cell(3, 5).merge(table.cell(len(
+        subjects)+2, 5)).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
 
+    cell = table.cell(3, 6).merge(table.cell(
+        len(subjects)+2, 6)).paragraphs[0]
+    cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    cell.add_run(details[1])
+    table.cell(3, 6).merge(table.cell(len(
+        subjects)+2, 6)).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+
+    table.cell(2, 0).paragraphs[0].add_run('Código').font.bold = True
+    table.cell(2, 1).paragraphs[0].add_run('Asignatura').font.bold = True
+    table.cell(2, 2).paragraphs[0].add_run('C').font.bold = True
+    table.cell(2, 3).paragraphs[0].add_run('T').font.bold = True
+    table.cell(2, 4).paragraphs[0].add_run('Nota').font.bold = True
     index = 0
     credits_sum = 0
     for subject in subjects:
@@ -72,12 +102,14 @@ def table_english(docx, subjects, details):
         table.cell(index+3, 3).paragraphs[0].add_run(subject[3])
         table.cell(index+3, 4).paragraphs[0].add_run(subject[4])
         index = index + 1
-
-    table.cell(index+3, 1).paragraphs[0].add_run('Créditos homologados P')
-    table.cell(index+3, 2).paragraphs[0].add_run(str(credits_sum))
-    table.cell(
-        index+4, 1).paragraphs[0].add_run('Total créditos que se homologan')
-    table.cell(index+4, 2).paragraphs[0].add_run(str(credits_sum))
+    cellp = table.cell(index+3, 0).merge(table.cell(index+3, 3)).paragraphs[0]
+    cellp.add_run('Créditos homologados P')
+    cellp = table.cell(index+3, 4).merge(table.cell(index+3, 6)).paragraphs[0]
+    cellp.add_run(str(credits_sum))
+    cellp = table.cell(index+4, 0).merge(table.cell(index+4, 3)).paragraphs[0]
+    cellp.add_run('Total créditos que se homologan')
+    cellp = table.cell(index+4, 4).merge(table.cell(index+4, 6)).paragraphs[0]
+    cellp.add_run(str(credits_sum))
 
 def table_approvals():
     raise NotImplementedError
