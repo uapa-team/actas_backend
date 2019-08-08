@@ -14,6 +14,20 @@ def table_general_data():
     raise NotImplementedError
 
 def table_subjects(docx, data):
+    '''Add a generated table with approvals subjects
+        Params:
+            docx (docx): The document to which the table will be added
+            subjects (list): A list of list with the subjects in table,
+            each list must be a list with following data:
+            [0]: Subject's SIA code
+            [1]: Subject's SIA name
+            [2]: Subject's SIA group
+            [3]: Subject's SIA tipology
+            [4]: Subject's SIA credits
+        Raises:
+            IndexError: All lists must have same size
+
+    '''
     table = docx.add_table(rows=len(data)+1, cols=5)
     table.style = 'Table Grid'
     table.style.font.size = Pt(9)
