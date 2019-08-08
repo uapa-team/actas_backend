@@ -37,6 +37,16 @@ def table_subjects(docx, data):
     table.columns[2].width = 800000
     table.columns[3].width = 800000
     table.columns[4].width = 800000
+    for cell in table.columns[0].cells:
+        cell.width = 700000
+    for cell in table.columns[1].cells:
+        cell.width = 2300000
+    for cell in table.columns[2].cells:
+        cell.width = 800000
+    for cell in table.columns[3].cells:
+        cell.width = 800000
+    for cell in table.columns[4].cells:
+        cell.width = 800000
     table.cell(0, 0).paragraphs[0].add_run('Código').font.bold = True
     table.cell(0, 1).paragraphs[0].add_run('Asignatura').font.bold = True
     table.cell(0, 2).paragraphs[0].add_run('Grupo').font.bold = True
