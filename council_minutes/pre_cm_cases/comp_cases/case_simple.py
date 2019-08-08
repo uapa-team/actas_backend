@@ -112,8 +112,45 @@ class simple():
 
     @staticmethod
     def case_ELIMINACION_DE_LA_HISTORIA_ACADEMICA_BAPI_PREGRADO(request, docx, redirected=False):
-        raise NotImplementedError
-
+        analysis_list = simple.case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO_Analysis(request)
+        answers_list = simple.case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO_Answers(request)
+        para = docx.add_paragraph()
+        para.add_run('Analisis:')
+        analysis_para = docx.add_paragraph()
+        analysis_para.paragraph_format.left_indent = Pt(36)
+        count = 1
+        for analysis in analysis_list:
+            analysis_para.add_run(str(count) + '. ' + analysis + '\n')
+            count = count + 1
+        para = docx.add_paragraph()
+        para.add_run('Concepto:')
+        answer_para = docx.add_paragraph()
+        answer_para.paragraph_format.left_indent = Pt(36)
+        count = 1
+        for answer in answers_list:
+            answer_para.add_run(str(count) + '. ' + answer + '\n')
+            count = count + 1
+            
+    @staticmethod    
+    def case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO_Analysis(request):
+        a1_f = 'Modalidad de trabajo de grado: {}. {}.'
+        analysis1 = a1_f.format(request['pre_cm']['detail_pre_cm']['advisory_committee'],
+                                request['pre_cm']['detail_pre_cm']['cm_cancelation'],
+                                request['pre_cm']['detail_pre_cm']['year'])
+        return [analysis1] + request['pre_cm']['extra_analysis']
+        
+    @staticmethod    
+    def case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO_Answers(request):
+        c1 = 'El Comité Asesor recomienda al Consejo de Facultad {} APROBAR eliminar la historia académica de BAPI '
+        c2 = 'del periodo {}, porque {} justifica adecuadamente la solicitud.'
+        if request['pre_cm']['pre_approval_status'] == 'AP':
+            c1 = c1.format('APROBAR')
+            c2 = c2.format(request['pre_cm']['academic_period'], '')
+        else:
+            c1 = c1_f1.format('NO')
+            c2 = c2.format(request['pre_cm']['academic_period'], 'no')
+        return [c1, c2+c22]
+            
     @staticmethod
     def case_RESERVA_DE_CUPO_ADICIONAL_PREGRADO(request, docx, redirected=False):
         raise NotImplementedError
