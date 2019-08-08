@@ -7,6 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import Request
 from .helpers import QuerySetEncoder, Translator
 from .docx import CouncilMinuteGenerator
+from .docx import PreCouncilMinuteGenerator
 # Esto va solo para evitar la verificacion de django
 
 
@@ -130,7 +131,7 @@ def update_cm(request, cm_id):
 
 
 @csrf_exempt
-def cm_gen_by_date(request):
+def docx_gen_by_date(request):
     try:
         body = json.loads(request.body)
         start_date = body['cm']['start_date']
@@ -141,23 +142,37 @@ def cm_gen_by_date(request):
         start_date.split(':')[0] + '_' + end_date.split(':')[0] + '.docx'
     generator = CouncilMinuteGenerator()
     try:
-        generator.add_cases_from_date_except_app_status(start_date, end_date, 'ET')
+        generator.add_cases_from_date(start_date, end_date)
     except IndexError:
         return HttpResponse('No cases in date range specified', status=401)
     generator.generate(filename)
     return HttpResponse(filename)
 
+
 @csrf_exempt
-def pre_cm_gen_by_date(request):
+def docx_gen_pre_by_id(request, cm_id):
+    filename = 'public/preacta' + cm_id + '.docx'
+    try:
+        request_by_id = Request.objects.get(id=cm_id)
+    except mongoengine.DoesNotExist:
+        return HttpResponse('Does not exist', status=404)
+    generator = PreCouncilMinuteGenerator()
+    generator.add_case_from_request(request_by_id)
+    generator.generate(filename)
+    return HttpResponse(filename)
+
+
+@csrf_exempt
+def docx_gen_pre_by_date(request):
     try:
         body = json.loads(request.body)
         start_date = body['cm']['start_date']
         end_date = body['cm']['end_date']
     except (json.decoder.JSONDecodeError):
         return HttpResponse("Bad Request", status=400)
-    filename = 'public/acta' + \
+    filename = 'public/preacta' + \
         start_date.split(':')[0] + '_' + end_date.split(':')[0] + '.docx'
-    generator = CouncilMinuteGenerator()
+    generator = PreCouncilMinuteGenerator()
     try:
         generator.add_cases_from_date(start_date, end_date)
     except IndexError:
