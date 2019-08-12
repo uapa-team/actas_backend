@@ -34,11 +34,16 @@ class simple():
         analysis_para.add_run(
             '1. SIA: {} - Perfil de {}.\n'.format(get_academic_program(request['academic_program']), details_pre['profile'])
             )
-        recommendation_run = '2. El comité {}lo considera fuerza mayor o caso fortuito.'
+        recommendation_run = '2. El comité {}lo considera fuerza mayor o caso fortuito.\n'
         if request['approval_status'] == 'CR':
             analysis_para.add_run(recommendation_run.format(''))
         else:
             analysis_para.add_run(recommendation_run.format('no '))
+
+        counter = 3
+        for analysis in pre_cm['extra_analysis']:
+            analysis_para.add_run('{}. {}\n'.format(counter, analysis))
+            counter += 1
         
         concept_para = docx.add_paragraph()
         concept_para.add_run('Concepto: ').bold = True
@@ -59,10 +64,21 @@ class simple():
         concept_para1_run3 = '(Artículo 18 del Acuerdo 008 del Consejo Superior Universitario).'
         concept_para1.add_run(concept_para1_run1 + concept_para1_run2 + concept_para1_run3)
 
-        #Tabla de asignaturas inscritas
+        subjects = []
+        for subject in details_pre['subjects']:
+            subjects.append([
+                subject['code'],
+                subject['name'],
+                subject['group'],
+                subject['tipology'],
+                subject['credits']
+            ])
+        
+        table_subjects(docx, subjects)
+
 
         concept_para2 = docx.add_paragraph()
-        concept_para2_run1 = '2. Devolución proporcional del {} por ciento ({}%) del valor pagado por concepto de '.format(
+        concept_para2_run1 = '\n2. Devolución proporcional del {} por ciento ({}%) del valor pagado por concepto de '.format(
             num2words(float(details_pre['percentage']), lang='es'),
             details_pre['percentage']
         )
