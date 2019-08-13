@@ -149,7 +149,42 @@ class simple():
 
     @staticmethod
     def case_RETIRO_DEFINITIVO_DEL_PROGRAMA_PREGRADO(request, docx, redirected=False):
-        raise NotImplementedError
+        ### Frequently used ###
+        details = request['detail_cm']
+        pre_cm = request['pre_cm']
+        details_pre = pre_cm['detail_pre_cm']
+        is_recommended = request['approval_status'] == 'CR'
+
+        ### Finishing last paragraph ###
+        para = docx.paragraphs[-1]
+        para.add_run('Análisis:\t\t\t')
+        para.add_run('Acuerdo 026 de 2012').underline = True
+
+        ### Analysis Paragraph ###
+        analysis_para = docx.add_paragraph()
+        analysis_para.paragraph_format.left_indent = Pt(36)
+        analysis_para.add_run(
+            '1. SIA: Porcentaje de avance en el plan {}%, número de matriculas {}, P.A.P.A. {}.\n'.format(
+                details_pre['percentage'], details_pre['register_num'], details_pre['PAPA']
+            ))
+
+        counter = 2
+        for analysis in pre_cm['extra_analysis']:
+            analysis_para.add_run('{}. {}\n'.format(counter, analysis))
+            counter += 1
+
+        ### Concept Pragraphs ###
+        concept_para = docx.add_paragraph()
+        concept_para.add_run('Concepto: ').bold = True
+        concept_para.add_run('El Comité Asesor recomienda al Consejo de Facultad ')
+        modifier = 'APROBAR ' if is_recommended else 'NO APROBAR '
+        concept_para.add_run(modifier).bold = True
+        concept_para.add_run(
+            'presentar con concepto positivo a la División de Registro y Matrícula, el retiro voluntario del programa '
+        )
+        concept_para.add_run(
+            '{} ({})'.format(get_academic_program(request['academic_program'], request['academic_program'])
+            ).bold = True
 
     @staticmethod
     def case_CREDITOS_EXCEDENTES_MAPI_PREGRADO(request, docx, redirected=False):
