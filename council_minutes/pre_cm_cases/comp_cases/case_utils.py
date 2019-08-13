@@ -330,8 +330,8 @@ def table_approvals(docx, subjects, details):
         details[0], details[1])).font.bold = True
     cellp = table.cell(1, 0).merge(table.cell(1, 5)).paragraphs[0]
     cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    cellp.add_run('Asignaturas a homologar en el plan de estudios de {} ({})'.format(
-        get_academic_program(details[2]), details[2])).font.bold = True
+    cellp.add_run('Asignaturas a {} en el plan de estudios de {} ({})'.format(
+        case_d[details[4]], get_academic_program(details[2]), details[2])).font.bold = True
     cellp = table.cell(1, 6).merge(table.cell(1, 7)).paragraphs[0]
     cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
     cellp.add_run('Asignaturas cursadas en {}'.format(
@@ -382,6 +382,9 @@ def table_approvals(docx, subjects, details):
                                ).paragraphs[0].add_run(str(total_homologated))
     table.cell(count, 6).merge(table.cell(count, 7)
                                ).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+    para = docx.add_paragraph()
+    para.paragraph_format.space_after = Pt(0)
+    para.paragraph_format.space_before = Pt(0)
 
 def table_approvals_na(docx, subjects, details):
     '''Add a generated table with approvals subjects
