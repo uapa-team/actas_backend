@@ -46,8 +46,8 @@ def header(request, docx):
     para.add_run('Justificación:\t\t{}\n'.format(
         request['pre_cm']['justification']))
     para.add_run('Soportes:\t\t{}\n'.format(request['pre_cm']['supports']))
-    para.add_run('Fecha radicación:\t{}\n'.format(request['date']))
-
+    para.add_run('Fecha radicación:\t{}'.format(request['date']))
+    para.paragraph_format.space_after = Pt(0)
 
 def table_general_data(general_data, case, docx):
     '''
@@ -274,6 +274,7 @@ def table_approvals(docx, subjects, details):
         [1]: Student's DNI
         [2]: Student's academica plan code
         [3]: Source institution
+        
 
 
     Raises:
@@ -281,6 +282,8 @@ def table_approvals(docx, subjects, details):
 
 
     '''
+    case_d = {'homologation': 'homologar',
+                  'equivalence': 'equivaler', 'recognition': 'convalidar'}
     tipology = {}
     periods = []
     for asign in subjects:
@@ -296,6 +299,7 @@ def table_approvals(docx, subjects, details):
     table = docx.add_table(
         rows=(4+asign_number+tipology_number), cols=8, style='Table Grid')
     table.style.font.size = Pt(8)
+    table.alignment = WD_ALIGN_PARAGRAPH.CENTER
     table.columns[0].width = 500000
     table.columns[1].width = 550000
     table.columns[2].width = 1600000
@@ -359,7 +363,7 @@ def table_approvals(docx, subjects, details):
         count += 1
     total_homologated = 0
     for tip in tipology:
-        text = 'Céditos homologados ' + str(tip)
+        text = 'Créditos homologados ' + str(tip)
         table.cell(count, 0).merge(table.cell(
             count, 5)).paragraphs[0].add_run(text)
         table.cell(count, 0).merge(table.cell(count, 5)
@@ -379,6 +383,77 @@ def table_approvals(docx, subjects, details):
     table.cell(count, 6).merge(table.cell(count, 7)
                                ).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
 
+def table_approvals_na(docx, subjects, details):
+    '''Add a generated table with approvals subjects
+
+    Params:
+        docx (docx): The document to which the table will be added
+        subjects (list): A list of list with the subjects in table,
+        each list must be a list with following data:
+        [0]: Subject's SIA name
+        [1]: Subject's old name
+        [2]: Justification
+        [3]: Subject's SIA credits
+        [4]: Subject's SIA grade
+        details (list): A list with the datails of homologation,
+        must be contains the following data:
+        [0]: Student's name
+        [1]: Student's DNI
+        [2]: Student's academica plan code
+        [3]: Source institution
+        [4]: Case (homologation, equivalence or recognition)
+
+
+    Raises:
+        IndexError: All lists must have same size
+
+
+    '''
+    case_d = {'homologation': 'homologar',
+                  'equivalence': 'equivaler', 'recognition': 'convalidar'}
+    table = docx.add_table(rows=len(subjects)+3, cols=5, style='Table Grid')
+    table.style.font.size = Pt(8)
+    table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    for column in table.columns:
+        for cell in column.cells:
+            cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+    cellp = table.cell(0, 0).merge(table.cell(0, 4)).paragraphs[0]
+    cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    for cell in table.columns[0].cells:
+        cell.width = 1380000
+    for cell in table.columns[1].cells:
+        cell.width = 1380000
+    for cell in table.columns[2].cells:
+        cell.width = 1380000
+    for cell in table.columns[3].cells:
+        cell.width = 655000
+    for cell in table.columns[4].cells:
+        cell.width = 655000
+    cellp.add_run('{}\t\t\tDNI.{}'.format(
+        details[0], details[1])).font.bold = True
+    cellp = table.cell(1, 0).merge(table.cell(1, 4)).paragraphs[0]
+    cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    cellp.add_run('Asignaturas que no se {} en el plan de estudios de {}({})'
+    .format(case_d[details[4]], get_academic_program(details[2]), details[2])).font.bold = True
+    table.cell(2, 0).paragraphs[0].add_run('Asignatura Universidad Nacional de Colombia - ({})'.format(
+        details[2])).font.bold = True
+    table.cell(2, 1).paragraphs[0].add_run('Asignatura ({})'.format(
+        details[3])).font.bold = True
+    table.cell(2, 2).paragraphs[0].add_run(
+        'Justificación').font.bold = True
+    table.cell(2, 3).paragraphs[0].add_run('C').font.bold = True
+    table.cell(2, 4).paragraphs[0].add_run('Nota').font.bold = True
+    count = 3
+    for subject in subjects:
+        table.cell(count, 0).paragraphs[0].add_run(subject[0])
+        table.cell(count, 1).paragraphs[0].add_run(subject[1])
+        table.cell(count, 2).paragraphs[0].add_run(
+            subject[2])
+        table.cell(count, 3).paragraphs[0].add_run(subject[3])
+        table.cell(count, 4).paragraphs[0].add_run(subject[4])
+        count += 1
+        
 
 def table_credits_summary(docx, credits, case):
     '''Add a generated table with credits summary
