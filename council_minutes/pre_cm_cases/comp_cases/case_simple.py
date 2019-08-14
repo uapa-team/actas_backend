@@ -1,5 +1,6 @@
 from num2words import num2words
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.enum.table import WD_ALIGN_VERTICAL
 from docx.shared import Pt
 from ...models import Request
 from .case_utils import *
@@ -130,6 +131,35 @@ class simple():
         .format(request.academic_period))
         para.add_run("Bogotá, Acuerdo 230 de 2016 de Consejo Superior Universitario)")
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        table = docx.add_table(
+            rows=len(request.detail_cm['subjects'])+2, cols=3, style='Table Grid')
+        table.style.font.size = Pt(9)
+        table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        for column in table.columns:
+            for cell in column.cells:
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                cell.paragraphs[0].alignment= WD_ALIGN_PARAGRAPH.CENTER
+        for cell in table.columns[0].cells:
+            cell.width = 915000
+        for cell in table.columns[1].cells:
+            cell.width = 3620000
+        for cell in table.columns[2].cells:
+            cell.width = 915000
+        table.cell(0, 0).paragraphs[0].add_run('Código SIA').font.bold = True
+        table.cell(0, 1).paragraphs[0].add_run(
+            'Nombre Asignatura').font.bold = True
+        table.cell(0, 2).paragraphs[0].add_run('Créditos').font.bold = True
+        index = 1
+        credits_sum = 0
+        for subject in request.detail_cm['subjects']:
+            credits_sum = credits_sum+int(subject['credits'])
+            table.cell(index, 0).paragraphs[0].add_run(subject['code'])
+            table.cell(index, 1).paragraphs[0].add_run(subject['name'])
+            table.cell(index, 2).paragraphs[0].add_run(subject['credits'])
+            index = index + 1
+        table.cell(index, 2).paragraphs[0].add_run(str(credits_sum))
+        cellp = table.cell(index, 0).merge(table.cell(index, 1)).paragraphs[0]
+        cellp.add_run('Total Créditos').font.bold = True
 
     @staticmethod
     def case_ELIMINACION_DE_LA_HISTORIA_ACADEMICA_BAPI_PREGRADO(request, docx, redirected=False):
