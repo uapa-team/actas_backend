@@ -161,28 +161,29 @@ class simple():
         para.add_run('Acuerdo 026 de 2012').underline = True
 
         ### Analysis Paragraph ###
-        analysis_para = docx.add_paragraph()
-        analysis_para.paragraph_format.left_indent = Pt(36)
-        analysis_para.add_run(
-            '1. SIA: Porcentaje de avance en el plan {}%, número de matriculas {}, P.A.P.A. {}.\n'.format(
+        para = docx.add_paragraph(style='List Number')
+        para.add_run(
+            'SIA: Porcentaje de avance en el plan: {}%\nNúmero de matriculas: {}\nPAPA: {}.'.format(
                 details_pre['percentage'], details_pre['register_num'], details_pre['PAPA']
             ))
 
-        counter = 2
+        ## Extra Analysis ##
         for analysis in pre_cm['extra_analysis']:
-            analysis_para.add_run('{}. {}\n'.format(counter, analysis))
-            counter += 1
+            para = docx.add_paragraph(style='List Number')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            para.add_run(analysis)
 
         ### Concept Pragraphs ###
-        concept_para = docx.add_paragraph()
-        concept_para.add_run('Concepto: ').bold = True
-        concept_para.add_run('El Comité Asesor recomienda al Consejo de Facultad ')
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Concepto: ').bold = True
+        para.add_run('El Comité Asesor recomienda al Consejo de Facultad ')
         modifier = 'APROBAR ' if is_recommended else 'NO APROBAR '
-        concept_para.add_run(modifier).bold = True
-        concept_para.add_run(
+        para.add_run(modifier).bold = True
+        para.add_run(
             'presentar con concepto positivo a la División de Registro y Matrícula, el retiro voluntario del programa '
         )
-        concept_para.add_run(
+        para.add_run(
             '{} ({})'.format(get_academic_program(request['academic_program']), request['academic_program'])
             ).bold = True
 
