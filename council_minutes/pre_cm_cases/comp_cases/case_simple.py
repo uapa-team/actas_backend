@@ -33,38 +33,44 @@ class simple():
         para.add_run('Acuerdo 008 de 2008').underline = True
 
         ### Analysis Paragraph ###
-        analysis_para = docx.add_paragraph()
-        analysis_para.paragraph_format.left_indent = Pt(36)
-        analysis_para.add_run(
-            '1. SIA: {} - Perfil de {}.\n'.format(
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run(
+            'SIA: {} - Perfil de {}.'.format(
                 get_academic_program(request['academic_program']), details_pre['academic_profile'])
             )
-        recommendation_run = '2. El comité {}lo considera fuerza mayor o caso fortuito.\n'
+        
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         modifier = '' if is_recommended else 'no '
-        analysis_para.add_run(recommendation_run.format(modifier))
+        para.add_run('El comité {}lo considera fuerza mayor o caso fortuito.'.format(modifier))
 
-        counter = 3
+        ## Extra Analysis ##
         for analysis in pre_cm['extra_analysis']:
-            analysis_para.add_run('{}. {}\n'.format(counter, analysis))
-            counter += 1
+            para = docx.add_paragraph(style='List Number')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            para.add_run(analysis)
         
         ### Concept Pragraphs ###
-        concept_para = docx.add_paragraph()
-        concept_para.add_run('Concepto: ').bold = True
-        concept_para.add_run('El Comité Asesor recomienda al Consejo de Facultad ')
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Concepto: ').bold = True
+        para.add_run('El Comité Asesor recomienda al Consejo de Facultad ')
         modifier = 'APROBAR:' if is_recommended else 'NO APROBAR:'
-        concept_para.add_run(modifier).bold = True
+        para.add_run(modifier).bold = True
         
         ## First Concept Paragraph ##
-        concept_para1 = docx.add_paragraph()
-        cp1_run1 = '1. Cancelar la totalidad de asignaturas inscritas en el periodo {}, en el programa de {}, '.format(
-            details['period_cancel'], get_academic_program(request['academic_program'])
-            )
-        cp1_run2 = 'teniendo en cuenta que {}justifica documentalmente la fuerza mayor o caso fortuito '
+        para = docx.add_paragraph(style='List Number 2')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p_aux =  'Cancelar la totalidad de asignaturas inscritas en el periodo {}, en el programa de {}, '
+        p_aux += 'teniendo en cuenta que {}justifica documentalmente la fuerza mayor o caso fortuito '
+        p_aux += '(Artículo 18 del Acuerdo 008 del Consejo Superior Universitario).'
         modifier = '' if is_recommended else 'no '
-        cp1_run2 = cp1_run2.format(modifier)
-        cp1_run3 = '(Artículo 18 del Acuerdo 008 del Consejo Superior Universitario).'
-        concept_para1.add_run(cp1_run1 + cp1_run2 + cp1_run3)
+        para.add_run(p_aux.format(
+            details['period_cancel'],
+            get_academic_program(request['academic_program']),
+            modifier
+        ))
 
         ## Subjects Table ##
         subjects = []
@@ -73,20 +79,19 @@ class simple():
         table_subjects(docx, subjects)
 
         ## Second Concept Paragraph ##
-        concept_para2 = docx.add_paragraph()
-        cp2_run1 = '\n2. Devolución proporcional del {} por ciento ({}%) del valor pagado por concepto de '.format(
+        para = docx.add_paragraph(style='List Number 2')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p_aux =  'Devolución proporcional del {} por ciento ({}%) del valor pagado por concepto de '
+        p_aux += 'derechos de matrícula del periodo {}, teniendo en cuenta la fecha de presentación '
+        p_aux += 'de la solicitud y que le fue aprobada la cancelación de periodo '
+        p_aux += 'en el Acta {} de Consejo de Facultad '
+        p_aux += '(Acuerdo 032 de 2010 del Consejo Superior Universitario, Artículo 1 Resolución 1416 de 2013 de Rectoría).'
+        para.add_run(p_aux.format(
             num2words(float(details_pre['percentage']), lang='es'),
-            details_pre['percentage']
-        )
-        cp2_run2 = 'derechos de matrícula del periodo {}, teniendo en cuenta la fecha de presentación '.format(
-            details['period_cancel']
-        )
-        cp2_run3 = 'de la solicitud y que le fue aprobada la cancelación de periodo '
-        cp2_run4 = 'en el Acta {} de Consejo de Facultad '.format(details_pre['approval_minute'])
-        cp2_run5 = '(Acuerdo 032 de 2010 del Consejo Superior Universitario, Artículo 1 Resolución 1416 de 2013 de Rectoría).'
-        concept_para2.add_run(
-            cp2_run1 + cp2_run2 + cp2_run3 + cp2_run4 + cp2_run5
-        )
+            details_pre['percentage'],
+            details['period_cancel'],
+            details_pre['approval_minute']
+        ))
 
     @staticmethod
     def case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO(request, docx, redirected=False):
