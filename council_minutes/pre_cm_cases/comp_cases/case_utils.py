@@ -46,7 +46,8 @@ def header(request, docx):
     para.add_run('Justificación:\t\t{}\n'.format(
         request['pre_cm']['justification']))
     para.add_run('Soportes:\t\t{}\n'.format(request['pre_cm']['supports']))
-    para.add_run('Fecha radicación:\t{}\n'.format(request['date']))
+    para.add_run('Fecha radicación:\t{}'.format(request['date']))
+    para.paragraph_format.space_after = Pt(0)
 
 
 def table_general_data(general_data, case, docx):
@@ -359,7 +360,7 @@ def table_approvals(docx, subjects, details):
         count += 1
     total_homologated = 0
     for tip in tipology:
-        text = 'Céditos homologados ' + str(tip)
+        text = 'Créditos homologados ' + str(tip)
         table.cell(count, 0).merge(table.cell(
             count, 5)).paragraphs[0].add_run(text)
         table.cell(count, 0).merge(table.cell(count, 5)
@@ -398,9 +399,9 @@ def table_credits_summary(docx, credits, case):
         [1][4]: equivalent or validated credits of typology L
         [2][0]: mandatory outstanding credits of typology B
         [2][1]: optional outstanding credits of typology B
-        [2][2]: mandatory outstanding credits of typology B
-        [2][3]: optional outstanding credits of typology B
-        [2][4]: outstanding credits of typology B
+        [2][2]: mandatory outstanding credits of typology C
+        [2][3]: optional outstanding credits of typology C
+        [2][4]: outstanding credits of typology L
         2.  case: DOBLE TITULACIÓN or REINGRESO or TRASLADO
         3.  docx (docx): The document to which the table will be added
 
@@ -425,7 +426,7 @@ def table_credits_summary(docx, credits, case):
     for cell in table.columns[5].cells:
         cell.width = 900000
     for cell in table.columns[6].cells:
-        cell.width = 700000
+        cell.width = 660000
     for column in table.columns:
         for cell in column.cells:
             cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
@@ -496,13 +497,13 @@ def table_recommend(docx, details):
         cell.width = 800000
     for cell in table.columns[4].cells:
         cell.width = 300000
-    table.columns[0].width = 3000000
-    table.columns[1].width = 800000
-    table.columns[2].width = 300000
-    table.columns[3].width = 800000
-    table.columns[4].width = 300000
+    # table.columns[0].width = 3000000
+    # table.columns[1].width = 700000
+    # table.columns[2].width = 400000
+    # table.columns[3].width = 700000
+    # table.columns[4].width = 400000
     table.cell(0, 0).paragraphs[0].add_run(
-        'El Comité Asesor de ' + details[0] + ' en sesión del día ')
+        'El ' + details[0] + ' en sesión del día ')
     table.cell(0, 0).paragraphs[0].add_run(
         str(details[1])[0:2] + num_to_month(int(str(details[1])[4:5])) + str(details[1])[6:10])
     table.cell(0, 0).paragraphs[0].add_run(
