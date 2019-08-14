@@ -113,7 +113,23 @@ class simple():
 
     @staticmethod
     def case_DEVOLUCION_DE_CREDITOS_PREGRADO(request, docx, redirected=False):
-        raise NotImplementedError
+        approval_status = "APROBAR"
+        if request.approval_status == "NA":
+            approval_status = "NO APROBAR"
+        para = docx.add_paragraph()
+        para.add_run("Análisis:\t\t\tAcuerdo 018 de 2014")
+        for i in range (0, len(request['pre_cm']['extra_analysis'])):
+            para = docx.add_paragraph(request['pre_cm']['extra_analysis'][i], style = 'List Number')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para = docx.add_paragraph()
+        para.add_run("Concepto: ").font.bold = True
+        para.add_run("El Comité Asesor recomienda al Consejo de Facultad {} reintegrar "
+        .format(approval_status))
+        para.add_run("al cupo, los créditos descontados por cancelación de la(s) siguiente(s) asignaturas ")
+        para.add_run("en el periodo académico {}. (Circular 001 de 2019 de Vicerrectoría de Sede"
+        .format(request.academic_period))
+        para.add_run("Bogotá, Acuerdo 230 de 2016 de Consejo Superior Universitario)")
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
 
     @staticmethod
     def case_ELIMINACION_DE_LA_HISTORIA_ACADEMICA_BAPI_PREGRADO(request, docx, redirected=False):
