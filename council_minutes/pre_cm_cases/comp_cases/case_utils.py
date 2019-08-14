@@ -46,7 +46,8 @@ def header(request, docx):
     para.add_run('Justificación:\t\t{}\n'.format(
         request['pre_cm']['justification']))
     para.add_run('Soportes:\t\t{}\n'.format(request['pre_cm']['supports']))
-    para.add_run('Fecha radicación:\t{}\n'.format(request['date']))
+    para.add_run('Fecha radicación:\t{}'.format(request['date']))
+    para.paragraph_format.space_after = Pt(0)
 
 
 def table_general_data(general_data, case, docx):

@@ -209,7 +209,20 @@ class simple():
 
     @staticmethod
     def case_EXPEDICION_DE_RECIBO_PREGRADO(request, docx, redirected=False):
-        raise NotImplementedError
+        para = docx.add_paragraph()
+        approval = "APRUEBA"
+        if request.approval_status == "NA":
+            approval = "NO APRUEBA"
+        para.add_run("Análisis:\t\t\tResolución 051 de 2003")
+        fecha = request.pre_cm['detail_pre_cm']['payment_date'].split("-")
+        para = docx.add_paragraph("Recibo de pago original para cancelar hasta {}{}{}."
+        .format(fecha[2], num_to_month(fecha[1]), fecha[0]), style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para = docx.add_paragraph()
+        para.add_run("Concepto: ").font.bold = True
+        para.add_run("El Comité Asesor recomienda al Consejo de Facultad {} expedir un nuevo recibo de pago de derechos de matrícula con cambio de fecha, para el periodo académico {}."
+        .format(approval, request.academic_period))
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
 
     @staticmethod
     def case_INFORME_DE_AVANCE_DE_TESIS_POSGRADO(request, docx, redirected=False):
