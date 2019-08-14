@@ -139,7 +139,10 @@ class simple():
     def case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO(request, docx, redirected=False):
         para = docx.add_paragraph()
         para.paragraph_format.space_after = Pt(0)
-        para.add_run('Análisis:\t\tAcuerdo 40 de 2017 - Consejo de Facultad')
+        para.add_run('Análisis:\t\t\t')
+        add_hyperlink(
+            para, 'http://www.legal.unal.edu.co/sisjurun/normas/Norma1.jsp?i=89183',
+            'Acuerdo 40 de 2017 - Consejo de Facultad')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.paragraph_format.space_after = Pt(0)
         para = docx.add_paragraph(style='List Number')
@@ -150,7 +153,100 @@ class simple():
             para.add_run('investigación')
         else:
             raise AssertionError(
-                '[tesis_trabajo] must be "Trabajo Final" or "Tesis"')
+                'datail_cm[tesis_trabajo] must be "Trabajo Final" or "Tesis"')
+        para.add_run('. La estudiante tiene la asignatura ')
+        para.add_run(request.detail_cm['tesis_trabajo'])
+        para.add_run(' de ' + request.detail_cm['nivel_pos'])
+        para.add_run(
+            ' (' + request.pre_cm['detail_pre_cm']['cod_assig'] + ').')
+        para = docx.add_paragraph(style='List Number')
+        para.add_run('Concepto').font.bold = True
+        para.add_run(' motivado acerca del trabajo por parte del director ')
+        para.add_run(request.pre_cm['detail_pre_cm']['director'])
+        para.add_run(' (Artículo 43).')
+        para = docx.add_paragraph(style='List Number')
+        para.add_run('Propuesta de tesis aprobada ')
+        para.add_run(
+            '(' + request.pre_cm['detail_pre_cm']['date_approval'][0:2])
+        para.add_run(' de ')
+        para.add_run(num_to_month(
+            request.pre_cm['detail_pre_cm']['date_approval'][3:5]))
+        para.add_run(
+            ' de 20' + request.pre_cm['detail_pre_cm']['date_approval'][6:8])
+        para.add_run(
+            ' - Acta ' + request.pre_cm['detail_pre_cm']['number_council'])
+        para.add_run(' de Consejo de Facultad): ')
+        para.add_run(request.detail_cm['tittle']).font.bold = True
+        para = docx.add_paragraph(style='List Number')
+        para.add_run(
+            'Copia impresa y versión electrónica en formato pdf (Artículo 43).')
+        para = docx.add_paragraph(style='List Number')
+        para.add_run('Solicitud de nombramiento de jurados (Artículo 44).')
+        para = docx.add_paragraph(style='List Number')
+        para.add_run('Uno o más evaluadores para los trabajos finales, dos o más' +
+                     ' jurados para las tesis de Maestría y cuatro jurados para ' +
+                     'tesis de Doctorado (Artículo 44).')
+        if request.detail_cm['nivel_pos'] == 'Doctorado':
+            para = docx.add_paragraph(style='List Number')
+            para.add_run('Para las tesis de doctorado, al menos dos de los jurados ' +
+                         'deberán ser externos a la Universidad Nacional de Colombia ' +
+                         'y preferiblemente laborar en el extranjero (Artículo 44).')
+        elif request.detail_cm['nivel_pos'] != 'Maestría':
+            raise AssertionError(
+                'datail_cm[nivel_pos] must be "Maestría" or "Doctorado"')
+        para = docx.add_paragraph()
+        para.add_run('Concepto: ').font.bold = True
+        para.add_run('El Comité Asesor ')
+        if request.approval_status == 'RC':
+            para.add_run('recomienda')
+        else:
+            para.add_run('no recomienda')
+        para.add_run(' al Consejo de Facultad')
+        para.add_run('designar en el jurado calificador de')
+        if request.detail_cm['tesis_trabajo'] == 'Trabajo Final':
+            para.add_run('l Trabajo Final de ' +
+                         request.detail_cm['nivel_pos'] + ' de ')
+        elif request.detail_cm['tesis_trabajo'] == 'Tesis':
+            para.add_run(' la Tesis de ' +
+                         request.detail_cm['nivel_pos'] + ' de ')
+        large_program = get_academic_program(request.academic_program)
+        para.add_run(large_program)
+        para.add_run(', cuyo título es: "')
+        para.add_run(request.detail_cm['tittle']).font.italic = True
+        para.add_run('", a los docentes ')
+        count = len(request.detail_cm['doc'])
+        for doc in request.detail_cm['doc']:
+            count = count - 1
+            para.add_run(doc['nomb'])
+            if 'dep' in doc:
+                para.add_run(
+                    ' de la Universidad Nacional de Colombia de la dependencia: ')
+                para.add_run(doc['dep'])
+            elif 'univ' in doc:
+                para.add_run(' de la ' + doc['univ'])
+            else:
+                raise AttributeError
+            if count == 0:
+                para.add_run('.')
+                return
+            elif count == 1:
+                para.add_run(' y ')
+                break
+            else:
+                para.add_run(', ')
+        length = len(request.detail_cm['doc']) - 1
+        para.add_run(request.detail_cm['doc'][length]['nomb'])
+        if 'dep' in request.detail_cm['doc'][length]:
+            para.add_run(
+                ' de la Universidad Nacional de Colombia de la dependencia: ')
+            para.add_run(request.detail_cm['doc'][length]['dep'])
+        elif 'univ' in request.detail_cm['doc'][length]:
+            para.add_run(' de la ' + request.detail_cm['doc'][length]['univ'])
+            para.add_run('.')
+        else:
+            raise AttributeError(
+                'Each professor must have a "dep" or "univ" key into object')
+        para.add_run('.')
 
     @staticmethod
     def case_MODIFICACION_DE_OBJETIVOS_DE_TESIS_PROPUESTA_POSGRADO(request, docx, redirected=False):
