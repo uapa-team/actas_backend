@@ -137,7 +137,20 @@ class simple():
 
     @staticmethod
     def case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO(request, docx, redirected=False):
-        raise NotImplementedError
+        para = docx.add_paragraph()
+        para.paragraph_format.space_after = Pt(0)
+        para.add_run('Análisis:\t\tAcuerdo 40 de 2017 - Consejo de Facultad')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.paragraph_format.space_after = Pt(0)
+        para = docx.add_paragraph(style='List Number')
+        para.add_run('SIA: Plan de estudios de ')
+        if request.detail_cm['tesis_trabajo'] == 'Trabajo Final':
+            para.add_run('profundización')
+        elif request.detail_cm['tesis_trabajo'] == 'Tesis':
+            para.add_run('investigación')
+        else:
+            raise AssertionError(
+                '[tesis_trabajo] must be "Trabajo Final" or "Tesis"')
 
     @staticmethod
     def case_MODIFICACION_DE_OBJETIVOS_DE_TESIS_PROPUESTA_POSGRADO(request, docx, redirected=False):
