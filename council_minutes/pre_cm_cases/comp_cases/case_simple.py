@@ -218,6 +218,9 @@ class simple():
         para = docx.add_paragraph("Recibo de pago original para cancelar hasta {}{}{}."
         .format(fecha[2], num_to_month(fecha[1]), fecha[0]), style='List Number')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        for i in range (0, len(request['pre_cm']['extra_analysis'])):
+            para = docx.add_paragraph(request['pre_cm']['extra_analysis'][i], style = 'List Number')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para = docx.add_paragraph()
         para.add_run("Concepto: ").font.bold = True
         para.add_run("El Comité Asesor recomienda al Consejo de Facultad {} expedir un nuevo recibo de pago de derechos de matrícula con cambio de fecha, para el periodo académico {}."
