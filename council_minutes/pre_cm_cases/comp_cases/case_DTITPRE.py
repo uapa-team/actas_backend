@@ -48,6 +48,9 @@ class DTITPRE_pre():
         para = docx.add_paragraph("No ha perdido la calidad de estudiante por las causales 2, 3, 4 o 5 del Artículo 44 del Acuerdo 008 del 2008 Consejo Superior Universitario. (Artículo 7, Acuerdo 155 de 2014 del Consejo Superior  Universitario.).Universitas: {}"
         .format(request.pre_cm['detail_pre_cm']['6_Universitas']), style='List Number')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        for i in range (0, len(request['pre_cm']['extra_analysis'])):
+            para = docx.add_paragraph(request['pre_cm']['extra_analysis'][i], style = 'List Number')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para = docx.add_paragraph()
         para.add_run("Concepto: ").font.bold = True
         para.add_run("El Comité Asesor recomienda al Consejo de Facultad APROBAR {} al Consejo de Sede que formalice la admisión y ubicación en el programa de pregrado {} – {}"
