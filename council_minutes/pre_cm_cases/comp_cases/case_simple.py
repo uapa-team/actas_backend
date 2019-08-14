@@ -197,7 +197,44 @@ class simple():
 
     @staticmethod
     def case_REINGRESO_POSGRADO(request, docx, redirected=False):
-        raise NotImplementedError
+        ### Frequently used ###
+        details = request['detail_cm']
+        pre_cm = request['pre_cm']
+        details_pre = pre_cm['detail_pre_cm']
+        is_recommended = request['approval_status'] == 'CR'
+
+        ### Finishing last paragraph ###
+        para = docx.paragraphs[-1]
+        para.add_run('Análisis:\t')
+        para.add_run('Resolución 239 de 2009,Acuerdo 008 de 2008,Resolución 012 de 2014').underline = True
+
+        ### Analysis Paragraphs ###
+        ## Last Reentry ##   
+        ap_1 = 'El estudiante {} ha tenido otro reingreso posterior al 2009-1S{} '
+        ap_1 += '(Artículo 46, Acuerdo 008 de 2008 del Consejo Superior Universitario).'
+        last = details_pre['last_reentry']
+        modifier = ('no', '') if last == '' else ('ya', ' en el periodo {}'.format(last))
+        docx.add_paragraph(style='List Number').add_run(ap_1.format(*modifier))
+
+        ## Retirement Cause ##
+        docx.add_paragraph(style='List Number').add_run(
+            '{}. Plan de estudios {} - Perfil de {}.'.format(
+                details_pre['retirement_cause'],
+                get_academic_program(request['academic_program']),
+                details_pre['academic_profile']
+                )
+            )
+
+        ## P.A.P.A. ##
+        ap_3 = '{}iene PAPA superior o igual a 3.5 '
+        ap_3 += '(literal 3a – Artículo 3, Resolución 239 de 2009 de Vicerrectoría Académica; Artículo 46, Acuerdo 008 de 2008 del Consejo Superior Universitario).'
+        ap_3 += '\nSIA PAPA: {}.'
+        modifier = 'T' if float(details_pre['PAPA']) >= 3.5 else 'No t'
+        docx.add_paragraph(style='List Number').add_run(ap_3.format(modifier, details_pre['PAPA']))
+        
+        ## Extra Analysis ##
+        for analysis in pre_cm['extra_analysis']:
+            docx.add_paragraph(style='List Number').add_run(analysis)
 
     @staticmethod
     def case_REGISTRO_DE_CALIFICACION_DEL_PROYECTO_Y_EXAMEN_DOCTORAL_POSGRADO(request, docx, redirected=False):
