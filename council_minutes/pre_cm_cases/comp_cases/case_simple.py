@@ -183,7 +183,7 @@ class simple():
             'presentar con concepto positivo a la División de Registro y Matrícula, el retiro voluntario del programa '
         )
         concept_para.add_run(
-            '{} ({})'.format(get_academic_program(request['academic_program'], request['academic_program'])
+            '{} ({})'.format(get_academic_program(request['academic_program']), request['academic_program'])
             ).bold = True
 
     @staticmethod
