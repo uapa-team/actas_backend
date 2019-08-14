@@ -69,6 +69,9 @@ class HCEMPRE():
             .format(request.pre_cm['detail_pre_cm']['previous_minute'])) 
             para =  docx.add_paragraph(previous_minute, style = 'List Number')
         
+        for i in range (0, len(request['pre_cm']['extra_analysis'])):
+            para = docx.add_paragraph(request['pre_cm']['extra_analysis'][i], style = 'List Number')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para =  docx.add_paragraph()
         para.add_run("Concepto: ").font.bold = True
         # subjects = [
