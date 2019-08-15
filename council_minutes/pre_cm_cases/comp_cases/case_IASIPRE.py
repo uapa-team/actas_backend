@@ -60,6 +60,7 @@ class IASIPRE():
         if 'extra_analysis' in request.pre_cm:
             for analysis in request.pre_cm['extra_analysis']:
                 para = docx.add_paragraph(style='List Number')
+                para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
                 para.add_run(analysis)
         para.paragraph_format.space_after = Pt(0)
         para = docx.add_paragraph()
