@@ -8,4 +8,5 @@ class REINPRE():
 
     @staticmethod
     def case_REINGRESO_PREGRADO(request, docx, redirected=False):
-        raise NotImplementedError
+        para = docx.add_paragraph()
+        para.add_run('Análisis:\t\t\t')
