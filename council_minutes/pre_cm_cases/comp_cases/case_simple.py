@@ -194,6 +194,9 @@ class simple():
         elif request.detail_cm['nivel_pos'] != 'Maestría':
             raise AssertionError(
                 'datail_cm[nivel_pos] must be "Maestría" or "Doctorado"')
+        for analysis in request.pre_cm['extra_analysis']:
+            para = docx.add_paragraph(style='List Number')
+            para.add_run(analysis)
         para = docx.add_paragraph()
         para.add_run('Concepto: ').font.bold = True
         para.add_run('El Comité Asesor ')
