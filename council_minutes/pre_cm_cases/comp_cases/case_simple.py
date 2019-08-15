@@ -201,10 +201,11 @@ class simple():
         elif request.detail_cm['nivel_pos'] != 'Maestría':
             raise AssertionError(
                 'datail_cm[nivel_pos] must be "Maestría" or "Doctorado"')
-        for analysis in request.pre_cm['extra_analysis']:
-            para = docx.add_paragraph(style='List Number')
-            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-            para.add_run(analysis)
+        if 'extra_analysis' in request.pre_cm:
+            for analysis in request.pre_cm['extra_analysis']:
+                para = docx.add_paragraph(style='List Number')
+                para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+                para.add_run(analysis)
         para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('Concepto: ').font.bold = True
