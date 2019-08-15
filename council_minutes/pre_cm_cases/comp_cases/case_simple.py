@@ -146,6 +146,7 @@ class simple():
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.paragraph_format.space_after = Pt(0)
         para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('SIA: Plan de estudios de ')
         if request.detail_cm['tesis_trabajo'] == 'Trabajo Final':
             para.add_run('profundización')
@@ -160,11 +161,13 @@ class simple():
         para.add_run(
             ' (' + request.pre_cm['detail_pre_cm']['cod_assig'] + ').')
         para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('Concepto').font.bold = True
         para.add_run(' motivado acerca del trabajo por parte del director ')
         para.add_run(request.pre_cm['detail_pre_cm']['director'])
         para.add_run(' (Artículo 43).')
         para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('Propuesta de tesis aprobada ')
         para.add_run(
             '(' + request.pre_cm['detail_pre_cm']['date_approval'][0:2])
@@ -178,16 +181,20 @@ class simple():
         para.add_run(' de Consejo de Facultad): ')
         para.add_run(request.detail_cm['tittle']).font.bold = True
         para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run(
             'Copia impresa y versión electrónica en formato pdf (Artículo 43).')
         para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('Solicitud de nombramiento de jurados (Artículo 44).')
         para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('Uno o más evaluadores para los trabajos finales, dos o más' +
                      ' jurados para las tesis de Maestría y cuatro jurados para ' +
                      'tesis de Doctorado (Artículo 44).')
         if request.detail_cm['nivel_pos'] == 'Doctorado':
             para = docx.add_paragraph(style='List Number')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
             para.add_run('Para las tesis de doctorado, al menos dos de los jurados ' +
                          'deberán ser externos a la Universidad Nacional de Colombia ' +
                          'y preferiblemente laborar en el extranjero (Artículo 44).')
@@ -196,8 +203,10 @@ class simple():
                 'datail_cm[nivel_pos] must be "Maestría" or "Doctorado"')
         for analysis in request.pre_cm['extra_analysis']:
             para = docx.add_paragraph(style='List Number')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
             para.add_run(analysis)
         para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('Concepto: ').font.bold = True
         para.add_run('El Comité Asesor ')
         if request.approval_status == 'RM':
