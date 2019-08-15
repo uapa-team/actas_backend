@@ -1,6 +1,5 @@
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from ...models import Request
 from .case_utils import num_to_month
 from .case_utils import get_academic_program
 from .case_utils import table_subjects
@@ -14,6 +13,7 @@ class IASIPRE():
         para.paragraph_format.space_after = Pt(0)
         para.add_run('Análisis:')
         para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('SIA: ')
         counts = {'offered': 0, 'not offered': 0}
         for subject in request.detail_cm['subjects']:
@@ -48,6 +48,7 @@ class IASIPRE():
             data.append([subject['cod'], subject['subject'],
                          subject['grup'], subject['T'], subject['cre']])
             para = docx.add_paragraph(style='List Number')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
             para.add_run('SIA: La asignatura ' + subject['subject'])
             para.add_run(' (' + subject['cod'] + '), ')
             para.add_run('tipología ' + subject['T'] + ', cuenta con ')
@@ -58,6 +59,7 @@ class IASIPRE():
             para.add_run('20' + subject['review_date'][6:8] + ').')
         para.paragraph_format.space_after = Pt(0)
         para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('Concepto: ').font.bold = True
         para.add_run('El Comité Asesor ')
         if request.approval_status == 'RM':
