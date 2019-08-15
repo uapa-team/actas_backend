@@ -57,6 +57,10 @@ class IASIPRE():
             para.add_run(
                 '(' + subject['review_date'][0:2] + num_to_month(subject['review_date'][3:5]))
             para.add_run('20' + subject['review_date'][6:8] + ').')
+        if 'extra_analysis' in request.pre_cm:
+            for analysis in request.pre_cm['extra_analysis']:
+                para = docx.add_paragraph(style='List Number')
+                para.add_run(analysis)
         para.paragraph_format.space_after = Pt(0)
         para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
