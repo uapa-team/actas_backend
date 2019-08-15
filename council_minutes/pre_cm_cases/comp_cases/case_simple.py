@@ -121,6 +121,7 @@ class simple():
         para.paragraph_format.space_after = Pt(0)
         para.add_run('Analisis:')
         para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run(
             'Modalidad de trabajo de grado: Asignaturas de posgrado. ')
         para.add_run('Acta de comité ' +
@@ -129,9 +130,11 @@ class simple():
             ' de ' + request.pre_cm['detail_pre_cm']['council_year'] + '.')
         for analysis in request.pre_cm['extra_analysis']:
             para = docx.add_paragraph(style='List Number')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
             para.add_run(analysis)
         para.paragraph_format.space_after = Pt(0)
         para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('Concepto: ').font.bold = True
         para.add_run('El Comité Asesor ')
         if request.approval_status == 'RM':
