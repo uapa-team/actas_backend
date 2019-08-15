@@ -1,5 +1,9 @@
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.shared import Pt
 from .case_utils import add_hyperlink
+from .case_utils import table_general_data
+from .case_utils import get_academic_program
+from .case_utils import string_to_date
 
 
 class REINPRE():
@@ -37,7 +41,7 @@ class REINPRE():
         para.add_run(
             '(literal 3b - Artículo 3, Resolución 239 de 2009 de Vicerrectoría Académica; ')
         para.add_run(
-            'Artículo 46, Acuerdo 008 de 2008 del COnsejo Superior Universitario.). SIA: ')
+            'Artículo 46, Acuerdo 008 de 2008 del Consejo Superior Universitario.). SIA: ')
         para.add_run('P.A.P.A. de ' + request.detail_cm['PAPA'] + '.')
         para = docx.add_paragraph(style='List Number')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
@@ -64,9 +68,38 @@ class REINPRE():
             para.add_run('en')
         else:
             para.add_run('fuera de las')
-        para.add_run(' fechas de calendario de sede (parágrado Artículo 3).')
+        para.add_run(' fechas de calendario de sede (parágrafo Artículo 3).')
         if 'extra_analysis' in request.pre_cm:
             for analysis in request.pre_cm['extra_analysis']:
                 para = docx.add_paragraph(style='List Number')
                 para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
                 para.add_run(analysis)
+        para.paragraph_format.space_after = Pt(0)
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Concepto: ').font.bold = True
+        para.add_run('El Comité Asesor ')
+        if request.approval_status == 'RM':
+            para.add_run('recomienda')
+        elif request.approval_status == 'NM':
+            para.add_run('no recomienda')
+        para.add_run(
+            ' al Consejo de Facultad aprobar reingreso por única vez a partir del periodo ')
+        para.add_run(request.detail_cm['reing_per'])
+        para.add_run(
+            '. Si el estudiante no renueva su matrícula en el semestre de reingreso el acto ')
+        para.add_run(
+            'académico expedido por el Consejo de Facultad queda sin efecto. (Resolución 012')
+        para.add_run(
+            ' de 2014 de Vicerrectoría Académica; Artículo 46, Acuerdo 008 de 2008 del Consejo ')
+        para.add_run('Superior Universitario).')
+        general_data = []
+        general_data.append(['Estudiante', request.student_name])
+        general_data.append(['DNI', request.student_dni])
+        general_data.append(['Plan de estudios',
+                             get_academic_program(request.academic_program)])
+        general_data.append(
+            ['Código del plan de estudios', request.academic_program])
+        general_data.append(
+            ['Fecha de la solicitud', string_to_date(request.detail_cm['solic_date'])])
+        table_general_data(general_data, 'REINGRESO', docx)

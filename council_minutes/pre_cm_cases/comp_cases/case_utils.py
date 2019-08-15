@@ -1,7 +1,17 @@
+import docx
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
 from docx.shared import Pt
 from ...models import Request
+
+
+def string_to_date(string):
+    ret = ''
+    ret += string[0:2]
+    ret += num_to_month(string[3:5])
+    ret += '20'
+    ret += string[6:8]
+    return ret
 
 
 def get_academic_program(cod_program):
