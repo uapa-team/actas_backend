@@ -121,7 +121,25 @@ class simple():
 
     @staticmethod
     def case_RESERVA_DE_CUPO_ADICIONAL_PREGRADO(request, docx, redirected=False):
-        raise NotImplementedError
+        para = docx.add_paragraph()
+        para.add_run('Analisis:')
+        analysis_para = docx.add_paragraph()
+        analysis_para.paragraph_format.left_indent = Pt(36)
+        if request['approval_status'] == 'RM' || request['approval_status'] == 'AP':
+            analysis = 'El comité de {} considera que la situación personal está debidamente justificada.'
+            answer = 'El Comité Asesor recomienda al Consejo de Facultad {} la primera reserva de cupo adicional en el periodo académico 20##-#S debido a que justifica debidamente la solicitud. (Artículo 20 del Acuerdo 008 de 2008 del Consejo Superior Universitario.)'
+        elif request['approval_status'] == 'NM' || request['approval_status'] == 'NA':
+            analysis = ''
+            answer = 'El Comité Asesor recomienda al Consejo de Facultad {} la primera reserva de cupo adicional para el periodo académico 20##-#S teniendo en cuenta que esta posibilidad es viable a continuación de la segunda reserva de cupo automática. (Artículo 20 del Acuerdo 008 de 2008 del Consejo Superior Universitario)'
+        else:
+            analysis = ' en trámite '
+            answer = analysis
+        analysis_para.add_run('1. ' + analysis + '\n')
+        para = docx.add_paragraph()
+        para.add_run('Concepto:')
+        answer_para = docx.add_paragraph()
+        answer_para.paragraph_format.left_indent = Pt(36)
+        answer_para.add_run('. ' + answer + '\n')
 
     @staticmethod
     def case_REEMBOLSO_POSGRADO(request, docx, redirected=False):
