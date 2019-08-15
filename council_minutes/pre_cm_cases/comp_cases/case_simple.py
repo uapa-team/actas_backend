@@ -200,9 +200,9 @@ class simple():
         para = docx.add_paragraph()
         para.add_run('Concepto: ').font.bold = True
         para.add_run('El Comité Asesor ')
-        if request.approval_status == 'RC':
+        if request.approval_status == 'RM':
             para.add_run('recomienda')
-        else:
+        if request.approval_status == 'NM':
             para.add_run('no recomienda')
         para.add_run(' al Consejo de Facultad')
         para.add_run('designar en el jurado calificador de')
