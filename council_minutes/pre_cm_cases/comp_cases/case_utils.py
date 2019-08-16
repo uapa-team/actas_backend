@@ -117,6 +117,9 @@ def table_general_data(general_data, case, docx):
         cell.width = 2400000
     for cell in table.columns[2].cells:
         cell.width = 2400000
+    table.columns[0].width = 400000
+    table.columns[1].width = 2400000
+    table.columns[2].width = 2400000
     cellp = table.cell(0, 0).merge(table.cell(0, 2)).paragraphs[0]
     cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
     cellp.add_run(case + '\n').font.bold = True

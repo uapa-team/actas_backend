@@ -73,6 +73,9 @@ class REINPRE():
             cell.width = 2400000
         for cell in table.columns[2].cells:
             cell.width = 2400000
+        table.columns[0].width = 400000
+        table.columns[1].width = 2400000
+        table.columns[2].width = 2400000
         cellp = table.cell(0, 0).merge(table.cell(0, 2)).paragraphs[0]
         cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
         cellp.add_run('REINGRESO\n').font.bold = True
@@ -115,6 +118,9 @@ class REINPRE():
             cell.width = 3200000
         for cell in table.columns[2].cells:
             cell.width = 1600000
+        table.columns[0].width = 400000
+        table.columns[1].width = 3200000
+        table.columns[2].width = 1600000
         table.cell(0, 0).merge(table.cell(0, 1)).paragraphs[0].add_run(
             'Periodo para el cual fue admitido en este plan de estudios')
         table.cell(0, 2).paragraphs[0].add_run(request.detail_cm['per_admi'])
@@ -190,6 +196,8 @@ class REINPRE():
             cell.width = 3100000
         for cell in table.columns[1].cells:
             cell.width = 2100000
+        table.columns[0].width = 3100000
+        table.columns[1].width = 2100000
         table.cell(0, 0).merge(table.cell(0, 1)
                                ).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
         table.cell(0, 0).merge(table.cell(0, 1)).paragraphs[0].add_run(
@@ -227,8 +235,15 @@ class REINPRE():
             cell.width = 610000
         for cell in table.columns[5].cells:
             cell.width = 675000
-        for cell in table.columns[5].cells:
+        for cell in table.columns[6].cells:
             cell.width = 375000
+        table.columns[0].width = 1610000
+        table.columns[1].width = 690000
+        table.columns[2].width = 610000
+        table.columns[3].width = 690000
+        table.columns[4].width = 610000
+        table.columns[5].width = 675000
+        table.columns[6].width = 375000
         table.cell(0, 0).merge(table.cell(1, 0)
                                ).paragraphs[0].add_run('Créditos')
         table.cell(0, 0).merge(table.cell(1, 0)
