@@ -43,8 +43,7 @@ def string_to_date(string):
     ret = ''
     ret += string[0:2]
     ret += num_to_month(string[3:5])
-    ret += '20'
-    ret += string[6:8]
+    ret += string[6:10]
     return ret
 
 

@@ -5,6 +5,7 @@ from .case_utils import add_hyperlink
 from .case_utils import table_general_data
 from .case_utils import get_academic_program
 from .case_utils import string_to_date
+from .case_utils import table_recommend
 
 
 class REINPRE():
@@ -204,19 +205,24 @@ class REINPRE():
             request.detail_cm['first_reingreso'])
         table.cell(1, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(2, 0).merge(table.cell(2, 2)).paragraphs[0].add_run(
-            'Si la respuesta es NO, el Comité Asesor no debe recomendar al Consejo de Facultad el reingreso')
+            'Si la respuesta es NO, el Comité Asesor no debe recomendar al Consejo de ' +
+            'Facultad el reingreso')
         table.cell(3, 0).merge(table.cell(3, 1)).paragraphs[0].add_run(
-            'Es caso de ser primer reingreso en ¿qué periodo académico perdió la calidad de estudiante?')
+            'Es caso de ser primer reingreso en ¿qué periodo académico perdió la calidad ' +
+            'de estudiante?')
         table.cell(3, 2).paragraphs[0].add_run(request.detail_cm['per_perd'])
         table.cell(3, 2).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         table.cell(3, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(4, 0).merge(table.cell(4, 1)).paragraphs[0].add_run(
-            'Al momento de presentar la solicitud ¿cuántos periodos académicos (incluido el periodo académico en que presentó la solicitud) han transcurridos a partir del periodo académico en que registró su última matrícula?')
+            'Al momento de presentar la solicitud ¿cuántos periodos académicos (incluido ' +
+            'el periodo académico en que presentó la solicitud) han transcurridos a partir ' +
+            'del periodo académico en que registró su última matrícula?')
         table.cell(4, 2).paragraphs[0].add_run(request.detail_cm['per_transc'])
         table.cell(4, 2).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         table.cell(4, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(5, 0).merge(table.cell(5, 2)).paragraphs[0].add_run(
-            'En caso que la respuesta sea mayor de 6 periodos académicos no se debe recomendar el reingreso')
+            'En caso que la respuesta sea mayor de 6 periodos académicos no se debe recomendar ' +
+            'el reingreso')
         table.cell(6, 0).merge(table.cell(6, 1)
                                ).paragraphs[0].add_run('P.A.P.A.')
         table.cell(6, 2).paragraphs[0].add_run(request.detail_cm['PAPA'])
@@ -392,3 +398,10 @@ class REINPRE():
         para.add_run(
             '     *Sin incluir los créditos correspondientes al cumplimiento del ' +
             'requisito de suficiencia en idioma.').font.size = Pt(8)
+        details = []
+        details.append(request.detail_cm['commite_name'])
+        details.append(request.detail_cm['comite_date'])
+        details.append(request.detail_cm['comite_acta'])
+        details.append(request.detail_cm['comite_date'][6:10])
+        details.append(request.detail_cm['reccomend'])
+        table_recommend(docx, details)
