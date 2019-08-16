@@ -77,22 +77,82 @@ class REINPRE():
         para.paragraph_format.space_after = Pt(0)
         para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('Concepto: ').font.bold = True
-        para.add_run('El Comité Asesor ')
-        if request.approval_status == 'RM':
-            para.add_run('recomienda')
-        elif request.approval_status == 'NM':
-            para.add_run('no recomienda')
-        para.add_run(
-            ' al Consejo de Facultad aprobar reingreso por única vez a partir del periodo ')
-        para.add_run(request.detail_cm['reing_per'])
-        para.add_run(
-            '. Si el estudiante no renueva su matrícula en el semestre de reingreso el acto ')
-        para.add_run(
-            'académico expedido por el Consejo de Facultad queda sin efecto. (Resolución 012')
-        para.add_run(
-            ' de 2014 de Vicerrectoría Académica; Artículo 46, Acuerdo 008 de 2008 del Consejo ')
-        para.add_run('Superior Universitario).')
+        if request.pre_cm['detail_pre_cm']['request_in_date']:
+            para.add_run('Concepto: ').font.bold = True
+            para.add_run('El Comité Asesor ')
+            if request.approval_status == 'RM':
+                para.add_run('recomienda')
+            elif request.approval_status == 'NM':
+                para.add_run('no recomienda')
+            para.add_run(' al Consejo de Facultad ')
+            para.add_run('APROBAR').font.bold = True
+            para.add_run(
+                ' reingreso por única vez a partir del periodo académico')
+            para.add_run(request.detail_cm['reing_per'])
+            if 'grants_cred' in request.pre_cm['detail_pre_cm']:
+                para.add_run('y otorga ')
+                para.add_run(request.pre_cm['detail_pre_cm']['grants_cred'])
+                para.add_run(
+                    ' crédito(s) adicional(es) para culminar su plan de estudios')
+            para.add_run(
+                '. Si el estudiante no renueva su matrícula en el semestre de reingreso el acto ')
+            para.add_run(
+                'académico expedido por el Consejo de Facultad queda sin efecto. (Resolución 012')
+            para.add_run(
+                ' de 2014 de Vicerrectoría Académica; Artículo 46, Acuerdo 008 de 2008 del Consejo')
+            para.add_run(' Superior Universitario).')
+            para = docx.add_paragraph()
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            para.add_run('El señor ' + request.student_name +
+                         'tiene pendiente por aprobar ' + request.detail_cm['creds_remaining'])
+            para.add_run(' créditos del plan de estudios de ' +
+                         get_academic_program(request.academic_program))
+            para.add_run(
+                ' y ' + request.detail_cm['creds_ingl'] + ' créditos del requisito de nivelación')
+            para.add_run(
+                ' - inglés, con un cupo disponible para inscripción de ')
+            para.add_run(str(int(
+                request.detail_cm['creds_remaining']) + int(
+                    request.detail_cm['creds_minus_remaining'])))
+            para.add_run(' créditos.')
+            para = docx.add_paragraph()
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            para.add_run(
+                'El parágrafo del artículo 11 del Acuerdo 008 de 2008 de Consejo Superior ')
+            para.add_run('Superior Universitario establece: ')
+            para.add_run(
+                '"Los créditos adicionales que como resultado del ').font.italic = True
+            para.add_run(
+                'proceso de clasificación en la admisión deba aprobar ').font.italic = True
+            para.add_run(
+                'un estudiante de pregrado, se sumarán por única vez al "').font.italic = True
+            para.add_run(
+                'cupo adicional de créditos para inscripción"').font.italic = True
+            para.add_run(', por lo tanto solo es viable otorgar ' +
+                         request.pre_cm['detail_pre_cm']['grants_cred'])
+            para.add_run(
+                ' crédito(s) para la inscripción de asignaturas pendientes del plan de estudios ')
+            para.add_run(
+                ' de ' + get_academic_program(request.academic_program) + '.')
+        else:
+            para.add_run('Concepto: ').font.bold = True
+            para.add_run('El Comité Asesor ')
+            if request.approval_status == 'RM':
+                para.add_run('recomienda')
+            elif request.approval_status == 'NM':
+                para.add_run('no recomienda')
+            para.add_run(' al Consejo de Facultad ')
+            para.add_run('NO APROBAR').font.bold = True
+            para.add_run(
+                ' reingreso por única vez a partir del periodo académico')
+            para.add_run(request.detail_cm['reing_per'])
+            para.add_run(
+                ', porque el estudiante presentó la solicitud fuera de las fechas establecidas ')
+            para.add_run(
+                'en el Calendario Académico de la Sede Bogotá. (Resolución 012')
+            para.add_run(
+                ' de 2014 de Vicerrectoría Académica; Artículo 46, Acuerdo 008 de 2008 del Consejo')
+            para.add_run(' Superior Universitario).')
         general_data = []
         general_data.append(['Estudiante', request.student_name])
         general_data.append(['DNI', request.student_dni])
@@ -102,4 +162,7 @@ class REINPRE():
             ['Código del plan de estudios', request.academic_program])
         general_data.append(
             ['Fecha de la solicitud', string_to_date(request.detail_cm['solic_date'])])
+        bullet = para.add_run('1. Datos Generales')
+        bullet.font.bold = True
+        bullet.font.size = Pt(8)
         table_general_data(general_data, 'REINGRESO', docx)
