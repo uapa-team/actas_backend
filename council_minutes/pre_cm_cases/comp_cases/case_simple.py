@@ -128,18 +128,22 @@ class simple():
         analysis = ''
         answer = ''
         if request['approval_status'] == 'RM' or request['approval_status'] == 'AP':
-            analysis = 'El comité de {} considera que la situación personal está debidamente justificada.'
+            analysis_1 = 'El comité de {} considera que la situación personal está debidamente justificada.'
             answer_1 = 'El Comité Asesor recomienda al Consejo de Facultad aprobar la primera reserva de cupo adicional'
             answer_2 = ' en el periodo académico {} debido a que justifica debidamente la solicitud. (Artículo 20 del'
             answer_3 = ' Acuerdo 008 de 2008 del Consejo Superior Universitario.)'
-            answer = answer_1.format('Ingeniería de Sistemas y Computación') + \
+            analysis = analysis_1.format(
+                request.get_academic_program_display())
+            answer = answer_1 + \
                 answer_2.format(request['academic_period']) + answer_3
         elif request['approval_status'] == 'NM' or request['approval_status'] == 'NA':
-            analysis = 'El comité de NO considera que la situación personal está debidamente justificada.'
+            analysis_1 = 'El comité de {} NO considera que la situación personal está debidamente justificada.'
             answer_1 = 'El Comité Asesor recomienda al Consejo de Facultad no aprobar la' + \
                 ' primera reserva de cupo adicional para el periodo académico {} teniendo ' + \
                 'en cuenta que esta posibilidad es viable a continuación de la segunda reserva ' + \
                 'de cupo automática. (Artículo 20 del Acuerdo 008 de 2008 del Consejo Superior Universitario)'
+            analysis = analysis_1.format(
+                request.get_academic_program_display())
             answer = answer_1.format(request['academic_period'])
         else:
             analysis = ' en trámite '
