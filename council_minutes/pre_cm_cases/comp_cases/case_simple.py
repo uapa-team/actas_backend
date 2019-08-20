@@ -63,7 +63,7 @@ class simple():
     def case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO_Answers(request):
         c1_f1 = '{}ancelar el periodo académico {}, porque {}justifica documentalmente la fuerza mayor '
         c1_f2 = 'o caso fortuito. (Artículo 18 del Acuerdo 008 del Consejo Superior Universitario).'
-        if request['pre_cm']['pre_approval_status'] == 'AP':
+        if request['pre_cm']['pre_approval_status'] == 'RC':
             c1 = c1_f1.format('C', request['academic_period'], '') + c1_f2
             c2_f1 = 'Devolución proporcional del {} por ciento ({} %) del valor pagado por concepto de derechos'
             c2_f2 = ' de matrícula del periodo {}, teniendo en cuenta la fecha de presentación de la solicitud y'
@@ -125,12 +125,22 @@ class simple():
         para.add_run('Analisis:')
         analysis_para = docx.add_paragraph()
         analysis_para.paragraph_format.left_indent = Pt(36)
-        if request['approval_status'] == 'RM' || request['approval_status'] == 'AP':
+        analysis = ''
+        answer = ''
+        if request['approval_status'] == 'RM' or request['approval_status'] == 'AP':
             analysis = 'El comité de {} considera que la situación personal está debidamente justificada.'
-            answer = 'El Comité Asesor recomienda al Consejo de Facultad {} la primera reserva de cupo adicional en el periodo académico 20##-#S debido a que justifica debidamente la solicitud. (Artículo 20 del Acuerdo 008 de 2008 del Consejo Superior Universitario.)'
-        elif request['approval_status'] == 'NM' || request['approval_status'] == 'NA':
-            analysis = ''
-            answer = 'El Comité Asesor recomienda al Consejo de Facultad {} la primera reserva de cupo adicional para el periodo académico 20##-#S teniendo en cuenta que esta posibilidad es viable a continuación de la segunda reserva de cupo automática. (Artículo 20 del Acuerdo 008 de 2008 del Consejo Superior Universitario)'
+            answer_1 = 'El Comité Asesor recomienda al Consejo de Facultad aprobar la primera reserva de cupo adicional'
+            answer_2 = ' en el periodo académico {} debido a que justifica debidamente la solicitud. (Artículo 20 del'
+            answer_3 = ' Acuerdo 008 de 2008 del Consejo Superior Universitario.)'
+            answer = answer_1.format('Ingeniería de Sistemas y Computación') + \
+                answer_2.format(request['academic_period']) + answer_3
+        elif request['approval_status'] == 'NM' or request['approval_status'] == 'NA':
+            analysis = 'El comité de NO considera que la situación personal está debidamente justificada.'
+            answer_1 = 'El Comité Asesor recomienda al Consejo de Facultad no aprobar la' + \
+                ' primera reserva de cupo adicional para el periodo académico {} teniendo ' + \
+                'en cuenta que esta posibilidad es viable a continuación de la segunda reserva ' + \
+                'de cupo automática. (Artículo 20 del Acuerdo 008 de 2008 del Consejo Superior Universitario)'
+            answer = answer_1.format(request['academic_period'])
         else:
             analysis = ' en trámite '
             answer = analysis
@@ -139,7 +149,7 @@ class simple():
         para.add_run('Concepto:')
         answer_para = docx.add_paragraph()
         answer_para.paragraph_format.left_indent = Pt(36)
-        answer_para.add_run('. ' + answer + '\n')
+        answer_para.add_run('1. ' + answer + '\n')
 
     @staticmethod
     def case_REEMBOLSO_POSGRADO(request, docx, redirected=False):
