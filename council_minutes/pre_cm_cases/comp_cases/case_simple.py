@@ -217,8 +217,8 @@ class simple():
         para.add_run('El Comité Asesor recomienda al Consejo de Facultad ')
         modifier = 'APROBAR' if is_recommended else 'NO APROBAR'
         para.add_run(modifier).bold = True
-        modifier = '' if details_pre['first_time'] == 'si' else 'la renovación de'
-        para.add_run(' {} la exención del {}% del pago de los derechos académicos '.format(
+        modifier = '' if details_pre['first_time'] == 'si' else 'la renovación de '
+        para.add_run(' {}la exención del {}% del pago de los derechos académicos '.format(
             modifier,
             details_pre['value']
         ))
