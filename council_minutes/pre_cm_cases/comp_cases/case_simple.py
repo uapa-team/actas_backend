@@ -129,7 +129,53 @@ class simple():
 
     @staticmethod
     def case_ADMISION_AUTOMATICA_POSGRADO(request, docx, redirected=False):
-        raise NotImplementedError
+        ### Frequently used ###
+        details = request['detail_cm']
+        pre_cm = request['pre_cm']
+        details_pre = pre_cm['detail_pre_cm']
+        is_recommended = request['approval_status'] == 'CR'
+
+        ### Finishing last paragraph ###
+        para = docx.paragraphs[-1]
+        para.add_run('Análisis:\t')
+        para.add_run('Acuerdo 070 de 2009 - Consejo Académico, Acuerdo 008 de 2008').underline = True
+
+        ### Analysis Paragraph ###
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('El estudiante completó plan de estudios en {}.'.format(details_pre['grade_period']))
+
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Cupo de admisión automática en resolución {}.'.format(details_pre['place_resolution']))
+
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Solicita admisión al plan de estudios {} - perfil de {}.'.format(
+            get_academic_program(request['academic_program']),
+            details_pre['academic_profile']
+        ))
+
+        ## Extra Analysis ##
+        for analysis in pre_cm['extra_analysis']:
+            para = docx.add_paragraph(style='List Number')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            para.add_run(analysis)
+        
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Concepto: ').bold = True
+        para.add_run('El Comité Asesor recomienda al Consejo de Facultad ')
+        modifier = 'APROBAR' if is_recommended else 'NO APROBAR'
+        para.add_run(modifier).bold = True
+        p_aux =  ' admisión automática al programa {} en el plan de estudios de {}'
+        p_aux += ' a partir del periodo académico {} (Acuerdo 070 de 2009 de Consejo Académico '
+        p_aux += 'y literal c, Artículo 57 del Acuerdo 008 de 2008 del Consejo Superior Universitario).'
+        para.add_run(p_aux.format(
+            get_academic_program(request['academic_program']),
+            details_pre['academic_profile'],
+            details['ing_period']
+        ))
 
     @staticmethod
     def case_REGISTRO_DE_CALIFICACION_DE_MOVILIDAD_PREGRADO(request, docx, redirected=False):
