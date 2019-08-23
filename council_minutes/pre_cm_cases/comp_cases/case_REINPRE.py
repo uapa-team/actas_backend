@@ -108,7 +108,7 @@ class REINPRE():
             para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
             para.paragraph_format.space_after = Pt(0)
             para.add_run('El señor ' + request.student_name +
-                         'tiene pendiente por aprobar ' + request.detail_cm['creds_remaining'])
+                         ' tiene pendiente por aprobar ' + request.detail_cm['creds_remaining'])
             para.add_run(' créditos del plan de estudios de ' +
                          get_academic_program(request.academic_program))
             para.add_run(
