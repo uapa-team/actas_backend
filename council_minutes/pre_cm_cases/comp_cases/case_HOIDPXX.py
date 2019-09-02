@@ -11,7 +11,7 @@ class HOIDPXX():
         case_HOMOLOGACION_INGLES_Answers(request, docx)
 
     @staticmethod
-    def case_HOMOLOGACION_INGLES_Analysis(request):
+    def case_HOMOLOGACION_INGLES_Analysis(request, docx):
         para = docx.add_paragraph()
         para.add_run('Analisis:')
         analysis_para = docx.add_paragraph()
@@ -22,7 +22,7 @@ class HOIDPXX():
         analysis_para.add_run(analysis)
 
     @staticmethod
-    def case_HOMOLOGACION_INGLES_Answers(request):
+    def case_HOMOLOGACION_INGLES_Answers(request, docx):
         para = docx.add_paragraph()
         para.add_run('Concepto:')
         answer_para = docx.add_paragraph()
