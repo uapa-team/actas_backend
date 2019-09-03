@@ -1,5 +1,7 @@
+import docx
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
+from docx.enum.dml import MSO_THEME_COLOR
 from docx.shared import Pt
 from ...models import Request
 
@@ -337,25 +339,41 @@ def table_approvals(docx, subjects, details):
             table.cell(
                 i, j).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
     table.cell(2, 0).paragraphs[0].add_run('Periodo').font.bold = True
+    table.cell(2, 0).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
     table.cell(2, 1).paragraphs[0].add_run('Código').font.bold = True
+    table.cell(2, 1).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
     table.cell(2, 2).paragraphs[0].add_run('Asignatura').font.bold = True
+    table.cell(2, 2).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
     table.cell(2, 3).paragraphs[0].add_run('C').font.bold = True
+    table.cell(2, 3).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
     table.cell(2, 4).paragraphs[0].add_run('T').font.bold = True
+    table.cell(2, 4).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
     table.cell(2, 5).paragraphs[0].add_run('Nota').font.bold = True
+    table.cell(2, 5).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
     table.cell(2, 6).paragraphs[0].add_run('Asignatura').font.bold = True
+    table.cell(2, 6).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
     table.cell(2, 7).paragraphs[0].add_run('Nota').font.bold = True
+    table.cell(2, 7).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
     count = 3
     for subject in subjects:
         table.cell(count, 0).paragraphs[0].add_run(subject[0])
+        table.cell(count, 0).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         table.cell(count, 1).paragraphs[0].add_run(subject[1])
+        table.cell(count, 1).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         table.cell(count, 2).paragraphs[0].add_run(
             subject[2])
+        table.cell(count, 2).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         table.cell(count, 3).paragraphs[0].add_run(subject[3])
+        table.cell(count, 3).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         table.cell(count, 4).paragraphs[0].add_run(subject[4])
+        table.cell(count, 4).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         table.cell(count, 5).paragraphs[0].add_run(subject[5])
+        table.cell(count, 5).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         table.cell(count, 6).paragraphs[0].add_run(
             subject[6])
+        table.cell(count, 6).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         table.cell(count, 7).paragraphs[0].add_run(subject[7])
+        table.cell(count, 7).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         count += 1
     total_homologated = 0
     for tip in tipology:
