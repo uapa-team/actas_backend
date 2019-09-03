@@ -150,6 +150,19 @@ class simple():
             details['from_node']
         ))
 
+        subjects = []
+        for subject in details_pre['subject_homologation']:
+            subjects.append([
+                subject['period'], subject['code'], subject['name'],
+                subject['credits'], subject['tipology'], subject['grade'],
+                subject['old_name'], subject['old_grade']
+            ])
+
+        table_approvals(docx, subjects, [
+            request['student_name'], request['student_dni'],
+            request['academic_program'], 'Universidad Nacional de Colombia'
+        ])
+
     @staticmethod
     def case_AMPLIACION_DE_LA_FECHA_DE_PAGO_DE_DERECHOS_ACADEMICOS_POSGRADO(request, docx, redirected=False):
         raise NotImplementedError
