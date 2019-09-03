@@ -214,3 +214,109 @@ class simple():
     @staticmethod
     def case_INFORME_DE_AVANCE_DE_TESIS_POSGRADO(request, docx, redirected=False):
         raise NotImplementedError
+
+    @staticmethod
+    def case_HOMOLOGACION_DE_ASIGNATURAS_CONVENIO_CON_UNIVERSIDAD_ANDES_POSGRADO(request, docx, redirected=False):
+        assign = ['2024944 - Asignatura Por Convenio Con Universidad De Los Andes I - Posgrado',
+                  '2024945 - Asignatura Por Convenio Con Universidad De Los Andes II - Posgrado']
+        para = docx.add_paragraph()
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Análisis:\t\t')
+        # add_hyperlink(para, 'Acuerdo 008 de 2008',
+        #              'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34983/')
+        para = docx.add_paragraph(style='List Number')
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Solicitud de homologación de ')
+        para.add_run(str(len(request.detail_cm['subjects'])))
+        para.add_run(' asignaturas del programa ')
+        para.add_run(get_academic_program(request.academic_program))
+        para.add_run(' de la Universidad de los Andes.')
+        para = docx.add_paragraph(style='List Number')
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('La(s) asignatura(s) a homologar ')
+        if request.pre_cm['detail_pre_cm']['pre_req'] == 'false':
+            para.add_run('NO ').font.bold = True
+        elif request.pre_cm['detail_pre_cm']['pre_req'] != 'true':
+            raise AssertionError('request.pre_cm["detail_pre"]["pre_req"]' +
+                                 ' must be string "true" or "false"')
+        para.add_run('cumple(n) con los prerrequisitos.')
+        para = docx.add_paragraph(style='List Number')
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        if request.pre_cm['detail_pre_cm']['more_50'] == 'false':
+            para.add_run('NO').font.bold = True
+            para.add_run(' s')
+        elif request.pre_cm['detail_pre_cm']['more_50'] == 'true':
+            para.add_run('S')
+        para.add_run('e homologan más del 50% de los créditos del plan')
+        para.add_run(
+            ' (Artículo 38, Acuerdo 008 de 2008 - Consejo Superior Universitario.). ')
+        prev = 'antecedente' not in request.pre_cm['detail_pre_cm']
+        if prev:
+            para.add_run('NO').font.bold = True
+            para.add_run(' h')
+        else:
+            para.add_run('H')
+        para.add_run('a tenido homologaciones anteriores.')
+        if prev:
+            para = docx.add_paragraph(style='List Number')
+            para.paragraph_format.space_after = Pt(0)
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            para.add_run(
+                'Antecedente de homologación de la institución en Acta ')
+            para.add_run(request.pre_cm['detail_pre_cm']
+                         ['antecedente']['council_minute_number'])
+            para.add_run(' de ')
+            para.add_run(request.pre_cm['detail_pre_cm']
+                         ['antecedente']['council_minute_year'])
+            para.add_run('.')
+        para = docx.add_paragraph()
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Concepto:').font.bold = True
+        para.add_run(' El comité Asesor ')
+        if request.approval_status != 'CR':
+            para.add_run('NO').font.bold = True
+        para.add_run(' recomienda aprobar:')
+        para = docx.add_paragraph(style='List Number 2')
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        total_creds = 0
+        acum_papa = 0
+        for subject in request.detail_cm['subjects']:
+            total_creds += int(subject['creds_asig'])
+            acum_papa += int(subject['creds_asig']) * \
+                float(subject['cal_asign'])
+        mini_papa = acum_papa / total_creds
+        para.add_run('Registrar calificación ')
+        if mini_papa > 3:
+            para.add_run('aprobada (AP)')
+        else:
+            para.add_run('no aprobada (NA)')
+        para.add_run(' en la asignatura ')
+        para.add_run(assign[int(request.detail_cm['index']) - 1])
+        para.add_run(', en el periodo ')
+        para.add_run(request.academic_period)
+        para.add_run('.')
+        para = docx.add_paragraph(style='List Number 2')
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Homologar, en el periodo académico ')
+        para.add_run(request.academic_period)
+        para.add_run(
+            ', la(s) siguiente(s) asignatura(s) cursada(s) en el Convenio en la ')
+        para.add_run(
+            'Universidad de los Andes de la siguiente manera (Artículo 35 de Acuerdo')
+        para.add_run(' 008 de 2008 del Consejo Superior Universitario):')
+        subjects = []
+        details = [request.student_name, request.student_dni,
+                   request.academic_program, 'Universidad de los Andes']
+        for subject in request.detail_cm['subjects']:
+            subjects.append(
+                [request.academic_period, subject['cod_asig'], subject['name_asig'],
+                 subject['creds_asig'], 'L', subject['cal_asign'], subject['name_asig'],
+                 subject['cal_asign']])
+        table_approvals(docx, subjects, details)
