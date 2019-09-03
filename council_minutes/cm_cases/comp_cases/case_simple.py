@@ -3,6 +3,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
 from docx.shared import Pt
 from ...models import Request
+from ...pre_cm_cases.comp_cases.case_utils import table_approvals
 
 
 class simple():
@@ -1286,87 +1287,45 @@ class simple():
             para.add_run('APRUEBA:').font.bold = True
         else:
             para.add_run('NO APRUEBA: ').font.bold = True
-        item = 'Calificación '
-        item += 'aprobada (AP) ' if request.detail_cm['cal_movilidad'] == 'AP' else 'no aprobada (NA) '
-        item += 'a la asignatura ' + assign[int(request.detail_cm['index']) - 1] +\
-            ', en el periodo ' + request.academic_period + '.'
-        para = docx.add_paragraph(item, style='List Number')
+        total_creds = 0
+        acum_papa = 0
+        for subject in request.detail_cm['subjects']:
+            total_creds += int(subject['creds_asig'])
+            acum_papa += int(subject['creds_asig']) * \
+                float(subject['cal_asign'])
+        para = docx.add_paragraph(style='List Number')
         para.paragraph_format.space_after = Pt(0)
-        item = 'Homologar, en el periodo académico ' + request.academic_period +\
-            ', la(s) siguiente(s) asignatura(s) cursadas en el Convenio en la Universidad de los Andes' +\
-                ' de la siguiente manera (Artículo 35 del Acuerdo 008 de 2008 del Consejo Superior Universitario):'
-        para = docx.add_paragraph(item, style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        mini_papa = acum_papa / total_creds
+        para.add_run('Calificación ')
+        if mini_papa > 3:
+            para.add_run('aprobada (AP)')
+        else:
+            para.add_run('no aprobada (NA)')
+        para.add_run(' en la asignatura ')
+        para.add_run(assign[int(request.detail_cm['index']) - 1])
+        para.add_run(', en el periodo ')
+        para.add_run(request.academic_period)
+        para.add_run('.')
+        para = docx.add_paragraph(style='List Number')
         para.paragraph_format.space_after = Pt(0)
-        table = docx.add_table(rows=6, cols=7, style='Table Grid')
-        table.style.font.size = Pt(8)
-        table.columns[0].width = 850000
-        table.columns[1].width = 1800000
-        table.columns[2].width = 300000
-        table.columns[3].width = 300000
-        table.columns[4].width = 400000
-        table.columns[5].width = 1400000
-        table.columns[6].width = 400000
-        for cell in table.columns[0].cells:
-            cell.width = 850000
-        for cell in table.columns[1].cells:
-            cell.width = 1800000
-        for cell in table.columns[2].cells:
-            cell.width = 300000
-        for cell in table.columns[3].cells:
-            cell.width = 300000
-        for cell in table.columns[4].cells:
-            cell.width = 400000
-        for cell in table.columns[5].cells:
-            cell.width = 1400000
-        for cell in table.columns[6].cells:
-            cell.width = 400000
-        cellp = table.cell(0, 0).merge(table.cell(0, 6)).paragraphs[0]
-        cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        cellp.add_run('{}\t\t\tDNI.{}'.format(
-            request.student_name, request.student_dni)).font.bold = True
-        cellp = table.cell(1, 0).merge(table.cell(1, 4)).paragraphs[0]
-        cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        cellp.add_run('Asignaturas a homologar en el plan de estudios de {} ({})'.format(
-            request.get_academic_program_display(), request.academic_program)).font.bold = True
-        cellp = table.cell(1, 5).merge(table.cell(1, 6)).paragraphs[0]
-        cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        cellp.add_run('Asignaturas cursadas en el Convenio en la Universidad de los Andes').font.bold = True
-        table.cell(2, 0).paragraphs[0].add_run('Código').font.bold = True
-        table.cell(2, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(2, 1).paragraphs[0].add_run('Asignatura').font.bold = True
-        table.cell(2, 1).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(2, 2).paragraphs[0].add_run('C').font.bold = True
-        table.cell(2, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(2, 3).paragraphs[0].add_run('T').font.bold = True
-        table.cell(2, 3).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(2, 4).paragraphs[0].add_run('Nota').font.bold = True
-        table.cell(2, 4).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(2, 5).paragraphs[0].add_run('Asignatura').font.bold = True
-        table.cell(2, 5).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(2, 6).paragraphs[0].add_run('Nota').font.bold = True
-        table.cell(2, 6).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(3, 0).paragraphs[0].add_run(request.detail_cm['cod_asig'])
-        table.cell(3, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(3, 1).paragraphs[0].add_run(request.detail_cm['name_asig'])
-        table.cell(3, 1).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(3, 2).paragraphs[0].add_run(request.detail_cm['creds_asig'])
-        table.cell(3, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(3, 3).paragraphs[0].add_run('L')
-        table.cell(3, 3).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(3, 4).paragraphs[0].add_run(request.detail_cm['cal_asign'])
-        table.cell(3, 4).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(3, 5).paragraphs[0].add_run(request.detail_cm['name_asig'])
-        table.cell(3, 5).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(3, 6).paragraphs[0].add_run(request.detail_cm['cal_asign'])
-        table.cell(3, 6).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(4, 0).merge(table.cell(4, 4)).paragraphs[0].add_run('Créditos homologados L')
-        table.cell(4, 0).merge(table.cell(4, 4)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(4, 5).merge(table.cell(4, 6)).paragraphs[0].add_run(request.detail_cm['creds_asig'])
-        table.cell(4, 5).merge(table.cell(4, 6)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(5, 0).merge(table.cell(5, 4)).paragraphs[0].add_run('Total créditos que se homologan')
-        table.cell(5, 0).merge(table.cell(5, 4)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(5, 5).merge(table.cell(5, 6)).paragraphs[0].add_run(request.detail_cm['creds_asig'])
-        table.cell(5, 5).merge(table.cell(5, 6)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Homologar, en el periodo académico ')
+        para.add_run(request.academic_period)
+        para.add_run(
+            ', la(s) siguiente(s) asignatura(s) cursada(s) en el Convenio en la ')
+        para.add_run(
+            'Universidad de los Andes de la siguiente manera (Artículo 35 de Acuerdo')
+        para.add_run(' 008 de 2008 del Consejo Superior Universitario):')
+        subjects = []
+        details = [request.student_name, request.student_dni,
+                   request.academic_program, 'Universidad de los Andes']
+        for subject in request.detail_cm['subjects']:
+            subjects.append(
+                [request.academic_period, subject['cod_asig'], subject['name_asig'],
+                 subject['creds_asig'], 'L', subject['cal_asign'], subject['name_asig'],
+                 subject['cal_asign']])
+        table_approvals(docx, subjects, details)
 
     @staticmethod
     def case_HOMOLOGACION_DE_ASIGNATURAS_CONVENIO_CON_UNIVERSIDAD_ANDES_POSGRADO(request, docx, redirected=False):
@@ -1381,87 +1340,45 @@ class simple():
             para.add_run('APRUEBA:').font.bold = True
         else:
             para.add_run('NO APRUEBA: ').font.bold = True
-        item = 'Calificación '
-        item += 'aprobada (AP) ' if request.detail_cm['cal_movilidad'] == 'AP' else 'no aprobada (NA) '
-        item += 'a la asignatura ' + assign[int(request.detail_cm['index']) - 1] +\
-            ', en el periodo ' + request.academic_period + '.'
-        para = docx.add_paragraph(item, style='List Number')
+        total_creds = 0
+        acum_papa = 0
+        for subject in request.detail_cm['subjects']:
+            total_creds += int(subject['creds_asig'])
+            acum_papa += int(subject['creds_asig']) * \
+                float(subject['cal_asign'])
+        para = docx.add_paragraph(style='List Number')
         para.paragraph_format.space_after = Pt(0)
-        item = 'Homologar, en el periodo académico ' + request.academic_period +\
-            ', la(s) siguiente(s) asignatura(s) cursadas en el Convenio en la Universidad de los Andes' +\
-                ' de la siguiente manera (Artículo 35 del Acuerdo 008 de 2008 del Consejo Superior Universitario):'
-        para = docx.add_paragraph(item, style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        mini_papa = acum_papa / total_creds
+        para.add_run('Calificación ')
+        if mini_papa > 3:
+            para.add_run('aprobada (AP)')
+        else:
+            para.add_run('no aprobada (NA)')
+        para.add_run(' en la asignatura ')
+        para.add_run(assign[int(request.detail_cm['index']) - 1])
+        para.add_run(', en el periodo ')
+        para.add_run(request.academic_period)
+        para.add_run('.')
+        para = docx.add_paragraph(style='List Number')
         para.paragraph_format.space_after = Pt(0)
-        table = docx.add_table(rows=6, cols=7, style='Table Grid')
-        table.style.font.size = Pt(8)
-        table.columns[0].width = 850000
-        table.columns[1].width = 1800000
-        table.columns[2].width = 300000
-        table.columns[3].width = 300000
-        table.columns[4].width = 400000
-        table.columns[5].width = 1400000
-        table.columns[6].width = 400000
-        for cell in table.columns[0].cells:
-            cell.width = 850000
-        for cell in table.columns[1].cells:
-            cell.width = 1800000
-        for cell in table.columns[2].cells:
-            cell.width = 300000
-        for cell in table.columns[3].cells:
-            cell.width = 300000
-        for cell in table.columns[4].cells:
-            cell.width = 400000
-        for cell in table.columns[5].cells:
-            cell.width = 1400000
-        for cell in table.columns[6].cells:
-            cell.width = 400000
-        cellp = table.cell(0, 0).merge(table.cell(0, 6)).paragraphs[0]
-        cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        cellp.add_run('{}\t\t\tDNI.{}'.format(
-            request.student_name, request.student_dni)).font.bold = True
-        cellp = table.cell(1, 0).merge(table.cell(1, 4)).paragraphs[0]
-        cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        cellp.add_run('Asignaturas a homologar en el plan de estudios de {} ({})'.format(
-            request.get_academic_program_display(), request.academic_program)).font.bold = True
-        cellp = table.cell(1, 5).merge(table.cell(1, 6)).paragraphs[0]
-        cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        cellp.add_run('Asignaturas cursadas en el Convenio en la Universidad de los Andes').font.bold = True
-        table.cell(2, 0).paragraphs[0].add_run('Código').font.bold = True
-        table.cell(2, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(2, 1).paragraphs[0].add_run('Asignatura').font.bold = True
-        table.cell(2, 1).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(2, 2).paragraphs[0].add_run('C').font.bold = True
-        table.cell(2, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(2, 3).paragraphs[0].add_run('T').font.bold = True
-        table.cell(2, 3).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(2, 4).paragraphs[0].add_run('Nota').font.bold = True
-        table.cell(2, 4).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(2, 5).paragraphs[0].add_run('Asignatura').font.bold = True
-        table.cell(2, 5).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(2, 6).paragraphs[0].add_run('Nota').font.bold = True
-        table.cell(2, 6).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(3, 0).paragraphs[0].add_run(request.detail_cm['cod_asig'])
-        table.cell(3, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(3, 1).paragraphs[0].add_run(request.detail_cm['name_asig'])
-        table.cell(3, 1).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(3, 2).paragraphs[0].add_run(request.detail_cm['creds_asig'])
-        table.cell(3, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(3, 3).paragraphs[0].add_run('L')
-        table.cell(3, 3).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(3, 4).paragraphs[0].add_run(request.detail_cm['cal_asign'])
-        table.cell(3, 4).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(3, 5).paragraphs[0].add_run(request.detail_cm['name_asig'])
-        table.cell(3, 5).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(3, 6).paragraphs[0].add_run(request.detail_cm['cal_asign'])
-        table.cell(3, 6).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(4, 0).merge(table.cell(4, 4)).paragraphs[0].add_run('Créditos homologados L')
-        table.cell(4, 0).merge(table.cell(4, 4)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(4, 5).merge(table.cell(4, 6)).paragraphs[0].add_run(request.detail_cm['creds_asig'])
-        table.cell(4, 5).merge(table.cell(4, 6)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(5, 0).merge(table.cell(5, 4)).paragraphs[0].add_run('Total créditos que se homologan')
-        table.cell(5, 0).merge(table.cell(5, 4)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(5, 5).merge(table.cell(5, 6)).paragraphs[0].add_run(request.detail_cm['creds_asig'])
-        table.cell(5, 5).merge(table.cell(5, 6)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Homologar, en el periodo académico ')
+        para.add_run(request.academic_period)
+        para.add_run(
+            ', la(s) siguiente(s) asignatura(s) cursada(s) en el Convenio en la ')
+        para.add_run(
+            'Universidad de los Andes de la siguiente manera (Artículo 35 de Acuerdo')
+        para.add_run(' 008 de 2008 del Consejo Superior Universitario):')
+        subjects = []
+        details = [request.student_name, request.student_dni,
+                   request.academic_program, 'Universidad de los Andes']
+        for subject in request.detail_cm['subjects']:
+            subjects.append(
+                [request.academic_period, subject['cod_asig'], subject['name_asig'],
+                 subject['creds_asig'], 'L', subject['cal_asign'], subject['name_asig'],
+                 subject['cal_asign']])
+        table_approvals(docx, subjects, details)
 
     @staticmethod
     def case_ACLARACION_DE_DECISION_PREGRADO(request, docx, redirected=False):
