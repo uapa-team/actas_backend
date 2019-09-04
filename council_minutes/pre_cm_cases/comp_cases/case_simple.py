@@ -165,7 +165,44 @@ class simple():
 
     @staticmethod
     def case_CAMBIO_DE_DIRECTIOR_CODIRECTOR_JURADO_O_EVALUADOR_POSGRADO(request, docx, redirected=False):
-        raise NotImplementedError
+        ### Frequently used ###
+        details = request['detail_cm']
+        pre_cm = request['pre_cm']
+        details_pre = pre_cm['detail_pre_cm']
+        is_recommended = request['approval_status'] == 'CR'
+
+        ### Finishing last paragraph ###
+        para = docx.paragraphs[-1]
+        para.add_run('Análisis:')
+
+        ### Analysis Paragraph ###
+        ## Extra Analysis ##
+        for analysis in pre_cm['extra_analysis']:
+            para = docx.add_paragraph(style='List Number')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            para.add_run(analysis)
+
+        ### Concept Pragraphs ###
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Concepto: ').bold = True
+        para.add_run('El Comité Asesor recomienda al Consejo de Facultad ')
+        modifier = 'APROBAR' if is_recommended else 'NO APROBAR'
+        para.add_run(modifier).bold = True
+
+        p_aux  = ' designar director de {} de {} cuyo título es : "{}", '
+        p_aux += 'al profesor {} del {}, en reemplazo del profesor {} '
+        p_aux += 'designado en el {}.'
+
+        para.add_run(p_aux.format(
+            details['testra'],
+            get_academic_program(request['academic_program']),
+            details['titulo'],
+            details['nuevo'],
+            details['depto'],
+            details['antiguo'],
+            details_pre['minute']
+        ))
 
     @staticmethod
     def case_DESIGNACION_DE_CODIRECTOR_POSGRADO(request, docx, redirected=False):
