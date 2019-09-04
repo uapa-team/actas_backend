@@ -245,7 +245,7 @@ class simple():
         para = docx.add_paragraph(style='List Number')
         para.paragraph_format.space_after = Pt(0)
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        if request.pre_cm['detail_pre_cm']['pre_req'] == 'false':
+        if request.pre_cm['detail_pre_cm']['more_50'] == 'false':
             para.add_run('NO').font.bold = True
             para.add_run(' s')
         elif request.pre_cm['detail_pre_cm']['more_50'] == 'true':
@@ -260,7 +260,7 @@ class simple():
         else:
             para.add_run('H')
         para.add_run('a tenido homologaciones anteriores.')
-        if prev:
+        if not prev:
             para = docx.add_paragraph(style='List Number')
             para.paragraph_format.space_after = Pt(0)
             para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
