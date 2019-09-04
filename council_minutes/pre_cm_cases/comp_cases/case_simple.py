@@ -261,7 +261,7 @@ class simple():
         else:
             para.add_run('H')
         para.add_run('a tenido homologaciones anteriores.')
-        if prev:
+        if not prev:
             para = docx.add_paragraph(style='List Number')
             para.paragraph_format.space_after = Pt(0)
             para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
