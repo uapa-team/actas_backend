@@ -173,7 +173,50 @@ class simple():
 
     @staticmethod
     def case_EVALUADOR_ADICIONAL_POSGRADO(request, docx, redirected=False):
-        raise NotImplementedError
+        ### Frequently used ###
+        details = request['detail_cm']
+        pre_cm = request['pre_cm']
+        details_pre = pre_cm['detail_pre_cm']
+        is_recommended = request['approval_status'] == 'CR'
+
+        ### Finishing last paragraph ###
+        para = docx.paragraphs[-1]
+        para.add_run('Análisis:')
+
+        ### Analysis Paragraph ###
+        ## Extra Analysis ##
+        for analysis in pre_cm['extra_analysis']:
+            para = docx.add_paragraph(style='List Number')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            para.add_run(analysis)
+
+        ### Concept Pragraphs ###
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Concepto: ').bold = True
+        para.add_run('El Comité Asesor recomienda al Consejo de Facultad ')
+        modifier = 'APROBAR' if is_recommended else 'NO APROBAR'
+        para.add_run(modifier).bold = True
+
+        p_aux  = ' designar evaluador adicional del trabajo de {}, '
+        p_aux += 'cuyo título es {}, al profesor {} '
+
+        if details['professor_university'] != '':
+            p_aux += 'de {}, '.format(details['professor_university'])
+        else:
+            p_aux += 'del departamento {} de la facultad de {}, '.format(
+                details['professor_department'],
+                details['professor_faculty']
+            )
+        
+        p_aux += 'quien deberá dirimir la diferencia calificando el trabajo como '
+        p_aux += 'aprobado o no aprobado (Acuerdo 56 de 2012 Consejo Superior Universitario).'
+
+        para.add_run(p_aux.format(
+            get_academic_program(request['academic_program']),
+            details['title'],
+            details['professor_name']
+        ))
 
     @staticmethod
     def case_TRABAJO_DE_GRADO_PREGADO(request, docx, redirected=False):
