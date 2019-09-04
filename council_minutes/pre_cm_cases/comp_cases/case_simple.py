@@ -214,3 +214,19 @@ class simple():
     @staticmethod
     def case_INFORME_DE_AVANCE_DE_TESIS_POSGRADO(request, docx, redirected=False):
         raise NotImplementedError
+
+    @staticmethod
+    def case_HOMOLOGACION_DE_ASIGNATURAS_INTERCAMBIO_ACADEMICO_INTERNACIONAL_PREGRADO(request, docx, redirected=False):
+        para = docx.add_paragraph()
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Análisis:\t\t')
+        add_hyperlink(para, 'Acuerdo 008 de 2008',
+                      'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34983/')
+        para = docx.add_paragraph(style='List Number')
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Solicitud de homologación de ')
+        para.add_run(str(len(request.detail_cm['subjects'])))
+        para.add_run(' asignaturas del programa ')
+        para.add_run(get_academic_program(request.academic_program))

@@ -13,6 +13,7 @@ from .comp_cases.case_HCEMPRE import HCEMPRE
 from .comp_cases.case_simple import simple
 from .comp_cases.case_utils import *
 
+
 class PreCasesSpliter():
 
     def __init__(self):
@@ -315,3 +316,7 @@ class PreCasesSpliter():
     def case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO(self, request, docx, redirected):
         simple.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO(
             request, docx, redirected)
+
+    def case_HOMOLOGACION_DE_ASIGNATURAS_INTERCAMBIO_ACADEMICO_INTERNACIONAL_PREGRADO(self, request, docx):
+        simple.case_HOMOLOGACION_DE_ASIGNATURAS_INTERCAMBIO_ACADEMICO_INTERNACIONAL_PREGRADO(
+            request, docx)
