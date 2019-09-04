@@ -160,7 +160,7 @@ class simple():
 
         table_approvals(docx, subjects, [
             request['student_name'], request['student_dni'],
-            request['academic_program'], 'Universidad Nacional de Colombia'
+            request['academic_program'], 'perfil de {}'.format(details['from_node'])
         ])
 
     @staticmethod
