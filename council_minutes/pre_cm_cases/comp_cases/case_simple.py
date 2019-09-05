@@ -214,3 +214,7 @@ class simple():
     @staticmethod
     def case_INFORME_DE_AVANCE_DE_TESIS_POSGRADO(request, docx, redirected=False):
         raise NotImplementedError
+
+    @staticmethod
+    def case_TYPE_PROYECTO_DE_TESIS_O_TRABAJO_FINAL_DE_MAESTRIA_POSGRADO(request, docx, redirected=False):
+        raise NotImplementedError

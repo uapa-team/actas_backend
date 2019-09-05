@@ -1010,3 +1010,7 @@ class simple():
             para.add_run('NO APRUEBA ').font.bold = True
             para.add_run('calificación avance satisfactorio (AS) a '+ common + ', debido a que {}'.format(request.justification))
         para.add_run('.')
+
+    @staticmethod
+    def case_TYPE_PROYECTO_DE_TESIS_O_TRABAJO_FINAL_DE_MAESTRIA_POSGRADO(request, docx, redirected=False):
+        raise NotImplementedError
