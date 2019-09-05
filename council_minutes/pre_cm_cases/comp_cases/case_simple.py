@@ -217,4 +217,50 @@ class simple():
 
     @staticmethod
     def case_TYPE_PROYECTO_DE_TESIS_O_TRABAJO_FINAL_DE_MAESTRIA_POSGRADO(request, docx, redirected=False):
-        raise NotImplementedError
+         ### Frequently used ###
+        details = request['detail_cm']
+        pre_cm = request['pre_cm']
+        details_pre = pre_cm['detail_pre_cm']
+        is_recommended = request['approval_status'] == 'CR'
+
+        ### Finishing last paragraph ###
+        para = docx.paragraphs[-1]
+        para.add_run('Análisis: ')
+        para.add_run('Acuerdo 040 de 2017 de Consejo de Facultad, Acuerdo 056 de 2012 C.S.U.').underline = True
+
+        ### Analysis Paragraph ###
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('El estudiante en el perfil de {}, tiene la asignatura {} ({}).'.format(
+            details['node'], details['subject_name'], details['subject_code']))
+
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Tiene la firma del director de tesis.')
+
+        if details['research_group'] != '':
+            para = docx.add_paragraph(style='List Number')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            para.add_run('El proyecto hace parte del grupo de investigación: {}.'.format(
+                details['research_group']))
+        
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p_aux  = 'El proyecto de tesis debe inscribirse y entregarse, antes de alcanzar '
+        p_aux += 'el 50% de la duración establecida para el programa (Parágrafo Artículo 14 '
+        p_aux += 'del Acuerdo 056 de 2012 del Consejo Superior Universitario).'
+        para.add_run(p_aux)
+
+        ## Extra Analysis ##
+        for analysis in pre_cm['extra_analysis']:
+            para = docx.add_paragraph(style='List Number')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            para.add_run(analysis)
+        
+        ### Concept Pragraphs ###
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Concepto: ').bold = True
+        para.add_run('El Comité Asesor recomienda al Consejo de Facultad ')
+        modifier = 'APROBAR:' if is_recommended else 'NO APROBAR:'
+        para.add_run(modifier).bold = True
