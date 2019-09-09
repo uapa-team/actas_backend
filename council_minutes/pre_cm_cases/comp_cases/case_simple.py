@@ -232,17 +232,35 @@ class simple():
         para = docx.add_paragraph(style='List Number')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('El estudiante en el perfil de {}, tiene la asignatura {} ({}).'.format(
-            details['node'], details['subject_name'], details['subject_code']))
+            details_pre['node'], details_pre['subject_name'], details_pre['subject_code']))
 
         para = docx.add_paragraph(style='List Number')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('Tiene la firma del director de tesis.')
 
-        if details['research_group'] != '':
+        if details_pre['research_group'] != '':
             para = docx.add_paragraph(style='List Number')
             para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
             para.add_run('El proyecto hace parte del grupo de investigación: {}.'.format(
-                details['research_group']))
+                details_pre['research_group']))
+
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Titulo: ').bold = True
+        para.add_run('"{}".'.format(details_pre['title'])).italic = True
+
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Objetivo General: ').bold = True
+        para.add_run('{}.'.format(details_pre['general_objective']))
+
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Objetivos Especificos: ').bold = True
+        for objective in details_pre['specific_objectives']:
+            para = docx.add_paragraph(style='List Bullet 2')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            para.add_run('{}.'.format(objective))
         
         para = docx.add_paragraph(style='List Number')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
