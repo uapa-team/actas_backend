@@ -282,3 +282,21 @@ class simple():
         para.add_run('El Comité Asesor recomienda al Consejo de Facultad ')
         modifier = 'APROBAR:' if is_recommended else 'NO APROBAR:'
         para.add_run(modifier).bold = True
+
+        para = docx.add_paragraph(style='List Number 2')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p_aux = 'Calificación aprobada (AP) a {} de {}, cuyo título es:'
+        para.add_run(p_aux.format(
+            details_pre['subject_name'],
+            get_academic_program(request['academic_program'])     
+        ))
+        para.add_run('"{}".'.format(details_pre['title'])).italic = True
+
+        para = docx.add_paragraph(style='List Number 2')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p_aux = 'Designar director de {} cuyo título es '
+        para.add_run(p_aux.format(details_pre['subject_name']))
+        para.add_run('"{}" '.format(details_pre['title'])).italic = True
+        p_aux = 'al profesor {}, del departamento de {}.'
+        para.add_run(p_aux.format(
+            details_pre['advisor_name'], details_pre['advisor_department']))
