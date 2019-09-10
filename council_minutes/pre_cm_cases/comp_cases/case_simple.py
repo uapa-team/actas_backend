@@ -244,8 +244,64 @@ class simple():
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('Presenta acta de calificación firmada con jurados evaluadores designados.')
 
+        if details_pre['research_group'] != '':
+            para = docx.add_paragraph(style='List Number')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            para.add_run('El proyecto hace parte del grupo de investigación: {}.'.format(
+                details_pre['research_group']))
+
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Titulo: ').bold = True
+        para.add_run('"{}".'.format(details_pre['title'])).italic = True
+
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Objetivo General: ').bold = True
+        para.add_run('{}.'.format(details_pre['general_objective']))
+
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Objetivos Especificos: ').bold = True
+        for objective in details_pre['specific_objectives']:
+            para = docx.add_paragraph(style='List Bullet 2')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            para.add_run('{}.'.format(objective))
+
         ## Extra Analysis ##
         for analysis in pre_cm['extra_analysis']:
             para = docx.add_paragraph(style='List Number')
             para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
             para.add_run(analysis)
+
+        ### Concept Pragraphs ###
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Concepto: ').bold = True
+        para.add_run('El Comité Asesor recomienda al Consejo de Facultad ')
+        modifier = 'APROBAR:' if is_recommended else 'NO APROBAR:'
+        para.add_run(modifier).bold = True
+
+        para = docx.add_paragraph(style='List Number 2')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p_aux  = 'Inscribir y calificar aprobado (AP) el Examen de calificación '
+        p_aux += 'con código {} en el periodo académico {}.'
+        para.add_run(p_aux.format(
+            details_pre['subject_code'],
+            details_pre['subject_period']     
+        ))
+
+        para = docx.add_paragraph(style='List Number 2')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p_aux  = 'Calificar aprobado (AP) el proyecto de Tesis de Doctorado en '
+        p_aux += 'Ingeniería, cuyo título es: '
+        para.add_run(p_aux)
+        para.add_run('"{}".'.format(details_pre['title'])).italic = True
+
+        para = docx.add_paragraph(style='List Number 2')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Designar director de la Tesis de Doctorado cuyo título es ')
+        para.add_run('"{}" '.format(details_pre['title'])).italic = True
+        p_aux = 'al profesor {}, del departamento de {}.'
+        para.add_run(p_aux.format(
+            details_pre['advisor_name'], details_pre['advisor_department']))
