@@ -18,6 +18,7 @@ class CASIPXX():
         CASIPXX.case_CANCELACION_DE_ASIGNATURAS_Analysis_1(request, docx)
         CASIPXX.case_CANCELACION_DE_ASIGNATURAS_Analysis_2(request, docx)
         CASIPXX.case_CANCELACION_DE_ASIGNATURAS_Analysis_3(request, docx)
+        CASIPXX.case_CANCELACION_DE_ASIGNATURAS_Analysis_extra(request, docx)
 
     @staticmethod
     def case_CANCELACION_DE_ASIGNATURAS_Analysis_1(request, docx):
@@ -49,6 +50,13 @@ class CASIPXX():
             subject_credits = int(subject['credits'])
             subject['remaining'] = current_credits - subject_credits
             CASIPXX.case_CANCELACION_DE_ASIGNATURAS_Analysis_S(docx, subject)
+
+    @staticmethod
+    def case_CANCELACION_DE_ASIGNATURAS_Analysis_extra(request, docx):
+        for analysis in request['pre_cm']['extra_analysis']:
+            CASIPXX.count = CASIPXX.count + 1
+            str_in = '{}. {}.'
+            docx.add_paragraph(str_in.format(CASIPXX.count, analysis))
 
     @staticmethod
     def case_CANCELACION_DE_ASIGNATURAS_Answers(request, docx):
