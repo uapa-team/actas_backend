@@ -145,7 +145,21 @@ class simple():
 
     @staticmethod
     def case_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO(request, docx, redirected=False):
-        raise NotImplementedError
+        str_in_ana = 'Análisis:	Acuerdo 008 de 2008\n'
+        str_in_ana += '1. SIA: Porcentaje de avance en el plan: {}. Número de matrículas: {}. PAPA: {}.\n'
+        str_in_ana += '2. SIA: Créditos disponibles: {}.'
+        str_in_ans = 'Concepto: El Comité Asesor recomienda al Consejo de Facultad cursar el periodo'
+        str_in_ans += 'académico {} con un número de créditos inferior al mínimo exigido, porque{} '
+        str_in_ans += 'justifica debidamente la solicitud (Artículo 10 del Acuerdo 008 de 2008 del '
+        str_in_ans += 'Consejo Superior Universitario).'
+        docx.add_paragraph(str_in_ana.format(request['pre_cm']['advance'],
+                           request['pre_cm']['enrolled_academic_periods'],
+                           request['pre_cm']['papa'],
+                           request['pre_cm']['available']))
+        if request['approval_status'] == 'RC':
+            docx.add_paragraph(str_in_ans.format(request['academic_period'], ' '))
+        else:
+            docx.add_paragraph(str_in_ans.format(request['academic_period'], ' no '))
 
     @staticmethod
     def case_RETIRO_DEFINITIVO_DEL_PROGRAMA_PREGRADO(request, docx, redirected=False):
