@@ -60,4 +60,15 @@ class CASIPXX():
 
     @staticmethod
     def case_CANCELACION_DE_ASIGNATURAS_Answers(request, docx):
+        if request['approval_status'] == 'RC':
+            pass
+        else:
+            pass
+
+    @staticmethod
+    def case_CANCELACION_DE_ASIGNATURAS_Answers_RC(request, docx):
+        pass
+
+    @staticmethod
+    def case_CANCELACION_DE_ASIGNATURAS_Answers_NRC(request, docx):
         pass
