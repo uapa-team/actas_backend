@@ -1,5 +1,6 @@
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from .case_utils import *
 
 
 class CASIPXX():
@@ -61,13 +62,29 @@ class CASIPXX():
     @staticmethod
     def case_CANCELACION_DE_ASIGNATURAS_Answers(request, docx):
         if request['approval_status'] == 'RC':
-            pass
+            CASIPXX.case_CANCELACION_DE_ASIGNATURAS_Answers_RC(request, docx)
         else:
-            pass
+            CASIPXX.case_CANCELACION_DE_ASIGNATURAS_Answers_NRC(request, docx)
 
     @staticmethod
     def case_CANCELACION_DE_ASIGNATURAS_Answers_RC(request, docx):
-        pass
+        str_in = 'Concepto: El Comité Asesor recomienda al Consejo de Facultad'
+        str_in += ' cancelar la(s) siguiente(s) asignatura(s) inscrita(s) del '
+        str_in += 'periodo académico {}, porque se justifica debidamente '
+        str_in += 'la solicitud. (Artículo 15 Acuerdo 008 de 2008 del '
+        str_in += 'Consejo Superior Universitario)'
+        docx.add_paragraph(str_in.format(request['academic_period']))
+        data = []
+        index = 0
+        for subject in request['detail_cm']['subjects']:
+            data.append([])
+            data[index] += [subject['code']]
+            data[index] += [subject['subject']]
+            data[index] += [subject['group']]
+            data[index] += [subject['tipology']]
+            data[index] += [subject['credits']]
+            index = index + 1
+        table_subjects(docx, data)
 
     @staticmethod
     def case_CANCELACION_DE_ASIGNATURAS_Answers_NRC(request, docx):
