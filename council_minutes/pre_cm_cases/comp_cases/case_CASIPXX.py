@@ -88,4 +88,41 @@ class CASIPXX():
 
     @staticmethod
     def case_CANCELACION_DE_ASIGNATURAS_Answers_NRC(request, docx):
-        pass
+        str_in = 'Concepto: El Comité Asesor recomienda al Consejo de Facultad'
+        str_in += ' NO cancelar la(s) siguiente(s) asignatura(s) inscrita(s) '
+        str_in += 'del periodo académico {}, '
+        if request['pre_cm']['nrc'] == 'Incoherente o consecuente':
+            str_in += 'porque no existe coherencia entre la documentación y '
+            str_in += 'justificación que presenta. '
+        elif request['pre_cm']['nrc'] == 'No diligente':
+            str_in += 'porque lo expuesto es un hecho de su conocimiento '
+            str_in += 'desde el inicio del periodo académico; tuvo la '
+            str_in += 'oportunidad de resolverlo oportunamente hasta el '
+            str_in += '50 % del periodo académico, por tanto, no constituye '
+            str_in += 'causa extraña que justifique la cancelación de '
+            str_in += 'la(s) asignatura(s). '
+        elif request['pre_cm']['nrc'] == 'Motivos Laborales':
+            str_in += 'porque de acuerdo con la documentación que presenta, '
+            str_in += 'su situación laboral no le impide asistir a las clases '
+            str_in += 'y tiene el tiempo suficiente para responder por las '
+            str_in += 'actividades académicas de la(s) asignatura(s). '
+        elif request['pre_cm']['nrc'] == 'Información Falsa':
+            str_in += 'porque verificada la información de los soportes, se '
+            str_in += 'encontró que el contenido de los mismos no coincide '
+            str_in += 'con lo que en ellos se afirma. '
+        elif request['pre_cm']['nrc'] == 'Falta de conocimiento':
+            str_in += 'poque es responsabilidad del estudiante indagar sobre '
+            str_in += 'el conocimiento requerido y la preparación necesaria '
+            str_in += 'para cursar la(s) asignatura(s) antes de inscribir. '
+        elif request['pre_cm']['nrc'] == 'Argumentos insuficientes':
+            str_in += 'porque lo expuesto no es un hecho que constituya causa '
+            str_in += 'extraña que justifique la cancelación de la(s) '
+            str_in += 'asignatura(s). '
+        elif request['pre_cm']['nrc'] == 'Argumento cuando los soportes no aportan':
+            str_in += 'porque de la documentación aportada, se tiene que no hay '
+            str_in += 'justificación para acceder a lo pedido. '
+        else:
+            pass
+        str_in += ' (Artículo 15 Acuerdo 008 de 2008 del '
+        str_in += 'Consejo Superior Universitario).'
+        docx.add_paragraph(str_in.format(request['academic_period']))
