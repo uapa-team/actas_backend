@@ -22,9 +22,11 @@ class PESTPRE():
         str_1 += ' 70% de los créditos del plan de estudios. SIA: {} de avance en '
         str_1 += 'los créditos exigidos del plan de estudios.'
         if int(request['pre_cm']['advance']) >= 70:
-            docx.add_paragraph(str_1.format(' ', request['pre_cm']['advance'] + '%'))
+            docx.add_paragraph(str_1.format(
+                ' ', request['pre_cm']['advance'] + '%'))
         else:
-            docx.add_paragraph(str_1.format(' no ', request['pre_cm']['advance'] + '%'))
+            docx.add_paragraph(str_1.format(
+                ' no ', request['pre_cm']['advance'] + '%'))
 
     @staticmethod
     def case_PRACTICA_ESTUDIANTIL_PREGRADO_Analysis_2(request, docx):
@@ -50,7 +52,25 @@ class PESTPRE():
 
     @staticmethod
     def case_PRACTICA_ESTUDIANTIL_PREGRADO_Analysis_4(request, docx):
-        str_4 = '4. Documentación ## cumple con requisitos: Formato ## está completamente diligenciado. ## adjunta copia del Acuerdo firmado. ## adjunta el recibido de la carta de presentación de la Universidad. ## están fijados los porcentajes de evaluación.'
+        str_4 = '4. Documentación{}cumple con requisitos: Formato{}'
+        str_4 += 'está completamente diligenciado. {}adjunta copia del '
+        str_4 += 'Acuerdo firmado. {}adjunta el recibido de la carta de '
+        str_4 += 'presentación de la Universidad. {}están fijados los '
+        str_4 += 'porcentajes de evaluación.'
+
+        str_ans_1 = ' sí ' if request['pre_cm']['format_right'] == 'true' and \
+            request['pre_cm']['agreement_signed'] == 'true' and \
+            request['pre_cm']['presentation_letter'] == 'true' and \
+            request['pre_cm']['evaluation_percents'] == 'true' else ' no '
+        str_ans_2 = ' sí ' if request['pre_cm']['format_right'] == 'true' else ' no '
+        str_ans_3 = 'Sí ' if request['pre_cm']['agreement_signed'] == 'true' else 'No '
+        str_ans_4 = 'Sí ' if request['pre_cm']['presentation_letter'] == 'true' else 'No '
+        str_ans_5 = 'Sí ' if request['pre_cm']['evaluation_percents'] == 'true' else 'No '
+        docx.add_paragraph(str_4.format(str_ans_1,
+                                        str_ans_2,
+                                        str_ans_3,
+                                        str_ans_4,
+                                        str_ans_5))
 
     @staticmethod
     def case_PRACTICA_ESTUDIANTIL_PREGRADO_Answers(request, docx):
