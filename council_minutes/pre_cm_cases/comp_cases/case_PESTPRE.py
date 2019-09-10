@@ -37,11 +37,20 @@ class PESTPRE():
 
     @staticmethod
     def case_PRACTICA_ESTUDIANTIL_PREGRADO_Analysis_3(request, docx):
-        pass
+        str_3 = '3. Requisitos: Pertinencia, objetivos, alcance, empresa {},'
+        str_3 += 'duración: {} horas/semana durante {}, costos, descripción '
+        str_3 += 'de actividades (Artículo 3, Acuerdo 016 de 2011 – Consejo '
+        str_3 += 'Académico). A cargo de un profesor de la Facultad: {}, '
+        str_3 += 'porcentajes de evaluación definidos (Artículo 3, Acuerdo '
+        str_3 += '016 de 2011 – Consejo Académico)'
+        docx.add_paragraph(str_3.format(request['detail_cm']['institution'],
+                                        request['pre_cm']['hours_week'],
+                                        request['pre_cm']['duration'],
+                                        request['detail_cm']['person_un']))
 
     @staticmethod
     def case_PRACTICA_ESTUDIANTIL_PREGRADO_Analysis_4(request, docx):
-        pass
+        str_4 = '4. Documentación ## cumple con requisitos: Formato ## está completamente diligenciado. ## adjunta copia del Acuerdo firmado. ## adjunta el recibido de la carta de presentación de la Universidad. ## están fijados los porcentajes de evaluación.'
 
     @staticmethod
     def case_PRACTICA_ESTUDIANTIL_PREGRADO_Answers(request, docx):
