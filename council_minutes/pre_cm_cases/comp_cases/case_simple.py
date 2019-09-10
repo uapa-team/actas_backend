@@ -214,3 +214,80 @@ class simple():
     @staticmethod
     def case_INFORME_DE_AVANCE_DE_TESIS_POSGRADO(request, docx, redirected=False):
         raise NotImplementedError
+
+    @staticmethod
+    def case_CANCELACION_DE_ASIGNATURAS_CON_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO(request, docx, redirected=False):
+        para = docx.add_paragraph()
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Análisis:\t\t')
+        add_hyperlink(para, 'Acuerdo 008 de 2008',
+                      'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34983/')
+        para = docx.add_paragraph(style='List Number')
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('SIA: Porcentaje de avance en el plan: ')
+        para.add_run(request.pre_cm['detail_pre_cm']['advance_percentage'])
+        para.add_run('%. Número de matrículas: ')
+        para.add_run(request.pre_cm['detail_pre_cm']['enrollment_number'])
+        para.add_run('. P.A.P.A.: ')
+        para.add_run(request.pre_cm['detail_pre_cm']['PAPA'])
+        para.add_run('.')
+        para = docx.add_paragraph(style='List Number')
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('SIA: Créditos disponibles: ')
+        para.add_run(request.pre_cm['detail_pre_cm']['available_creds'])
+        para.add_run('.')
+        para = docx.add_paragraph(style='List Number')
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run(
+            'SIA: Al aprobar la cancelación de la(s) asignatura(s) ')
+        para.add_run('solicitada(s) el estudiante quedaría con ')
+        para.add_run(request.pre_cm['detail_pre_cm']['affter_cancel_creds'])
+        para.add_run(' créditos inscritos.')
+        if 'extra_analysis' in request.pre_cm:
+            for analysis in request.pre_cm['extra_analysis']:
+                para = docx.add_paragraph(style='List Number')
+                para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+                para.paragraph_format.space_after = Pt(0)
+                para.add_run(analysis)
+        para = docx.add_paragraph()
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Concepto: ').font.bold = True
+        para.add_run('El Comité Asesor')
+        if request.approval_status != 'CR':
+            para.add_run(' NO').font.bold = True
+        para.add_run(' recomienda al Consejo de Facultad aprobar:')
+        para = docx.add_paragraph(style='List Number 2')
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Cursar el periodo académico ')
+        para.add_run(request.academic_period)
+        para.add_run(
+            ' con un número de créditos inferior al mínimo exigido, porque')
+        if request.approval_status != 'CR':
+            para.add_run(' NO').font.bold = True
+        para.add_run(
+            ' justifica debidamente la solicitud. (Artículo 10 del Acuerdo 008')
+        para.add_run(' de 2008 del Consejo Superior Universitario).')
+        para = docx.add_paragraph(style='List Number 2')
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run(
+            'Cancelar la(s) siguiente(s) asignatura(s) inscrita(s) del periodo ')
+        para.add_run('académico ')
+        para.add_run(request.academic_period)
+        para.add_run(', porque')
+        if request.approval_status != 'CR':
+            para.add_run(' NO').font.bold = True
+        para.add_run(
+            ' justifica debidamente la solicitud. (Artículo 10 del Acuerdo 008')
+        para.add_run(' de 2008 del Consejo Superior Universitario).')
+        subjects = []
+        for sbj in request.detail_cm['subjects']:
+            subjects.append([sbj['cod_sia'], sbj['name_asig'],
+                             sbj['group_asig'], sbj['tipo_asig'], sbj['creds_asig']])
+        table_subjects(docx, subjects)
