@@ -272,6 +272,11 @@ class simple():
             para.add_run(request.pre_cm['detail_pre_cm']
                          ['antecedente']['council_minute_year'])
             para.add_run('.')
+        for analysis in request.pre_cm['extra_analysis']:
+            para = docx.add_paragraph(style='List Number')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            para.paragraph_format.space_after = Pt(0)
+            para.add_run(analysis)
         para = docx.add_paragraph()
         para.paragraph_format.space_after = Pt(0)
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
