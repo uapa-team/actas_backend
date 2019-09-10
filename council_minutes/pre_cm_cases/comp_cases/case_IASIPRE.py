@@ -11,16 +11,21 @@ class IASIPRE():
     def case_INSCRIPCION_DE_ASIGNATURAS_PREGRADO(request, docx, redirected=False):
         para = docx.add_paragraph()
         para.paragraph_format.space_after = Pt(0)
-        para.add_run('Análisis:')
+        para.add_run('Análisis:\t\t')
+        add_hyperlink(para, 'Acuerdo 008 de 2008',
+                      'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34983/')
         para = docx.add_paragraph(style='List Number')
-        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY0
         para.add_run('SIA: ')
         counts = {'offered': 0, 'not offered': 0}
         for subject in request.detail_cm['subjects']:
-            if subject['offered']:
+            if subject['offered'] == 'true':
                 counts.update({'offered': (counts['offered'] + 1)})
-            else:
+            elif subject['offered'] == 'false':
                 counts.update({'not offered': (counts['not offered'] + 1)})
+            else:
+                raise AssertionError(
+                    'request.detail_cm["subjects"][i]["offered"] must be "true" or "false".')
         if counts['offered'] > 0:
             line_subjects = ''
             for subject in request.detail_cm['subjects']:
@@ -57,6 +62,14 @@ class IASIPRE():
             para.add_run(
                 '(' + subject['review_date'][0:2] + num_to_month(subject['review_date'][3:5]))
             para.add_run('20' + subject['review_date'][6:8] + ').')
+        para = docx.add_paragraph(style='List Number')
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        if request.pre_cm['detail_pre_cm']['cruces'] == 'false':
+            para.add_run('No p')
+        elif request.pre_cm['detail_pre_cm']['cruces'] == 'true':
+            para.add_run('P')
+        para.add_run('resenta cruces con el horario inscrito.')
         if 'extra_analysis' in request.pre_cm:
             for analysis in request.pre_cm['extra_analysis']:
                 para = docx.add_paragraph(style='List Number')
