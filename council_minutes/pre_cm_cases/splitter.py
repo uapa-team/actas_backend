@@ -318,4 +318,4 @@ class PreCasesSpliter():
             request, docx, redirected)
 
     def case_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO(self, request, docx, redirected):
-        raise NotImplementedError
+        simple.case_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO(request, docx, redirected)

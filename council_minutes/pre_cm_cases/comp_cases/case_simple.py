@@ -214,3 +214,38 @@ class simple():
     @staticmethod
     def case_INFORME_DE_AVANCE_DE_TESIS_POSGRADO(request, docx, redirected=False):
         raise NotImplementedError
+
+    @staticmethod
+    def case_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO(request, docx, redirected=False):
+        ### Frequently used ###
+        details = request['detail_cm']
+        pre_cm = request['pre_cm']
+        details_pre = pre_cm['detail_pre_cm']
+        is_recommended = request['approval_status'] == 'CR'
+
+        ### Finishing last paragraph ###
+        para = docx.paragraphs[-1]
+        para.add_run('Análisis: ')
+
+        ### Analysis Paragraph ###
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p_aux = 'SIA: Perfil de {}. El estudiante tiene la asignatura {} ({}).'
+        para.add_run(p_aux.format(
+            details_pre['node'], details_pre['subject_name'], details_pre['subject_code']
+        ))
+
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p_aux = 'Jurados evaluadores designados en Acta de Comité {}.'
+        para.add_run(p_aux.format(details_pre['approved_jury_minute']))
+
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Presenta acta de calificación firmada con jurados evaluadores designados.')
+
+        ## Extra Analysis ##
+        for analysis in pre_cm['extra_analysis']:
+            para = docx.add_paragraph(style='List Number')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            para.add_run(analysis)
