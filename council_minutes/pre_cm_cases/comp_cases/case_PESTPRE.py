@@ -74,4 +74,12 @@ class PESTPRE():
 
     @staticmethod
     def case_PRACTICA_ESTUDIANTIL_PREGRADO_Answers(request, docx):
-        pass
+        str_a_1 = 'Concepto: El Comité Asesor recomienda al Consejo de Facultad inscribir la '
+        str_a_1 += 'siguiente asignatura en el periodo académico {}, a '
+        str_a_1 += 'desarrollar en la empresa {}, a cargo del profesor {}, por '
+        str_a_1 += 'parte de la Universidad Nacional de Colombia y el Sr. {} por '
+        str_a_1 += 'parte de la entidad.'
+        docx.add_paragraph(str_a_1.format(request['academic_period'],
+                                          request['detail_cm']['institution'],
+                                          request['detail_cm']['person_un'],
+                                          request['detail_cm']['person_ins']))
