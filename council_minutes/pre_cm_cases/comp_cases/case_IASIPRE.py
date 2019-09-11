@@ -15,7 +15,7 @@ class IASIPRE():
         add_hyperlink(para, 'Acuerdo 008 de 2008',
                       'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34983/')
         para = docx.add_paragraph(style='List Number')
-        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY0
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('SIA: ')
         counts = {'offered': 0, 'not offered': 0}
         for subject in request.detail_cm['subjects']:
