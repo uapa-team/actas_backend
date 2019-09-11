@@ -48,7 +48,7 @@ class HCEMPOS():
             get_academic_program(request['academic_program']),
             details['node'],
             request['academic_period'],
-            details_pre['origin_program']
+            get_academic_program(details_pre['origin_program'])
         ))
 
         options = {
