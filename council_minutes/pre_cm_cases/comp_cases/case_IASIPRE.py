@@ -3,6 +3,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from .case_utils import num_to_month
 from .case_utils import get_academic_program
 from .case_utils import table_subjects
+from .case_utils import add_hyperlink
 
 
 class IASIPRE():
@@ -29,7 +30,7 @@ class IASIPRE():
         if counts['offered'] > 0:
             line_subjects = ''
             for subject in request.detail_cm['subjects']:
-                if subject['offered']:
+                if subject['offered'] == 'true':
                     line_subjects += ', '
                     line_subjects += subject['subject']
                     line_subjects += ' (' + subject['cod'] + ')'
@@ -41,12 +42,14 @@ class IASIPRE():
         if counts['not offered'] > 0:
             line_subjects = ''
             for subject in request.detail_cm['subjects']:
-                if not subject['offered']:
+                if subject['offered'] == 'false':
                     line_subjects += ', '
                     line_subjects += subject['subject']
                     line_subjects += ' (' + subject['cod'] + ')'
+            letter = 'l' if counts['offered'] > 0 else 'L'
+            para.add_run(letter)
             para.add_run(
-                'La(s) asignatura(s) ' + line_subjects[2:] + ' no se encuentra(n)' +
+                'a(s) asignatura(s) ' + line_subjects[2:] + ' no se encuentra(n)' +
                 ' ofertada(s) para el plan de estudios.')
         data = []
         for subject in request.detail_cm['subjects']:
