@@ -12,6 +12,7 @@ class CGRUPXX():
     @staticmethod
     def case_CAMBIO_DE_GRUPO_Analysis(request, docx, redirected=False):
         para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         run = para.add_run('Análisis:\t')
         run.font.bold = True
         # add_hyperlink(para, 'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34983',
@@ -29,7 +30,8 @@ class CGRUPXX():
     @staticmethod
     def case_CAMBIO_DE_GRUPO_Answer(request, docx, redirected=False):
         para = docx.add_paragraph()
-        run = para.add_run('Concepto:\t')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        run = para.add_run('Concepto: ')
         run.font.bold = True
         str_2 = 'El Comité Asesor recomienda'
         str_2 += ' al Consejo de Facultad cambio de grupo de la asignatura/ '
