@@ -68,6 +68,7 @@ class Request(DynamicDocument):
     TYPE_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO = 'DJCTPOS'
     TYPE_EXENCION_DE_PAGO_POR_CURSAR_TESIS_COMO_UNICA_ACTIVIDAD_ACADEMICA_POSGRADO = 'EPTUPOS'
     TYPE_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO = 'DJCPPOS'
+    TYPE_BECA_EXENSION_DERECHOS_ACADEMICOS = 'BEDAPOS'
     TYPE_CHOICES = (
         (TYPE_TRASLADO_PREGRADO, 'Traslado (Pregrado)'),
         (TYPE_REINGRESO_PREGRADO, 'Reingreso (Pregrado)'),
@@ -173,6 +174,7 @@ class Request(DynamicDocument):
          'Exención de pago por cursar tesis como única actividad académica (Posgrado)'),
         (TYPE_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO,
          'Designación de jurados calificadores de proyecto de tesis de doctorado (Posgrado)'),
+        (TYPE_BECA_EXENSION_DERECHOS_ACADEMICOS, 'Beca Exension Derechos Académicos (Posgrado)')
     )
     APPROVAL_STATUS_APLAZA = 'AL'
     APPROVAL_STATUS_APRUEBA = 'AP'
