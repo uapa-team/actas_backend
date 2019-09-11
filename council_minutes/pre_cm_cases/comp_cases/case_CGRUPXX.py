@@ -6,6 +6,11 @@ class CGRUPXX():
 
     @staticmethod
     def case_CAMBIO_DE_GRUPO(request, docx, redirected=False):
+        CGRUPXX.case_CAMBIO_DE_GRUPO_Analysis(request, docx)
+        CGRUPXX.case_CAMBIO_DE_GRUPO_Answer(request, docx)
+
+    @staticmethod
+    def case_CAMBIO_DE_GRUPO_Analysis(request, docx, redirected=False):
         para = docx.add_paragraph()
         run = para.add_run('Análisis:\t')
         run.font.bold = True
@@ -19,8 +24,10 @@ class CGRUPXX():
         run = para.add_run(str_1.format(request['detail_cm']['subjects'][0]['gd'],
                                         request['detail_cm']['subjects'][0]['subject'],
                                         request['detail_cm']['subjects'][0]['cod'],
-                                        request['pre_cm']['free_places'],))
+                                        request['pre_cm']['free_places']))
 
+    @staticmethod
+    def case_CAMBIO_DE_GRUPO_Answer(request, docx, redirected=False):
         para = docx.add_paragraph()
         run = para.add_run('Concepto:\t')
         run.font.bold = True
