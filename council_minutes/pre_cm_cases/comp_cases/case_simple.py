@@ -341,7 +341,59 @@ class simple():
 
     @staticmethod
     def case_TRANSITO_ENTRE_PROGRAMAS_POSGRADO(request, docx, redirected=False):
-        raise NotImplementedError
+        ### Frequently used ###
+        details = request['detail_cm']
+        pre_cm = request['pre_cm']
+        details_pre = pre_cm['detail_pre_cm']
+        is_recommended = request['approval_status'] == 'CR'
+
+        ### Finishing last paragraph ###
+        para = docx.paragraphs[-1]
+        para.add_run('Análisis:\t')
+        para.add_run('Resolución 035 de 2014, Acuerdo 002 de 2011 de Consejo de Facultad').underline = True 
+
+        ### Analysis Paragraphs ###
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('En el programa hay {} cupos para tránsito.'.format(details_pre['availible_places']))
+
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Viene del programa {}.'.format(get_academic_program(details['origen'])))
+
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        modifier = '' if details_pre['language_prof'] == 'si' else 'no '
+        para.add_run('El estudiante {}cumple con la suficiencia de idioma exigida.'.format(modifier))
+        
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p_aux =  'La solicitud {}se hace luego de completar el plan de estudios y antes del grado'
+        p_aux += ' (a menos que no se haya abierto convocatorio durante el periodo)'
+        p_aux += '(Parágrafo 2, Resolución 241 de 2009).'
+        modifier = '' if details_pre['on_time'] == 'si' else 'no '
+        para.add_run(p_aux.format(modifier))
+
+        ## Extra Analysis ##
+        for analysis in pre_cm['extra_analysis']:
+            para = docx.add_paragraph(style='List Number')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            para.add_run(analysis)
+        
+        ### Concept Paragraph ###
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Concepto: ').bold = True
+        para.add_run('El Comité Asesor recomienda al Consejo de Facultad ')
+        modifier = 'APROBAR' if is_recommended else 'NO APROBAR'
+        para.add_run(modifier).bold = True
+        p_aux =  ' tránsito del programa {} al programa {}, a partir del periodo académico {} '
+        p_aux += '(Artículo 3, Resolución 241 de 2009 de la Vicerrectoría Académica).'
+        para.add_run(p_aux.format(
+            get_academic_program(details['origen']),
+            get_academic_program(request['academic_program']),
+            details['desde']
+        ))
 
     @staticmethod
     def case_CAMBIO_DE_DIRECTIOR_CODIRECTOR_JURADO_O_EVALUADOR_POSGRADO(request, docx, redirected=False):
