@@ -245,7 +245,100 @@ class simple():
     @staticmethod
     def case_EXENCION_DE_PAGO_POR_CURSAR_TESIS_COMO_UNICA_ACTIVIDAD_ACADEMICA_POSGRADO(
             request, docx, redirected=False):
-        raise NotImplementedError
+        ### Frequently used ###
+        details = request['detail_cm']
+        pre_cm = request['pre_cm']
+        details_pre = pre_cm['detail_pre_cm']
+        is_recommended = request['approval_status'] == 'CR'
+
+        ### Finishing last paragraph ###
+        para = docx.paragraphs[-1]
+        para.add_run('Análisis:\t\t')
+        para.add_run('Acuerdo 002 de 2011 - Consejo de Facultad.').underline = True
+
+        ### Analysis Paragraph ###
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('SIA: {}, perfil de {}.'.format(
+            get_academic_program(request['academic_program']), details_pre['node']))
+        
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        modifier = 'Está' if details_pre['on_time'] == "true" else 'No está'
+        para.add_run('{} en fechas de solicitud.'.format(modifier))
+
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p_aux  = 'El incentivo se aplicará hasta por dos periodos académicos maestría y 5 periodos '
+        p_aux += 'para doctorado (Literal c, Artículo 16). Ha tenido el incentivo {} periodos.'
+        para.add_run(p_aux.format(details_pre['total_periods']))
+
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p_aux  = 'Para solicitar o renovar este estímulo la evaluación por parte del director del trabajo '
+        p_aux += 'desarrollado por el estudiante en la tesis o en el trabajo final deberá ser "Avance Satisfactorio" si aplica.'
+        para.add_run(p_aux)
+
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p_aux  = 'Se exceptúa el caso en el cual un estudiante también cursa el último seminario del programa '
+        p_aux += 'simultáneamente con la tesis, en cuyo caso se le podrá conceder dicho estímulo.'
+        para.add_run(p_aux)
+
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p_aux  = 'Estos beneficios no se podrán renovar si el estudiante pierde calidad de '
+        p_aux += 'estudiante o entra en reserva de cupo.'
+        para.add_run(p_aux)
+
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p_aux  = 'Las exenciones establecidas en el Artículo 16 de la presente Acuerdo, no podrán ser concedidas '
+        p_aux += 'a estudiantes que hayan reingresado a programas de posgrado de la Facultad en cualquier época (Artículo 19).'
+        para.add_run(p_aux)
+
+        ## Extra Analysis ##
+        for analysis in pre_cm['extra_analysis']:
+            para = docx.add_paragraph(style='List Number')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            para.add_run(analysis)
+
+        ### Concept Pragraphs ###
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Concepto: ').bold = True
+        para.add_run('El Comité Asesor recomienda al Consejo de Facultad ')
+        modifier = 'APROBAR' if is_recommended else 'NO APROBAR'
+        para.add_run(modifier).bold = True
+
+        ## Several options ##
+        p_aux = ''
+        if is_recommended:
+            p_aux += ' pago de {} puntos por derechos académicos en el periodo académico {}, condicionado a la '
+            p_aux += 'inscripción de tesis/trabajo final y/o seminario como única actividad académica en el '
+            p_aux += 'periodo {}. (Literal c, Artículo 16 del Acuerdo 002 de 2011 del Consejo de Facultad).'
+            p_aux = p_aux.format(details['points'], details_pre['target_period'], details_pre['target_period'])
+        elif details_pre['cause'] == "1":
+            p_aux += ' pago de {} puntos por derechos académicos del periodo académico {}, condicionado a la '
+            p_aux += 'inscripción de tesis/trabajo final y/o seminario como única actividad académica en el '
+            p_aux += 'periodo {}, porque el incentivo sólo se aplicará hasta por dos/cinco periodos académicos '
+            p_aux += '(Artículo 16 del Acuerdo 002 de 2011 del Consejo de Facultad, Literal c).'
+            p_aux = p_aux.format(details['points'], details_pre['target_period'], details_pre['target_period'])
+        elif details_pre['cause'] == "2":
+            p_aux += ' porque para solicitar o renovar este estímulo la evaluación por parte del director del trabajo '
+            p_aux += 'desarrollado por el estudiante en la tesis o en el trabajo final deberá ser "Avance Satisfactorio". '
+            p_aux += '(Literal c, Artículo 16 del Acuerdo 002 de 2011 del Consejo de Facultad).'
+        elif details_pre['cause'] == "3":
+            p_aux += ' porque las exenciones establecidas en el Artículo 16 del Acuerdo 002 de 2011 del Consejo de '
+            p_aux += 'Facultad, no podrán ser concedidas a estudiantes que hayan reingresado a programas de posgrado '
+            p_aux += 'de la Facultad en cualquier época. (Artículo 19 del Acuerdo 002 de 2011 del Consejo de Facultad).'
+        elif details_pre['cause'] == "4":
+            p_aux += 'porque la solicitud se presenta fuera de los plazos establecidos en el Calendario de Tramites de '
+            p_aux += 'Fin de Semestre {} - Estudiantes Posgrado (Artículo 58 del Acuerdo 008 de 2008 del Consejo Superior Universitario).'
+            p_aux = p_aux.format(request['academic_period'])
+        
+        para.add_run(p_aux)
+
 
     @staticmethod
     def case_GENERACION_DE_RECIBO_UNICO_DE_PAGO_POSGRADO(request, docx, redirected=False):
