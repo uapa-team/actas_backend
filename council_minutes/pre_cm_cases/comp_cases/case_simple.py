@@ -106,7 +106,7 @@ class simple():
         answers_list = simple.case_CANCELACION_DE_PERIODO_ACADEMICO_PREGRADO_Answers(
             request)
         para = docx_.add_paragraph()
-        para.add_run('Analisis:')
+        para.add_run('Analisis:').font.bold = True
         analysis_para = docx_.add_paragraph()
         analysis_para.paragraph_format.left_indent = Pt(36)
         count = 1
@@ -114,7 +114,7 @@ class simple():
             analysis_para.add_run(str(count) + '. ' + analysis + '\n')
             count = count + 1
         para = docx_.add_paragraph()
-        para.add_run('Concepto:')
+        para.add_run('Concepto:').font.bold = True
         answer_para = docx_.add_paragraph()
         answer_para.paragraph_format.left_indent = Pt(36)
         count = 1
