@@ -122,7 +122,8 @@ class simple():
     @staticmethod
     def case_RESERVA_DE_CUPO_ADICIONAL_PREGRADO(request, docx, redirected=False):
         para = docx.add_paragraph()
-        para.add_run('Analisis:')
+        run = para.add_run('Analisis:')
+        run.font.bold = True
         analysis_para = docx.add_paragraph()
         analysis_para.paragraph_format.left_indent = Pt(36)
         analysis = ''
@@ -150,10 +151,12 @@ class simple():
             answer = analysis
         analysis_para.add_run('1. ' + analysis + '\n')
         para = docx.add_paragraph()
-        para.add_run('Concepto:')
+        run = para.add_run('Concepto:')
+        run.font.bold = True
         answer_para = docx.add_paragraph()
         answer_para.paragraph_format.left_indent = Pt(36)
         answer_para.add_run('1. ' + answer + '\n')
+        answer_para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
 
     @staticmethod
     def case_REEMBOLSO_POSGRADO(request, docx, redirected=False):
