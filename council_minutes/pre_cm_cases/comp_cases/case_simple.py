@@ -950,3 +950,122 @@ class simple():
         p_aux = 'al profesor {}, del departamento de {}.'
         para.add_run(p_aux.format(
             details_pre['advisor_name'], details_pre['advisor_department']))
+        para.add_run('.')
+
+    @staticmethod
+    def case_HOMOLOGACION_DE_ASIGNATURAS_INTERCAMBIO_ACADEMICO_INTERNACIONAL_PREGRADO(request, docx, redirected=False):
+        assign = ['2011183 - Intercambio Académico Internacional',
+                  '2014269 - Intercambio Académico Internacional Prórroga',
+                  '2026630 - Intercambio Académico Internacional II',
+                  '2026631 - Intercambio Académico Internacional II Prórroga']
+        para = docx.add_paragraph()
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Análisis:\t\t')
+        # add_hyperlink(para, 'Acuerdo 008 de 2008',
+        # 'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34983/')
+        para = docx.add_paragraph(style='List Number')
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Solicitud de homologación de ')
+        para.add_run(str(len(request.detail_cm['subjects'])))
+        para.add_run(' asignaturas del programa ')
+        para.add_run(get_academic_program(request.academic_program))
+        para.add_run(' de la insitución ')
+        para.add_run(request.detail_cm['inst'])
+        para.add_run('.')
+        para = docx.add_paragraph(style='List Number')
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Las asignaturas')
+        para.add_run('La(s) asignatura(s) a homologar ')
+        if request.pre_cm['detail_pre_cm']['pre_req'] == 'false':
+            para.add_run('NO ').font.bold = True
+        elif request.pre_cm['detail_pre_cm']['pre_req'] != 'true':
+            raise AssertionError('request.pre_cm["detail_pre"]["pre_req"]' +
+                                 ' must be string "true" or "false"')
+        para.add_run('cumple(n) con los prerrequisitos. ')
+        if request.pre_cm['detail_pre_cm']['more_50'] == 'false':
+            para.add_run('NO').font.bold = True
+            para.add_run(' s')
+        elif request.pre_cm['detail_pre_cm']['more_50'] == 'true':
+            para.add_run('S')
+        para.add_run('e homologan más del 50% de los créditos del plan')
+        para.add_run(
+            ' (Artículo 38, Acuerdo 008 de 2008 - Consejo Superior Universitario.). ')
+        prev = 'antecedente' not in request.pre_cm['detail_pre_cm']
+        if prev:
+            para.add_run('NO').font.bold = True
+            para.add_run(' h')
+        else:
+            para.add_run('H')
+        para.add_run('a tenido homologaciones anteriores.')
+        if not prev:
+            para = docx.add_paragraph(style='List Number')
+            para.paragraph_format.space_after = Pt(0)
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            para.add_run(
+                'Antecedente de homologación de la institución en Acta ')
+            para.add_run(request.pre_cm['detail_pre_cm']
+                         ['antecedente']['council_minute_number'])
+            para.add_run(' de ')
+            para.add_run(request.pre_cm['detail_pre_cm']
+                         ['antecedente']['council_minute_year'])
+            para.add_run('.')
+        for analysis in request.pre_cm['extra_analysis']:
+            para = docx.add_paragraph(style='List Number')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            para.paragraph_format.space_after = Pt(0)
+            para.add_run(analysis)
+        para = docx.add_paragraph()
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Concepto:').font.bold = True
+        para.add_run(' El comité Asesor ')
+        if request.approval_status != 'CR':
+            para.add_run('NO').font.bold = True
+        para.add_run(' recomienda aprobar:')
+        para = docx.add_paragraph(style='List Number 2')
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        total_creds = 0
+        acum_papa = 0
+        for subject in request.detail_cm['subjects']:
+            total_creds += int(subject['creds_asig'])
+            acum_papa += int(subject['creds_asig']) * \
+                float(subject['new_cal_asig'])
+        mini_papa = acum_papa / total_creds
+        para.add_run('Registrar calificación ')
+        if mini_papa > 3:
+            para.add_run('aprobada (AP)')
+        else:
+            para.add_run('no aprobada (NA)')
+        para.add_run(' en la asignatura ')
+        para.add_run(assign[int(request.pre_cm['detail_pre_cm']['index']) - 1])
+        para.add_run(', en el periodo ')
+        para.add_run(request.academic_period)
+        para.add_run('.')
+        para = docx.add_paragraph(style='List Number 2')
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Homologar ')
+        para.add_run(
+            'la(s) siguiente(s) asignatura(s) cursada(s) en Intercambio ')
+        para.add_run(
+            'Académico Internacional en ')
+        if 'old_program' in request.pre_cm['detail_pre_cm']:
+            para.add_run(request.pre_cm['detail_pre_cm']['old_program'])
+            para.add_run(' de ')
+        para.add_run(request.detail_cm['inst'])
+        para.add_run(
+            ', de la siguiente manera (Artículo 35, Acuerdo 008 de 2008 del ')
+        para.add_run(
+            'Consejo Superior Universitario y Resolución 105 de 2017 de ')
+        para.add_run('Vicerrectoría Académica):')
+        details = [request.student_name, request.student_dni,
+                   request.academic_program, request.detail_cm['inst']]
+        subjects = []
+        for sbj in request.detail_cm['subjects']:
+            subjects.append([sbj['per_asig'], sbj['cod_asig'], sbj['new_name_asig'], sbj['creds_asig'],
+                             sbj['tipo_asig'], sbj['new_cal_asig'], sbj['old_name_asig'], sbj['old_cal_asig']])
+        table_approvals(docx, subjects, details)

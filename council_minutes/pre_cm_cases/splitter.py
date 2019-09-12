@@ -85,6 +85,7 @@ class PreCasesSpliter():
             'DJCPOS': self.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO,
             'ADICPOS': self.case_ADICION_DE_CODIRECTOR_POSGRADO
             'PRTMPOS': self.case_TYPE_PROYECTO_DE_TESIS_O_TRABAJO_FINAL_DE_MAESTRIA_POSGRADO,
+            'HAIAPRE': self.case_HOMOLOGACION_DE_ASIGNATURAS_INTERCAMBIO_ACADEMICO_INTERNACIONAL_PREGRADO
         }
 
     def request_case(self, request, docx, redirected=False):
@@ -325,4 +326,8 @@ class PreCasesSpliter():
 
     def case_TYPE_PROYECTO_DE_TESIS_O_TRABAJO_FINAL_DE_MAESTRIA_POSGRADO(self, request, docx, redirected):
         simple.case_TYPE_PROYECTO_DE_TESIS_O_TRABAJO_FINAL_DE_MAESTRIA_POSGRADO(
+            request, docx, redirected)
+
+    def case_HOMOLOGACION_DE_ASIGNATURAS_INTERCAMBIO_ACADEMICO_INTERNACIONAL_PREGRADO(self, request, docx, redirected):
+        simple.case_HOMOLOGACION_DE_ASIGNATURAS_INTERCAMBIO_ACADEMICO_INTERNACIONAL_PREGRADO(
             request, docx, redirected)
