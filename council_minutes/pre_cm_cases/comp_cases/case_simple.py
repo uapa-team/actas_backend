@@ -243,7 +243,90 @@ class simple():
 
     @staticmethod
     def case_REINGRESO_POSGRADO(request, docx, redirected=False):
-        raise NotImplementedError
+        ### Frequently used ###
+        details = request['detail_cm']
+        pre_cm = request['pre_cm']
+        details_pre = pre_cm['detail_pre_cm']
+        is_recommended = request['approval_status'] == 'CR'
+
+        ### Finishing last paragraph ###
+        para = docx.paragraphs[-1]
+        para.add_run('Análisis:\t')
+        para.add_run('Resolución 239 de 2009,Acuerdo 008 de 2008,Resolución 012 de 2014').underline = True
+
+        ### Analysis Paragraphs ###
+        ## Last Reentry ##   
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p_aux =  'El estudiante {} ha tenido otro reingreso posterior al 2009-1S{} '
+        p_aux += '(Artículo 46, Acuerdo 008 de 2008 del Consejo Superior Universitario).'
+        last = details_pre['last_reentry']
+        modifier = ('no', '') if last == '' else ('ya', ' en el periodo {}'.format(last))
+        para.add_run(p_aux.format(*modifier))
+
+        ## Retirement Cause ##
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run(
+            '{}. Plan de estudios {} - Perfil de {}.'.format(
+                details_pre['retirement_cause'],
+                get_academic_program(request['academic_program']),
+                details_pre['academic_profile']
+                )
+            )
+
+        ## P.A.P.A. ##
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p_aux =  '{}iene PAPA superior o igual a 3.5 '
+        p_aux += '(literal 3a – Artículo 3, Resolución 239 de 2009 de Vicerrectoría Académica; Artículo 46, Acuerdo 008 de 2008 del Consejo Superior Universitario).'
+        modifier = 'T' if float(details_pre['PAPA']) >= 3.5 else 'No t'
+        p_aux += 'SIA PAPA: '
+        para.add_run(p_aux.format(modifier))
+        para.add_run('{}.'.format(details_pre['PAPA'])).bold = True
+
+        ## Remaining Subjects ##
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p_aux =  'En caso de ser por máximo tiempo de permanencia o por tener dos calificaciones NA en su historia académica:'
+        p_aux += 'las asignaturas que le faltan por aprobar pueden cursarse en un solo periodo académico adicional (literal 5 – Artículo 3, '
+        p_aux += 'Resolución 239 de 2009 de Vicerrectoría Académica; parágrafo 2 Artículo 46, Acuerdo 008 de 2008 del Consejo Superior Universitario).'
+        p_aux += 'SIA: Le falta por aprobar '
+        para.add_run(p_aux)
+        para.add_run('{}.'.format(details_pre['remaining_subjects'])).bold = True
+
+        ## On Time ##
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p_aux = 'La solicitud {}se hace en fechas de calendario de sede (parágrafo Artículo 3).'
+        modifier = '' if details_pre['on_time'] == 'si' else 'no '
+        para.add_run(p_aux.format(modifier))
+
+        ## Extra Analysis ##
+        for analysis in pre_cm['extra_analysis']:
+            para = docx.add_paragraph(style='List Number')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            para.add_run(analysis)
+
+        ### Concept Paragraph ###
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Concepto: ').bold = True
+        para.add_run('El Comité Asesor recomienda al Consejo de Facultad ')
+        modifier = 'APROBAR' if is_recommended else 'NO APROBAR'
+        para.add_run(modifier).bold = True
+        para.add_run(' reingreso por única vez al programa {}, '.format(get_academic_program(request['academic_program'])))
+        if is_recommended:
+            para.add_run('a partir del periodo académico {}, '.format(details_pre['reentry_period']))
+
+        ## Final Comment ##
+        p_aux =  'el reingreso del estudiante estará regido por el Acuerdo 008 de 2008 del Consejo Superior Universitario.'
+        p_aux += 'Durante el periodo académico adicional otorgado, el estudiante deberá solicitar el nombramiento de jurados de su'
+        p_aux += ' {}, con el fin de obtener su título, previo cumplimiento de las demás exigencias académicas y administrativas vigentes.'
+        p_aux += '(Artículo 7 de la Resolución 012 de 2014 de la Vicerrectoría Académica).'
+        aditional = details_pre['aditional_comments'] + '.'
+        modifier = p_aux.format(details_pre['grade_option']) if aditional == '.' else aditional
+        para.add_run(modifier)
 
     @staticmethod
     def case_REGISTRO_DE_CALIFICACION_DEL_PROYECTO_Y_EXAMEN_DOCTORAL_POSGRADO(request, docx, redirected=False):
