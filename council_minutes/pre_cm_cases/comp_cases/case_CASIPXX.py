@@ -21,29 +21,29 @@ class CASIPXX():
         run.font.bold = True
         # add_hyperlink(para, 'Acuerdo 008 de 2008',
         # 'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34983')
-        CASIPXX.case_CANCELACION_DE_ASIGNATURAS_Analysis_1(request, docx)
-        CASIPXX.case_CANCELACION_DE_ASIGNATURAS_Analysis_2(request, docx)
-        CASIPXX.case_CANCELACION_DE_ASIGNATURAS_Analysis_3(request, docx)
-        CASIPXX.case_CANCELACION_DE_ASIGNATURAS_Analysis_extra(request, docx)
+        CASIPXX.case_CANCELACION_DE_ASIGNATURAS_Analysis_1(request, para)
+        CASIPXX.case_CANCELACION_DE_ASIGNATURAS_Analysis_2(request, para)
+        CASIPXX.case_CANCELACION_DE_ASIGNATURAS_Analysis_3(request, para)
+        CASIPXX.case_CANCELACION_DE_ASIGNATURAS_Analysis_extra(request, para)
 
     @staticmethod
-    def case_CANCELACION_DE_ASIGNATURAS_Analysis_1(request, docx):
-        str_in = '1. SIA: Porcentaje de avance en el plan: {}. Número de'
+    def case_CANCELACION_DE_ASIGNATURAS_Analysis_1(request, para):
+        str_in = '\n1. SIA: Porcentaje de avance en el plan: {}. Número de'
         str_in += 'matrículas: {}. PAPA: {}.'
-        docx.add_paragraph(str_in.format(request['pre_cm']['advance'],
+        para.add_run(str_in.format(request['pre_cm']['advance'],
                            request['pre_cm']['enrolled_academic_periods'],
                            request['pre_cm']['papa']))
 
     @staticmethod
-    def case_CANCELACION_DE_ASIGNATURAS_Analysis_2(request, docx):
-        str_in = '2. SIA: Créditos disponibles: {}.'
-        docx.add_paragraph(str_in.format(request['pre_cm']['available']))
+    def case_CANCELACION_DE_ASIGNATURAS_Analysis_2(request, para):
+        str_in = '\n2. SIA: Créditos disponibles: {}.'
+        para.add_run(str_in.format(request['pre_cm']['available']))
 
     @staticmethod
-    def case_CANCELACION_DE_ASIGNATURAS_Analysis_S(docx, subject):
-        str_in = '{}. SIA: Al aprobar la cancelación de la asignatura {} ({}) '
+    def case_CANCELACION_DE_ASIGNATURAS_Analysis_S(para, subject):
+        str_in = '\n{}. SIA: Al aprobar la cancelación de la asignatura {} ({}) '
         str_in += ' el estudiante quedaría con {} créditos inscritos.'
-        docx.add_paragraph(str_in.format(subject['number'], subject['code'],
+        para.add_run(str_in.format(subject['number'], subject['code'],
                            subject['subject'], subject['remaining']))
 
     @staticmethod
@@ -58,11 +58,11 @@ class CASIPXX():
             CASIPXX.case_CANCELACION_DE_ASIGNATURAS_Analysis_S(docx, subject)
 
     @staticmethod
-    def case_CANCELACION_DE_ASIGNATURAS_Analysis_extra(request, docx):
+    def case_CANCELACION_DE_ASIGNATURAS_Analysis_extra(request, para):
         for analysis in request['pre_cm']['extra_analysis']:
             CASIPXX.count = CASIPXX.count + 1
-            str_in = '{}. {}.'
-            docx.add_paragraph(str_in.format(CASIPXX.count, analysis))
+            str_in = '\n{}. {}.'
+            para.add_run(str_in.format(CASIPXX.count, analysis))
 
     @staticmethod
     def case_CANCELACION_DE_ASIGNATURAS_Answers(request, docx):
@@ -73,12 +73,16 @@ class CASIPXX():
 
     @staticmethod
     def case_CANCELACION_DE_ASIGNATURAS_Answers_RC(request, docx):
-        str_in = 'Concepto: El Comité Asesor recomienda al Consejo de Facultad'
+        str_in = 'El Comité Asesor recomienda al Consejo de Facultad'
         str_in += ' cancelar la(s) siguiente(s) asignatura(s) inscrita(s) del '
         str_in += 'periodo académico {}, porque se justifica debidamente '
         str_in += 'la solicitud. (Artículo 15 Acuerdo 008 de 2008 del '
         str_in += 'Consejo Superior Universitario)'
-        docx.add_paragraph(str_in.format(request['academic_period']))
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run(str_in.format(request['academic_period']))
+        para.add_run('Concepto: ')
+        para.font.bold = True
         data = []
         index = 0
         for subject in request['detail_cm']['subjects']:
@@ -93,7 +97,7 @@ class CASIPXX():
 
     @staticmethod
     def case_CANCELACION_DE_ASIGNATURAS_Answers_NRC(request, docx):
-        str_in = 'Concepto: El Comité Asesor recomienda al Consejo de Facultad'
+        str_in = 'El Comité Asesor recomienda al Consejo de Facultad'
         str_in += ' NO cancelar la(s) siguiente(s) asignatura(s) inscrita(s) '
         str_in += 'del periodo académico {}, '
         if request['pre_cm']['nrc'] == 'Incoherente o consecuente':
@@ -130,4 +134,8 @@ class CASIPXX():
             pass
         str_in += ' (Artículo 15 Acuerdo 008 de 2008 del '
         str_in += 'Consejo Superior Universitario).'
-        docx.add_paragraph(str_in.format(request['academic_period']))
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        run = para.add_run('Concepto: ')
+        run.font.bold = True
+        para.add_run(str_in.format(request['academic_period']))
