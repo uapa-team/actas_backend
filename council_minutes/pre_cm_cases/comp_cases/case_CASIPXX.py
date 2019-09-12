@@ -15,7 +15,12 @@ class CASIPXX():
     @staticmethod
     def case_CANCELACION_DE_ASIGNATURAS_Analysis(request, docx):
         para = docx.add_paragraph()
-        para.add_run('Analisis:')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.paragraph_format.left_indent = Pt(36)
+        run = para.add_run('Analisis: ')
+        run.font.bold = True
+        # add_hyperlink(para, 'Acuerdo 008 de 2008',
+        # 'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34983')
         CASIPXX.case_CANCELACION_DE_ASIGNATURAS_Analysis_1(request, docx)
         CASIPXX.case_CANCELACION_DE_ASIGNATURAS_Analysis_2(request, docx)
         CASIPXX.case_CANCELACION_DE_ASIGNATURAS_Analysis_3(request, docx)
