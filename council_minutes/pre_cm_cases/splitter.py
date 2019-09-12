@@ -13,6 +13,7 @@ from .comp_cases.case_HCEMPRE import HCEMPRE
 from .comp_cases.case_simple import simple
 from .comp_cases.case_utils import *
 
+
 class PreCasesSpliter():
 
     def __init__(self):
@@ -82,7 +83,8 @@ class PreCasesSpliter():
             'DJCTPOS': self.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO,
             'EPTUPOS': self.case_EXENCION_DE_PAGO_POR_CURSAR_TESIS_COMO_UNICA_ACTIVIDAD_ACADEMICA_POSGRADO,
             'DJCPOS': self.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO,
-            'ADICPOS' : self.case_ADICION_DE_CODIRECTOR_POSGRADO
+            'ADICPOS': self.case_ADICION_DE_CODIRECTOR_POSGRADO
+            'PRTMPOS': self.case_TYPE_PROYECTO_DE_TESIS_O_TRABAJO_FINAL_DE_MAESTRIA_POSGRADO,
         }
 
     def request_case(self, request, docx, redirected=False):
@@ -316,7 +318,11 @@ class PreCasesSpliter():
     def case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO(self, request, docx, redirected):
         simple.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO(
             request, docx, redirected)
-    
+
     def case_ADICION_DE_CODIRECTOR_POSGRADO(self, request, docx, redirected):
         simple.case_ADICION_DE_CODIRECTOR_POSGRADO(
+            request, docx, redirected)
+
+    def case_TYPE_PROYECTO_DE_TESIS_O_TRABAJO_FINAL_DE_MAESTRIA_POSGRADO(self, request, docx, redirected):
+        simple.case_TYPE_PROYECTO_DE_TESIS_O_TRABAJO_FINAL_DE_MAESTRIA_POSGRADO(
             request, docx, redirected)

@@ -864,4 +864,89 @@ class simple():
         .format(request.detail_cm['council_AP'], request.detail_cm['council_AP_year'],
         request.detail_cm['professor_name'], request.detail_cm['professor_deparment']))
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+
+    @staticmethod    
+    def case_TYPE_PROYECTO_DE_TESIS_O_TRABAJO_FINAL_DE_MAESTRIA_POSGRADO(request, docx, redirected=False):
+         ### Frequently used ###
+        details = request['detail_cm']
+        pre_cm = request['pre_cm']
+        details_pre = pre_cm['detail_pre_cm']
+        is_recommended = request['approval_status'] == 'CR'
+
+        ### Finishing last paragraph ###
+        para = docx.paragraphs[-1]
+        para.add_run('Análisis: ')
+        para.add_run('Acuerdo 040 de 2017 de Consejo de Facultad, Acuerdo 056 de 2012 C.S.U.').underline = True
+
+        ### Analysis Paragraph ###
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('El estudiante en el perfil de {}, tiene la asignatura {} ({}).'.format(
+            details_pre['node'], details_pre['subject_name'], details_pre['subject_code']))
+
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Tiene la firma del director de tesis.')
+
+        if details_pre['research_group'] != '':
+            para = docx.add_paragraph(style='List Number')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            para.add_run('El proyecto hace parte del grupo de investigación: {}.'.format(
+                details_pre['research_group']))
+
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Titulo: ').bold = True
+        para.add_run('"{}".'.format(details_pre['title'])).italic = True
+
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Objetivo General: ').bold = True
+        para.add_run('{}.'.format(details_pre['general_objective']))
+
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Objetivos Especificos: ').bold = True
+        for objective in details_pre['specific_objectives']:
+            para = docx.add_paragraph(style='List Bullet 2')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            para.add_run('{}.'.format(objective))
         
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p_aux  = 'El proyecto de tesis debe inscribirse y entregarse, antes de alcanzar '
+        p_aux += 'el 50% de la duración establecida para el programa (Parágrafo Artículo 14 '
+        p_aux += 'del Acuerdo 056 de 2012 del Consejo Superior Universitario).'
+        para.add_run(p_aux)
+
+        ## Extra Analysis ##
+        for analysis in pre_cm['extra_analysis']:
+            para = docx.add_paragraph(style='List Number')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            para.add_run(analysis)
+        
+        ### Concept Pragraphs ###
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Concepto: ').bold = True
+        para.add_run('El Comité Asesor recomienda al Consejo de Facultad ')
+        modifier = 'APROBAR:' if is_recommended else 'NO APROBAR:'
+        para.add_run(modifier).bold = True
+
+        para = docx.add_paragraph(style='List Number 2')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p_aux = 'Calificación aprobada (AP) a {} de {}, cuyo título es:'
+        para.add_run(p_aux.format(
+            details_pre['subject_name'],
+            get_academic_program(request['academic_program'])     
+        ))
+        para.add_run('"{}".'.format(details_pre['title'])).italic = True
+
+        para = docx.add_paragraph(style='List Number 2')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p_aux = 'Designar director de {} cuyo título es '
+        para.add_run(p_aux.format(details_pre['subject_name']))
+        para.add_run('"{}" '.format(details_pre['title'])).italic = True
+        p_aux = 'al profesor {}, del departamento de {}.'
+        para.add_run(p_aux.format(
+            details_pre['advisor_name'], details_pre['advisor_department']))
