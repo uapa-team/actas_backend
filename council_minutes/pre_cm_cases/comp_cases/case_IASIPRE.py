@@ -3,7 +3,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from .case_utils import num_to_month
 from .case_utils import get_academic_program
 from .case_utils import table_subjects
-from .case_utils import add_hyperlink
+#from .case_utils import add_hyperlink
 
 
 class IASIPRE():

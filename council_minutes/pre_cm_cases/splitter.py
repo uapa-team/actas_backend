@@ -5,13 +5,13 @@ from .comp_cases.case_TRASPRE import TRASPRE
 from .comp_cases.case_TRASPOS import TRASPOS
 from .comp_cases.case_IASIPRE import IASIPRE
 from .comp_cases.case_CGRUPXX import CGRUPXX
-from .comp_cases.case_IASIPOS import IASIPOS
 from .comp_cases.case_CASIPXX import CASIPXX
 from .comp_cases.case_HCEMPOS import HCEMPOS
 from .comp_cases.case_DTITPRE import DTITPRE
 from .comp_cases.case_HCEMPRE import HCEMPRE
 from .comp_cases.case_simple import simple
 from .comp_cases.case_utils import *
+
 
 class PreCasesSpliter():
 
@@ -241,7 +241,7 @@ class PreCasesSpliter():
         CASIPXX.case_CANCELACION_DE_ASIGNATURAS(request, docx, redirected)
 
     def case_INSCRIPCION_DE_ASIGNATURAS_POSGRADO(self, request, docx, redirected):
-        IASIPOS.case_INSCRIPCION_DE_ASIGNATURAS_POSGRADO(
+        IASIPRE.case_INSCRIPCION_DE_ASIGNATURAS_PREGRADO(
             request, docx, redirected)
 
     def case_INFORME_DE_AVANCE_DE_TESIS_POSGRADO(self, request, docx, redirected):
