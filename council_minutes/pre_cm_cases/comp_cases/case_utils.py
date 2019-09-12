@@ -1,25 +1,55 @@
 import docx
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
-from docx.enum.dml import MSO_THEME_COLOR
 from docx.shared import Pt
+from ...models import Request
+
+
+def add_hyperlink(paragraph_, text, url):
+    """
+    A function that places a hyperlink within a paragraph object.
+    :param paragraph: The paragraph we are adding the hyperlink to.
+    :param url: A string containing the required url
+    :param text: The text displayed for the url
+    :return: The hyperlink object
+    """
+
+    # This gets access to the document.xml.rels file and gets a new relation id value
+    part = paragraph_.part
+    r_id = part.relate_to(
+        url, docx.opc.constants.RELATIONSHIP_TYPE.HYPERLINK, is_external=True)
+
+    # Create the w:hyperlink tag and add needed values
+    hyperlink = docx.oxml.shared.OxmlElement('w:hyperlink')
+    hyperlink.set(docx.oxml.shared.qn('r:id'), r_id, )
+
+    # Create a w:r element
+    new_run = docx.oxml.shared.OxmlElement('w:r')
+
+    # Create a new w:rPr element
+    rPr = docx.oxml.shared.OxmlElement('w:rPr')
+
+    # Join all the xml elements together add add the required text to the w:r element
+    new_run.append(rPr)
+    new_run.text = text
+    hyperlink.append(new_run)
+    # pylint: disable=protected-access
+    paragraph_._p.append(hyperlink)
+
+    return hyperlink
 
 
 def string_to_date(string):
-    ret = ''
-    ret += string[0:2]
+    ret = string[0:2]
     ret += num_to_month(string[3:5])
     ret += string[6:10]
     return ret
 
 
 def get_academic_program(cod_program):
-    large_program = ''
     for p in Request.PROGRAM_CHOICES:
         if p[0] == cod_program:
-            large_program = p[1]
-            break
-    return large_program
+            return p[1]
 
 
 def num_to_month(month):
@@ -49,8 +79,8 @@ def num_to_month(month):
         return ' de diciembre de '
 
 
-def header(request, docx):
-    para = docx.add_paragraph()
+def header(request, docx_):
+    para = docx_.add_paragraph()
     para.add_run('Tipo de solicitud:\t{}\n'.format(request.get_type_display()))
     para.add_run('Justificación:\t\t{}\n'.format(
         request['pre_cm']['justification']))
@@ -59,7 +89,7 @@ def header(request, docx):
     para.paragraph_format.space_after = Pt(0)
 
 
-def table_general_data(general_data, case, docx):
+def table_general_data(general_data, case, docx_):
     '''
     Add a generated table with general data
         Params:
@@ -71,10 +101,10 @@ def table_general_data(general_data, case, docx):
              ['Código del plan de estudios', '2879'],
              ['Fecha de la Solicitud', '29 de abril del 2019']]
         2.  case (string):  DOBLE TITULACIÓN or REINGRESO or TRASLADO
-        3.  docx (docx):  The document to which the table will be added
+        3.  docx_ (docx_):  The document to which the table will be added
     '''
-    table = docx.add_table(rows=len(general_data) + 1,
-                           cols=3, style='Table Grid')
+    table = docx_.add_table(rows=len(general_data) + 1,
+                            cols=3, style='Table Grid')
     table.style.font.size = Pt(8)
     table.alignment = WD_ALIGN_PARAGRAPH.CENTER
     for cell in table.columns[0].cells:
@@ -98,17 +128,18 @@ def table_general_data(general_data, case, docx):
         cellp.add_run(
             'Normativa Asociada: Articulo 39 del Acuerdo 008 de 2008 '
             'del CSU y Acuerdo 089 de 2014 del C.A.')
-    for i in range(0, len(general_data)):
+    # pylint: disable=consider-using-enumerate
+    for i in range(len(general_data)):
         table.cell(i+1, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(i+1, 0).paragraphs[0].add_run(str(i+1)).font.bold = True
         for j in range(0, len(general_data[i])):
             table.cell(i+1, j+1).paragraphs[0].add_run(general_data[i][j])
 
 
-def table_subjects(docx, data):
+def table_subjects(docx_, data):
     '''Add a generated table with approvals subjects
         Params:
-            docx (docx): The document to which the table will be added
+            docx_ (docx_): The document to which the table will be added
             subjects (list): A list of list with the subjects in table,
             each list must be a list with following data:
             [0]: Subject's SIA code
@@ -120,7 +151,7 @@ def table_subjects(docx, data):
             IndexError: All lists must have same size
 
     '''
-    table = docx.add_table(rows=len(data)+1, cols=5)
+    table = docx_.add_table(rows=len(data)+1, cols=5)
     table.style = 'Table Grid'
     table.style.font.size = Pt(9)
     table.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -154,11 +185,11 @@ def table_subjects(docx, data):
         index = index + 1
 
 
-def table_english(docx, subjects, details):
+def table_english(docx_, subjects, details):
     '''Add a generated table with approvals subjects
 
         Params:
-            docx (docx): The document to which the table will be added
+            docx_ (docx_): The document to which the table will be added
             subjects (list): A list of list with the subjects in table,
             each list must be a list with following data:
             [0]: Subject's SIA code
@@ -178,7 +209,7 @@ def table_english(docx, subjects, details):
             IndexError: All lists must have same size
 
     '''
-    table = docx.add_table(rows=len(subjects)+5, cols=7)
+    table = docx_.add_table(rows=len(subjects)+5, cols=7)
     table.style = 'Table Grid'
     table.style.font.size = Pt(8)
     table.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -263,11 +294,11 @@ def table_english(docx, subjects, details):
     cellp.add_run(str(credits_sum))
 
 
-def table_approvals(docx, subjects, details):
+def table_approvals(docx_, subjects, details):
     '''Add a generated table with approvals subjects
 
     Params:
-        docx (docx): The document to which the table will be added
+        docx_ (docx_): The document to which the table will be added
         subjects (list): A list of list with the subjects in table,
         each list must be a list with following data:
         [0]: Subject's period
@@ -303,7 +334,7 @@ def table_approvals(docx, subjects, details):
             periods.append(asign[0])
     asign_number = len(subjects)
     tipology_number = len(tipology)
-    table = docx.add_table(
+    table = docx_.add_table(
         rows=(4+asign_number+tipology_number), cols=8, style='Table Grid')
     table.style.font.size = Pt(8)
     table.columns[0].width = 500000
@@ -406,7 +437,7 @@ def table_approvals(docx, subjects, details):
                                ).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
 
 
-def table_credits_summary(docx, credits, case):
+def table_credits_summary(docx_, credits_, case):
     '''Add a generated table with credits summary
     Params:
         1.  credits: A list of list of 3 rows and 5 columns with the credits in table,
@@ -427,12 +458,12 @@ def table_credits_summary(docx, credits, case):
         [2][3]: optional outstanding credits of typology B
         [2][4]: outstanding credits of typology B
         2.  case: DOBLE TITULACIÓN or REINGRESO or TRASLADO
-        3.  docx (docx): The document to which the table will be added
+        3.  docx_ (docx_): The document to which the table will be added
     Raises:
         IndexError: All lists must have same size
     '''
 
-    table = docx.add_table(rows=5, cols=7, style='Table Grid')
+    table = docx_.add_table(rows=5, cols=7, style='Table Grid')
     table.style.font.size = Pt(8)
     table.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
@@ -486,18 +517,18 @@ def table_credits_summary(docx, credits, case):
     for i in range(0, 3):
         suma = 0
         for j in range(0, 5):
-            table.cell(2+i, j+1).paragraphs[0].add_run(str(credits[i][j]))
+            table.cell(2+i, j+1).paragraphs[0].add_run(str(credits_[i][j]))
             table.cell(
                 2+i, j+1).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-            suma += credits[i][j]
+            suma += credits_[i][j]
         table.cell(2+i, 6).paragraphs[0].add_run(str(suma))
         table.cell(2+i, 6).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
 
 
-def table_recommend(docx, details):
+def table_recommend(docx_, details):
     '''Add a generated table with approvals subjects
     Params:
-        docx(docx): The document to which the table will be added
+        docx_(docx_): The document to which the table will be added
         details(list): A list with the datails of homologation,
         must be contains the following data:
         [0]: Comite's name
@@ -506,7 +537,7 @@ def table_recommend(docx, details):
         [3]: Comite's acta year
         [4]: Recommend(boolean)
     '''
-    table = docx.add_table(rows=1, cols=5)
+    table = docx_.add_table(rows=1, cols=5)
     table.style = 'Table Grid'
     table.style.font.size = Pt(8)
     table.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -548,10 +579,10 @@ def table_recommend(docx, details):
     table.cell(0, 4).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
 
 
-def table_change_typology(docx, subjects):
+def table_change_typology(docx_, subjects):
     '''Add a generated table with approvals subjects
         Params:
-            docx (docx): The document to which the table will be added
+            docx_ (docx_): The document to which the table will be added
             subjects (list): A list of list with the subjects in table,
             each list must be a list with following data:
             [0]: Subject's SIA code
@@ -562,7 +593,7 @@ def table_change_typology(docx, subjects):
         Raises:
             IndexError: All lists must have same size
     '''
-    table = docx.add_table(rows=len(subjects)+1, cols=5)
+    table = docx_.add_table(rows=len(subjects)+1, cols=5)
     table.alignment = WD_ALIGN_PARAGRAPH.CENTER
     table.style = 'Table Grid'
     table.style.font.size = Pt(9)
