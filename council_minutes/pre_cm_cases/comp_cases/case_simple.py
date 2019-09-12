@@ -155,7 +155,84 @@ class simple():
 
     @staticmethod
     def case_CAMBIO_DE_PERFIL_POSGRADO(request, docx, redirected=False):
-        raise NotImplementedError
+        ### Frequently used ###
+        details = request['detail_cm']
+        pre_cm = request['pre_cm']
+        details_pre = pre_cm['detail_pre_cm']
+        is_recommended = request['approval_status'] == 'CR'
+
+        ### Finishing last paragraph ###
+        para = docx.paragraphs[-1]
+        para.add_run('Análisis:')
+
+        ### Analysis Paragraph ###
+        ## Extra Analysis ##
+        for analysis in pre_cm['extra_analysis']:
+            para = docx.add_paragraph(style='List Number')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            para.add_run(analysis)
+        
+        ### Concept Pragraphs ###
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Concepto: ').bold = True
+        para.add_run('El Comité Asesor recomienda al Consejo de Facultad ')
+        modifier = 'APROBAR:' if is_recommended else 'NO APROBAR:'
+        para.add_run(modifier).bold = True
+
+        ## Transfer ##
+        para = docx.add_paragraph(style='List Bullet')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p_aux =  'Traslado intrafacultad del estudiante de {}, del plan de estudios {} '
+        p_aux += 'al plan de estudios de {} debido a que {}justifica adecuadamente su solicitud.'
+        modifier = '' if is_recommended else 'no '
+        para.add_run(p_aux.format(
+            get_academic_program(request['academic_program']),
+            details['from_node'],
+            details['to_node'],
+            modifier
+        ))
+
+        ## Subject's type ##
+        para = docx.add_paragraph(style='List Bullet')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Cambiar de componente las siguientes asignaturas del programa {}:'.format(
+            get_academic_program(request['academic_program'])
+        ))
+
+        subjects = []
+        for subject in details_pre['subject_type_mod']:
+            subjects.append([
+                subject['code'], subject['name'], subject['grade'],
+                subject['old_type'], subject['new_type']
+            ])
+
+        table_change_typology(docx, subjects)
+
+        ## Homologation ##
+        para = docx.add_paragraph(style='List Bullet')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p_aux =  'Equivaler en el programa {} perfil de {}, '
+        p_aux += 'las siguientes asignaturas cursadas en el programa {} perfil de {}:'
+        para.add_run(p_aux.format(
+            get_academic_program(request['academic_program']),
+            details['to_node'],
+            get_academic_program(request['academic_program']),
+            details['from_node']
+        ))
+
+        subjects = []
+        for subject in details_pre['subject_homologation']:
+            subjects.append([
+                subject['period'], subject['code'], subject['name'],
+                subject['credits'], subject['tipology'], subject['grade'],
+                subject['old_name'], subject['old_grade']
+            ])
+
+        table_approvals(docx, subjects, [
+            request['student_name'], request['student_dni'],
+            request['academic_program'], 'perfil de {}'.format(details['from_node'])
+        ])
 
     @staticmethod
     def case_AMPLIACION_DE_LA_FECHA_DE_PAGO_DE_DERECHOS_ACADEMICOS_POSGRADO(request, docx, redirected=False):
