@@ -2002,9 +2002,87 @@ class simple():
         p_aux += 'por obtener el promedio académico ponderado más alto del semestre en '
         p_aux += 'las asignaturas cursadas durante el periodo académico inmediatamente '
         p_aux += 'anterior (Artículo 8 Acuerdo 02 de 2012 de Consejo de Facultad).'
-
         para.add_run(p_aux.format(
             get_academic_program(request['academic_program']),
             request['academic_program'],
             details_pre['target_period']
         ))
+        para.add_run('.')
+
+    @staticmethod
+    def case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_TESIS_DE_DOCTORADO_POSGRADO(
+            request, docx, redirected=False):
+        para = docx.add_paragraph()
+        para.add_run(
+            "Análisis:\t\t\tAcuerdo 056 de 2012 Consejo Superior Universitario, Acuerdo 40 '+\
+                'de 2017 Consejo de Facultad de Ingeniería")
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run("El/La estudiante tiene la asignatura <nombre asignatura> ({})."
+                     .format(request.pre_cm['detail_pre_cm']['subject']))
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run(
+            "Copia impresa y versión electrónica en formato pdf (Artículo 35).")
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run("El documento ")
+        para.add_run("Proyecto de Tesis de Doctorado ").font.italic = True
+        para.add_run("será evaluado por un grupo de evaluadores"
+                     + " conformado por mínimo tres integrantes, designados por el Comité '+\
+                         'Asesor de Posgrado. (Artículo 36)."
+                     + " Jurados propuestos: {}"
+                     .format(request.pre_cm['detail_pre_cm']['proposed_jurors']))
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run(
+            "El estudiante deberá realizar una sustentación pública de su ")
+        para.add_run("Proyecto de Tesis de Doctorado ").font.italic = True
+        para.add_run("ante los evaluadores. En la sustentación deberán participar, "
+                     + "presencialmente o mediante video conferencia, el estudiante, '+\
+                         'los evaluadores, el profesor tutor "
+                     + "del estudiante y un profesor activo de la Universidad Nacional '+\
+                         'de Colombia delegado por el Comité Asesor "
+                     + "de Posgrado, quien hará las veces de coordinador de la '+\
+                         'sustentación (Artículo 37).")
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run("El Comité Asesor ")
+        para.add_run("DESIGNA:").font.bold = True
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run("En el jurado evaluador del proyecto de tesis del {}: "
+                     .format(request.get_academic_program_display()))
+        para.add_run("'{}'".format(
+            request.detail_cm['titulo'])).font.italic = True
+        para.add_run(", a los profesores ")
+        for professor in request.detail_cm['jury']:
+            if professor['department']:
+                para.add_run("{} del Departamento de {} de la {}"
+                             .format(professor['name'], professor['department'],
+                                     professor['institution']))
+            else:
+                para.add_run("{} de la {} - {}"
+                             .format(professor['name'], professor['institution'],
+                                     professor['country']))
+            if professor != request.detail_cm['jury'][-1]:
+                para.add_run(", ")
+            else:
+                para.add_run(".")
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run("En el jurado evaluador del examen de calificación del {} a los profesores "
+                     .format(request.get_academic_program_display()))
+        for professor in request.detail_cm['jury_exam']:
+            if professor['department']:
+                para.add_run("{} del Departamento de {} de la {}"
+                             .format(professor['name'], professor['department'],
+                                     professor['institution']))
+            else:
+                para.add_run("{} de la {} - {}"
+                             .format(professor['name'], professor['institution'],
+                                     professor['country']))
+            if professor != request.detail_cm['jury_exam'][-1]:
+                para.add_run(", ")
+            else:
+                para.add_run(".")

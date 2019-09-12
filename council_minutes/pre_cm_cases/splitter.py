@@ -339,7 +339,7 @@ class PreCasesSpliter():
 
     def case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_TESIS_DE_DOCTORADO_POSGRADO(
             self, request, docx, redirected):
-        simple.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO(
+        simple.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_TESIS_DE_DOCTORADO_POSGRADO(
             request, docx, redirected)
 
     def case_ADICION_DE_CODIRECTOR_POSGRADO(self, request, docx, redirected):
