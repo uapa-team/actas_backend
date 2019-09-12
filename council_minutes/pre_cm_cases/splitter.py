@@ -8,7 +8,7 @@ from .comp_cases.case_CGRUPXX import CGRUPXX
 from .comp_cases.case_IASIPOS import IASIPOS
 from .comp_cases.case_CASIPXX import CASIPXX
 from .comp_cases.case_HCEMPOS import HCEMPOS
-from .comp_cases.case_DTITPRE import DTITPRE
+from .comp_cases.case_DTITPRE import DTITPRE_pre
 from .comp_cases.case_HCEMPRE import HCEMPRE
 from .comp_cases.case_simple import simple
 from .comp_cases.case_utils import *
@@ -82,6 +82,7 @@ class PreCasesSpliter():
             'DJCTPOS': self.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO,
             'EPTUPOS': self.case_EXENCION_DE_PAGO_POR_CURSAR_TESIS_COMO_UNICA_ACTIVIDAD_ACADEMICA_POSGRADO,
             'DJCPOS': self.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO,
+            'ADICPOS' : self.case_ADICION_DE_CODIRECTOR_POSGRADO
         }
 
     def request_case(self, request, docx, redirected=False):
@@ -107,7 +108,7 @@ class PreCasesSpliter():
         simple.case_TRABAJO_DE_GRADO_PREGADO(request, docx)
 
     def case_DOBLE_TITULACION_PREGRADO(self, request, docx, redirected):
-        DTITPRE.case_DOBLE_TITULACION_PREGRADO(request, docx, redirected)
+        DTITPRE_pre.case_DOBLE_TITULACION_PREGRADO(request, docx, redirected)
 
     def case_HOMOLOGACION_INGLES_PREGRADO(self, request, docx, redirected):
         HOIDPXX.case_HOMOLOGACION_INGLES(request, docx, redirected)
@@ -314,4 +315,8 @@ class PreCasesSpliter():
 
     def case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO(self, request, docx, redirected):
         simple.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO(
+            request, docx, redirected)
+    
+    def case_ADICION_DE_CODIRECTOR_POSGRADO(self, request, docx, redirected):
+        simple.case_ADICION_DE_CODIRECTOR_POSGRADO(
             request, docx, redirected)

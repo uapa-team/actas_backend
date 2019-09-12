@@ -719,3 +719,29 @@ class simple():
     @staticmethod
     def case_INFORME_DE_AVANCE_DE_TESIS_POSGRADO(request, docx, redirected=False):
         raise NotImplementedError
+
+    @staticmethod
+    def case_ADICION_DE_CODIRECTOR_POSGRADO(request, docx, redirected=False):
+        para = docx.add_paragraph()
+        approval = "APRUEBA"
+        if request.approval_status == "CR":
+            approval = "NO APRUEBA"
+        para = docx.add_paragraph()
+        para.add_run("Análisis:\t\t\tResolución 173 de 2009.")
+        para = docx.add_paragraph("SIA: <no se que va aquí> | <no se que va aquí>: perfil de {}."
+        .format(request.pre_cm['detail_pre_cm']['profile']), style='List Number')
+        for i in range (0, len(request['pre_cm']['extra_analysis'])):
+            para = docx.add_paragraph(request['pre_cm']['extra_analysis'][i], style = 'List Number')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para = docx.add_paragraph()
+        para.add_run("Concepto: ").font.bold = True
+        para.add_run("El Comité Asesor recomienda al Consejo de Facultad ")
+        para.add_run(approval).font.bold = True
+        para.add_run(" designar codirector de Tesis de {} - {} con título “{}” "
+        .format(request.pre_cm['detail_pre_cm']['niv_pos'],  request.get_academic_program_display(),
+        request.detail_cm['tittle']))
+        para.add_run("aprobado en el acta No.{} del año {}, al profesor {} del Departamento de {}."
+        .format(request.detail_cm['council_AP'], request.detail_cm['council_AP_year'],
+        request.detail_cm['professor_name'], request.detail_cm['professor_deparment']))
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        
