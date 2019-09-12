@@ -410,7 +410,43 @@ class simple():
 
     @staticmethod
     def case_EXCENCION_POR_MEJORES_SABER_PRO_POSGRADO(request, docx, redirected=False):
-        raise NotImplementedError
+        ### Frequently used ###
+        details = request['detail_cm']
+        pre_cm = request['pre_cm']
+        details_pre = pre_cm['detail_pre_cm']
+        is_recommended = request['approval_status'] == 'CR'
+
+        ### Finishing last paragraph ###
+        para = docx.paragraphs[-1]
+        para.add_run('Análisis:')
+        
+        ### Analysis Paragraphs ###
+        ## Extra Analysis ##
+        for analysis in pre_cm['extra_analysis']:
+            para = docx.add_paragraph(style='List Number')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            para.add_run(analysis)
+        
+        ### Concept Paragraph ###
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Concepto: ').bold = True
+        para.add_run('El Comité Asesor recomienda al Consejo de Facultad ')
+        modifier = 'APROBAR' if is_recommended else 'NO APROBAR'
+        para.add_run(modifier).bold = True
+        modifier = '' if details_pre['first_time'] == 'si' else 'la renovación de '
+        para.add_run(' {}la exención del {}% del pago de los derechos académicos '.format(
+            modifier,
+            details_pre['value']
+        ))
+        modifier = 'l mejor puntaje' if details_pre['value'] == '100' else ' los 10 mejores puntajes'
+        para.add_run('y renovación de matrícula a{} del Examen de Estado '.format(modifier))
+        para.add_run('de la Calidad de la Educación Superior (SABER PRO) {} - {} '.format(
+            details_pre['exam_year'],
+            details_pre['degree']
+        ))
+        para.add_run('para el periodo académico {} '.format(request['academic_period']))
+        para.add_run('(Literal b, Artículo 16 del Acuerdo No.002 de 2011 del Consejo de Facultad).')
 
     @staticmethod
     def case_REINGRESO_POSGRADO(request, docx, redirected=False):
