@@ -1,6 +1,8 @@
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
+from ...pre_cm_cases.comp_cases.case_utils import table_recommend
+from ...pre_cm_cases.comp_cases.case_utils import string_to_date
 from ...models import Request
 
 
@@ -35,8 +37,9 @@ class REINPRE():
 
     @staticmethod
     def case_REINGRESO_PREGRADO(request, docx, redirected=False):
-        para = docx.paragraphs[-1]
-        if not redirected:
+        if redirected:
+            para = docx.paragraphs[-1]
+        else:
             para = docx.add_paragraph()
             para.add_run('El Consejo de Facultad ')
         large_program = ''
@@ -73,6 +76,9 @@ class REINPRE():
             cell.width = 2400000
         for cell in table.columns[2].cells:
             cell.width = 2400000
+        table.columns[0].width = 400000
+        table.columns[1].width = 2400000
+        table.columns[2].width = 2400000
         cellp = table.cell(0, 0).merge(table.cell(0, 2)).paragraphs[0]
         cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
         cellp.add_run('REINGRESO\n').font.bold = True
@@ -98,8 +104,8 @@ class REINPRE():
         table.cell(4, 2).paragraphs[0].add_run(request.academic_program)
         table.cell(5, 0).paragraphs[0].add_run('5').font.bold = True
         table.cell(5, 1).paragraphs[0].add_run('Fecha solicitud')
-        table.cell(5, 2).paragraphs[0].add_run(str(request.detail_cm['solic_date'].day) + REINPRE.num_to_month(
-            request.detail_cm['solic_date'].month) + str(request.detail_cm['solic_date'].year))
+        table.cell(5, 2).paragraphs[0].add_run(
+            string_to_date(request.detail_cm['solic_date']))
         para = docx.add_paragraph()
         bullet = para.add_run('2. Información Académica')
         para.paragraph_format.space_after = Pt(0)
@@ -115,6 +121,9 @@ class REINPRE():
             cell.width = 3200000
         for cell in table.columns[2].cells:
             cell.width = 1600000
+        table.columns[0].width = 400000
+        table.columns[1].width = 3200000
+        table.columns[2].width = 1600000
         table.cell(0, 0).merge(table.cell(0, 1)).paragraphs[0].add_run(
             'Periodo para el cual fue admitido en este plan de estudios')
         table.cell(0, 2).paragraphs[0].add_run(request.detail_cm['per_admi'])
@@ -125,19 +134,24 @@ class REINPRE():
             request.detail_cm['first_reingreso'])
         table.cell(1, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(2, 0).merge(table.cell(2, 2)).paragraphs[0].add_run(
-            'Si la respuesta es NO, el Comité Asesor no debe recomendar al Consejo de Facultad el reingreso')
+            'Si la respuesta es NO, el Comité Asesor no debe recomendar al Consejo ' +
+            'de Facultad el reingreso')
         table.cell(3, 0).merge(table.cell(3, 1)).paragraphs[0].add_run(
-            'Es caso de ser primer reingreso en ¿qué periodo académico perdió la calidad de estudiante?')
+            'Es caso de ser primer reingreso en ¿qué periodo académico perdió la ' +
+            'calidad de estudiante?')
         table.cell(3, 2).paragraphs[0].add_run(request.detail_cm['per_perd'])
         table.cell(3, 2).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         table.cell(3, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(4, 0).merge(table.cell(4, 1)).paragraphs[0].add_run(
-            'Al momento de presentar la solicitud ¿cuántos periodos académicos (incluido el periodo académico en que presentó la solicitud) han transcurridos a partir del periodo académico en que registró su última matrícula?')
+            'Al momento de presentar la solicitud ¿cuántos periodos académicos (incluido' +
+            ' el periodo académico en que presentó la solicitud) han transcurridos a partir' +
+            ' del periodo académico en que registró su última matrícula?')
         table.cell(4, 2).paragraphs[0].add_run(request.detail_cm['per_transc'])
         table.cell(4, 2).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         table.cell(4, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(5, 0).merge(table.cell(5, 2)).paragraphs[0].add_run(
-            'En caso que la respuesta sea mayor de 6 periodos académicos no se debe recomendar el reingreso')
+            'En caso que la respuesta sea mayor de 6 periodos académicos no se debe ' +
+            'recomendar el reingreso')
         table.cell(6, 0).merge(table.cell(6, 1)
                                ).paragraphs[0].add_run('P.A.P.A.')
         table.cell(6, 2).paragraphs[0].add_run(request.detail_cm['PAPA'])
@@ -190,10 +204,13 @@ class REINPRE():
             cell.width = 3100000
         for cell in table.columns[1].cells:
             cell.width = 2100000
+        table.columns[0].width = 3100000
+        table.columns[1].width = 2100000
         table.cell(0, 0).merge(table.cell(0, 1)
                                ).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
         table.cell(0, 0).merge(table.cell(0, 1)).paragraphs[0].add_run(
-            'Al finalizar el semestre de reingreso para mantener la calidad de estudiante, deberá obtener un Promedio Semestral mínimo de:')
+            'Al finalizar el semestre de reingreso para mantener la calidad de estudiante,' +
+            ' deberá obtener un Promedio Semestral mínimo de:')
         table.cell(1, 0).paragraphs[0].add_run('Si inscribe 12 Créditos')
         table.cell(2, 0).paragraphs[0].add_run('Si inscribe 15 Créditos')
         table.cell(3, 0).paragraphs[0].add_run('Si inscribe 18 Créditos')
@@ -227,8 +244,15 @@ class REINPRE():
             cell.width = 610000
         for cell in table.columns[5].cells:
             cell.width = 675000
-        for cell in table.columns[5].cells:
+        for cell in table.columns[6].cells:
             cell.width = 375000
+        table.columns[0].width = 1610000
+        table.columns[1].width = 690000
+        table.columns[2].width = 610000
+        table.columns[3].width = 690000
+        table.columns[4].width = 610000
+        table.columns[5].width = 675000
+        table.columns[6].width = 375000
         table.cell(0, 0).merge(table.cell(1, 0)
                                ).paragraphs[0].add_run('Créditos')
         table.cell(0, 0).merge(table.cell(1, 0)
@@ -280,46 +304,33 @@ class REINPRE():
             request.detail_cm['summary']['approved']['free'])
         table.cell(4, 5).paragraphs[0].add_run(
             request.detail_cm['summary']['remaining']['free'])
-        exiged = int(request.detail_cm['summary']['exiged']['fund_m']) + int(request.detail_cm['summary']['exiged']['fund_o']) + int(
-            request.detail_cm['summary']['exiged']['disc_m']) + int(request.detail_cm['summary']['exiged']['disc_o']) + int(request.detail_cm['summary']['exiged']['free'])
-        approved = int(request.detail_cm['summary']['approved']['fund_m']) + int(request.detail_cm['summary']['approved']['fund_o']) + int(
-            request.detail_cm['summary']['approved']['disc_m']) + int(request.detail_cm['summary']['approved']['disc_o']) + int(request.detail_cm['summary']['approved']['free'])
-        remaining = int(request.detail_cm['summary']['remaining']['fund_m']) + int(request.detail_cm['summary']['remaining']['fund_o']) + int(
-            request.detail_cm['summary']['remaining']['disc_m']) + int(request.detail_cm['summary']['remaining']['disc_o']) + int(request.detail_cm['summary']['remaining']['free'])
+        exiged = int(request.detail_cm['summary']['exiged']['fund_m']) + int(
+            request.detail_cm['summary']['exiged']['fund_o']) + int(
+                request.detail_cm['summary']['exiged']['disc_m']) + int(
+                    request.detail_cm['summary']['exiged']['disc_o']) + int(
+                        request.detail_cm['summary']['exiged']['free'])
+        approved = int(request.detail_cm['summary']['approved']['fund_m']) + int(
+            request.detail_cm['summary']['approved']['fund_o']) + int(
+                request.detail_cm['summary']['approved']['disc_m']) + int(
+                    request.detail_cm['summary']['approved']['disc_o']) + int(
+                        request.detail_cm['summary']['approved']['free'])
+        remaining = int(request.detail_cm['summary']['remaining']['fund_m']) + int(
+            request.detail_cm['summary']['remaining']['fund_o']) + int(
+                request.detail_cm['summary']['remaining']['disc_m']) + int(
+                    request.detail_cm['summary']['remaining']['disc_o']) + int(
+                        request.detail_cm['summary']['remaining']['free'])
         table.cell(2, 6).paragraphs[0].add_run(str(exiged))
         table.cell(3, 6).paragraphs[0].add_run(str(approved))
         table.cell(4, 6).paragraphs[0].add_run(str(remaining))
         para = docx.add_paragraph()
         para.paragraph_format.space_after = Pt(0)
         para.add_run(
-            '     *Sin incluir los créditos correspondientes al cumplimiento del requisito de suficiencia en idioma.').font.size = Pt(8)
-        table = docx.add_table(rows=1, cols=5)
-        table.style = 'Table Grid'
-        table.style.font.size = Pt(8)
-        table.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        for cell in table.columns[0].cells:
-            cell.width = 3000000
-        for cell in table.columns[1].cells:
-            cell.width = 800000
-        for cell in table.columns[2].cells:
-            cell.width = 300000
-        for cell in table.columns[3].cells:
-            cell.width = 800000
-        for cell in table.columns[4].cells:
-            cell.width = 300000
-        table.cell(0, 0).paragraphs[0].add_run(
-            'El Comité Asesor de ' + request.detail_cm['commite_name'] + ' en sesión del día ')
-        table.cell(0, 0).paragraphs[0].add_run(str(request.detail_cm['comite_date'].day) + REINPRE.num_to_month(
-            request.detail_cm['comite_date'].month) + str(request.detail_cm['comite_date'].year))
-        table.cell(0, 0).paragraphs[0].add_run(
-            '. Acta ' + request.detail_cm['comite_acta'] + '.')
-        table.cell(0, 1).paragraphs[0].add_run('Recomienda')
-        table.cell(0, 1).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-        table.cell(0, 3).paragraphs[0].add_run('No Recomienda')
-        table.cell(0, 3).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-        if request.detail_cm['reccomend'] == 'true':
-            table.cell(0, 2).paragraphs[0].add_run('X')
-        else:
-            table.cell(0, 4).paragraphs[0].add_run('X')
-        table.cell(0, 2).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-        table.cell(0, 4).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            '     *Sin incluir los créditos correspondientes al cumplimiento del ' +
+            'requisito de suficiencia en idioma.').font.size = Pt(8)
+        details = []
+        details.append(request.detail_cm['commite_name'])
+        details.append(request.detail_cm['comite_date'])
+        details.append(request.detail_cm['comite_acta'])
+        details.append(request.detail_cm['comite_date'][6:10])
+        details.append(request.detail_cm['reccomend'])
+        table_recommend(docx, details)
