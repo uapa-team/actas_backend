@@ -1589,3 +1589,54 @@ class simple():
             details_pre['init_year'], details_pre['months'], details_pre['target_period']
         ))
         para.add_run('.')
+
+    @staticmethod
+    def case_BECA_EXENSION_DERECHOS_ACADEMICOS(request, docx, redirected=False):
+        ### Frequently used ###
+        details = request['detail_cm']
+        pre_cm = request['pre_cm']
+        details_pre = pre_cm['detail_pre_cm']
+        is_recommended = request['approval_status'] == 'CR'
+
+        ### Finishing last paragraph ###
+        para = docx.paragraphs[-1]
+        para.add_run('Análisis: ')
+
+        ### Analysis Paragraph ###
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p_aux  = 'La coordinación curricular del programa presenta como beneficiario de la BECA '
+        p_aux += 'EXENCIÓN DE DERECHOS ACADÉMICOS del Acuerdo 2 de 2012 de Consejo de Facultad, '
+        p_aux += 'por obtener el promedio académico ponderado más alto del semestre en las '
+        p_aux += 'asignaturas cursadas durante el periodo académico inmediatamente anterior.'
+        para.add_run(p_aux)
+
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Promedio: {}/5.0 .'.format(details_pre['average']))
+
+        ## Extra Analysis ##
+        for analysis in pre_cm['extra_analysis']:
+            para = docx.add_paragraph(style='List Number')
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            para.add_run(analysis)
+
+        ### Concept Pragraphs ###
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Concepto: ').bold = True
+        para.add_run('El Comité Asesor recomienda al Consejo de Facultad ')
+        modifier = 'APROBAR' if is_recommended else 'NO APROBAR'
+        para.add_run(modifier).bold = True
+
+        p_aux  = ' la BECA EXENCIÓN DE DERECHOS ACADÉMICOS en el programa de {} ({}) '
+        p_aux += 'en el periodo {} y otorgar la exención del 100% de derechos académicos '
+        p_aux += 'por obtener el promedio académico ponderado más alto del semestre en '
+        p_aux += 'las asignaturas cursadas durante el periodo académico inmediatamente '
+        p_aux += 'anterior (Artículo 8 Acuerdo 02 de 2012 de Consejo de Facultad).'
+
+        para.add_run(p_aux.format(
+            get_academic_program(request['academic_program']),
+            request['academic_program'],
+            details_pre['target_period']
+            ))

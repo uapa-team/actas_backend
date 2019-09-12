@@ -82,27 +82,16 @@ class PreCasesSpliter():
             'APGDPOS': self.case_APROBACION_PROYECTO_PROPUESTA_Y_DESIGNACION_DE_DIRECTOR_POSGRADO,
             'DJCTPOS': self.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO,
             'EPTUPOS': self.case_EXENCION_DE_PAGO_POR_CURSAR_TESIS_COMO_UNICA_ACTIVIDAD_ACADEMICA_POSGRADO,
-            << << << < HEAD
             'DJCPOS': self.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO,
-            << << << < HEAD
-            << << << < HEAD
-            << << << < HEAD
-            'ADICPOS': self.case_ADICION_DE_CODIRECTOR_POSGRADO
+            'ADICPOS': self.case_ADICION_DE_CODIRECTOR_POSGRADO,
             'PRTMPOS': self.case_TYPE_PROYECTO_DE_TESIS_O_TRABAJO_FINAL_DE_MAESTRIA_POSGRADO,
-            'HAIAPRE': self.case_HOMOLOGACION_DE_ASIGNATURAS_INTERCAMBIO_ACADEMICO_INTERNACIONAL_PREGRADO
-            == == == =
+            'HAIAPRE': self.case_HOMOLOGACION_DE_ASIGNATURAS_INTERCAMBIO_ACADEMICO_INTERNACIONAL_PREGRADO,
             'DJCPPOS': self.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO,
             'HAUAPRE': self.case_HOMOLOGACION_DE_ASIGNATURAS_CONVENIO_CON_UNIVERSIDAD_ANDES_PREGRADO,
-            >>>>>> > HAUAPRE_pre
-            == == == =
-            'HAUAPOS': self.case_HOMOLOGACION_DE_ASIGNATURAS_CONVENIO_CON_UNIVERSIDAD_ANDES_POSGRADO
-            >> >>>> > HAUAPOS_pre
-            == == == =
+            'HAUAPOS': self.case_HOMOLOGACION_DE_ASIGNATURAS_CONVENIO_CON_UNIVERSIDAD_ANDES_POSGRADO,
             'PRTDPOS': self.case_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO,
-            >>>>>> > origin/PRTDPOS_pre
-            == == == =
-            'CAIMPRE': self.case_CANCELACION_DE_ASIGNATURAS_CON_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO
-            >> >>>> > CAIMPRE_pre
+            'CAIMPRE': self.case_CANCELACION_DE_ASIGNATURAS_CON_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO,
+            'BEDAPOS': self.case_BECA_EXENSION_DERECHOS_ACADEMICOS,
         }
 
     def request_case(self, request, docx, redirected=False):
@@ -364,4 +353,8 @@ class PreCasesSpliter():
 
     def case_CANCELACION_DE_ASIGNATURAS_CON_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO(self, request, docx, redirected):
         simple.case_CANCELACION_DE_ASIGNATURAS_CON_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO(
+            request, docx, redirected)
+
+    def case_BECA_EXENSION_DERECHOS_ACADEMICOS(self, request, docx, redirected):
+        simple.case_BECA_EXENSION_DERECHOS_ACADEMICOS(
             request, docx, redirected)

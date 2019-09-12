@@ -84,6 +84,7 @@ class CasesSpliter():
             'DJCPOS': self.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO,
             'PRTMPOS': self.case_TYPE_PROYECTO_DE_TESIS_O_TRABAJO_FINAL_DE_MAESTRIA_POSGRADO,
             'PRTDPOS': self.case_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO,
+            'BEDAPOS': self.case_BECA_EXENSION_DERECHOS_ACADEMICOS,
         }
 
     def request_case(self, request, docx, redirected=False):
@@ -317,20 +318,13 @@ class CasesSpliter():
         simple.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO(
             request, docx, redirected)
 
-
-<< << << < HEAD
-
-
-def case_TYPE_PROYECTO_DE_TESIS_O_TRABAJO_FINAL_DE_MAESTRIA_POSGRADO(self, request, docx, redirected):
+    def case_TYPE_PROYECTO_DE_TESIS_O_TRABAJO_FINAL_DE_MAESTRIA_POSGRADO(self, request, docx, redirected):
         simple.case_TYPE_PROYECTO_DE_TESIS_O_TRABAJO_FINAL_DE_MAESTRIA_POSGRADO(
             request, docx, redirected)
 
-
-== == == =
-
-
-def case_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO(self, request, docx, redirected):
+    def case_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO(self, request, docx, redirected):
         raise NotImplementedError
 
-
->>>>>> > origin/PRTDPOS_pre
+    def case_BECA_EXENSION_DERECHOS_ACADEMICOS(self, request, docx, redirected):
+        simple.case_BECA_EXENSION_DERECHOS_ACADEMICOS(
+            request, docx, redirected)
