@@ -7,6 +7,9 @@ from num2words import num2words  ##pip install num2words
 from docx.shared import Pt
 from .case_REINPRE import REINPRE
 from docx.shared import Cm, Inches
+from ...pre_cm_cases.comp_cases.case_utils import *
+from datetime import date
+
 
 
 class DTITPRE():
@@ -96,73 +99,30 @@ class DTITPRE():
         para.paragraph_format.space_before = Pt(0)
         bullet = para.add_run('*Sin incluir los créditos correspondientes al cumplimiento del requisito de suficiencia en idioma extranjero (Circular 09 de 2013 de la División de Registro).\n**Aprobados del plan de estudios, sin excedentes.')
         para.paragraph_format.space_after = Pt(0)
-        bullet.font.size = Pt(8)
-        table = docx.add_table(rows=1, cols=5, style='Table Grid')
-        table.style.font.size = Pt(8)
-        table.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        for cell in table.columns[0].cells:
-            cell.width = 3050000
-        for cell in table.columns[1].cells:
-            cell.width = 700000
-        for cell in table.columns[2].cells:
-            cell.width = 500000
-        for cell in table.columns[3].cells:
-            cell.width = 700000
-        for cell in table.columns[4].cells:
-            cell.width = 500000
-        table.cell(0, 0).paragraphs[0].add_run('El Consejo de la Facultad de Ingeniería en sesión del día {} Acta {}'.format(str(request.detail_cm['fecha_sesion'].day) + REINPRE.num_to_month(request.detail_cm['fecha_sesion'].month) + str(request.detail_cm['fecha_sesion'].year), request.detail_cm['acta']))
-        table.cell(0, 1).paragraphs[0].add_run('Recomienda')
-        table.cell(0, 3).paragraphs[0].add_run('No recomienda')
-        if request.detail_cm['recomienda'] == 'Si':
-            table.cell(0, 2).paragraphs[0].add_run('X')
-            table.cell(0, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        else:
-            table.cell(0, 4).paragraphs[0].add_run('X')
-            table.cell(0, 4).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        bullet.font.size = Pt(6)        
+        fecha_sesion = request.detail_cm['fecha_sesion'].split('-')
+        details = [
+            "Consejo de la Facultad de Ingeniería",
+            fecha_sesion[2] + "-" + fecha_sesion[1] + "-" + fecha_sesion[0],
+            request.detail_cm['acta'],
+            fecha_sesion[0],
+            True
+        ]
+        table_recommend(docx, details)
     
     @staticmethod
     def case_DOBLE_TITULACION_PREGRADO_TABLE_DATOS_PERSONALES(request, docx):
-        table = docx.add_table(rows=8, cols=3, style='Table Grid')
-        table.style.font.size = Pt(8)
-        table.alignment = WD_ALIGN_PARAGRAPH.CENTER  
-        for cell in table.columns[0].cells:
-            cell.width = 450000
-        for cell in table.columns[1].cells:
-            cell.width = 2500000
-        for cell in table.columns[2].cells:
-            cell.width = 2500000
-        cellp = table.cell(0, 0).merge(table.cell(0, 2)).paragraphs[0]
-        cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        cellp.add_run('DOBLE TITULACIÓN\n').font.bold = True
-        cellp.add_run('Normativa Asociada: Articulo 47 al 50 del Acuerdo 008 de 2008 del CSU y Acuerdo 155 de 2014 del CSU')
-        table.cell(1, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(2, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(3, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(4, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(5, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(6, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(7, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(1, 0).paragraphs[0].add_run('1').font.bold = True
-        table.cell(1, 1).paragraphs[0].add_run('Estudiante')
-        table.cell(1, 2).paragraphs[0].add_run(request.student_name)
-        table.cell(2, 0).paragraphs[0].add_run('2').font.bold = True
-        table.cell(2, 1).paragraphs[0].add_run('DNI')
-        table.cell(2, 2).paragraphs[0].add_run(request.student_dni)
-        table.cell(3, 0).paragraphs[0].add_run('3').font.bold = True
-        table.cell(3, 1).paragraphs[0].add_run('Plan de estudios origen (1er plan) – Sede')
-        table.cell(3, 2).paragraphs[0].add_run(DTITPRE.GET_PLAN(request.detail_cm['datos_generales']['plan_origen']))
-        table.cell(4, 0).paragraphs[0].add_run('4').font.bold = True
-        table.cell(4, 1).paragraphs[0].add_run('Código del plan de estudios')
-        table.cell(4, 2).paragraphs[0].add_run(request.detail_cm['datos_generales']['plan_origen'])
-        table.cell(5, 0).paragraphs[0].add_run('5').font.bold = True
-        table.cell(5, 1).paragraphs[0].add_run('Plan de estudios doble titulación (2do plan)')
-        table.cell(5, 2).paragraphs[0].add_run(request.get_academic_program_display())
-        table.cell(6, 0).paragraphs[0].add_run('6').font.bold = True
-        table.cell(6, 1).paragraphs[0].add_run('Código del plan de estudios doble titulación')
-        table.cell(6, 2).paragraphs[0].add_run(request.academic_program)
-        table.cell(7, 0).paragraphs[0].add_run('7').font.bold = True
-        table.cell(7, 1).paragraphs[0].add_run('Fecha de la Solicitud a través del SIA')
-        table.cell(7, 2).paragraphs[0].add_run(str(request.detail_cm['datos_generales']['fecha_solicitud'].day) + REINPRE.num_to_month(request.detail_cm['datos_generales']['fecha_solicitud'].month) + str(request.detail_cm['datos_generales']['fecha_solicitud'].year))
+        
+        general_data = [    
+            ['Nombre Estudiante', request.student_name], 
+            ['DNI', request.student_dni], 
+            ['Plan de estudios origen (1er plan) – Sede', get_academic_program(request.detail_cm['datos_generales']['plan_origen'])], 
+            ['Código del plan de estudios', request.detail_cm['datos_generales']['plan_origen']], 
+            ['Plan de estudios doble titulación (2do plan)', request.get_academic_program_display()], 
+            ['Código del plan de estudios doble titulación', request.academic_program], 
+            ['Fecha de la Solicitud', str(request.detail_cm['datos_generales']['fecha_solicitud'].day) + REINPRE.num_to_month(request.detail_cm['datos_generales']['fecha_solicitud'].month) + str(request.detail_cm['datos_generales']['fecha_solicitud'].year)]
+        ]
+        table_general_data(general_data, "DOBLE TITULACIÓN", docx)
 
     @staticmethod
     def case_DOBLE_TITULACION_PREGRADO_TABLE_INFORMACION_ACADEMICA(request, docx):
@@ -598,89 +558,29 @@ class DTITPRE():
 
     @staticmethod
     def case_DOBLE_TITULACION_PREGRADO_TABLE_RESUMEN_GENERAL(request, docx):
-        table = docx.add_table(rows=5, cols=7, style='Table Grid')
-        table.style.font.size = Pt(8)
-        table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        summary_credits = [
+            [
+                int(request.detail_cm['resumen_general']['exigidos']['B']['ob']),
+                int(request.detail_cm['resumen_general']['exigidos']['B']['op']),
+                int(request.detail_cm['resumen_general']['exigidos']['C']['ob']),
+                int(request.detail_cm['resumen_general']['exigidos']['C']['op']),
+                int(request.detail_cm['resumen_general']['exigidos']['L'])
+            ],
+            [
+                int(request.detail_cm['resumen_general']['equiv_conv']['B']['ob']),
+                int(request.detail_cm['resumen_general']['equiv_conv']['B']['op']),
+                int(request.detail_cm['resumen_general']['equiv_conv']['C']['ob']),
+                int(request.detail_cm['resumen_general']['equiv_conv']['C']['op']),
+                int(request.detail_cm['resumen_general']['equiv_conv']['L'])
+            ],
+            [
+                int(request.detail_cm['resumen_general']['pendientes']['B']['ob']),
+                int(request.detail_cm['resumen_general']['pendientes']['B']['op']),
+                int(request.detail_cm['resumen_general']['pendientes']['C']['ob']),
+                int(request.detail_cm['resumen_general']['pendientes']['C']['op']),
+                int(request.detail_cm['resumen_general']['pendientes']['L'])
+            ]
+        ]
 
-        for column in table.columns:
-            for cell in column.cells:
-                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-
-        table.allow_autofit = False
-        
-        for cell in table.columns[0].cells:
-            cell.width = 1250000
-        for cell in table.columns[1].cells:
-            cell.width = 700000
-        for cell in table.columns[2].cells:
-            cell.width = 700000
-        for cell in table.columns[3].cells:
-            cell.width = 700000
-        for cell in table.columns[4].cells:
-            cell.width = 700000
-        for cell in table.columns[5].cells:
-            cell.width = 850000
-        for cell in table.columns[6].cells:
-            cell.width = 500000
-
-        cellp = table.cell(0, 0).merge(table.cell(1, 0)).paragraphs[0] 
-        cellp.add_run('Créditos')
-        cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(2, 0).paragraphs[0].add_run('Exigidos*')
-        table.cell(3, 0).paragraphs[0].add_run('Convalidados/equivalentes**')
-        table.cell(4, 0).paragraphs[0].add_run('Pendientes')
-        cellp = table.cell(0, 1).merge(table.cell(0, 2)).paragraphs[0] 
-        cellp.add_run('Fundamentación (B)')
-        cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER  
-        table.cell(1, 1).paragraphs[0].add_run('Obligatorios')
-        table.cell(1, 1).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER 
-        table.cell(1, 2).paragraphs[0].add_run('Optativos')
-        table.cell(1, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER 
-        cellp = table.cell(0, 3).merge(table.cell(0, 4)).paragraphs[0] 
-        cellp.add_run('Disciplinar (C)')
-        cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(1, 3).paragraphs[0].add_run('Obligatorios')
-        table.cell(1, 3).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER 
-        table.cell(1, 4).paragraphs[0].add_run('Optativos')
-        table.cell(1, 4).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER 
-        cellp = table.cell(0, 5).merge(table.cell(1, 5)).paragraphs[0] 
-        cellp.add_run('Libre Elección (L)')
-        cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        cellp = table.cell(0, 6).merge(table.cell(1, 6)).paragraphs[0] 
-        cellp.add_run('Total')
-        cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(2, 1).paragraphs[0].add_run(request.detail_cm['resumen_general']['exigidos']['B']['ob'])
-        table.cell(2, 2).paragraphs[0].add_run(request.detail_cm['resumen_general']['exigidos']['B']['op'])
-        table.cell(2, 3).paragraphs[0].add_run(request.detail_cm['resumen_general']['exigidos']['C']['ob'])
-        table.cell(2, 4).paragraphs[0].add_run(request.detail_cm['resumen_general']['exigidos']['C']['op'])
-        table.cell(2, 5).paragraphs[0].add_run(request.detail_cm['resumen_general']['exigidos']['L'])
-        suma = int(request.detail_cm['resumen_general']['exigidos']['B']['ob']) 
-        suma = suma + int(request.detail_cm['resumen_general']['exigidos']['B']['op'])
-        suma = suma + int(request.detail_cm['resumen_general']['exigidos']['C']['ob'])
-        suma = suma + int(request.detail_cm['resumen_general']['exigidos']['C']['op'])
-        suma = suma + int(request.detail_cm['resumen_general']['exigidos']['L'])
-        table.cell(2, 6).paragraphs[0].add_run(str(suma))
-        table.cell(3, 1).paragraphs[0].add_run(request.detail_cm['resumen_general']['equiv_conv']['B']['ob'])
-        table.cell(3, 2).paragraphs[0].add_run(request.detail_cm['resumen_general']['equiv_conv']['B']['op'])
-        table.cell(3, 3).paragraphs[0].add_run(request.detail_cm['resumen_general']['equiv_conv']['C']['ob'])
-        table.cell(3, 4).paragraphs[0].add_run(request.detail_cm['resumen_general']['equiv_conv']['C']['op'])
-        table.cell(3, 5).paragraphs[0].add_run(request.detail_cm['resumen_general']['equiv_conv']['L'])
-        suma = int(request.detail_cm['resumen_general']['equiv_conv']['B']['ob']) 
-        suma = suma + int(request.detail_cm['resumen_general']['equiv_conv']['B']['op'])
-        suma = suma + int(request.detail_cm['resumen_general']['equiv_conv']['C']['ob'])
-        suma = suma + int(request.detail_cm['resumen_general']['equiv_conv']['C']['op'])
-        suma = suma + int(request.detail_cm['resumen_general']['equiv_conv']['L'])
-        table.cell(3, 6).paragraphs[0].add_run(str(suma))
-        table.cell(4, 1).paragraphs[0].add_run(request.detail_cm['resumen_general']['pendientes']['B']['ob'])
-        table.cell(4, 2).paragraphs[0].add_run(request.detail_cm['resumen_general']['pendientes']['B']['op'])
-        table.cell(4, 3).paragraphs[0].add_run(request.detail_cm['resumen_general']['pendientes']['C']['ob'])
-        table.cell(4, 4).paragraphs[0].add_run(request.detail_cm['resumen_general']['pendientes']['C']['op'])
-        table.cell(4, 5).paragraphs[0].add_run(request.detail_cm['resumen_general']['pendientes']['L'])
-        suma = int(request.detail_cm['resumen_general']['pendientes']['B']['ob']) 
-        suma = suma + int(request.detail_cm['resumen_general']['pendientes']['B']['op'])
-        suma = suma + int(request.detail_cm['resumen_general']['pendientes']['C']['ob'])
-        suma = suma + int(request.detail_cm['resumen_general']['pendientes']['C']['op'])
-        suma = suma + int(request.detail_cm['resumen_general']['pendientes']['L'])
-        table.cell(4, 6).paragraphs[0].add_run(str(suma))
-    
+        table_credits_summary(docx, summary_credits, "DOBLE TITULACIÓN")
         
