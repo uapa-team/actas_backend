@@ -233,7 +233,35 @@ class simple():
 
     @staticmethod
     def case_ELIMINACION_DE_LA_HISTORIA_ACADEMICA_BAPI_PREGRADO(request, docx, redirected=False):
-        raise NotImplementedError
+        para = docx.add_paragraph()
+        para.paragraph_format.space_after = Pt(0)
+        para.add_run('Analisis:')
+        para = docx.add_paragraph(style='List Number')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run(
+            'Modalidad de trabajo de grado: Asignaturas de posgrado. ')
+        para.add_run('Acta de comité ' +
+                     request.pre_cm['detail_pre_cm']['council_number'])
+        para.add_run(
+            ' de ' + request.pre_cm['detail_pre_cm']['council_year'] + '.')
+        if 'extra_analysis' in request.pre_cm:
+            for analysis in request.pre_cm['extra_analysis']:
+                para = docx.add_paragraph(style='List Number')
+                para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+                para.add_run(analysis)
+        para.paragraph_format.space_after = Pt(0)
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Concepto: ').font.bold = True
+        para.add_run('El Comité Asesor ')
+        if request.approval_status == 'RM':
+            para.add_run('recomienda')
+        elif request.approval_status == 'NM':
+            para.add_run('no recomienda')
+        para.add_run(
+            ' al Consejo de Facultad eliminar la historia académica BAPI del periodo ')
+        para.add_run(request.academic_period)
+        para.add_run(', porque justifica debidamente la solicitud.')
 
     @staticmethod
     def case_RESERVA_DE_CUPO_ADICIONAL_PREGRADO(request, docx, redirected=False):
