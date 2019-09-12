@@ -86,6 +86,7 @@ class PreCasesSpliter():
             'DJCPOS': self.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO,
             << << << < HEAD
             << << << < HEAD
+            << << << < HEAD
             'ADICPOS': self.case_ADICION_DE_CODIRECTOR_POSGRADO
             'PRTMPOS': self.case_TYPE_PROYECTO_DE_TESIS_O_TRABAJO_FINAL_DE_MAESTRIA_POSGRADO,
             'HAIAPRE': self.case_HOMOLOGACION_DE_ASIGNATURAS_INTERCAMBIO_ACADEMICO_INTERNACIONAL_PREGRADO
@@ -99,6 +100,9 @@ class PreCasesSpliter():
             == == == =
             'PRTDPOS': self.case_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO,
             >>>>>> > origin/PRTDPOS_pre
+            == == == =
+            'CAIMPRE': self.case_CANCELACION_DE_ASIGNATURAS_CON_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO
+            >> >>>> > CAIMPRE_pre
         }
 
     def request_case(self, request, docx, redirected=False):
@@ -356,4 +360,8 @@ class PreCasesSpliter():
 
     def case_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO(self, request, docx, redirected):
         simple.case_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO(
+            request, docx, redirected)
+
+    def case_CANCELACION_DE_ASIGNATURAS_CON_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO(self, request, docx, redirected):
+        simple.case_CANCELACION_DE_ASIGNATURAS_CON_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO(
             request, docx, redirected)
