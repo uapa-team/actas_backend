@@ -229,7 +229,7 @@ class PreCasesSpliter():
         HOIDPXX.case_HOMOLOGACION_INGLES(request, docx, redirected)
 
     def case_APROBACION_PASANTIA_POSGRADO(self, request, docx, redirected):
-        raise NotImplementedError
+        simple.case_APROBACION_PASANTIA_POSGRADO(request, docx, redirected)
 
     def case_BECA_MEJOR_PROMEDIO_POSGRADO(self, request, docx, redirected):
         simple.case_BECA_MEJOR_PROMEDIO_POSGRADO(request, docx, redirected)
