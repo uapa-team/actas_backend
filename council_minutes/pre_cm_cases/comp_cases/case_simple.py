@@ -88,7 +88,39 @@ class simple():
 
     @staticmethod
     def case_AMPLIACION_DE_LA_FECHA_DE_PAGO_DE_DERECHOS_ACADEMICOS_POSGRADO(request, docx, redirected=False):
-        raise NotImplementedError
+        para = docx.add_paragraph()
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Análisis:')
+        para = docx.add_paragraph(style='List Number')
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('El estudiante tiene la historia académica activa.')
+        if 'extra_analysis' in request.pre_cm:
+            for analysis in request.pre_cm['extra_analysis']:
+                para = docx.add_paragraph(style='List Number')
+                para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+                para.paragraph_format.space_after = Pt(0)
+                para.add_run(analysis)
+        para = docx.add_paragraph()
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Concepto:').font.bold = True
+        para.add_run(' El comité Asesor ')
+        if request.approval_status != 'CR':
+            para.add_run('NO').font.bold = True
+        para.add_run(
+            ' recomienda al Consejo de Facultad presentar con concepto positivo al Comité')
+        para.add_run(
+            ' de Matrículas de la Sede Bogotá, la expedición de un único recibo correspondiente')
+        para.add_run(
+            ' a los derechos académicos y administrativos para el periodo académico ')
+        para.add_run(request.academic_period)
+        para.add_run(' y se le concede como fecha de pago el ')
+        para.add_run(request.pre_cm['detail_pre_cm']['limit_date'])
+        para.add_run(', teniendo en cuenta el estado de pago por parte de ')
+        para.add_run(request.student_name)
+        para.add_run('.')
 
     @staticmethod
     def case_REEMBOLSO_PREGRADO(request, docx, redirected=False):
