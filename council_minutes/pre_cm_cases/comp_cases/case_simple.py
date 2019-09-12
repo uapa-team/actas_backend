@@ -105,7 +105,89 @@ class simple():
 
     @staticmethod
     def case_EXENCION_DE_PAGO_POR_CREDITOS_SOBRANTES_DE_PREGRADO_POSGRADO(request, docx, redirected=False):
-        raise NotImplementedError
+        para = docx.add_paragraph()
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Análisis:\t\t')
+        # add_hyperlink(para, 'Acuerdo 008 de 2008',
+        #              'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34983/')
+        para = docx.add_paragraph(style='List Number')
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('SIA: Admitido al programa ')
+        para.add_run(get_academic_program(request.academic_program))
+        para.add_run('. Perfil de ')
+        para.add_run(request.pre_cm['detail_pre_cm']['profile'])
+        para.add_run('.')
+        para = docx.add_paragraph(style='List Number')
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        if request.pre_cm['detail_pre_cm']['enrolled'] == 'true':
+            para.add_run('S')
+        elif request.pre_cm['detail_pre_cm']['enrolled'] == 'false':
+            para.add_run('No s')
+        else:
+            raise AssertionError(
+                'request.pre_cm["detail_pre_cm"]["enrolled"] must be ' +
+                '"true" or "false"')
+        para.add_run(
+            'e matriculó en un programa de posgrado de la Universidad en el año siguiente')
+        para.add_run(
+            ' a la culminación de sus estudios de pregrado. Culminó sus estudios en el periodo ')
+        para.add_run(request.pre_cm['detail_pre_cm']['finish_period'])
+        para.add_run(' e ingresó al posgrado en ')
+        para.add_run(request.pre_cm['detail_pre_cm']['start_period'])
+        para.add_run('.')
+        para = docx.add_paragraph(style='List Number')
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        if request.pre_cm['detail_pre_cm']['limit'] == 'true':
+            para.add_run('P')
+        elif request.pre_cm['detail_pre_cm']['limit'] == 'false':
+            para.add_run('No p')
+        else:
+            raise AssertionError(
+                'request.pre_cm["detail_pre_cm"]["limit"] must be ' +
+                '"true" or "false"')
+        para.add_run(
+            'resenta la solicitud dentro de las fechas límite establecidas por el reglamento:')
+        para.add_run(
+            ' 2 semanas después de la publicación de resultados de admitidos.')
+        para = docx.add_paragraph(style='List Number')
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('La fecha límite para presentar la solicitud fue el ')
+        para.add_run(request.pre_cm['detail_pre_cm']['limit_date'])
+        para.add_run('.')
+        para = docx.add_paragraph()
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Concepto:').font.bold = True
+        para.add_run(' El comité Asesor ')
+        if request.approval_status != 'CR':
+            para.add_run('NO').font.bold = True
+        para.add_run(
+            ' recomienda al Consejo de Facultad otorgar exención del pago de ')
+        para.add_run(request.detail_cm['points'])
+        para.add_run(' puntos de Derechos Académicos, a partir del periodo ')
+        para.add_run(request.pre_cm['detail_pre_cm']['start_period'])
+        para.add_run(', y durante los siguientes ')
+        para.add_run(request.pre_cm['detail_pre_cm']['num_periods'])
+        para.add_run(
+            ' periodos académicos, por tener créditos disponibles al finalizar')
+        para.add_run(' estudios del programa de pregado ')
+        para.add_run(request.detail_cm['program'])
+        para.add_run('.')
+        if request.approval_status != 'CR' and request.pre_cm['detail_pre_cm']['limit'] == 'false':
+            para.add_run(
+                ' Debido a que presenta la solicitud fuera de los plazos establecidos')
+        para.add_run(
+            ' (Artículo 4 de la resolución 121 de 2010) (Artículo 58 del Acuerdo 008 de 2008')
+        para.add_run(
+            ' del Consejo Superior Universitario.). El cálculo de los créditos disponibles se')
+        para.add_run(
+            ' realiza con base en el cupo de créditos establecido en el Artículo 2 del Acuerdo')
+        para.add_run(' 014 de 2008 del Consejo Académico.')
 
     @staticmethod
     def case_DEVOLUCION_PROPORCIONAL_DEL_VALOR_PAGADO_POR_CONCEPTO_DE_DERECHOS_DE_MATRICULA_PREGRADO(request, docx, redirected=False):
