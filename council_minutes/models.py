@@ -73,6 +73,7 @@ class Request(DynamicDocument):
     TYPE_HOMOLOGACION_DE_ASIGNATURAS_INTERCAMBIO_ACADEMICO_INTERNACIONAL_PREGRADO = 'HAIAPRE'
     TYPE_HOMOLOGACION_DE_ASIGNATURAS_CONVENIO_CON_UNIVERSIDAD_ANDES_PREGRADO = 'HAUAPRE'
     TYPE_HOMOLOGACION_DE_ASIGNATURAS_CONVENIO_CON_UNIVERSIDAD_ANDES_POSGRADO = 'HAUAPOS'
+    TYPE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO = 'PRTDPOS'
     TYPE_CHOICES = (
         (TYPE_TRASLADO_PREGRADO, 'Traslado (Pregrado)'),
         (TYPE_REINGRESO_PREGRADO, 'Reingreso (Pregrado)'),
@@ -178,6 +179,7 @@ class Request(DynamicDocument):
          'Exención de pago por cursar tesis como única actividad académica (Posgrado)'),
         (TYPE_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO,
          'Designación de jurados calificadores de proyecto de tesis de doctorado (Posgrado)'),
+        << << << < HEAD
         (TYPE_ADICION_DE_CODIRECTOR_POSGRADO,
          'Adición de codirector en proyecto de tesis'),
         (TYPE_PROYECTO_DE_TESIS_O_TRABAJO_FINAL_DE_MAESTRIA_POSGRADO,
@@ -188,6 +190,10 @@ class Request(DynamicDocument):
          'Homologación de asignaturas convenio con Universidad de los Andes (Pregrado)'),
         (TYPE_HOMOLOGACION_DE_ASIGNATURAS_CONVENIO_CON_UNIVERSIDAD_ANDES_POSGRADO,
          'Homologación de asignaturas convenio con Universidad de los Andes (Posgrado)'),
+        == == == =
+        (TYPE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO,
+         'Proyecto de tesis de Doctorado (Posgrado)'),
+        >>>>>> > origin/PRTDPOS_pre
     )
     APPROVAL_STATUS_APLAZA = 'AL'
     APPROVAL_STATUS_APRUEBA = 'AP'

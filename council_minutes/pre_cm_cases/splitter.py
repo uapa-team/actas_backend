@@ -85,6 +85,7 @@ class PreCasesSpliter():
             << << << < HEAD
             'DJCPOS': self.case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO,
             << << << < HEAD
+            << << << < HEAD
             'ADICPOS': self.case_ADICION_DE_CODIRECTOR_POSGRADO
             'PRTMPOS': self.case_TYPE_PROYECTO_DE_TESIS_O_TRABAJO_FINAL_DE_MAESTRIA_POSGRADO,
             'HAIAPRE': self.case_HOMOLOGACION_DE_ASIGNATURAS_INTERCAMBIO_ACADEMICO_INTERNACIONAL_PREGRADO
@@ -95,6 +96,9 @@ class PreCasesSpliter():
             == == == =
             'HAUAPOS': self.case_HOMOLOGACION_DE_ASIGNATURAS_CONVENIO_CON_UNIVERSIDAD_ANDES_POSGRADO
             >> >>>> > HAUAPOS_pre
+            == == == =
+            'PRTDPOS': self.case_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO,
+            >>>>>> > origin/PRTDPOS_pre
         }
 
     def request_case(self, request, docx, redirected=False):
@@ -349,3 +353,7 @@ class PreCasesSpliter():
         simple.case_HOMOLOGACION_DE_ASIGNATURAS_CONVENIO_CON_UNIVERSIDAD_ANDES_POSGRADO(
             request, docx, redirected
         )
+
+    def case_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO(self, request, docx, redirected):
+        simple.case_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO(
+            request, docx, redirected)
