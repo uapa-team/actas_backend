@@ -158,7 +158,8 @@ class simple():
         para.add_run(request.justification + '.')
 
     @staticmethod
-    def case_AMPLIACION_DE_LA_FECHA_DE_PAGO_DE_DERECHOS_ACADEMICOS_POSGRADO(request, docx, redirected=False):
+    def case_AMPLIACION_DE_LA_FECHA_DE_PAGO_DE_DERECHOS_ACADEMICOS_POSGRADO(
+            request, docx, redirected=False):
         if redirected:
             para = docx.paragraphs[-1]
         else:
@@ -244,7 +245,8 @@ class simple():
             para.add_run(', debido a que {}.'.format(request.justification))
 
     @staticmethod
-    def case_EXENCION_DE_PAGO_POR_CREDITOS_SOBRANTES_DE_PREGRADO_POSGRADO(request, docx, redirected=False):
+    def case_EXENCION_DE_PAGO_POR_CREDITOS_SOBRANTES_DE_PREGRADO_POSGRADO(
+            request, docx, redirected=False):
         if redirected:
             para = docx.paragraphs[-1]
         else:
@@ -282,7 +284,8 @@ class simple():
                 '. (Artículo 58 del acuerdo 008 de 2008 del Consejo Superior Universitario. ')
 
     @staticmethod
-    def case_DEVOLUCION_PROPORCIONAL_DEL_VALOR_PAGADO_POR_CONCEPTO_DE_DERECHOS_DE_MATRICULA_PREGRADO(request, docx, redirected=False):
+    def case_DEVOLUCION_PROPORCIONAL_DEL_VALOR_PAGADO_POR_CONCEPTO_DE_DERECHOS_MATRICULA_PREGRADO(
+            request, docx, redirected=False):
         if redirected:
             para = docx.paragraphs[-1]
         else:
@@ -335,11 +338,23 @@ class simple():
             'Consejo Superior Universitario).')
         table = docx.add_table(
             rows=len(request.detail_cm['subjects'])+2, cols=3, style='Table Grid')
+        table.style.font.size = Pt(9)
+        table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        for column in table.columns:
+            for cell in column.cells:
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        for cell in table.columns[0].cells:
+            cell.width = 915000
+        for cell in table.columns[1].cells:
+            cell.width = 3620000
+        for cell in table.columns[2].cells:
+            cell.width = 915000
         table.cell(0, 0).paragraphs[0].add_run('Código SIA').font.bold = True
         table.cell(0, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(0, 1).paragraphs[0].add_run(
             'Nombre Asignatura').font.bold = True
-        table.cell(0, 1).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER    
+        table.cell(0, 1).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(0, 2).paragraphs[0].add_run('Créditos').font.bold = True
         table.cell(0, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         index = 1
@@ -352,10 +367,8 @@ class simple():
             index = index + 1
         table.cell(index, 2).paragraphs[0].add_run(str(credits_sum))
         cellp = table.cell(index, 0).merge(table.cell(index, 1)).paragraphs[0]
-        cellp.alignment = WD_ALIGN_PARAGRAPH.LEFT
         cellp.add_run('Total Créditos').font.bold = True
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        
         for column in table.columns:
             for cell in column.cells:
                 cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
@@ -483,7 +496,8 @@ class simple():
         para.add_run(request.detail_cm['per_assig'] + '.')
 
     @staticmethod
-    def case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO(request, docx, redirected=False):
+    def case_DESIGNACION_DE_JURADOS_CALIFICADORES_DE_TESIS_TRABAJO_FINAL_POSGRADO(
+            request, docx, redirected=False):
         if redirected:
             para = docx.paragraphs[-1]
         else:
@@ -656,7 +670,6 @@ class simple():
             for cell in column.cells:
                 cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
                 cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-                
         # table.columns[0].width = 700000
         # table.columns[1].width = 2000000
         # table.columns[2].width = 600000
@@ -672,7 +685,6 @@ class simple():
             cell.width = 1050000
         for cell in table.columns[4].cells:
             cell.width = 1050000
-            
         table.cell(0, 0).paragraphs[0].add_run('Código').font.bold = True
         table.cell(0, 1).paragraphs[0].add_run('Asignatura').font.bold = True
         table.cell(0, 2).paragraphs[0].add_run('Nota').font.bold = True
@@ -722,7 +734,8 @@ class simple():
             para.add_run(' porque ' + request.justification + '.')
 
     @staticmethod
-    def case_CAMBIO_DE_DIRECTIOR_CODIRECTOR_JURADO_O_EVALUADOR_POSGRADO(request, docx, redirected=False):
+    def case_CAMBIO_DE_DIRECTIOR_CODIRECTOR_JURADO_O_EVALUADOR_POSGRADO(
+            request, docx, redirected=False):
         if redirected:
             para = docx.paragraphs[-1]
         else:
@@ -861,7 +874,6 @@ class simple():
         # table.columns[2].width = 600000
         # table.columns[3].width = 600000
         # table.columns[4].width = 600000
-        
         for column in table.columns:
             for cell in column.cells:
                 cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
@@ -892,7 +904,8 @@ class simple():
         table.cell(1, 4).paragraphs[0].add_run('6')
 
     @staticmethod
-    def case_APROBACION_PROYECTO_PROPUESTA_Y_DESIGNACION_DE_DIRECTOR_POSGRADO(request, docx, redirected=False):
+    def case_APROBACION_PROYECTO_PROPUESTA_Y_DESIGNACION_DE_DIRECTOR_POSGRADO(
+            request, docx, redirected=False):
         if redirected:
             para = docx.paragraphs[-1]
         else:
@@ -934,7 +947,8 @@ class simple():
             para = docx.add_paragraph()
             para.add_run('El Consejo de Facultad ')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('designar en el jurado calificador de ' + request.detail_cm['subject'] + ' en ')
+        para.add_run('designar en el jurado calificador de ' + \
+             request.detail_cm['subject'] + ' en ')
         para.add_run(request.get_academic_program_display() + ', cuyo título es: "' +
                      request.detail_cm['project_title']+'"')
         para.add_run(', al(los) profesor(es) ')
@@ -999,11 +1013,13 @@ class simple():
         else:
             para = docx.add_paragraph()
             para.add_run('El Consejo de Facultad ')
-        common = 'reingreso por única vez en el programa de {}, a partir del periodo {}'.format(request.get_academic_program_display(), request.academic_period)
+        common = 'reingreso por única vez en el programa de {}, a partir del periodo {}'
+        common = common.format(request.get_academic_program_display(), request.academic_period)
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         if request.approval_status == 'AP':
             para.add_run('APRUEBA ').font.bold = True
-            para.add_run(common + '. El reingreso del estudiante estará regido por el Acuerdo 008 de 2008 del Consejo Superior Universitario')
+            para.add_run(common + '. El reingreso del estudiante estará regido por'+\
+                ' el Acuerdo 008 de 2008 del Consejo Superior Universitario')
             if request.observation:
                 para.add_run('. {}'.format(request.observation))
         else:
@@ -1012,7 +1028,8 @@ class simple():
         para.add_run('.')
 
     @staticmethod
-    def case_REGISTRO_DE_CALIFICACION_DEL_PROYECTO_Y_EXAMEN_DOCTORAL_POSGRADO(request, docx, redirected=False):
+    def case_REGISTRO_DE_CALIFICACION_DEL_PROYECTO_Y_EXAMEN_DOCTORAL_POSGRADO(
+            request, docx, redirected=False):
         if redirected:
             para = docx.paragraphs[-1]
         else:
@@ -1024,24 +1041,31 @@ class simple():
         else:
             para.add_run('NO APRUEBA:').font.bold = True
         calificacion = {'AP': 'aprobado', 'NA': 'no aprobado'}
-        for i in range (0, len(request.detail_cm['casos'])):
+        for i in range(0, len(request.detail_cm['casos'])):
             if request.detail_cm['casos'][i]['caso'] == 'examen':
-                Item1 = 'Calificar {} ({})'.format(calificacion[request.detail_cm['casos'][i]['calificacion']], request.detail_cm['casos'][i]['calificacion'])
-                Item2 = ' el Examen de calificación con código {}'.format(request.detail_cm['casos'][i]['codigo'])  
-                Item3 =  ' en el periodo académico {}.'.format(request.academic_period)
+                Item1 = 'Calificar {} ({})'.format(calificacion[
+                    request.detail_cm['casos'][i]['calificacion']],
+                                                   request.detail_cm['casos'][i]['calificacion'])
+                Item2 = ' el Examen de calificación con código {}'
+                Item2 = Item2.format(request.detail_cm['casos'][i]['codigo'])
+                Item3 = ' en el periodo académico {}.'.format(request.academic_period)
                 Item = Item1 + Item2 + Item3
                 para = docx.add_paragraph(Item, style='List Number')
                 para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
                 para.paragraph_format.space_after = Pt(0)
             else:
-                Item1 = 'Calificar {} ({})'.format(calificacion[request.detail_cm['casos'][i]['calificacion']], request.detail_cm['casos'][i]['calificacion'])
-                Item2 = ' el Proyecto de Tesis de {} con código {}'.format(request.get_academic_program_display(), request.detail_cm['casos'][i]['codigo'])
-                Item3 = ' en el periodo académico {}, cuyo título es: “{}”.'.format(request.academic_period, request.detail_cm['casos'][i]['titulo'])
+                Item1 = 'Calificar {} ({})'.format(calificacion[
+                    request.detail_cm['casos'][i]['calificacion']],
+                                                   request.detail_cm['casos'][i]['calificacion'])
+                Item2 = ' el Proyecto de Tesis de {} con código {}'.format(
+                    request.get_academic_program_display(), request.detail_cm['casos'][i]['codigo'])
+                Item3 = ' en el periodo académico {}, cuyo título es: “{}”.'.format(
+                    request.academic_period, request.detail_cm['casos'][i]['titulo'])
                 Item = Item1 + Item2 + Item3
                 para = docx.add_paragraph(Item, style='List Number')
                 para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
                 para.paragraph_format.space_after = Pt(0)
-    
+
     @staticmethod
     def case_CAMBIO_DE_PROYECTO_DE_TESIS(request, docx, redirected=False):
         if redirected:
@@ -1050,7 +1074,8 @@ class simple():
             para = docx.add_paragraph()
             para.add_run('El Consejo de Facultad ')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        common = 'cambiar título de Tesis de {} a: “{}”'.format(request.get_academic_program_display(), request.detail_cm['titulo'])
+        common = 'cambiar título de Tesis de {} a: “{}”'.format(
+            request.get_academic_program_display(), request.detail_cm['titulo'])
         if request.approval_status == 'AP':
             para.add_run('APRUEBA ').font.bold = True
             para.add_run(common)
@@ -1067,9 +1092,12 @@ class simple():
             para = docx.add_paragraph()
             para.add_run('El Consejo de Facultad ')
         if request.detail_cm['caso'] == 'nuevo':
-            common = 'expedir un nuevo recibo de pago de derechos de matrícula con cambio de fecha, para el periodo académico {}'.format(request.academic_period)
+            common = 'expedir un nuevo recibo de pago de derechos de matrícula con ' + \
+                'cambio de fecha, para el periodo académico {}'.format(request.academic_period)
         if request.detail_cm['caso'] == 'unico':
-            common = 'la expedición de un único recibo correspondiente a los derechos académicos y administrativos para el periodo académico {}'.format(request.academic_period)
+            common = 'la expedición de un único recibo correspondiente a ' + \
+                'los derechos académicos y administrativos para el periodo académico {}'.format(
+                    request.academic_period)
         if request.approval_status == 'AP':
             para.add_run('APRUEBA ').font.bold = True
             para.add_run(common)
@@ -1088,18 +1116,23 @@ class simple():
             para = docx.add_paragraph()
             para.add_run('El Consejo de Facultad ')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        common = '{} de Doctorado ({}) en {}, en el periodo {}'.format(request.detail_cm['caso'], request.detail_cm['codigo'], request.get_academic_program_display(), request.academic_period)
+        common = '{} de Doctorado ({}) en {}, en el periodo {}'.format(
+            request.detail_cm['caso'], request.detail_cm['codigo'],
+            request.get_academic_program_display(), request.academic_period)
         if request.approval_status == 'AP':
             para.add_run('APRUEBA ').font.bold = True
             para.add_run('calificación avance satisfactorio (AS) a ' + common +
-            ', teniendo en cuenta que el estudiante entregó el documento para nombramiento de jurados')
+                         ', teniendo en cuenta que el estudiante entregó el documento' + \
+                             ' para nombramiento de jurados')
         else:
             para.add_run('NO APRUEBA ').font.bold = True
-            para.add_run('calificación avance satisfactorio (AS) a '+ common + ', debido a que {}'.format(request.justification))
+            para.add_run('calificación avance satisfactorio (AS) a ' + common + \
+                 ', debido a que {}'.format(request.justification))
         para.add_run('.')
-    
+
     @staticmethod
-    def case_CANCELACION_DE_ASIGNATURAS_CON_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO(request, docx, redirected=False):
+    def case_CANCELACION_DE_ASIGNATURAS_CON_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO(
+            request, docx, redirected=False):
         if redirected:
             para = docx.paragraphs[-1]
         else:
@@ -1112,7 +1145,8 @@ class simple():
             para.add_run('NO APRUEBA: ').font.bold = True
         para.paragraph_format.space_after = Pt(0)
         para = docx.add_paragraph(style='List Number')
-        para.add_run('Cursar el periodo académico ' + request.academic_period + ' con un número de ')
+        para.add_run('Cursar el periodo académico ' + request.academic_period + \
+                     ' con un número de ')
         para.add_run('créditos inferior al mínimo exigido, porque ' + request.justification)
         para.add_run('. (Artículo 10 del Acuerdo 008 de 2008 del Consejo Superior Universitario)')
         para.paragraph_format.space_after = Pt(0)
@@ -1160,7 +1194,8 @@ class simple():
             index = index + 1
 
     @staticmethod
-    def case_HOMOLOGACION_DE_ASIGNATURAS_INTERCAMBIO_ACADEMICO_INTERNACIONAL_PREGRADO(request, docx, redirected=False):
+    def case_HOMOLOGACION_DE_ASIGNATURAS_INTERCAMBIO_ACADEMICO_INTERNACIONAL_PREGRADO(
+            request, docx, redirected=False):
         assign = ['2011183 - Intercambio Académico Internacional',
                   '2014269 - Intercambio Académico Internacional Prórroga',
                   '2026630 - Intercambio Académico Internacional II',
@@ -1175,9 +1210,12 @@ class simple():
             para.add_run('APRUEBA:').font.bold = True
         else:
             para.add_run('NO APRUEBA: ').font.bold = True
-        item = 'Homologar las siguientes asignaturas cursadas en Intercambio Académico Internacional en '+\
-            request.detail_cm['inst'] + ' de la siguiente manera (Asrtículo 35, Acuerdo 008 de 2008 ' +\
-                'del Consejo Superior Universitario y Resolución 105 de 2017 de Vicerrectoría Académica):'
+        item = 'Homologar las siguientes asignaturas cursadas en Intercambio ' + \
+            'Académico Internacional en '+\
+            request.detail_cm['inst'] + ' de la siguiente manera ' + \
+                '(Artículo 35, Acuerdo 008 de 2008 ' +\
+                'del Consejo Superior Universitario y Resolución 105 ' + \
+                    'de 2017 de Vicerrectoría Académica):'
         para = docx.add_paragraph(item, style='List Number')
         para.paragraph_format.space_after = Pt(0)
         asign_number = len(request.detail_cm['subjects'])
@@ -1185,7 +1223,8 @@ class simple():
         periods = []
         for asign in request.detail_cm['subjects']:
             if asign['tipo_asig'] in tipology:
-                tipology.update({asign['tipo_asig']: tipology[asign['tipo_asig']] + int(asign['creds_asig'])})
+                tipology.update({asign['tipo_asig']: tipology[
+                    asign['tipo_asig']] + int(asign['creds_asig'])})
             else:
                 tipology.update({asign['tipo_asig']: int(asign['creds_asig'])})
             if asign['per_asig'] not in periods:
@@ -1227,7 +1266,8 @@ class simple():
             request.get_academic_program_display(), request.academic_program)).font.bold = True
         cellp = table.cell(1, 6).merge(table.cell(1, 7)).paragraphs[0]
         cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        cellp.add_run('Asignaturas cursadas en {}'.format(request.detail_cm['inst'])).font.bold = True
+        cellp.add_run('Asignaturas cursadas en {}'.format(
+            request.detail_cm['inst'])).font.bold = True
         for i in range(2, asign_number + 3):
             for j in range(8):
                 table.cell(i, j).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -1254,28 +1294,39 @@ class simple():
         for tip in tipology:
             text = 'Céditos homologados ' + str(tip)
             table.cell(count, 0).merge(table.cell(count, 5)).paragraphs[0].add_run(text)
-            table.cell(count, 0).merge(table.cell(count, 5)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-            table.cell(count, 6).merge(table.cell(count, 7)).paragraphs[0].add_run(str(tipology[tip]))
-            table.cell(count, 6).merge(table.cell(count, 7)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.cell(count, 0).merge(table.cell(count, 5)).paragraphs[
+                0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.cell(count, 6).merge(table.cell(count,
+                                                  7)).paragraphs[0].add_run(str(tipology[tip]))
+            table.cell(count, 6).merge(table.cell(count, 7)).paragraphs[
+                0].alignment = WD_ALIGN_PARAGRAPH.CENTER
             total_homologated += int(tipology[tip])
             count += 1
-        table.cell(count, 0).merge(table.cell(count, 5)).paragraphs[0].add_run('Total créditos que se homologan')
-        table.cell(count, 0).merge(table.cell(count, 5)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(count, 6).merge(table.cell(count, 7)).paragraphs[0].add_run(str(total_homologated))
-        table.cell(count, 6).merge(table.cell(count, 7)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(count, 0).merge(table.cell(count, 5)).paragraphs[
+            0].add_run('Total créditos que se homologan')
+        table.cell(count, 0).merge(table.cell(count, 5)).paragraphs[
+            0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(count, 6).merge(table.cell(count,
+                                              7)).paragraphs[0].add_run(str(total_homologated))
+        table.cell(count, 6).merge(table.cell(count, 7)).paragraphs[
+            0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         para = docx.add_paragraph(style='List Number')
         final_text = 'Calificar'
         other_count = 0
         for _ in periods:
-            final_text += ' aprobada (AP)' if request.detail_cm['califications'][other_count] == 'AP' else 'no aprobada (NA)'
-            final_text += ' la asignatura ' + assign[other_count] + ' en el periodo ' + periods[other_count]
+            final_text += ' aprobada (AP)' \
+                if request.detail_cm['califications'][other_count] == 'AP'\
+                     else 'no aprobada (NA)'
+            final_text += ' la asignatura ' + assign[other_count] + \
+                ' en el periodo ' + periods[other_count]
             other_count += 1
             if other_count + 1 == len(periods):
                 final_text += ' y'
         para.add_run(final_text)
 
     @staticmethod
-    def case_HOMOLOGACION_DE_ASIGNATURAS_CONVENIO_CON_UNIVERSIDAD_ANDES_PREGRADO(request, docx, redirected=False):
+    def case_HOMOLOGACION_DE_ASIGNATURAS_CONVENIO_CON_UNIVERSIDAD_ANDES_PREGRADO(
+            request, docx, redirected=False):
         assign = ['2011302 - Asignatura Por Convenio Con Universidad De Los Andes I - Pregrado',
                   '2012698 - Asignatura Por Convenio Con Universidad De Los Andes II - Pregrado']
         if redirected:
@@ -1328,7 +1379,8 @@ class simple():
         table_approvals(docx, subjects, details)
 
     @staticmethod
-    def case_HOMOLOGACION_DE_ASIGNATURAS_CONVENIO_CON_UNIVERSIDAD_ANDES_POSGRADO(request, docx, redirected=False):
+    def case_HOMOLOGACION_DE_ASIGNATURAS_CONVENIO_CON_UNIVERSIDAD_ANDES_POSGRADO(
+            request, docx, redirected=False):
         assign = ['2024944 - Asignatura Por Convenio Con Universidad De Los Andes I - Posgrado',
                   '2024945 - Asignatura Por Convenio Con Universidad De Los Andes II - Posgrado']
         if redirected:
@@ -1397,7 +1449,8 @@ class simple():
         raise NotImplementedError
 
     @staticmethod
-    def case_PROYECTO_DE_TESIS_O_TRABAJO_FINAL_DE_MAESTRIA_POSGRADO(request, docx, redirected=False):
+    def case_PROYECTO_DE_TESIS_O_TRABAJO_FINAL_DE_MAESTRIA_POSGRADO(
+            request, docx, redirected=False):
         raise NotImplementedError
 
     @staticmethod

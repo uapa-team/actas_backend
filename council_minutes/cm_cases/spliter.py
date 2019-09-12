@@ -195,7 +195,7 @@ class CasesSpliter():
 
     def case_DEVOLUCION_PROPORCIONAL_DEL_VALOR_PAGADO_POR_CONCEPTO_DE_DERECHOS_DE_MATRICULA_PREGRADO(
             self, request, docx, redirected):
-        simple.case_DEVOLUCION_PROPORCIONAL_DEL_VALOR_PAGADO_POR_CONCEPTO_DE_DERECHOS_DE_MATRICULA_PREGRADO(
+        simple.case_DEVOLUCION_PROPORCIONAL_DEL_VALOR_PAGADO_POR_CONCEPTO_DE_DERECHOS_MATRICULA_PREGRADO(
             request, docx, redirected)
 
     def case_TRASLADO_POSGRADO(self, request, docx, redirected):
