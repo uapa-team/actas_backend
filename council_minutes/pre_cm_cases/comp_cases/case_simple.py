@@ -177,7 +177,75 @@ class simple():
 
     @staticmethod
     def case_TRABAJO_DE_GRADO_PREGADO(request, docx, redirected=False):
-        raise NotImplementedError
+        para = docx.add_paragraph()
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Análisis:\t\t')
+        add_hyperlink(para, 'Acuerdo 026 de 2012',
+                      'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=47025')
+        para.add_run(', Acuerdo 40 de 2017')
+        para = docx.add_paragraph(style='List Number')
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run(
+            'Formato de registro diligenciado (Artículo 8): Revisado.')
+        para = docx.add_paragraph(style='List Number')
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run(
+            'Dirección de un profesor de la Universidad, aceptado y formalizado ')
+        para.add_run('(Artículo 6) en Acta ')
+        para.add_run(request.pre_cm['detail_pre_cm']['acta_comite'])
+        para.add_run(' de Comité en modalidad ')
+        para.add_run(request.detail_cm['modalidad'])
+        para.add_run('.')
+        para = docx.add_paragraph(style='List Number')
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Título del trabajo: ')
+        para.add_run(request.detail_cm['titulo'])
+        para.add_run(', Institución: ')
+        para.add_run(request.detail_cm['empresa'])
+        para.add_run(', docente encargado: ')
+        para.add_run(request.detail_cm['docente'])
+        para.add_run('.')
+        if 'extra_analysis' in request.pre_cm:
+            for analysis in request.pre_cm['extra_analysis']:
+                para = docx.add_paragraph(style='List Number')
+                para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+                para.paragraph_format.space_after = Pt(0)
+                para.add_run(analysis)
+        para = docx.add_paragraph()
+        para.paragraph_format.space_after = Pt(0)
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Concepto:').font.bold = True
+        para.add_run(' El comité Asesor ')
+        if request.approval_status != 'CR':
+            para.add_run('NO').font.bold = True
+        para.add_run(
+            ' recomienda inscribir la(s) siguiente(s) asignatura(s) en el periodo')
+        para.add_run(' académico ')
+        para.add_run(request.academic_period)
+        para.add_run(' modalidad')
+        cod_assig = ''
+        nom_assig = ''
+        if request.detail_cm['modalidad'] == 'trabajo':
+            para.add_run(' trabajos investigativos')
+            cod_assig = '2025990'
+            nom_assig = 'Trabajo de grado - Modalidad Trabajos Investigativos'
+        elif request.detail_cm['modalidad'] == 'pasantia':
+            para.add_run(' pasantía en ')
+            para.add_run(request.detail_cm['empresa'])
+            cod_assig = '2015289'
+            nom_assig = 'Trabajo de grado'
+        else:
+            raise AssertionError(
+                'request.detail_cm["modalidad"] must be "trabajo" or "pasantia".')
+        para.add_run(', dirigida por el profesor ')
+        para.add_run(request.detail_cm['docente'])
+        para.add_run('.')
+        table_subjects(docx, [[cod_assig, nom_assig,
+                               request.detail_cm['group'], 'P', '6']])
 
     @staticmethod
     def case_APROBACION_PROYECTO_PROPUESTA_Y_DESIGNACION_DE_DIRECTOR_POSGRADO(request, docx, redirected=False):
