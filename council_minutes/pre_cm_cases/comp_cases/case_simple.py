@@ -145,25 +145,37 @@ class simple():
 
     @staticmethod
     def case_CARGA_INFERIOR_A_LA_MINIMA_PREGRADO(request, docx, redirected=False):
-        str_in_ana = 'Análisis:	Acuerdo 008 de 2008\n'
-        str_in_ana += '1. SIA: Porcentaje de avance en el plan: {}. Número de matrículas: {}. PAPA: {}.\n'
+        para = docx.add_paragraph()
+        analysis_str = 'Análisis:'
+        run = para.add_run(analysis_str)
+        run.font.bold = True
+        # add_hyperlink(para, 'Acuerdo 008 de 2008',
+        # 'http://www.legal.unal.edu.co/sisjurun/normas/Norma1.jsp?i=34983')
+        para.paragraph_format.left_indent = Pt(36)
+        str_in_ana = '\n1. SIA: Porcentaje de avance en el plan: {}. Número de matrículas: {}. PAPA: {}.\n'
         str_in_ana += '2. SIA: Créditos disponibles: {}.'
-        str_in_ans = 'Concepto: El Comité Asesor recomienda al Consejo de Facultad cursar el periodo'
+        str_in_ans = 'El Comité Asesor recomienda al Consejo de Facultad cursar el periodo'
         str_in_ans += 'académico {} con un número de créditos inferior al mínimo exigido, porque{} '
         str_in_ans += 'justifica debidamente la solicitud (Artículo 10 del Acuerdo 008 de 2008 del '
         str_in_ans += 'Consejo Superior Universitario).'
-        docx.add_paragraph(str_in_ana.format(request['pre_cm']['advance'],
+        para.add_run(str_in_ana.format(request['pre_cm']['advance'],
                            request['pre_cm']['enrolled_academic_periods'],
                            request['pre_cm']['papa'],
                            request['pre_cm']['available']))
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        answer_str = 'Concepto: '
+        run = para.add_run(answer_str)
+        run.font.bold = True
         if request['approval_status'] == 'RC':
-            docx.add_paragraph(str_in_ans.format(request['academic_period'], ' '))
+            para.add_run(str_in_ans.format(request['academic_period'], ' '))
         else:
-            docx.add_paragraph(str_in_ans.format(request['academic_period'], ' no '))
+            para.add_run(str_in_ans.format(request['academic_period'], ' no '))
 
     @staticmethod
     def case_RETIRO_DEFINITIVO_DEL_PROGRAMA_PREGRADO(request, docx, redirected=False):
         raise NotImplementedError
+
 
     @staticmethod
     def case_CREDITOS_EXCEDENTES_MAPI_PREGRADO(request, docx, redirected=False):
