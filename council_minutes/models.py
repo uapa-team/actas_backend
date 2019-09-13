@@ -1,5 +1,5 @@
 import datetime
-from mongoengine import DynamicDocument, DateField, StringField
+from mongoengine import DynamicDocument, DateField, StringField, ListField, IntField, FloatField
 
 
 class Request(DynamicDocument):
@@ -415,21 +415,25 @@ class Request(DynamicDocument):
     )
     date = DateField(required=True, default=datetime.date.today)
     type = StringField(max_length=7, choices=TYPE_CHOICES, required=True)
-    student_name = StringField(max_length=512, required=True)
     approval_status = StringField(
         min_length=2, max_length=2, choices=APPROVAL_STATUS_CHOICES, required=True,
         default=APPROVAL_STATUS_EN_ESPERA)
-    student_dni = StringField(max_length=22, required=True)
+    student_name = StringField(max_length=512, required=True)
     student_dni_type = StringField(
         min_length=2, choices=DNI_TYPE_CHOICES, required=True,
         default=DNI_TYPE_CEDULA_DE_CIUDADANIA)
-    academic_period = StringField(max_length=10, required=True)
+    student_dni = StringField(max_length=22, required=True)
     academic_program = StringField(
         min_length=4, max_length=4, choices=PROGRAM_CHOICES, required=True)
-    justification = StringField(max_length=255, required=True, default='')
-    user = StringField(max_length=255, required=True)
+    council_decision = StringField(max_length=255, required=True, default='')
+    academic_period = StringField(max_length=10, required=True)
+    council_minute = StringField(max_length=7, required=True)
     date_stamp = DateField(required=True, default=datetime.date.today)
-    observation = StringField(default='')
+    consecutive_minute = IntField(min_value=1, required=True)
+    user = StringField(max_length=255, required=True)
+    student_justification = StringField(required=True, default='')
+    supports = StringField(required=True, default='')
+    extra_analisis = ListField(StringField(), required=true, default=[])
 
     def is_pre(self):
         return self.academic_program in ('2541', '2542', '2544', '2545', '2546',
