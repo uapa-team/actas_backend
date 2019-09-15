@@ -2,6 +2,13 @@ import datetime
 from mongoengine import DynamicDocument, DateField, StringField, ListField, IntField, FloatField
 
 
+class Subject(DynamicDocument):
+    name = StringField(required=True)
+    code = StringField(required=True)
+    credits = StringField(required=True)
+    group = StringField(required=True)
+    tipology = StringField(required=True)
+
 class Request(DynamicDocument):
     TYPE_TRASLADO_PREGRADO = 'TRASPRE'
     TYPE_REINGRESO_PREGRADO = 'REINPRE'
@@ -433,7 +440,7 @@ class Request(DynamicDocument):
     user = StringField(max_length=255, required=True)
     student_justification = StringField(required=True, default='')
     supports = StringField(required=True, default='')
-    extra_analisis = ListField(StringField(), required=true, default=[])
+    extra_analisis = ListField(StringField(), required=True, default=[])
 
     def is_pre(self):
         return self.academic_program in ('2541', '2542', '2544', '2545', '2546',

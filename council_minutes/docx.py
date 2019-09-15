@@ -22,7 +22,8 @@ class CouncilMinuteGenerator():
         self.case_count = 0
 
     def add_case_from_request(self, request):
-        self.spliter.request_case(request, self.document)
+        #self.spliter.request_case(request, self.document)
+        request.cm(self.document)
 
     def add_cases_from_date(self, start_date, end_date):
         request_by_date = Request.objects(date__gte=dateparser.parse(
