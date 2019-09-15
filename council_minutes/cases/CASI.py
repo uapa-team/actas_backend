@@ -1,13 +1,31 @@
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
+from ..models import Request
+from mongoengine import DynamicDocument, DateField, StringField, ListField, IntField, FloatField
 
 
-class CASI():
+class Subject(DynamicDocument):
+    name = StringField(required=True)
+    code = StringField(required=True)
+    credits = StringField(required=True)
+    group = StringField(required=True)
+    tipology = StringField(required=True)
+
+
+class CASI(Request):
+    subjects = ListField(Subject, required=True)
+    advance = FloatField(required=True)
+    enrolled_academic_periods = IntField(required=True)
+    papa = FloatField(required=True)
+    available_credits = IntField(required=True)
+    current_credits = IntField(required=True)
+    extra_analysis = ListField(StringField(required=True))
+    nrc_answer = StringField()
 
     count = 0
 
-    def cm(casi_request, docx, redirected=False):
+    def cm(self, casi_request, docx, redirected=False):
         if redirected:
             para = docx.paragraphs[-1]
         else:
@@ -19,7 +37,7 @@ class CASI():
         else:
             cm_na(casi_request, docx, para)
 
-    def cm_ap(casi_request, docx, paragraph):
+    def cm_ap(self, casi_request, docx, paragraph):
         paragraph.add_run('APRUEBA').font.bold = True
         paragraph.add_run(
             ' cancelar la(s) siguiente(s) asignatura(s) inscrita(s) del periodo académico ')
@@ -29,7 +47,7 @@ class CASI():
             ' (Artículo 15 Acuerdo 008 de 2008 del Consejo Superior Universitario).')
         cm_table(casi_request, docx)
 
-    def cm_na(casi_request, docx, paragraph):
+    def cm_na(self, casi_request, docx, paragraph):
         paragraph.add_run('NO APRUEBA').font.bold = True
         paragraph.add_run(
             ' cancelar la(s) siguiente(s) asignatura(s) inscrita(s) del periodo académico')
@@ -39,7 +57,7 @@ class CASI():
             '(Artículo 15 Acuerdo 008 de 2008 del Consejo Superior Universitario).')
         cm_table(casi_request, docx)
 
-    def cm_table(casi_request, docx):
+    def cm_table(self, casi_request, docx):
         table = docx.add_table(
             rows=len(casi_request.subjects)+1, cols=5)
         for column in table.columns:
@@ -95,12 +113,12 @@ class CASI():
             table.cell(index+1, 2).paragraphs[0].add_run(subject['credits'])
             index = index + 1
 
-    def pre_cm(casi_request, docx, redirected=False):
+    def pre_cm(self, casi_request, docx, redirected=False):
         CASI.count = 0
         pre_cm_analysis(casi_request, docx)
         pre_cm_answers(casi_request, docx)
 
-    def pre_cm_analysis(casi_request, docx):
+    def pre_cm_analysis(self, casi_request, docx):
         para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.paragraph_format.left_indent = Pt(36)
@@ -113,18 +131,18 @@ class CASI():
         pre_cm_analysis_3(casi_request, para)
         pre_cm_analysis_extra(casi_request, para)
 
-    def pre_cm_analysis_1(casi_request, para):
+    def pre_cm_analysis_1(self, casi_request, para):
         str_in = '\n1. SIA: Porcentaje de avance en el plan: {}. Número de'
         str_in += 'matrículas: {}. PAPA: {}.'
         para.add_run(str_in.format(casi_request.advance,
                                    casi_request.enrolled_academic_periods,
                                    casi_request.papa))
 
-    def pre_cm_analysis_2(casi_request, para):
+    def pre_cm_analysis_2(self, casi_request, para):
         str_in = '\n2. SIA: Créditos disponibles: {}.'
         para.add_run(str_in.format(casi_request.available_credits))
 
-    def pre_cm_analysis_3(casi_request, docx):
+    def pre_cm_analysis_3(self, casi_request, docx):
         CASI.count = 2
         for subject in casi_request.subjects:
             CASI.count = CASI.count + 1
@@ -134,25 +152,25 @@ class CASI():
             subject['remaining'] = current_credits - subject_credits
             pre_cm_analysis_s(docx, subject)
 
-    def pre_cm_analysis_s(para, subject):
+    def pre_cm_analysis_s(self, para, subject):
         str_in = '\n{}. SIA: Al aprobar la cancelación de la asignatura {} ({}) '
         str_in += ' el estudiante quedaría con {} créditos inscritos.'
         para.add_run(str_in.format(subject['number'], subject.code,
                                    subject.name, subject['remaining']))
 
-    def pre_cm_analysis_extra(casi_request, para):
+    def pre_cm_analysis_extra(self, casi_request, para):
         for extra_analysis in casi_request.extra_analysis:
             CASI.count = CASI.count + 1
             str_in = '\n{}. {}.'
             para.add_run(str_in.format(CASI.count, extra_analysis))
 
-    def pre_cm_answers(casi_request, docx):
+    def pre_cm_answers(self, casi_request, docx):
         if casi_request.approval_status == 'RC':
             pre_cm_answers_rc(casi_request, docx)
         elif casi_request.approval_status == 'NRC':
             pre_cm_answers_nrc(casi_request, docx)
 
-    def pre_cm_answers_rc(casi_request, docx):
+    def pre_cm_answers_rc(self, casi_request, docx):
         str_in = 'El Comité Asesor recomienda al Consejo de Facultad'
         str_in += ' cancelar la(s) siguiente(s) asignatura(s) inscrita(s) del '
         str_in += 'periodo académico {}, porque se justifica debidamente '
@@ -175,7 +193,7 @@ class CASI():
             index = index + 1
         table_subjects(docx, data)
 
-    def pre_cm_answers_nrc(casi_request, docx):
+    def pre_cm_answers_nrc(self, casi_request, docx):
         str_in = 'El Comité Asesor recomienda al Consejo de Facultad'
         str_in += ' NO cancelar la(s) siguiente(s) asignatura(s) inscrita(s) '
         str_in += 'del periodo académico {}, '
