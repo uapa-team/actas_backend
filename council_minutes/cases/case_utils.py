@@ -82,11 +82,11 @@ def num_to_month(month):
 
 def header(request, docx_):
     para = docx_.add_paragraph()
-    para.add_run('Tipo de solicitud:\t{}\n'.format(request.get_type_display()))
+    para.add_run('Tipo de solicitud:\t{}\n'.format(request.full_name)) 
     para.add_run('Justificación:\t\t{}\n'.format(
-        request['pre_cm']['justification']))
-    para.add_run('Soportes:\t\t{}\n'.format(request['pre_cm']['supports']))
-    para.add_run('Fecha radicación:\t{}'.format(request['date']))
+        request.student_justification ))
+    para.add_run('Soportes:\t\t{}\n'.format(request.supports))
+    para.add_run('Fecha radicación:\t{}'.format(request.date))
     para.paragraph_format.space_after = Pt(0)
 
 

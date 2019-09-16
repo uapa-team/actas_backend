@@ -3,12 +3,14 @@ from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
 from ..models import Request, Subject
-from mongoengine import DynamicDocument, DateField, StringField, ListField, IntField, FloatField
+from mongoengine import DynamicDocument, DateField, StringField, ListField, IntField, FloatField, EmbeddedDocumentListField
 
 
 class CASI(Request):
 
-    subjects = ListField(Subject, required=True)
+    full_name = "Cancelacion de Asignaturas"
+
+    subjects = EmbeddedDocumentListField(Subject, required=True)
     advance = FloatField(required=True)
     enrolled_academic_periods = IntField(required=True)
     papa = FloatField(required=True)
@@ -22,10 +24,10 @@ class CASI(Request):
         para = docx.add_paragraph()
         para.add_run('El Consejo de Facultad ')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        # if self.approval_status == 'AP':
-        #     self.cm_ap(docx, para)
-        # else:
-        #     self.cm_na(docx, para)
+        if self.approval_status == 'AP':
+            self.cm_ap(docx, para)
+        else:
+            self.cm_na(docx, para)
 
     def cm_ap(self, docx, paragraph):
         paragraph.add_run('APRUEBA').font.bold = True
@@ -35,7 +37,7 @@ class CASI(Request):
                           ', porque justifica debidamente la solicitud.')
         paragraph.add_run(
             ' (Artículo 15 Acuerdo 008 de 2008 del Consejo Superior Universitario).')
-        self.cm_table(docx)
+        # self.cm_table(docx)
 
     def cm_na(self, docx, paragraph):
         paragraph.add_run('NO APRUEBA').font.bold = True
@@ -96,11 +98,11 @@ class CASI(Request):
 
         index = 0
         for subject in self.subjects:
-            table.cell(index+1, 0).paragraphs[0].add_run(subject['code'])
-            table.cell(index+1, 1).paragraphs[0].add_run(subject['subject'])
-            table.cell(index+1, 4).paragraphs[0].add_run(subject['group'])
-            table.cell(index+1, 3).paragraphs[0].add_run(subject['tipology'])
-            table.cell(index+1, 2).paragraphs[0].add_run(subject['credits'])
+            table.cell(index+1, 0).paragraphs[0].add_run(subject.code)
+            table.cell(index+1, 1).paragraphs[0].add_run(subject.name)
+            table.cell(index+1, 4).paragraphs[0].add_run(subject.group)
+            table.cell(index+1, 3).paragraphs[0].add_run(subject.tipology)
+            table.cell(index+1, 2).paragraphs[0].add_run(subject.credits)
             index = index + 1
 
     def pre_cm(self, docx):
@@ -136,17 +138,21 @@ class CASI(Request):
         CASI.count = 2
         for subject in self.subjects:
             CASI.count = CASI.count + 1
-            subject['number'] = str(CASI.count)
             current_credits = self.current_credits
             subject_credits = subject.credits
-            subject['remaining'] = current_credits - subject_credits
-            self.pre_cm_analysis_s(docx, subject)
+            aux = {
+                'number' : str(CASI.count),
+                'remaining' : int(current_credits) - int(subject_credits),
+                'code' : subject.code,
+                'name' : subject.name
+            }
+            self.pre_cm_analysis_s(docx, aux)
 
     def pre_cm_analysis_s(self, para, subject):
         str_in = '\n{}. SIA: Al aprobar la cancelación de la asignatura {} ({}) '
         str_in += ' el estudiante quedaría con {} créditos inscritos.'
-        para.add_run(str_in.format(subject['number'], subject.code,
-                                   subject.name, subject['remaining']))
+        para.add_run(str_in.format(subject['number'], subject['code'],
+                                   subject['name'], subject['remaining']))
 
     def pre_cm_analysis_extra(self, para):
         for extra_analysis in self.extra_analysis:
@@ -168,9 +174,8 @@ class CASI(Request):
         str_in += 'Consejo Superior Universitario)'
         para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.add_run('Concepto: ').bold = True
         para.add_run(str_in.format(self.academic_period))
-        para.add_run('Concepto: ')
-        para.font.bold = True
         data = []
         index = 0
         for subject in self.subjects:

@@ -5,6 +5,7 @@ from docx.shared import Pt
 from .models import Request
 from .cm_cases.spliter import CasesSpliter
 from .pre_cm_cases.splitter import PreCasesSpliter
+from .cases.case_utils import *
 
 
 class CouncilMinuteGenerator():
@@ -22,7 +23,6 @@ class CouncilMinuteGenerator():
         self.case_count = 0
 
     def add_case_from_request(self, request):
-        #self.spliter.request_case(request, self.document)
         request.cm(self.document)
 
     def add_cases_from_date(self, start_date, end_date):
@@ -115,7 +115,8 @@ class PreCouncilMinuteGenerator():
         self.case_count = 0
 
     def add_case_from_request(self, request):
-        self.spliter.request_case(request, self.document)
+        header(request, self.document)
+        request.pre_cm(self.document)
 
     def add_cases_from_date(self, start_date, end_date):
         request_by_date = Request.objects(date__gte=dateparser.parse(

@@ -1,8 +1,8 @@
 import datetime
-from mongoengine import DynamicDocument, DateField, StringField, ListField, IntField, FloatField
+from mongoengine import DynamicDocument, EmbeddedDocument, DateField, StringField, ListField, IntField, FloatField
 
 
-class Subject():
+class Subject(EmbeddedDocument):
     name = StringField(required=True)
     code = StringField(required=True)
     credits = StringField(required=True)
@@ -443,7 +443,7 @@ class Request(DynamicDocument):
     user = StringField(max_length=255, required=True)
     student_justification = StringField(required=True, default='')
     supports = StringField(required=True, default='')
-    extra_analisis = ListField(StringField(), required=True, default=[])
+    extra_analysis = ListField(StringField(), default=[])
 
     def is_pre(self):
         return self.academic_program in ('2541', '2542', '2544', '2545', '2546',
