@@ -2,7 +2,7 @@ import datetime
 from mongoengine import DynamicDocument, DateField, StringField, ListField, IntField, FloatField
 
 
-class Subject(DynamicDocument):
+class Subject():
     name = StringField(required=True)
     code = StringField(required=True)
     credits = StringField(required=True)
@@ -10,6 +10,10 @@ class Subject(DynamicDocument):
     tipology = StringField(required=True)
 
 class Request(DynamicDocument):
+
+    meta = {'allow_inheritance': True,
+            'abstract': True}
+    
     TYPE_TRASLADO_PREGRADO = 'TRASPRE'
     TYPE_REINGRESO_PREGRADO = 'REINPRE'
     TYPE_REEMBOLSO_PREGRADO = 'REEMPRE'
@@ -88,6 +92,7 @@ class Request(DynamicDocument):
     TYPE_PROYECTO_DE_TESIS_O_TRABAJO_FINAL_DE_MAESTRIA_POSGRADO = 'PRTMPOS'
     TYPE_PROYECTO_DE_TESIS_DE_DOCTORADO_POSGRADO = 'PRTDPOS'
     TYPE_CHOICES = (
+        ('CASI', 'Cancelación de Asignaturas'),
         (TYPE_TRASLADO_PREGRADO, 'Traslado (Pregrado)'),
         (TYPE_REINGRESO_PREGRADO, 'Reingreso (Pregrado)'),
         (TYPE_REEMBOLSO_PREGRADO, 'Reembolso (Pregrado)'),
@@ -421,7 +426,7 @@ class Request(DynamicDocument):
          'Modalidad de Asignaturas de Posgrado Facultad de Odontología'),
     )
     date = DateField(required=True, default=datetime.date.today)
-    type = StringField(max_length=7, choices=TYPE_CHOICES, required=True)
+    _cls = StringField(max_length=7, choices=TYPE_CHOICES, required=True)
     approval_status = StringField(
         min_length=2, max_length=2, choices=APPROVAL_STATUS_CHOICES, required=True,
         default=APPROVAL_STATUS_EN_ESPERA)
@@ -434,7 +439,6 @@ class Request(DynamicDocument):
         min_length=4, max_length=4, choices=PROGRAM_CHOICES, required=True)
     council_decision = StringField(max_length=255, required=True, default='')
     academic_period = StringField(max_length=10, required=True)
-    council_minute = StringField(max_length=7, required=True)
     date_stamp = DateField(required=True, default=datetime.date.today)
     consecutive_minute = IntField(min_value=1, required=True)
     user = StringField(max_length=255, required=True)

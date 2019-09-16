@@ -8,6 +8,7 @@ from .models import Request
 from .helpers import QuerySetEncoder, Translator
 from .docx import CouncilMinuteGenerator
 from .docx import PreCouncilMinuteGenerator
+from .cases.CASI import CASI
 # Esto va solo para evitar la verificacion de django
 
 
@@ -47,7 +48,7 @@ def insert_request(request):
 def docx_gen_by_id(request, cm_id):
     filename = 'public/acta' + cm_id + '.docx'
     try:
-        request_by_id = Request.objects.get(id=cm_id)
+        request_by_id = CASI.objects.get(id=cm_id)
     except mongoengine.DoesNotExist:
         return HttpResponse('Does not exist', status=404)
     generator = CouncilMinuteGenerator()

@@ -7,13 +7,15 @@ from mongoengine import DynamicDocument, DateField, StringField, ListField, IntF
 
 
 class CASI(Request):
-    subjects = ListField(Subject, required=True)
+
+    meta = {'collection': 'request'}
+
+    #subjects = ListField(Subject, required=True)
     advance = FloatField(required=True)
     enrolled_academic_periods = IntField(required=True)
     papa = FloatField(required=True)
     available_credits = IntField(required=True)
     current_credits = IntField(required=True)
-    extra_analysis = ListField(StringField(required=True))
     nrc_answer = StringField() #TODO: choises
 
     count = 0
@@ -22,10 +24,10 @@ class CASI(Request):
         para = docx.add_paragraph()
         para.add_run('El Consejo de Facultad ')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        if self.approval_status == 'AP':
-            self.cm_ap(docx, para)
-        else:
-            self.cm_na(docx, para)
+        # if self.approval_status == 'AP':
+        #     self.cm_ap(docx, para)
+        # else:
+        #     self.cm_na(docx, para)
 
     def cm_ap(self, docx, paragraph):
         paragraph.add_run('APRUEBA').font.bold = True
