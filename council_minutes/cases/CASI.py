@@ -8,9 +8,7 @@ from mongoengine import DynamicDocument, DateField, StringField, ListField, IntF
 
 class CASI(Request):
 
-    meta = {'collection': 'request'}
-
-    #subjects = ListField(Subject, required=True)
+    subjects = ListField(Subject, required=True)
     advance = FloatField(required=True)
     enrolled_academic_periods = IntField(required=True)
     papa = FloatField(required=True)

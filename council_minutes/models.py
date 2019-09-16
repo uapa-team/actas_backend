@@ -11,8 +11,7 @@ class Subject():
 
 class Request(DynamicDocument):
 
-    meta = {'allow_inheritance': True,
-            'abstract': True}
+    meta = {'allow_inheritance': True}
     
     TYPE_TRASLADO_PREGRADO = 'TRASPRE'
     TYPE_REINGRESO_PREGRADO = 'REINPRE'
