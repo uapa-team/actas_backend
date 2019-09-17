@@ -448,3 +448,33 @@ class Request(DynamicDocument):
     def is_pre(self):
         return self.academic_program in ('2541', '2542', '2544', '2545', '2546',
                                          '2547', '2548', '2549', '2879')
+
+    def get_fields(self):
+        fields = []
+        _dir = self.__class__.__dict__
+        for key in dir(self.__class__):
+            try:
+                choices = _dir[key].choices or ()
+                field = (key,
+                    Request.clear_name(_dir[key].__class__),
+                    choices)
+                fields.append(field)
+            except Exception:
+                pass
+        if self.__class__ is not Request:
+            super_cls = self.__class__.mro()[1]
+            fields = super_cls.get_fields(super_cls()) + fields
+        return fields
+
+    @staticmethod
+    def clear_name(_class):
+        name = str(_class).split('\'')[1]
+        name = name.split('.')[-1]
+        if name == 'StringField':   return 'String'
+        elif name == 'DateField':   return 'Date'
+        elif name == 'ListField':   return 'List'
+        elif name == 'IntField':    return 'Integer'
+        elif name == 'FloatField':  return 'Float'
+        elif name == 'EmbeddedDocumentField':    return 'Object'
+        elif name == 'EmbeddedDocumentListField':return 'List'
+            
