@@ -6,8 +6,9 @@ def get_fields(obj):
         _dir = obj.__class__.__dict__
         for key in dir(obj.__class__):
             try:
-                choices = _dir[key].choices or ()
+                choices = _dir[key].choices
                 fields[key] = {'type': clear_name(_dir[key].__class__)}
+                if choices: fields[key]['choices'] = [option[1] for option in choices]
                 if isinstance(_dir[key], ListField):
                     fields[key]['list'] = {}
                     fields[key]['list']['type'] = clear_name(_dir[key].field.__class__)
