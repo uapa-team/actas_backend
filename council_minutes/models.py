@@ -1,6 +1,37 @@
 import datetime
-from mongoengine import DynamicDocument, EmbeddedDocument, DateField, StringField, ListField, IntField, FloatField
+from mongoengine import DynamicDocument, EmbeddedDocument, DateField, StringField, ListField, IntField, FloatField, EmbeddedDocumentListField, EmbeddedDocumentField
 
+def get_fields(obj):
+        fields = {}
+        _dir = obj.__class__.__dict__
+        for key in dir(obj.__class__):
+            try:
+                choices = _dir[key].choices or ()
+                fields[key] = {'type': clear_name(_dir[key].__class__)}
+                if isinstance(_dir[key], ListField):
+                    fields[key]['list'] = {}
+                    fields[key]['list']['type'] = clear_name(_dir[key].field.__class__)
+                    if issubclass(_dir[key].field.document_type_obj, EmbeddedDocument):
+                        fields[key]['list']['fields'] = get_fields(_dir[key].field.document_type_obj())
+
+            except Exception:
+                pass
+        super_cls = obj.__class__.mro()[1]
+        if super_cls not in (DynamicDocument, EmbeddedDocument):
+            fields.update(get_fields(super_cls()))
+        return fields
+
+def clear_name(_class):
+        name = str(_class).split('\'')[1]
+        name = name.split('.')[-1]
+        if name == 'StringField':   return 'String'
+        elif name == 'DateField':   return 'Date'
+        elif name == 'ListField':   return 'List'
+        elif name == 'IntField':    return 'Integer'
+        elif name == 'FloatField':  return 'Float'
+        elif name == 'EmbeddedDocumentField':    return 'Object'
+        elif name == 'EmbeddedDocumentListField':return 'List'
+        else: return name
 
 class Subject(EmbeddedDocument):
     name = StringField(required=True)
@@ -449,32 +480,4 @@ class Request(DynamicDocument):
         return self.academic_program in ('2541', '2542', '2544', '2545', '2546',
                                          '2547', '2548', '2549', '2879')
 
-    def get_fields(self):
-        fields = []
-        _dir = self.__class__.__dict__
-        for key in dir(self.__class__):
-            try:
-                choices = _dir[key].choices or ()
-                field = (key,
-                    Request.clear_name(_dir[key].__class__),
-                    choices)
-                fields.append(field)
-            except Exception:
-                pass
-        if self.__class__ is not Request:
-            super_cls = self.__class__.mro()[1]
-            fields = super_cls.get_fields(super_cls()) + fields
-        return fields
-
-    @staticmethod
-    def clear_name(_class):
-        name = str(_class).split('\'')[1]
-        name = name.split('.')[-1]
-        if name == 'StringField':   return 'String'
-        elif name == 'DateField':   return 'Date'
-        elif name == 'ListField':   return 'List'
-        elif name == 'IntField':    return 'Integer'
-        elif name == 'FloatField':  return 'Float'
-        elif name == 'EmbeddedDocumentField':    return 'Object'
-        elif name == 'EmbeddedDocumentListField':return 'List'
             
