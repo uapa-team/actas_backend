@@ -7,9 +7,6 @@ from mongoengine import DynamicDocument, DateField, StringField, ListField, IntF
 
 
 class CASI(Request):
-
-    full_name = "Cancelacion de Asignaturas"
-
     subjects = EmbeddedDocumentListField(Subject, required=True)
     advance = FloatField(required=True)
     enrolled_academic_periods = IntField(required=True)
@@ -18,92 +15,55 @@ class CASI(Request):
     current_credits = IntField(required=True)
     nrc_answer = StringField() #TODO: choises
 
+    full_name = "Cancelacion de Asignaturas"
+
     count = 0
 
+    case_str_ap = 'APRUEBA'
+    case_str_na = 'NO APRUEBA'
+    case_str_regulation = '(Artículo 15 Acuerdo 008 de 2008 del Consejo Superior Universitario).'
+
+    case_str_cm_1 = 'El Consejo de Facultad'
+    case_str_cm_2 = 'cancelar la(s) siguiente(s) asignatura(s) inscrita(s) del periodo académico {}'
+    case_str_cm_3 = 'porque {}justifica debidamente la solicitud.'
+    
+
     def cm(self, docx):
-        para = docx.add_paragraph()
-        para.add_run('El Consejo de Facultad ')
-        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        if self.approval_status == 'AP':
-            self.cm_ap(docx, para)
-        else:
-            self.cm_na(docx, para)
+        paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        self.cm_answer(paragraph)
+        self.casi_subjects_table(docx)
 
-    def cm_ap(self, docx, paragraph):
-        paragraph.add_run('APRUEBA').font.bold = True
-        paragraph.add_run(
-            ' cancelar la(s) siguiente(s) asignatura(s) inscrita(s) del periodo académico ')
-        paragraph.add_run(self.academic_period +
-                          ', porque justifica debidamente la solicitud.')
-        paragraph.add_run(
-            ' (Artículo 15 Acuerdo 008 de 2008 del Consejo Superior Universitario).')
-        # self.cm_table(docx)
+    def cm_answer(self, paragraph):
+        paragraph.add_run(self.case_str_cm_1 + ' ')
+        if self.approval_status == self.APPROVAL_STATUS_APRUEBA:
+            self.cm_ap(paragraph)
+        elif self.approval_status == self.APPROVAL_STATUS_NO_APRUEBA:
+            self.cm_na(paragraph)
+        paragraph.add_run(self.case_str_regulation)
 
-    def cm_na(self, docx, paragraph):
-        paragraph.add_run('NO APRUEBA').font.bold = True
-        paragraph.add_run(
-            ' cancelar la(s) siguiente(s) asignatura(s) inscrita(s) del periodo académico')
-        paragraph.add_run(self.academic_period +
-                          ', porque ' + self.council_decision + '. ')
-        paragraph.add_run(
-            '(Artículo 15 Acuerdo 008 de 2008 del Consejo Superior Universitario).')
-        self.cm_table(docx)
+    def cm_ap(self, paragraph):
+        paragraph.add_run(self.case_str_ap + ' ').font.bold = True
+        paragraph.add_run(self.case_str_cm_2.format(self.academic_period) + ', ')
+        paragraph.add_run(self.case_str_cm_3.format('') + ' ')
 
-    def cm_table(self, docx):
-        table = docx.add_table(
-            rows=len(self.subjects)+1, cols=5)
-        for column in table.columns:
-            for cell in column.cells:
-                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-                cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.style = 'Table Grid'
-        table.style.font.size = Pt(8)
-        table.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.columns[0].width = 700000
-        table.columns[1].width = 2000000
-        table.columns[2].width = 900000
-        table.columns[3].width = 900000
-        table.columns[4].width = 900000
+    def cm_na(self, paragraph):
+        paragraph.add_run(self.case_str_na + ' ').font.bold = True
+        paragraph.add_run(self.case_str_cm_2.format(self.academic_period) + ', ')
+        paragraph.add_run(self.case_str_cm_3.format('no ') + ' ')
 
-        for cell in table.columns[0].cells:
-            cell.width = 750000
-        for cell in table.columns[1].cells:
-            cell.width = 2000000
-        for cell in table.columns[2].cells:
-            cell.width = 900000
-        for cell in table.columns[3].cells:
-            cell.width = 900000
-        for cell in table.columns[4].cells:
-            cell.width = 900000
-
-        cellp = table.cell(0, 0).paragraphs[0]
-        cellp.add_run('Código SIA').font.bold = True
-        cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-
-        cellp = table.cell(0, 1).paragraphs[0]
-        cellp.add_run('Nombre Asignatura').font.bold = True
-        cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-
-        cellp = table.cell(0, 2).paragraphs[0]
-        cellp.add_run('Grupo').font.bold = True
-        cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-
-        cellp = table.cell(0, 3).paragraphs[0]
-        cellp.add_run('Tipología').font.bold = True
-        cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-
-        cellp = table.cell(0, 4).paragraphs[0]
-        cellp.add_run('Créditos').font.bold = True
-        cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-
+    def casi_subjects_table(self, docx):
+        data = []
         index = 0
         for subject in self.subjects:
-            table.cell(index+1, 0).paragraphs[0].add_run(subject.code)
-            table.cell(index+1, 1).paragraphs[0].add_run(subject.name)
-            table.cell(index+1, 4).paragraphs[0].add_run(subject.group)
-            table.cell(index+1, 3).paragraphs[0].add_run(subject.tipology)
-            table.cell(index+1, 2).paragraphs[0].add_run(subject.credits)
+            data.append([])
+            data[index] += [subject.code]
+            data[index] += [subject.name]
+            data[index] += [subject.group]
+            data[index] += [subject.tipology]
+            data[index] += [subject.credits]
             index = index + 1
+        table_subjects(docx, data)
 
     def pre_cm(self, docx):
         CASI.count = 0
@@ -176,17 +136,7 @@ class CASI(Request):
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.add_run('Concepto: ').bold = True
         para.add_run(str_in.format(self.academic_period))
-        data = []
-        index = 0
-        for subject in self.subjects:
-            data.append([])
-            data[index] += [subject.code]
-            data[index] += [subject.name]
-            data[index] += [subject.group]
-            data[index] += [subject.tipology]
-            data[index] += [subject.credits]
-            index = index + 1
-        table_subjects(docx, data)
+        self.casi_subjects_table(docx)
 
     def pre_cm_answers_nrc(self, docx):
         str_in = 'El Comité Asesor recomienda al Consejo de Facultad'
