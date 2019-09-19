@@ -1,22 +1,18 @@
 import datetime
+from mongoengine.fields import BaseField
 from mongoengine import DynamicDocument, EmbeddedDocument, DateField, StringField, ListField, IntField, FloatField, EmbeddedDocumentListField, EmbeddedDocumentField
 
 def get_fields(obj):
         fields = {}
         _dir = obj.__class__.__dict__
-        for key in dir(obj.__class__):
-            try:
-                choices = _dir[key].choices
-                fields[key] = {'type': clear_name(_dir[key].__class__)}
-                if choices: fields[key]['choices'] = [option[1] for option in choices]
-                if isinstance(_dir[key], ListField):
-                    fields[key]['list'] = {}
-                    fields[key]['list']['type'] = clear_name(_dir[key].field.__class__)
-                    if issubclass(_dir[key].field.document_type_obj, EmbeddedDocument):
-                        fields[key]['list']['fields'] = get_fields(_dir[key].field.document_type_obj())
-
-            except Exception:
-                pass
+        for key, value in _dir.items():
+            if isinstance(value, BaseField):
+                fields[key] = {'type': clear_name(value.__class__)}
+                if value.choices: fields[key]['choices'] = [option[1] for option in value.choices]
+                if isinstance(value, ListField):
+                    fields[key]['list'] = {'type': clear_name(value.field.__class__)}
+                    if isinstance(value.field, EmbeddedDocumentField):
+                        fields[key]['list']['fields'] = get_fields(value.field.document_type_obj())
         super_cls = obj.__class__.mro()[1]
         if super_cls not in (DynamicDocument, EmbeddedDocument):
             fields.update(get_fields(super_cls()))
