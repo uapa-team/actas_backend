@@ -3,30 +3,88 @@ from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
 from ..models import Request, Subject
+from .case_utils import *
 from mongoengine import DynamicDocument, DateField, StringField, ListField, IntField, FloatField, EmbeddedDocumentListField
 
 
 class CASI(Request):
+
+    CN_ANSWER_NO_DILIGENTE = 'ND'
+    CN_ANSWER_MOTIVOS_LABORALES = 'ML'
+    CN_ANSWER_INFORMACION_FALSA = 'TR'
+    CN_ANSWER_SOPORTES_NO_SOPORTAN = 'SN'
+    CN_ANSWER_FALTA_DE_CONOCIMIENTO = 'FC'
+    CN_ANSWER_ARGUMENTOS_INSUFICIENTES = 'AI'
+    CN_ANSWER_INCOHERENTE_O_INCONSECUENTE = 'II'
+    CN_ANSWER_OTRO = 'OT'
+    CN_ANSWER_CHOICES = (
+        (CN_ANSWER_NO_DILIGENTE, 'No diligente'),
+        (CN_ANSWER_MOTIVOS_LABORALES, 'Motivos Laborales'),
+        (CN_ANSWER_INFORMACION_FALSA, 'Información Falsa'),
+        (CN_ANSWER_SOPORTES_NO_SOPORTAN, 'Argumento cuando los soportes no soportan'),
+        (CN_ANSWER_FALTA_DE_CONOCIMIENTO, 'Falta de conocimiento'),
+        (CN_ANSWER_ARGUMENTOS_INSUFICIENTES, 'Argumentos insuficientes'),
+        (CN_ANSWER_INCOHERENTE_O_INCONSECUENTE, 'Incoherente o no consecuente'),
+        (CN_ANSWER_OTRO, 'Otro')
+    )
+
     subjects = EmbeddedDocumentListField(Subject, required=True)
     advance = FloatField(required=True)
     enrolled_academic_periods = IntField(required=True)
     papa = FloatField(required=True)
     available_credits = IntField(required=True)
     current_credits = IntField(required=True)
-    nrc_answer = StringField() #TODO: choises
+    nrc_answer = StringField(choices=CN_ANSWER_CHOICES)
 
-    full_name = "Cancelacion de Asignaturas"
+    full_name = 'Cancelacion de Asignaturas'
 
     count = 0
 
-    case_str_ap = 'APRUEBA'
-    case_str_na = 'NO APRUEBA'
-    case_str_regulation = '(Artículo 15 Acuerdo 008 de 2008 del Consejo Superior Universitario).'
+    str_ap = 'APRUEBA'
+    str_na = 'NO APRUEBA'
+    str_analysis = 'Analisis'
+    str_answer = 'Concepto'
+    str_regulation_1 = '(Artículo 15 Acuerdo 008 de 2008 del Consejo Superior Universitario).'
+    str_regulation_2 = 'Acuerdo 008 de 2008'
+    str_regulation_2_link = 'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34983'
 
-    case_str_cm_1 = 'El Consejo de Facultad'
-    case_str_cm_2 = 'cancelar la(s) siguiente(s) asignatura(s) inscrita(s) del periodo académico {}'
-    case_str_cm_3 = 'porque {}justifica debidamente la solicitud.'
+    str_cm_1 = 'El Consejo de Facultad'
+    str_cm_2 = 'cancelar la(s) siguiente(s) asignatura(s) inscrita(s) del periodo académico {}'
+    str_cm_3 = 'porque {}justifica debidamente la solicitud.'
     
+    str_pcm_1 = 'SIA: Porcentaje de avance en el plan: {}. Número de matrículas: {}. PAPA: {}.'
+    str_pcm_2 = 'SIA: Créditos disponibles: {}.'
+    str_pcm_3 = 'SIA: Al aprobar la cancelación de la asignatura {} ({}) '
+    str_pcm_3 += 'el estudiante quedaría con {} créditos inscritos.'
+
+    str_pcm_ans_1 = 'El Comité Asesor {}recomienda al Consejo de Facultad cancelar la(s) '
+    str_pcm_ans_1 += 'siguiente(s) asignatura(s) inscrita(s) del periodo académico {}, '
+    str_pcm_ans_cr = 'porque se justifica debidamente la solicitud.'
+
+    str_pcm_ans_nc_1 = 'porque no existe coherencia entre la documentación y '
+    str_pcm_ans_nc_1 += 'justificación que presenta.'
+
+    str_pcm_ans_nc_2 = 'porque lo expuesto es un hecho de su conocimiento desde el inicio del '
+    str_pcm_ans_nc_2 += 'periodo académico; tuvo la oportunidad de resolverlo oportunamente  '
+    str_pcm_ans_nc_2 += 'hasta el 50% del periodo académico, por tanto, no constituye causa  '
+    str_pcm_ans_nc_2 += 'extraña que justifique la cancelación de la(s) asignatura(s).'
+
+    str_pcm_ans_nc_3 = 'porque de acuerdo con la documentación que presenta, su situación laboral '
+    str_pcm_ans_nc_3 += 'no le impide asistir a las clases y tiene el tiempo suficiente para '
+    str_pcm_ans_nc_3 += 'responder por las actividades académicas de la(s) asignatura(s). '
+
+    str_pcm_ans_nc_4 = 'porque verificada la información de los soportes, se encontró que el '
+    str_pcm_ans_nc_4 += 'contenido de los mismos no coincide con lo que en ellos se afirma.'
+
+    str_pcm_ans_nc_5 = 'poque es responsabilidad del estudiante indagar sobre el conocimiento '
+    str_pcm_ans_nc_5 += 'requerido y la preparación necesaria para cursar la(s) asignatura(s)'
+    str_pcm_ans_nc_5 += 'antes de inscribir.'
+
+    str_pcm_ans_nc_6 = 'porque lo expuesto no es un hecho que constituya causa extraña que '
+    str_pcm_ans_nc_6 += 'justifique la cancelación de la(s) asignatura(s).'
+
+    str_pcm_ans_nc_7 = 'porque de la documentación aportada, se tiene que no hay justificación '
+    str_pcm_ans_nc_7 += 'para acceder a lo pedido. '
 
     def cm(self, docx):
         paragraph = docx.add_paragraph()
@@ -35,22 +93,22 @@ class CASI(Request):
         self.casi_subjects_table(docx)
 
     def cm_answer(self, paragraph):
-        paragraph.add_run(self.case_str_cm_1 + ' ')
+        paragraph.add_run(self.str_cm_1 + ' ')
         if self.approval_status == self.APPROVAL_STATUS_APRUEBA:
             self.cm_ap(paragraph)
         elif self.approval_status == self.APPROVAL_STATUS_NO_APRUEBA:
             self.cm_na(paragraph)
-        paragraph.add_run(self.case_str_regulation)
+        paragraph.add_run(self.str_regulation_1)
 
     def cm_ap(self, paragraph):
-        paragraph.add_run(self.case_str_ap + ' ').font.bold = True
-        paragraph.add_run(self.case_str_cm_2.format(self.academic_period) + ', ')
-        paragraph.add_run(self.case_str_cm_3.format('') + ' ')
+        paragraph.add_run(self.str_ap + ' ').font.bold = True
+        paragraph.add_run(self.str_cm_2.format(self.academic_period) + ', ')
+        paragraph.add_run(self.str_cm_3.format('') + ' ')
 
     def cm_na(self, paragraph):
-        paragraph.add_run(self.case_str_na + ' ').font.bold = True
-        paragraph.add_run(self.case_str_cm_2.format(self.academic_period) + ', ')
-        paragraph.add_run(self.case_str_cm_3.format('no ') + ' ')
+        paragraph.add_run(self.str_na + ' ').font.bold = True
+        paragraph.add_run(self.str_cm_2.format(self.academic_period) + ', ')
+        paragraph.add_run(self.str_cm_3.format('no ') + ' ')
 
     def casi_subjects_table(self, docx):
         data = []
@@ -65,119 +123,106 @@ class CASI(Request):
             index = index + 1
         table_subjects(docx, data)
 
-    def pre_cm(self, docx):
+    def pcm(self, docx):
         CASI.count = 0
-        self.pre_cm_analysis(docx)
-        self.pre_cm_answers(docx)
+        self.pcm_analysis_handler(docx)
+        self.pcm_answer_handler(docx)
 
-    def pre_cm_analysis(self, docx):
-        para = docx.add_paragraph()
-        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.paragraph_format.left_indent = Pt(36)
-        run = para.add_run('Analisis: ')
-        run.font.bold = True
-        # add_hyperlink(para, 'Acuerdo 008 de 2008',
-        # 'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34983')
-        self.pre_cm_analysis_1(para)
-        self.pre_cm_analysis_2(para)
-        self.pre_cm_analysis_3(para)
-        self.pre_cm_analysis_extra(para)
+    def pcm_analysis_handler(self, docx):
+        paragraph = docx.add_paragraph()
+        paragraph.add_run(self.str_analysis + ': ').font.bold = True
+        add_hyperlink(paragraph, self.str_regulation_2, self.str_regulation_2_link)
+        paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.left_indent = Pt(36)
+        self.pcm_analysis(paragraph)
 
-    def pre_cm_analysis_1(self, para):
-        str_in = '\n1. SIA: Porcentaje de avance en el plan: {}. Número de'
-        str_in += 'matrículas: {}. PAPA: {}.'
-        para.add_run(str_in.format(self.advance,
-                                   self.enrolled_academic_periods,
-                                   self.papa))
 
-    def pre_cm_analysis_2(self, para):
-        str_in = '\n2. SIA: Créditos disponibles: {}.'
-        para.add_run(str_in.format(self.available_credits))
+    def pcm_analysis(self, paragraph):
+        self.pcm_analysis_1(paragraph)
+        self.pcm_analysis_2(paragraph)
+        self.pcm_analysis_3(paragraph)
+        self.pcm_analysis_extra(paragraph)
 
-    def pre_cm_analysis_3(self, docx):
+    def pcm_analysis_1(self, paragraph):
+        paragraph.add_run(
+            ('\n1. ' + self.str_pcm_1).format(
+                self.advance,
+                self.enrolled_academic_periods,
+                self.papa
+                )
+            )
+
+    def pcm_analysis_2(self, para):
+        para.add_run(('\n2. ' + self.str_pcm_2).format(self.available_credits))
+
+    def pcm_analysis_3(self, paragraph):
         CASI.count = 2
         for subject in self.subjects:
             CASI.count = CASI.count + 1
             current_credits = self.current_credits
             subject_credits = subject.credits
-            aux = {
+            subject_info = {
                 'number' : str(CASI.count),
                 'remaining' : int(current_credits) - int(subject_credits),
                 'code' : subject.code,
                 'name' : subject.name
             }
-            self.pre_cm_analysis_s(docx, aux)
+            self.pcm_analysis_subject(paragraph, subject_info)
 
-    def pre_cm_analysis_s(self, para, subject):
-        str_in = '\n{}. SIA: Al aprobar la cancelación de la asignatura {} ({}) '
-        str_in += ' el estudiante quedaría con {} créditos inscritos.'
-        para.add_run(str_in.format(subject['number'], subject['code'],
-                                   subject['name'], subject['remaining']))
+    def pcm_analysis_subject(self, paragraph, subject_info):
+        paragraph.add_run(
+            ('\n{}. ' + self.str_pcm_3).format(
+                subject_info['number'],
+                subject_info['code'],
+                subject_info['name'],
+                subject_info['remaining']
+                )
+            )
 
-    def pre_cm_analysis_extra(self, para):
-        for extra_analysis in self.extra_analysis:
+    def pcm_analysis_extra(self, para):
+        for exa in self.extra_analysis:
             CASI.count = CASI.count + 1
-            str_in = '\n{}. {}.'
-            para.add_run(str_in.format(CASI.count, extra_analysis))
+            para.add_run('\n{}. {}.'.format(CASI.count, exa))
 
-    def pre_cm_answers(self, docx):
-        if self.approval_status == 'RC':
-            self.pre_cm_answers_rc(docx)
-        elif self.approval_status == 'NRC':
-            self.pre_cm_answers_nrc(docx)
 
-    def pre_cm_answers_rc(self, docx):
-        str_in = 'El Comité Asesor recomienda al Consejo de Facultad'
-        str_in += ' cancelar la(s) siguiente(s) asignatura(s) inscrita(s) del '
-        str_in += 'periodo académico {}, porque se justifica debidamente '
-        str_in += 'la solicitud. (Artículo 15 Acuerdo 008 de 2008 del '
-        str_in += 'Consejo Superior Universitario)'
-        para = docx.add_paragraph()
-        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('Concepto: ').bold = True
-        para.add_run(str_in.format(self.academic_period))
+    def pcm_answer_handler(self, docx):
+        paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.add_run(self.str_answer + ': ').bold = True
+        paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.left_indent = Pt(36)
+        self.pcm_answers(paragraph)
+
+    def pcm_answers(self, paragraph):
+        if self.approval_status == self.APPROVAL_STATUS_COMITE_RECOMIENDA:
+            self.pcm_answers_cr(paragraph)
+        elif self.approval_status == self.APPROVAL_STATUS_COMITE_NO_RECOMIENDA:
+            self.pcm_answers_cn(paragraph)
+
+    def pcm_answers_cr(self, paragraph):
+        paragraph.add_run(self.str_pcm_ans_1.format('', self.academic_period))
+        paragraph.add_run(self.str_pcm_ans_cr)
+        paragraph.add_run(self.str_regulation_1)
         self.casi_subjects_table(docx)
 
-    def pre_cm_answers_nrc(self, docx):
-        str_in = 'El Comité Asesor recomienda al Consejo de Facultad'
-        str_in += ' NO cancelar la(s) siguiente(s) asignatura(s) inscrita(s) '
-        str_in += 'del periodo académico {}, '
-        if self.nrc_answer == 'Incoherente o consecuente':
-            str_in += 'porque no existe coherencia entre la documentación y '
-            str_in += 'justificación que presenta. '
-        elif self.nrc_answer == 'No diligente':
-            str_in += 'porque lo expuesto es un hecho de su conocimiento '
-            str_in += 'desde el inicio del periodo académico; tuvo la '
-            str_in += 'oportunidad de resolverlo oportunamente hasta el '
-            str_in += '50 % del periodo académico, por tanto, no constituye '
-            str_in += 'causa extraña que justifique la cancelación de '
-            str_in += 'la(s) asignatura(s). '
-        elif self.nrc_answer == 'Motivos Laborales':
-            str_in += 'porque de acuerdo con la documentación que presenta, '
-            str_in += 'su situación laboral no le impide asistir a las clases '
-            str_in += 'y tiene el tiempo suficiente para responder por las '
-            str_in += 'actividades académicas de la(s) asignatura(s). '
-        elif self.nrc_answer == 'Información Falsa':
-            str_in += 'porque verificada la información de los soportes, se '
-            str_in += 'encontró que el contenido de los mismos no coincide '
-            str_in += 'con lo que en ellos se afirma. '
-        elif self.nrc_answer == 'Falta de conocimiento':
-            str_in += 'poque es responsabilidad del estudiante indagar sobre '
-            str_in += 'el conocimiento requerido y la preparación necesaria '
-            str_in += 'para cursar la(s) asignatura(s) antes de inscribir. '
-        elif self.nrc_answer == 'Argumentos insuficientes':
-            str_in += 'porque lo expuesto no es un hecho que constituya causa '
-            str_in += 'extraña que justifique la cancelación de la(s) '
-            str_in += 'asignatura(s). '
-        elif self.nrc_answer == 'Argumento cuando los soportes no aportan':
-            str_in += 'porque de la documentación aportada, se tiene que no hay '
-            str_in += 'justificación para acceder a lo pedido. '
+    def pcm_answers_cn(self, paragraph):
+        paragraph.add_run(self.str_pcm_ans_1.format('no ', self.academic_period))
+        if self.nrc_answer == self.CN_ANSWER_INCOHERENTE_O_INCONSECUENTE:
+            paragraph.add_run(self.str_pcm_ans_nc_1)
+        elif self.nrc_answer == self.CN_ANSWER_NO_DILIGENTE:
+            paragraph.add_run(self.str_pcm_ans_nc_2)
+        elif self.nrc_answer == self.CN_ANSWER_MOTIVOS_LABORALES:
+            paragraph.add_run(self.str_pcm_ans_nc_3)
+        elif self.nrc_answer == self.CN_ANSWER_INFORMACION_FALSA:
+            paragraph.add_run(self.str_pcm_ans_nc_4)
+        elif self.nrc_answer == self.CN_ANSWER_FALTA_DE_CONOCIMIENTO:
+            paragraph.add_run(self.str_pcm_ans_nc_5)
+        elif self.nrc_answer == self.CN_ANSWER_ARGUMENTOS_INSUFICIENTES:
+            paragraph.add_run(self.str_pcm_ans_nc_6)
+        elif self.nrc_answer == self.CN_ANSWER_SOPORTES_NO_SOPORTAN:
+            paragraph.add_run(self.str_pcm_ans_nc_7)
         else:
-            pass
-        str_in += ' (Artículo 15 Acuerdo 008 de 2008 del '
-        str_in += 'Consejo Superior Universitario).'
-        para = docx.add_paragraph()
-        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        run = para.add_run('Concepto: ')
-        run.font.bold = True
-        para.add_run(str_in.format(self.academic_period))
+            paragraph.add_run(self.str_pcm_ans_nc_7)
+        paragraph.add_run(self.str_regulation_1)
