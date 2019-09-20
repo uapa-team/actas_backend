@@ -2,34 +2,50 @@ import datetime
 from mongoengine.fields import BaseField
 from mongoengine import DynamicDocument, EmbeddedDocument, DateField, StringField, ListField, IntField, FloatField, EmbeddedDocumentListField, EmbeddedDocumentField
 
+
 def get_fields(obj):
-        fields = {}
-        _dir = obj.__class__.__dict__
-        for key, value in _dir.items():
-            if isinstance(value, BaseField):
-                fields[key] = {'type': clear_name(value.__class__)}
-                if 'display' in value.__dict__: fields[key]['display'] = value.display
-                if value.choices: fields[key]['choices'] = [option[1] for option in value.choices]
-                if isinstance(value, ListField):
-                    fields[key]['list'] = {'type': clear_name(value.field.__class__)}
-                    if isinstance(value.field, EmbeddedDocumentField):
-                        fields[key]['list']['fields'] = get_fields(value.field.document_type_obj())
-        super_cls = obj.__class__.mro()[1]
-        if super_cls not in (DynamicDocument, EmbeddedDocument):
-            fields.update(get_fields(super_cls()))
-        return fields
+    fields = {}
+    _dir = obj.__class__.__dict__
+    for key, value in _dir.items():
+        if isinstance(value, BaseField):
+            fields[key] = {'type': clear_name(value.__class__)}
+            if 'display' in value.__dict__:
+                fields[key]['display'] = value.display
+            if value.choices:
+                fields[key]['choices'] = [option[1]
+                                          for option in value.choices]
+            if isinstance(value, ListField):
+                fields[key]['list'] = {
+                    'type': clear_name(value.field.__class__)}
+                if isinstance(value.field, EmbeddedDocumentField):
+                    fields[key]['list']['fields'] = get_fields(
+                        value.field.document_type_obj())
+    super_cls = obj.__class__.mro()[1]
+    if super_cls not in (DynamicDocument, EmbeddedDocument):
+        fields.update(get_fields(super_cls()))
+    return fields
+
 
 def clear_name(_class):
-        name = str(_class).split('\'')[1]
-        name = name.split('.')[-1]
-        if name == 'StringField':   return 'String'
-        elif name == 'DateField':   return 'Date'
-        elif name == 'ListField':   return 'List'
-        elif name == 'IntField':    return 'Integer'
-        elif name == 'FloatField':  return 'Float'
-        elif name == 'EmbeddedDocumentField':    return 'Object'
-        elif name == 'EmbeddedDocumentListField':return 'List'
-        else: return name
+    name = str(_class).split('\'')[1]
+    name = name.split('.')[-1]
+    if name == 'StringField':
+        return 'String'
+    elif name == 'DateField':
+        return 'Date'
+    elif name == 'ListField':
+        return 'List'
+    elif name == 'IntField':
+        return 'Integer'
+    elif name == 'FloatField':
+        return 'Float'
+    elif name == 'EmbeddedDocumentField':
+        return 'Object'
+    elif name == 'EmbeddedDocumentListField':
+        return 'List'
+    else:
+        return name
+
 
 class Subject(EmbeddedDocument):
     name = StringField(required=True, display='Nombre Asignatura')
@@ -38,15 +54,11 @@ class Subject(EmbeddedDocument):
     group = StringField(required=True, display='Grupo')
     tipology = StringField(required=True, display='Tipología')
 
+
 class Request(DynamicDocument):
 
     meta = {'allow_inheritance': True}
-    
-    TYPE_CANCELACION_ASIGNATURAS = 'Request.CASI'
 
-    TYPE_CHOICES = (
-        (TYPE_CANCELACION_ASIGNATURAS, 'Cancelación de Asignaturas'),
-    )
     APPROVAL_STATUS_APLAZA = 'AL'
     APPROVAL_STATUS_APRUEBA = 'AP'
     APPROVAL_STATUS_EN_TRAMITE = 'ET'
@@ -259,32 +271,38 @@ class Request(DynamicDocument):
         (PROGRAM_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_ODONTOLOGIA,
          'Modalidad de Asignaturas de Posgrado Facultad de Odontología'),
     )
-    date = DateField(required=True, default=datetime.date.today, display='Fecha')
-    _cls = StringField(choices=TYPE_CHOICES, required=True, display='Tipo de Solicitud')
+    date = DateField(
+        required=True, default=datetime.date.today, display='Fecha')
+    _cls = StringField(required=True, display='Tipo de Solicitud')
     advisor_response = StringField(
         min_length=2, max_length=2, choices=ADVISOR_RESPONSE_CHOICES, required=True,
         default=ADVISOR_RESPONSE_COMITE_EN_ESPERA, display='Respuesta del Comité')
     approval_status = StringField(
         min_length=2, max_length=2, choices=APPROVAL_STATUS_CHOICES, required=True,
         default=APPROVAL_STATUS_EN_ESPERA, display='Estado de Aprobación')
-    student_name = StringField(max_length=512, required=True, display='Nombre del Estudiante')
+    student_name = StringField(
+        max_length=512, required=True, display='Nombre del Estudiante')
     student_dni_type = StringField(
         min_length=2, choices=DNI_TYPE_CHOICES, required=True,
         default=DNI_TYPE_CEDULA_DE_CIUDADANIA, display='Tipo de Documento')
-    student_dni = StringField(max_length=22, required=True, display='Documento')
+    student_dni = StringField(
+        max_length=22, required=True, display='Documento')
     academic_program = StringField(
         min_length=4, max_length=4, choices=PROGRAM_CHOICES, required=True, display='Programa Académico')
-    council_decision = StringField(max_length=255, required=True, default='', display='Justificación')
-    academic_period = StringField(max_length=10, required=True, display='Periodo')
+    council_decision = StringField(
+        max_length=255, required=True, default='', display='Justificación')
+    academic_period = StringField(
+        max_length=10, required=True, display='Periodo')
     date_stamp = DateField(required=True, default=datetime.date.today)
-    consecutive_minute = IntField(min_value=1, required=True, display='Número del Acta')
+    consecutive_minute = IntField(
+        min_value=1, required=True, display='Número del Acta')
     user = StringField(max_length=255, required=True)
-    student_justification = StringField(required=True, default='', display='Justificación del Estudiante')
+    student_justification = StringField(
+        required=True, default='', display='Justificación del Estudiante')
     supports = StringField(required=True, default='', display='Soportes')
-    extra_analysis = ListField(StringField(), default=[], display='Analisis Extra')
+    extra_analysis = ListField(
+        StringField(), default=[], display='Analisis Extra')
 
     def is_pre(self):
         return self.academic_program in ('2541', '2542', '2544', '2545', '2546',
                                          '2547', '2548', '2549', '2879')
-
-            

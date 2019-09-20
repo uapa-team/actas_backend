@@ -9,27 +9,31 @@ from .helpers import QuerySetEncoder, Translator
 from .docx import CouncilMinuteGenerator
 from .docx import PreCouncilMinuteGenerator
 from .cases.CASI import CASI
-# Esto va solo para evitar la verificacion de django
 
 
 def index():
-    return HttpResponse("¡Actas trabajando!")
+    return HttpResponse("Working!")
 
-@csrf_exempt
+
 def cases_defined(request):
     if request.method == 'GET':
-        response = [type.__name__ for type in Request.__subclasses__()]
-        return JsonResponse(response, safe=False)
+        response = {
+            'cases': [type.__name__ for type in Request.__subclasses__()]
+        }
+        return JsonResponse(response)
 
-@csrf_exempt
-def cases_defined_attributes(request, case_id):
+
+def info_cases(request, case_id):
     if request.method == 'GET':
         for type in Request.__subclasses__():
             if type.__name__ == case_id:
-                return JsonResponse(get_fields(type()), safe=False)
-        return JsonResponse('Not found', safe=False, status=404)
+                case_info = {
+                    'name': type.full_name,
+                    'attributes': get_fields(type()),
+                }
+                return JsonResponse(case_info)
+        return JsonResponse({'response': 'Not found'}, status=404)
 
-        
 
 @csrf_exempt  # Esto va solo para evitar la verificacion de django
 def filter_request(request):
