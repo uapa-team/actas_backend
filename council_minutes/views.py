@@ -15,6 +15,11 @@ from .cases.CASI import CASI
 def index():
     return HttpResponse("¡Actas trabajando!")
 
+@csrf_exempt  # Esto va solo para evitar la verificacion de django
+def cases_defined(request):
+    if request.method == 'GET':
+        response = [type.__name__ for type in Request.__subclasses__()]
+        return JsonResponse(response, safe=False)
 
 @csrf_exempt  # Esto va solo para evitar la verificacion de django
 def filter_request(request):
