@@ -29,13 +29,16 @@ class CASI(Request):
         (CN_ANSWER_OTRO, 'Otro')
     )
 
-    subjects = EmbeddedDocumentListField(Subject, required=True, display='Asignaturas')
+    subjects = EmbeddedDocumentListField(
+        Subject, required=True, display='Asignaturas')
     advance = FloatField(required=True, display='% de Avance')
-    enrolled_academic_periods = IntField(required=True, display='# Periodos Matriculados')
+    enrolled_academic_periods = IntField(
+        required=True, display='# Periodos Matriculados')
     papa = FloatField(required=True, display='PAPA')
     available_credits = IntField(required=True, display='Creditos Disponibles')
     current_credits = IntField(required=True, display='Creditos Inscritos')
-    nrc_answer = StringField(choices=CN_ANSWER_CHOICES, display='Motivo de rechazo')
+    nrc_answer = StringField(choices=CN_ANSWER_CHOICES,
+                             display='Motivo de rechazo')
 
     str_ap = 'APRUEBA'
     str_na = 'NO APRUEBA'
@@ -149,16 +152,12 @@ class CASI(Request):
         self.pcm_analysis_extra(docx)
 
     def pcm_analysis_1(self, docx):
-        self.pcm_analysis_add_analysis(docx,
-            self.str_pcm_1.format(
-                self.advance,
-                self.enrolled_academic_periods,
-                self.papa
-            )
-        )
+        self.pcm_analysis_add_analysis(docx, self.str_pcm_1.format(
+            self.advance, self.enrolled_academic_periods, self.papa))
 
     def pcm_analysis_2(self, docx):
-        self.pcm_analysis_add_analysis(docx, self.str_pcm_2.format(self.available_credits))
+        self.pcm_analysis_add_analysis(
+            docx, self.str_pcm_2.format(self.available_credits))
 
     def pcm_analysis_3(self, docx):
         for subject in self.subjects:
@@ -172,13 +171,8 @@ class CASI(Request):
             self.pcm_analysis_subject(docx, subject_info)
 
     def pcm_analysis_subject(self, docx, subject_info):
-        self.pcm_analysis_add_analysis(docx, 
-            self.str_pcm_3.format(
-                subject_info['name'],
-                subject_info['code'],
-                subject_info['remaining']
-            )
-        )
+        self.pcm_analysis_add_analysis(docx, self.str_pcm_3.format(
+            subject_info['name'], subject_info['code'], subject_info['remaining']))
 
     def pcm_analysis_extra(self, docx):
         for exa in self.extra_analysis:
@@ -213,6 +207,9 @@ class CASI(Request):
             paragraph.add_run(self.str_pcm_ans_nc_6 + ' ')
         elif self.nrc_answer == self.CN_ANSWER_SOPORTES_NO_SOPORTAN:
             paragraph.add_run(self.str_pcm_ans_nc_7 + ' ')
-        else:
+        elif self.nrc_answer == self.CN_ANSWER_OTRO:
             paragraph.add_run(self.str_pcm_ans_nc_7 + ' ')
+        else:
+            raise AssertionError(
+                'NRC answer not understood. CASI.pcm_answers_cn')
         paragraph.add_run(self.str_regulation_1)
