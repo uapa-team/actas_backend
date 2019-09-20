@@ -8,7 +8,7 @@ from .case_utils import add_hyperlink, table_subjects
 
 class CASI(Request):
 
-    full_name = 'Cancelacion de Asignaturas'
+    full_name = 'Cancelación de Asignaturas'
 
     CN_ANSWER_NO_DILIGENTE = 'ND'
     CN_ANSWER_MOTIVOS_LABORALES = 'ML'
@@ -102,9 +102,9 @@ class CASI(Request):
         self.pcm_answer_handler(docx)
 
     def pcm_answer(self, paragraph):
-        if self.approval_status == self.APPROVAL_STATUS_COMITE_RECOMIENDA:
+        if self.advisor_response == self.ADVISOR_RESPONSE_COMITE_RECOMIENDA:
             self.pcm_answers_cr(paragraph)
-        elif self.approval_status == self.APPROVAL_STATUS_COMITE_NO_RECOMIENDA:
+        elif self.advisor_response == self.ADVISOR_RESPONSE_COMITE_NO_RECOMIENDA:
             self.pcm_answers_cn(paragraph)
 
     def cm_ap(self, paragraph):

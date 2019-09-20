@@ -153,6 +153,10 @@ def table_subjects(docx_, data):
 
     '''
     table = docx_.add_table(rows=len(data)+1, cols=5)
+    for column in table.columns:
+        for cell in column.cells:
+            cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
     table.style = 'Table Grid'
     table.style.font.size = Pt(9)
     table.alignment = WD_ALIGN_PARAGRAPH.CENTER
