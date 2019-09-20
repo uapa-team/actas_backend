@@ -116,7 +116,7 @@ class PreCouncilMinuteGenerator():
 
     def add_case_from_request(self, request):
         header(request, self.document)
-        request.pre_cm(self.document)
+        request.pcm(self.document)
 
     def add_cases_from_date(self, start_date, end_date):
         request_by_date = Request.objects(date__gte=dateparser.parse(

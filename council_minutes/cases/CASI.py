@@ -37,8 +37,6 @@ class CASI(Request):
 
     full_name = 'Cancelacion de Asignaturas'
 
-    count = 0
-
     str_ap = 'APRUEBA'
     str_na = 'NO APRUEBA'
     str_analysis = 'Analisis'
@@ -100,7 +98,6 @@ class CASI(Request):
         paragraph.add_run(self.str_regulation_1)
 
     def pcm(self, docx):
-        CASI.count = 0
         self.pcm_analysis_handler(docx)
         self.pcm_answer_handler(docx)
 
@@ -138,90 +135,84 @@ class CASI(Request):
         paragraph.add_run(self.str_analysis + ': ').font.bold = True
         add_hyperlink(paragraph, self.str_regulation_2,
                       self.str_regulation_2_link)
+        self.pcm_analysis(docx)
+
+    def pcm_analysis_add_analysis(self, docx, analysis):
         paragraph = docx.add_paragraph()
-        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        paragraph.paragraph_format.left_indent = Pt(36)
-        self.pcm_analysis(paragraph)
+        paragraph.style = 'List Bullet'
+        paragraph.add_run(analysis)
 
-    def pcm_analysis(self, paragraph):
-        self.pcm_analysis_1(paragraph)
-        self.pcm_analysis_2(paragraph)
-        self.pcm_analysis_3(paragraph)
-        self.pcm_analysis_extra(paragraph)
+    def pcm_analysis(self, docx):
+        self.pcm_analysis_1(docx)
+        self.pcm_analysis_2(docx)
+        self.pcm_analysis_3(docx)
+        self.pcm_analysis_extra(docx)
 
-    def pcm_analysis_1(self, paragraph):
-        paragraph.add_run(
-            ('\n1. ' + self.str_pcm_1).format(
+    def pcm_analysis_1(self, docx):
+        self.pcm_analysis_add_analysis(docx,
+            self.str_pcm_1.format(
                 self.advance,
                 self.enrolled_academic_periods,
                 self.papa
             )
         )
 
-    def pcm_analysis_2(self, para):
-        para.add_run(('\n2. ' + self.str_pcm_2).format(self.available_credits))
+    def pcm_analysis_2(self, docx):
+        self.pcm_analysis_add_analysis(docx, self.str_pcm_2.format(self.available_credits))
 
-    def pcm_analysis_3(self, paragraph):
-        CASI.count = 2
+    def pcm_analysis_3(self, docx):
         for subject in self.subjects:
-            CASI.count = CASI.count + 1
             current_credits = self.current_credits
             subject_credits = subject.credits
             subject_info = {
-                'number': str(CASI.count),
                 'remaining': int(current_credits) - int(subject_credits),
                 'code': subject.code,
                 'name': subject.name
             }
-            self.pcm_analysis_subject(paragraph, subject_info)
+            self.pcm_analysis_subject(docx, subject_info)
 
-    def pcm_analysis_subject(self, paragraph, subject_info):
-        paragraph.add_run(
-            ('\n{}. ' + self.str_pcm_3).format(
-                subject_info['number'],
-                subject_info['code'],
+    def pcm_analysis_subject(self, docx, subject_info):
+        self.pcm_analysis_add_analysis(docx, 
+            self.str_pcm_3.format(
                 subject_info['name'],
+                subject_info['code'],
                 subject_info['remaining']
             )
         )
 
-    def pcm_analysis_extra(self, para):
+    def pcm_analysis_extra(self, docx):
         for exa in self.extra_analysis:
-            CASI.count = CASI.count + 1
-            para.add_run('\n{}. {}.'.format(CASI.count, exa))
+            self.pcm_analysis_add_analysis(docx, exa)
 
     def pcm_answer_handler(self, docx):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.add_run(self.str_answer + ': ').bold = True
-        paragraph = docx.add_paragraph()
-        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        paragraph.paragraph_format.left_indent = Pt(36)
         self.pcm_answer(paragraph)
+        self.casi_subjects_table(docx)
 
     def pcm_answers_cr(self, paragraph):
         paragraph.add_run(self.str_pcm_ans_1.format('', self.academic_period))
         paragraph.add_run(self.str_pcm_ans_cr)
         paragraph.add_run(self.str_regulation_1)
-        self.casi_subjects_table(docx)
 
     def pcm_answers_cn(self, paragraph):
         paragraph.add_run(self.str_pcm_ans_1.format(
             'no ', self.academic_period))
         if self.nrc_answer == self.CN_ANSWER_INCOHERENTE_O_INCONSECUENTE:
-            paragraph.add_run(self.str_pcm_ans_nc_1)
+            paragraph.add_run(self.str_pcm_ans_nc_1 + ' ')
         elif self.nrc_answer == self.CN_ANSWER_NO_DILIGENTE:
-            paragraph.add_run(self.str_pcm_ans_nc_2)
+            paragraph.add_run(self.str_pcm_ans_nc_2 + ' ')
         elif self.nrc_answer == self.CN_ANSWER_MOTIVOS_LABORALES:
-            paragraph.add_run(self.str_pcm_ans_nc_3)
+            paragraph.add_run(self.str_pcm_ans_nc_3 + ' ')
         elif self.nrc_answer == self.CN_ANSWER_INFORMACION_FALSA:
-            paragraph.add_run(self.str_pcm_ans_nc_4)
+            paragraph.add_run(self.str_pcm_ans_nc_4 + ' ')
         elif self.nrc_answer == self.CN_ANSWER_FALTA_DE_CONOCIMIENTO:
-            paragraph.add_run(self.str_pcm_ans_nc_5)
+            paragraph.add_run(self.str_pcm_ans_nc_5 + ' ')
         elif self.nrc_answer == self.CN_ANSWER_ARGUMENTOS_INSUFICIENTES:
-            paragraph.add_run(self.str_pcm_ans_nc_6)
+            paragraph.add_run(self.str_pcm_ans_nc_6 + ' ')
         elif self.nrc_answer == self.CN_ANSWER_SOPORTES_NO_SOPORTAN:
-            paragraph.add_run(self.str_pcm_ans_nc_7)
+            paragraph.add_run(self.str_pcm_ans_nc_7 + ' ')
         else:
-            paragraph.add_run(self.str_pcm_ans_nc_7)
+            paragraph.add_run(self.str_pcm_ans_nc_7 + ' ')
         paragraph.add_run(self.str_regulation_1)
