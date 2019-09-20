@@ -4,7 +4,7 @@ import mongoengine
 from mongoengine.errors import ValidationError
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .models import Request
+from .models import Request, get_fields
 from .helpers import QuerySetEncoder, Translator
 from .docx import CouncilMinuteGenerator
 from .docx import PreCouncilMinuteGenerator
@@ -15,11 +15,21 @@ from .cases.CASI import CASI
 def index():
     return HttpResponse("¡Actas trabajando!")
 
-@csrf_exempt  # Esto va solo para evitar la verificacion de django
+@csrf_exempt
 def cases_defined(request):
     if request.method == 'GET':
         response = [type.__name__ for type in Request.__subclasses__()]
         return JsonResponse(response, safe=False)
+
+@csrf_exempt
+def cases_defined_attributes(request, case_id):
+    if request.method == 'GET':
+        for type in Request.__subclasses__():
+            if type.__name__ == case_id:
+                return JsonResponse(get_fields(type()), safe=False)
+        return JsonResponse('Not found', safe=False, status=404)
+
+        
 
 @csrf_exempt  # Esto va solo para evitar la verificacion de django
 def filter_request(request):
