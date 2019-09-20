@@ -8,7 +8,6 @@ from .models import Request, get_fields
 from .helpers import QuerySetEncoder, Translator
 from .docx import CouncilMinuteGenerator
 from .docx import PreCouncilMinuteGenerator
-from .cases.CASI import CASI
 
 
 def index():
@@ -18,18 +17,18 @@ def index():
 def cases_defined(request):
     if request.method == 'GET':
         response = {
-            'cases': [type.__name__ for type in Request.__subclasses__()]
+            'cases': [type_case.__name__ for type_case in Request.__subclasses__()]
         }
         return JsonResponse(response)
 
 
 def info_cases(request, case_id):
     if request.method == 'GET':
-        for type in Request.__subclasses__():
-            if type.__name__ == case_id:
+        for type_case in Request.__subclasses__():
+            if type_case.__name__ == case_id:
                 case_info = {
-                    'name': type.full_name,
-                    'attributes': get_fields(type()),
+                    'name': type_case.full_name,
+                    'attributes': get_fields(type_case()),
                 }
                 return JsonResponse(case_info)
         return JsonResponse({'response': 'Not found'}, status=404)
@@ -90,11 +89,11 @@ def update_cm(request, cm_id):
             old = []
         old_obj = {}
         some_change = False
-        if 'type' in json_body:
-            if acta.type != json_body['type']:
+        if 'type_case' in json_body:
+            if acta.type_case != json_body['type_case']:
                 some_change = some_change or True
-                old_obj.update({'type': acta.type})
-                acta.type = json_body['type']
+                old_obj.update({'type_case': acta.type_case})
+                acta.type_case = json_body['type_case']
         if 'student_name' in json_body:
             if acta.student_name != json_body['student_name']:
                 some_change = some_change or True
@@ -110,11 +109,12 @@ def update_cm(request, cm_id):
                 some_change = some_change or True
                 old_obj.update({'student_dni': acta.student_dni})
                 acta.student_dni = json_body['student_dni']
-        if 'student_dni_type' in json_body:
-            if acta.student_dni_type != json_body['student_dni_type']:
+        if 'student_dni_type_case' in json_body:
+            if acta.student_dni_type_case != json_body['student_dni_type_case']:
                 some_change = some_change or True
-                old_obj.update({'student_dni_type': acta.student_dni_type})
-                acta.student_dni_type = json_body['student_dni_type']
+                old_obj.update(
+                    {'student_dni_type_case': acta.student_dni_type_case})
+                acta.student_dni_type_case = json_body['student_dni_type_case']
         if 'academic_period' in json_body:
             if acta.academic_period != json_body['academic_period']:
                 some_change = some_change or True
@@ -156,7 +156,7 @@ def docx_gen_by_date(request):
         body = json.loads(request.body)
         start_date = body['cm']['start_date']
         end_date = body['cm']['end_date']
-    except (json.decoder.JSONDecodeError):
+    except json.decoder.JSONDecodeError:
         return HttpResponse("Bad Request", status=400)
     filename = 'public/acta' + \
         start_date.split(':')[0] + '_' + end_date.split(':')[0] + '.docx'
@@ -188,7 +188,7 @@ def docx_gen_pre_by_date(request):
         body = json.loads(request.body)
         start_date = body['cm']['start_date']
         end_date = body['cm']['end_date']
-    except (json.decoder.JSONDecodeError):
+    except json.decoder.JSONDecodeError:
         return HttpResponse("Bad Request", status=400)
     filename = 'public/preacta' + \
         start_date.split(':')[0] + '_' + end_date.split(':')[0] + '.docx'

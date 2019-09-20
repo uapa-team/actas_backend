@@ -60,6 +60,8 @@ class Request(DynamicDocument):
 
     meta = {'allow_inheritance': True}
 
+    full_name = 'Petición sin tipo'
+
     APPROVAL_STATUS_APLAZA = 'AL'
     APPROVAL_STATUS_APRUEBA = 'AP'
     APPROVAL_STATUS_EN_TRAMITE = 'ET'
