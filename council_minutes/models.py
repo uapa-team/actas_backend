@@ -275,33 +275,37 @@ class Request(DynamicDocument):
         (PLAN_MODALIDAD_DE_ASIGNATURAS_DE_POSGRADO_FACULTAD_DE_ODONTOLOGIA,
          'Modalidad de Asignaturas de Posgrado Facultad de Odontología'),
     )
+
+    _cls = StringField(required=True)
+    date_stamp = DateField(required=True, default=datetime.date.today)
+    user = StringField(max_length=255, required=True)
+
     date = DateField(
         required=True, default=datetime.date.today, display='Fecha')
-    _cls = StringField(required=True, display='Tipo de Solicitud')
-    advisor_response = StringField(
-        min_length=2, max_length=2, choices=ADVISOR_RESPONSE_CHOICES, required=True,
-        default=ADVISOR_RESPONSE_COMITE_EN_ESPERA, display='Respuesta del Comité')
-    approval_status = StringField(
-        min_length=2, max_length=2, choices=APPROVAL_STATUS_CHOICES, required=True,
-        default=APPROVAL_STATUS_EN_ESPERA, display='Estado de Aprobación')
-    student_name = StringField(
-        max_length=512, required=True, display='Nombre del Estudiante')
+    consecutive_minute = IntField(
+        min_value=1, required=True, display='Número del Acta')
+    academic_program = StringField(
+        min_length=4, max_length=4, choices=PLAN_CHOICES,
+        required=True, display='Programa Académico')
     student_dni_type = StringField(
         min_length=2, choices=DNI_TYPE_CHOICES, required=True,
         default=DNI_TYPE_CEDULA_DE_CIUDADANIA, display='Tipo de Documento')
     student_dni = StringField(
         max_length=22, required=True, display='Documento')
-    academic_program = StringField(
-        min_length=4, max_length=4, choices=PLAN_CHOICES,
-        required=True, display='Programa Académico')
-    council_decision = StringField(
-        max_length=255, required=True, default='', display='Justificación')
+    student_name = StringField(
+        max_length=512, required=True, display='Nombre del Estudiante')
     academic_period = StringField(
         max_length=10, required=True, display='Periodo')
-    date_stamp = DateField(required=True, default=datetime.date.today)
-    consecutive_minute = IntField(
-        min_value=1, required=True, display='Número del Acta')
-    user = StringField(max_length=255, required=True)
+    approval_status = StringField(
+        min_length=2, max_length=2, choices=APPROVAL_STATUS_CHOICES, required=True,
+        default=APPROVAL_STATUS_EN_ESPERA, display='Estado de Aprobación')
+
+    advisor_response = StringField(
+        min_length=2, max_length=2, choices=ADVISOR_RESPONSE_CHOICES, required=True,
+        default=ADVISOR_RESPONSE_COMITE_EN_ESPERA, display='Respuesta del Comité')
+    council_decision = StringField(
+        max_length=255, required=True, default='', display='Justificación')
+    
     student_justification = StringField(
         required=True, default='', display='Justificación del Estudiante')
     supports = StringField(required=True, default='', display='Soportes')
