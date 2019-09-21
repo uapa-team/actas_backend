@@ -23,13 +23,14 @@ def get_fields(obj):
                         value.field.document_type_obj())
     super_cls = obj.__class__.mro()[1]
     if super_cls not in (DynamicDocument, EmbeddedDocument):
-        fields.update(get_fields(super_cls()))
+        super_fields = get_fields(super_cls())
+        super_fields.update(fields) 
+        fields = super_fields
     return fields
 
 
 def clear_name(_class):
-    name = str(_class).split('\'')[1]
-    name = name.split('.')[-1]
+    name = _class.__name__
     if name == 'StringField':
         return 'String'
     elif name == 'DateField':

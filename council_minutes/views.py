@@ -8,6 +8,7 @@ from .models import Request, get_fields
 from .helpers import QuerySetEncoder, Translator
 from .docx import CouncilMinuteGenerator
 from .docx import PreCouncilMinuteGenerator
+from .cases import *
 
 
 def index():
@@ -17,7 +18,9 @@ def index():
 def cases_defined(request):
     if request.method == 'GET':
         response = {
-            'cases': [type_case.__name__ for type_case in Request.__subclasses__()]
+            'cases': [
+                {'code': type_case.__name__, 'name': type_case.full_name} 
+                for type_case in Request.__subclasses__()]
         }
         return JsonResponse(response)
 
@@ -26,11 +29,7 @@ def info_cases(request, case_id):
     if request.method == 'GET':
         for type_case in Request.__subclasses__():
             if type_case.__name__ == case_id:
-                case_info = {
-                    'name': type_case.full_name,
-                    'attributes': get_fields(type_case()),
-                }
-                return JsonResponse(case_info)
+                return JsonResponse(get_fields(type_case()))
         return JsonResponse({'response': 'Not found'}, status=404)
 
 
