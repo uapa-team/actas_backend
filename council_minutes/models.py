@@ -280,10 +280,10 @@ class Request(DynamicDocument):
     date_stamp = DateField(required=True, default=datetime.date.today)
     user = StringField(max_length=255, required=True)
 
-    date = DateField(
-        required=True, default=datetime.date.today, display='Fecha')
     consecutive_minute = IntField(
         min_value=1, required=True, display='Número del Acta')
+    date = DateField(
+        required=True, default=datetime.date.today, display='Fecha')
     academic_program = StringField(
         min_length=4, max_length=4, choices=PLAN_CHOICES,
         required=True, display='Programa Académico')
@@ -299,12 +299,11 @@ class Request(DynamicDocument):
     approval_status = StringField(
         min_length=2, max_length=2, choices=APPROVAL_STATUS_CHOICES, required=True,
         default=APPROVAL_STATUS_EN_ESPERA, display='Estado de Aprobación')
-
     advisor_response = StringField(
         min_length=2, max_length=2, choices=ADVISOR_RESPONSE_CHOICES, required=True,
         default=ADVISOR_RESPONSE_COMITE_EN_ESPERA, display='Respuesta del Comité')
     council_decision = StringField(
-        max_length=255, required=True, default='', display='Justificación')
+        max_length=255, required=True, default='', display='Justificación del Consejo')
     
     student_justification = StringField(
         required=True, default='', display='Justificación del Estudiante')
