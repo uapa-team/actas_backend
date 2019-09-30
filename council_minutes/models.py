@@ -1,4 +1,5 @@
 import datetime
+import json
 from mongoengine.fields import BaseField
 from mongoengine import DynamicDocument, EmbeddedDocument, DateField, StringField
 from mongoengine import ListField, IntField, EmbeddedDocumentField
@@ -24,7 +25,7 @@ def get_fields(obj):
     super_cls = obj.__class__.mro()[1]
     if super_cls not in (DynamicDocument, EmbeddedDocument):
         super_fields = get_fields(super_cls())
-        super_fields.update(fields) 
+        super_fields.update(fields)
         fields = super_fields
     return fields
 
@@ -304,7 +305,6 @@ class Request(DynamicDocument):
         default=ADVISOR_RESPONSE_COMITE_EN_ESPERA, display='Respuesta del Comité')
     council_decision = StringField(
         max_length=255, required=True, default='', display='Justificación del Consejo')
-    
     student_justification = StringField(
         required=True, default='', display='Justificación del Estudiante')
     supports = StringField(required=True, default='', display='Soportes')
@@ -314,3 +314,18 @@ class Request(DynamicDocument):
     def is_pre(self):
         return self.academic_program in ('2541', '2542', '2544', '2545', '2546',
                                          '2547', '2548', '2549', '2879')
+
+    @classmethod
+    def translate(cls, data):
+        data_json = json.loads(data.decode('utf-8'))
+        for key in data_json:
+            try:
+                choices = cls._fields[key].choices
+                if choices:
+                    for item in choices:
+                        if item[1] == data_json[key]:
+                            data_json[key] = item[0]
+                            break
+            except KeyError:
+                pass
+        return json.dumps(data_json)
