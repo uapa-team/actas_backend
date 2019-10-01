@@ -13,6 +13,14 @@ def get_fields(obj):
             fields[key] = {'type': clear_name(value.__class__)}
             if 'display' in value.__dict__:
                 fields[key]['display'] = value.display
+                if value.default:
+                    if callable(value.default):
+                        fields[key]['default'] = value.default()
+                    elif value.choices:
+                        k = 'get_{}_display'.format(key)
+                        fields[key]['default'] = obj.__dict__[k]()
+                    else:
+                        fields[key]['default'] = value.default
             if value.choices:
                 fields[key]['choices'] = [option[1]
                                           for option in value.choices]
@@ -42,6 +50,8 @@ def clear_name(_class):
         return 'Integer'
     elif name == 'FloatField':
         return 'Float'
+    elif name == 'BooleanField':
+        return 'Boolean'
     elif name == 'EmbeddedDocumentField':
         return 'Object'
     elif name == 'EmbeddedDocumentListField':
