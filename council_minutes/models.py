@@ -1,4 +1,5 @@
 import datetime
+import json
 from mongoengine.fields import BaseField
 from mongoengine import DynamicDocument, EmbeddedDocument, DateField, StringField
 from mongoengine import ListField, IntField, EmbeddedDocumentField
@@ -12,6 +13,14 @@ def get_fields(obj):
             fields[key] = {'type': clear_name(value.__class__)}
             if 'display' in value.__dict__:
                 fields[key]['display'] = value.display
+                if value.default:
+                    if callable(value.default):
+                        fields[key]['default'] = value.default()
+                    elif value.choices:
+                        k = 'get_{}_display'.format(key)
+                        fields[key]['default'] = obj.__dict__[k]()
+                    else:
+                        fields[key]['default'] = value.default
             if value.choices:
                 fields[key]['choices'] = [option[1]
                                           for option in value.choices]
@@ -41,6 +50,8 @@ def clear_name(_class):
         return 'Integer'
     elif name == 'FloatField':
         return 'Float'
+    elif name == 'BooleanField':
+        return 'Boolean'
     elif name == 'EmbeddedDocumentField':
         return 'Object'
     elif name == 'EmbeddedDocumentListField':
@@ -269,33 +280,35 @@ class Request(DynamicDocument):
         (BAP_ODONTOLOGIA,
          'Modalidad de Asignaturas de Posgrado Facultad de Odontología'),
     )
+
+    _cls = StringField(required=True)
+    date_stamp = DateField(required=True, default=datetime.date.today)
+    user = StringField(max_length=255, required=True)
+
+    consecutive_minute = IntField(
+        min_value=1, required=True, display='Número del Acta')
     date = DateField(
         required=True, default=datetime.date.today, display='Fecha')
-    _cls = StringField(required=True, display='Tipo de Solicitud')
-    advisor_response = StringField(
-        min_length=2, max_length=2, choices=ARCR_CHOICES, required=True,
-        default=ARCR_EN_ESPERA, display='Respuesta del Comité')
-    approval_status = StringField(
-        min_length=2, max_length=2, choices=AS_CHOICES, required=True,
-        default=AS_EN_ESPERA, display='Estado de Aprobación')
-    student_name = StringField(
-        max_length=512, required=True, display='Nombre del Estudiante')
+    academic_program = StringField(
+        min_length=4, max_length=4, choices=PLAN_CHOICES,
+        required=True, display='Programa Académico')
     student_dni_type = StringField(
         min_length=2, choices=DNI_TYPE_CHOICES, required=True,
         default=DNI_TYPE_CEDULA_DE_CIUDADANIA, display='Tipo de Documento')
     student_dni = StringField(
         max_length=22, required=True, display='Documento')
-    academic_program = StringField(
-        min_length=4, max_length=4, choices=PLAN_CHOICES,
-        required=True, display='Programa Académico')
-    council_decision = StringField(
-        max_length=255, required=True, default='', display='Justificación')
+    student_name = StringField(
+        max_length=512, required=True, display='Nombre del Estudiante')
     academic_period = StringField(
         max_length=10, required=True, display='Periodo')
-    date_stamp = DateField(required=True, default=datetime.date.today)
-    consecutive_minute = IntField(
-        min_value=1, required=True, display='Número del Acta')
-    user = StringField(max_length=255, required=True)
+    approval_status = StringField(
+        min_length=2, max_length=2, choices=AS_CHOICES, required=True,
+        default=AS_EN_ESPERA, display='Estado de Aprobación')
+    advisor_response = StringField(
+        min_length=2, max_length=2, choices=ARCR_CHOICES, required=True,
+        default=ARCR_EN_ESPERA, display='Respuesta del Comité')
+    council_decision = StringField(
+        max_length=255, required=True, default='', display='Justificación del Consejo')
     student_justification = StringField(
         required=True, default='', display='Justificación del Estudiante')
     supports = StringField(required=True, default='', display='Soportes')
@@ -327,3 +340,18 @@ class Request(DynamicDocument):
                                          self.PI_DE_SISTEMAS_Y_COMPUTACION,
                                          self.PI_INDUSTRIAL, self.PI_ELECTRICA, self.PI_MECATRONICA,
                                          self.PI_MECATRONICA, self.PI_ELECTRONICA, self.PI_QUIMICA)
+
+    @classmethod
+    def translate(cls, data):
+        data_json = json.loads(data.decode('utf-8'))
+        for key in data_json:
+            try:
+                choices = cls._fields[key].choices
+                if choices:
+                    for item in choices:
+                        if item[1] == data_json[key]:
+                            data_json[key] = item[0]
+                            break
+            except KeyError:
+                pass
+        return json.dumps(data_json)

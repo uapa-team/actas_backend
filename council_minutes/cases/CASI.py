@@ -35,7 +35,7 @@ class CASI(Request):
     papa = FloatField(required=True, display='PAPA')
     available_credits = IntField(required=True, display='Creditos Disponibles')
     current_credits = IntField(required=True, display='Creditos Inscritos')
-    nrc_answer = StringField(choices=CN_ANSWER_CHOICES,
+    nrc_answer = StringField(choices=CN_ANSWER_CHOICES, default=CN_ANSWER_OTRO,
                              display='Motivo de rechazo')
 
     regulation_list = ['008|2008|CSU']  # List of regulations
