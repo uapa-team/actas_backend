@@ -305,7 +305,7 @@ class Request(DynamicDocument):
         min_length=2, max_length=2, choices=AS_CHOICES, required=True,
         default=AS_EN_ESPERA, display='Estado de Aprobación')
     advisor_response = StringField(
-        min_length=2, max_length=2, choices=ARCR_CHOICES, required=True,
+        min_length=3, max_length=3, choices=ARCR_CHOICES, required=True,
         default=ARCR_EN_ESPERA, display='Respuesta del Comité')
     council_decision = StringField(
         max_length=255, required=True, default='', display='Justificación del Consejo')
