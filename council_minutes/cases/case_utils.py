@@ -1,5 +1,4 @@
 import docx
-from .case_utils import *
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
 from docx.shared import Pt
@@ -36,19 +35,20 @@ def add_hyperlink(paragraph_, text, url):
     hyperlink.append(new_run)
     # pylint: disable=protected-access
     paragraph_._p.append(hyperlink)
+    #paragraph_.style.font.underline = True
 
     return hyperlink
 
 
 def string_to_date(string):
-    ret = string[0:2]
-    ret += num_to_month(string[3:5])
-    ret += string[6:10]
+    ret = string[8:10]
+    ret += num_to_month(string[5:7])
+    ret += string[0:4]
     return ret
 
 
 def get_academic_program(cod_program):
-    for p in Request.PROGRAM_CHOICES:
+    for p in Request.PLAN_CHOICES:
         if p[0] == cod_program:
             return p[1]
 
@@ -82,11 +82,19 @@ def num_to_month(month):
 
 def header(request, docx_):
     para = docx_.add_paragraph()
-    para.add_run('Tipo de solicitud:\t{}\n'.format(request.full_name)) 
+    para.add_run('Tipo de solicitud:\t{}\n'.format(request.full_name))
     para.add_run('Justificación:\t\t{}\n'.format(
-        request.student_justification ))
+        request.student_justification))
     para.add_run('Soportes:\t\t{}\n'.format(request.supports))
-    para.add_run('Fecha radicación:\t{}'.format(request.date))
+    para.add_run('Fecha radicación:\t{}\n'.format(request.date))
+    para.add_run('Normatividad:')
+    para.paragraph_format.space_after = Pt(0)
+    for regulation in request.regulation_list:
+        para = docx_.add_paragraph(style='List Bullet')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.paragraph_format.space_after = Pt(0)
+        add_hyperlink(
+            para, request.regulations[regulation][0], request.regulations[regulation][1])
     para.paragraph_format.space_after = Pt(0)
 
 
