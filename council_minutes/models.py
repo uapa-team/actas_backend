@@ -61,6 +61,7 @@ def clear_name(_class):
 
 
 class Subject(EmbeddedDocument):
+    # TODO: Add choices
     name = StringField(required=True, display='Nombre Asignatura')
     code = StringField(required=True, display='Código')
     credits = StringField(required=True, display='Créditos')
