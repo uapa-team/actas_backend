@@ -6,22 +6,37 @@ from .models import Request
 
 class QuerySetEncoder(DjangoJSONEncoder):
 
-    def default(self, o):
+    """def default(self, o):
         json_obj = {}
-        for element in o:
+        try:
+            for element in o:
+                id_ = str(element.id)
+                json_obj[id_] = {}
+                for key, value in element._fields.items():
+                    print(key, end=' ')
+                    if callable(value):
+                        json_obj[id_][key] = element[key]()
+                    elif value.choices:
+                        k = 'get_{}_display'.format(key)
+                        json_obj[id_][key] = element.__dict__[k]()
+                    else:
+                        json_obj[id_][key] = element[key]
+                    print(json_obj[id_][key])
+        except TypeError:
+            print('error', o)
+        except Exception:
+            print(o.__dict__)
+
+        return json_obj"""
+
+    def default(self, obj):
+        json_obj = {}
+        for element in obj:
+            print('hola')
             id_ = str(element.id)
             json_obj[id_] = {}
-            json_obj[id_]["Fecha Solicitud"] = str(element["date"])
-            json_obj[id_]["Tipo Solicitud"] = element.get_type_display()
-            json_obj[id_]["Nombre Estudiante"] = element["student_name"]
-            json_obj[id_]["Estado Aprobación"] = element.get_approval_status_display()
-            json_obj[id_]["Documento Identidad"] = element["student_dni"]
-            json_obj[id_]["Tipo Documento"] = element.get_student_dni_type_display()
-            json_obj[id_]["Periodo Academico"] = element["academic_period"]
-            json_obj[id_]["Programa"] = element.get_academic_program_display()
-            json_obj[id_]["Justificación"] = element["justification"]
-            json_obj[id_]["detail_cm"] = QuerySetEncoder.encode_dict(
-                element["detail_cm"])
+            for key in element._fields_ordered:
+                json_obj[id_][key] = str(element[key])
 
         return json_obj
 
