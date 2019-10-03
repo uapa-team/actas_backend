@@ -1,6 +1,6 @@
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from mongoengine import DateField
+from mongoengine import DateField, BooleanField
 from ..models import Request
 from .case_utils import string_to_date
 
@@ -9,6 +9,8 @@ class EREP(Request):
 
     full_name = 'Expedición de recibo'
 
+    ah_active = BooleanField(
+        required=True, display='¿Tiene active la historia académica?')
     payment_date = DateField(display='Fecha límite de pago')
 
     regulation_list = ['051|2003|CSU']  # List of regulations
@@ -19,7 +21,7 @@ class EREP(Request):
     str_cm_2 = ' y se le concede como fecha de pago el {} ({}), teniendo en cuenta el ' + \
         'estado de pago por parte de {}.'
 
-    list_analysis = ['El estudiante tiene la historia académica activa.']
+    list_analysis = ['El estudiante {}tiene la historia académica activa.']
 
     def cm(self, docx):
         paragraph = docx.add_paragraph()
@@ -62,9 +64,14 @@ class EREP(Request):
             self.payment_date, string_to_date(str(self.payment_date)), self.student_name))
 
     def cm_ng(self, paragraph):
-        paragraph.add_run(' ' + self.council_decision)
+        paragraph.add_run(self.council_decision + '.')
 
     def pcm_analysis(self, docx):
+        if self.ah_active:
+            active = ''
+        else:
+            active = 'no '
+        self.list_analysis[0] = self.list_analysis[0].format(active)
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
@@ -83,4 +90,4 @@ class EREP(Request):
             self.payment_date, string_to_date(str(self.payment_date)), self.student_name))
 
     def pcm_answers_ng(self, paragraph):
-        paragraph.add_run(' ' + self.council_decision)
+        paragraph.add_run(self.council_decision + '.')
