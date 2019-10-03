@@ -2,7 +2,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
 from mongoengine import StringField, IntField, FloatField, EmbeddedDocumentListField
 from ..models import Request, Subject
-from .case_utils import table_subjects
+from .case_utils import table_subjects, add_analysis_list
 
 
 class CASI(Request):
@@ -41,42 +41,44 @@ class CASI(Request):
 
     regulation_list = ['008|2008|CSU']  # List of regulations
 
-    str_cm_2 = 'cancelar la(s) siguiente(s) asignatura(s) inscrita(s) del periodo académico {}'
-    str_cm_3 = 'porque {}justifica debidamente la solicitud.'
+    str_cm = [
+        'cancelar la(s) siguiente(s) asignatura(s) inscrita(s) del periodo académico {}',
+        'porque {}justifica debidamente la solicitud.'
+    ]
 
-    str_pcm_1 = 'SIA: Porcentaje de avance en el plan: {}. Número de matrículas: {}. PAPA: {}.'
-    str_pcm_2 = 'SIA: Créditos disponibles: {}.'
-    str_pcm_3 = 'SIA: Al aprobar la cancelación de la asignatura {} ({}) ' + \
-        'el estudiante quedaría con {} créditos inscritos.'
+    str_pcm = [
+        'SIA: Porcentaje de avance en el plan: {}. Número de matrículas: {}. PAPA: {}.',
+        'SIA: Créditos disponibles: {}.',
+        'SIA: Al aprobar la cancelación de la asignatura {} ({}) el estudiante quedaría con {} cr' +
+        'éditos inscritos.'
+    ]
 
-    str_pcm_ans_2 = ' cancelar la(s) siguiente(s) asignatura(s) inscrita(s) ' + \
-        'del periodo académico {}, '
-    str_pcm_ans_cr = 'porque se justifica debidamente la solicitud.'
+    str_pcmap = [
+        ' cancelar la(s) siguiente(s) asignatura(s) inscrita(s) del periodo académico {}, ',
+    ]
 
-    str_pcm_ans_nc_1 = 'porque no existe coherencia entre la documentación y ' + \
-        'justificación que presenta.'
+    str_pcma_cap = [
+        'porque se justifica debidamente la solicitud.'
+    ]
 
-    str_pcm_ans_nc_2 = 'porque lo expuesto es un hecho de su conocimiento desde el inicio del ' + \
-        'periodo académico; tuvo la oportunidad de resolverlo oportunamente  ' + \
-        'hasta el 50% del periodo académico, por tanto, no constituye causa  ' + \
-        'extraña que justifique la cancelación de la(s) asignatura(s).'
-
-    str_pcm_ans_nc_3 = 'porque de acuerdo con la documentación que presenta, su ' + \
-        'situación laboral no le impide asistir a las clases y tiene el tiempo suficiente para ' + \
-        'responder por las actividades académicas de la(s) asignatura(s). '
-
-    str_pcm_ans_nc_4 = 'porque verificada la información de los soportes, se encontró que el ' + \
-        'contenido de los mismos no coincide con lo que en ellos se afirma.'
-
-    str_pcm_ans_nc_5 = 'poque es responsabilidad del estudiante indagar sobre el conocimiento ' + \
-        'requerido y la preparación necesaria para cursar la(s) asignatura(s)' + \
-        'antes de inscribir.'
-
-    str_pcm_ans_nc_6 = 'porque lo expuesto no es un hecho que constituya causa extraña que ' + \
-        'justifique la cancelación de la(s) asignatura(s).'
-
-    str_pcm_ans_nc_7 = 'porque de la documentación aportada, se tiene que no hay justificación ' + \
-        'para acceder a lo pedido. '
+    str_pcma_cna = [
+        'porque no existe coherencia entre la documentación y justificación que presenta.',
+        'porque lo expuesto es un hecho de su conocimiento desde el inicio del periodo académico' +
+        '; tuvo la oportunidad de resolverlo oportunamente hasta el 50% del periodo académico, p' +
+        'or tanto, no constituye causa extraña que justifique la cancelación de la(s) asignatura' +
+        '(s).',
+        'porque de acuerdo con la documentación que presenta, su situación laboral no le impide ' +
+        'asistir a las clases y tiene el tiempo suficiente para responder por las actividades ac' +
+        'adémicas de la(s) asignatura(s). ',
+        'porque verificada la información de los soportes, se encontró que el contenido de los m' +
+        'ismos no coincide con lo que en ellos se afirma.',
+        'poque es responsabilidad del estudiante indagar sobre el conocimiento requerido y la pr' +
+        'eparación necesaria para cursar la(s) asignatura(s) antes de inscribir.',
+        'porque lo expuesto no es un hecho que constituya causa extraña que justifique la cancel' +
+        'ación de la(s) asignatura(s).',
+        'porque de la documentación aportada, se tiene que no hay justificación para acceder a l' +
+        'o pedido. '
+    ]
 
     def cm(self, docx):
         paragraph = docx.add_paragraph()
@@ -90,7 +92,7 @@ class CASI(Request):
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True
-        paragraph.add_run(self.str_cm_2.format(self.academic_period) + ', ')
+        paragraph.add_run(self.str_cm[0].format(self.academic_period) + ', ')
         if self.is_affirmative_response_approval_status():
             self.cm_ap(paragraph)
         else:
@@ -105,18 +107,18 @@ class CASI(Request):
         paragraph.add_run(self.str_comittee_header)
         paragraph.add_run(
             # pylint: disable=no-member
-            self.get_advisor_response_display().upper()).font.bold = True
-        paragraph.add_run(self.str_pcm_ans_2.format(self.academic_period))
+            ' ' + self.get_advisor_response_display().upper()).font.bold = True
+        paragraph.add_run(self.str_pcmap[0].format(self.academic_period))
         if self.is_affirmative_response_advisor_response():
             self.pcm_answers_cr(paragraph)
         else:
             self.pcm_answers_cn(paragraph)
 
     def cm_ap(self, paragraph):
-        paragraph.add_run(self.str_cm_3.format('') + ' ')
+        paragraph.add_run(self.str_cm[1].format('') + ' ')
 
     def cm_na(self, paragraph):
-        paragraph.add_run(self.str_cm_3.format('no ') + ' ')
+        paragraph.add_run(self.str_cm[1].format('no ') + ' ')
 
     def casi_subjects_table(self, docx):
         data = []
@@ -132,34 +134,19 @@ class CASI(Request):
         table_subjects(docx, data)
 
     def pcm_analysis_handler(self, docx):
-        paragraph = docx.add_paragraph()
-        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        paragraph.paragraph_format.space_after = Pt(0)
-        paragraph.add_run(self.str_analysis + ': ').font.bold = True
         self.pcm_analysis(docx)
 
-    def pcm_analysis_add_analysis(self, docx, analysis):
-        paragraph = docx.add_paragraph()
-        paragraph.style = 'List Bullet'
-        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        paragraph.paragraph_format.space_after = Pt(0)
-        paragraph.add_run(analysis)
-
     def pcm_analysis(self, docx):
-        self.pcm_analysis_1(docx)
-        self.pcm_analysis_2(docx)
-        self.pcm_analysis_3(docx)
-        self.pcm_analysis_extra(docx)
+        analysis_list = []
+        analysis_list += [self.str_pcm[0].format(
+            self.advance, self.enrolled_academic_periods, self.papa)]
+        analysis_list += [self.str_pcm[1].format(self.available_credits)]
+        analysis_list += self.pcm_analysis_3_list()
+        analysis_list += self.extra_analysis
+        add_analysis_list(docx, analysis_list)
 
-    def pcm_analysis_1(self, docx):
-        self.pcm_analysis_add_analysis(docx, self.str_pcm_1.format(
-            self.advance, self.enrolled_academic_periods, self.papa))
-
-    def pcm_analysis_2(self, docx):
-        self.pcm_analysis_add_analysis(
-            docx, self.str_pcm_2.format(self.available_credits))
-
-    def pcm_analysis_3(self, docx):
+    def pcm_analysis_3_list(self):
+        analysis_subject_list = []
         for subject in self.subjects:
             current_credits = self.current_credits
             subject_credits = subject.credits
@@ -168,15 +155,9 @@ class CASI(Request):
                 'code': subject.code,
                 'name': subject.name
             }
-            self.pcm_analysis_subject(docx, subject_info)
-
-    def pcm_analysis_subject(self, docx, subject_info):
-        self.pcm_analysis_add_analysis(docx, self.str_pcm_3.format(
-            subject_info['name'], subject_info['code'], subject_info['remaining']))
-
-    def pcm_analysis_extra(self, docx):
-        for exa in self.extra_analysis:
-            self.pcm_analysis_add_analysis(docx, exa)
+            analysis_subject_list += [self.str_pcm[2].format(
+                subject_info['name'], subject_info['code'], subject_info['remaining'])]
+        return analysis_subject_list
 
     def pcm_answer_handler(self, docx):
         paragraph = docx.add_paragraph()
@@ -187,26 +168,26 @@ class CASI(Request):
         self.casi_subjects_table(docx)
 
     def pcm_answers_cr(self, paragraph):
-        paragraph.add_run(self.str_pcm_ans_cr)
+        paragraph.add_run(self.str_pcma_cap[0])
         paragraph.add_run(' ({}).'.format(self.regulations['008|2008|CSU'][0]))
 
     def pcm_answers_cn(self, paragraph):
         if self.nrc_answer == self.CN_ANSWER_INCOHERENTE_O_INCONSECUENTE:
-            paragraph.add_run(self.str_pcm_ans_nc_1 + ' ')
+            paragraph.add_run(self.str_pcma_cna[0] + ' ')
         elif self.nrc_answer == self.CN_ANSWER_NO_DILIGENTE:
-            paragraph.add_run(self.str_pcm_ans_nc_2 + ' ')
+            paragraph.add_run(self.str_pcma_cna[1] + ' ')
         elif self.nrc_answer == self.CN_ANSWER_MOTIVOS_LABORALES:
-            paragraph.add_run(self.str_pcm_ans_nc_3 + ' ')
+            paragraph.add_run(self.str_pcma_cna[2] + ' ')
         elif self.nrc_answer == self.CN_ANSWER_INFORMACION_FALSA:
-            paragraph.add_run(self.str_pcm_ans_nc_4 + ' ')
+            paragraph.add_run(self.str_pcma_cna[3] + ' ')
         elif self.nrc_answer == self.CN_ANSWER_FALTA_DE_CONOCIMIENTO:
-            paragraph.add_run(self.str_pcm_ans_nc_5 + ' ')
+            paragraph.add_run(self.str_pcma_cna[4] + ' ')
         elif self.nrc_answer == self.CN_ANSWER_ARGUMENTOS_INSUFICIENTES:
-            paragraph.add_run(self.str_pcm_ans_nc_6 + ' ')
+            paragraph.add_run(self.str_pcma_cna[5] + ' ')
         elif self.nrc_answer == self.CN_ANSWER_SOPORTES_NO_SOPORTAN:
-            paragraph.add_run(self.str_pcm_ans_nc_7 + ' ')
+            paragraph.add_run(self.str_pcma_cna[6] + ' ')
         elif self.nrc_answer == self.CN_ANSWER_OTRO:
-            paragraph.add_run(self.str_pcm_ans_nc_7 + ' ')
+            paragraph.add_run(self.str_pcma_cna[6] + ' ')
         else:
             raise AssertionError(
                 self.assertionerror['CHOICES'].format('NRC_answer'))
