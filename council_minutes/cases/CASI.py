@@ -1,7 +1,7 @@
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from mongoengine import StringField, IntField, FloatField, EmbeddedDocumentListField
 from ..models import Request, Subject
-from .case_utils import add_hyperlink, table_subjects
+from .case_utils import table_subjects
 
 
 class CASI(Request):
