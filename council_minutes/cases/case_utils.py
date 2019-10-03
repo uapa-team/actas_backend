@@ -90,7 +90,7 @@ def header(request, docx_):
     para.add_run('Normatividad:')
     para.paragraph_format.space_after = Pt(0)
     for regulation in request.regulation_list:
-        para = docx_.add_paragraph(style='List Bullet')
+        para = docx_.add_paragraph(style='List Hyperlink')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.paragraph_format.space_after = Pt(0)
         add_hyperlink(
