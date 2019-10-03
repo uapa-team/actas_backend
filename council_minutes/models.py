@@ -326,7 +326,7 @@ class Request(DynamicDocument):
         'CHOICES': '{} is not in choices list.'
     }
 
-    str_analysis = 'Analisis'
+    str_analysis = 'Análisis'
     str_answer = 'Concepto'
     str_council_header = 'El Consejo de Facultad'
     str_comittee_header = 'El Comité Asesor recomienda al Consejo de Facultad'

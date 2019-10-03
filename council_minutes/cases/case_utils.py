@@ -35,9 +35,45 @@ def add_hyperlink(paragraph_, text, url):
     hyperlink.append(new_run)
     # pylint: disable=protected-access
     paragraph_._p.append(hyperlink)
-    #paragraph_.style.font.underline = True
+    # paragraph_.style.font.underline = True
 
     return hyperlink
+
+
+def add_analysis_paragraph(docx_, analysis_list):
+    """
+     A function that adds the analysis paragraph within a docx object.
+     : param docx_: The docx we are adding the analysis to.
+     : param analysis_list: A list of the analysis to be added
+     """
+    paragraph = docx_.add_paragraph()
+    paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    paragraph.paragraph_format.space_after = Pt(0)
+    paragraph.add_run('Analisis: ').font.bold = True
+    add_analysis_list(docx_, analysis_list)
+
+
+def add_analysis_list(docx_, analysis_list):
+    """
+    A function that adds several analysis within a docx object.
+    : param docx_: The docx we are adding the analysis to.
+    : param analysis_list: A list of the analysis to be added
+    """
+    for analysis in analysis_list:
+        add_analysis(docx_, analysis)
+
+
+def add_analysis(docx_, analysis):
+    """
+    A function that adds an unique analysis within a docx object.
+    : param docx_: The docx we are adding the analysis to.
+    : param analysis: The analysis to be added
+    """
+    paragraph = docx_.add_paragraph()
+    paragraph.style = 'List Bullet'
+    paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    paragraph.paragraph_format.space_after = Pt(0)
+    paragraph.add_run(analysis)
 
 
 def string_to_date(string):

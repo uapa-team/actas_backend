@@ -2,7 +2,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
 from mongoengine import StringField, IntField, FloatField, EmbeddedDocumentListField
 from ..models import Request, Subject
-from .case_utils import table_subjects
+from .case_utils import table_subjects, add_analysis_list
 
 
 class CASI(Request):
@@ -132,34 +132,19 @@ class CASI(Request):
         table_subjects(docx, data)
 
     def pcm_analysis_handler(self, docx):
-        paragraph = docx.add_paragraph()
-        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        paragraph.paragraph_format.space_after = Pt(0)
-        paragraph.add_run(self.str_analysis + ': ').font.bold = True
         self.pcm_analysis(docx)
 
-    def pcm_analysis_add_analysis(self, docx, analysis):
-        paragraph = docx.add_paragraph()
-        paragraph.style = 'List Bullet'
-        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        paragraph.paragraph_format.space_after = Pt(0)
-        paragraph.add_run(analysis)
-
     def pcm_analysis(self, docx):
-        self.pcm_analysis_1(docx)
-        self.pcm_analysis_2(docx)
-        self.pcm_analysis_3(docx)
-        self.pcm_analysis_extra(docx)
+        analysis_list = []
+        analysis_list += [self.str_pcm_1.format(
+            self.advance, self.enrolled_academic_periods, self.papa)]
+        analysis_list += [self.str_pcm_2.format(self.available_credits)]
+        analysis_list += self.pcm_analysis_3_list()
+        analysis_list += self.extra_analysis
+        add_analysis_list(docx, analysis_list)
 
-    def pcm_analysis_1(self, docx):
-        self.pcm_analysis_add_analysis(docx, self.str_pcm_1.format(
-            self.advance, self.enrolled_academic_periods, self.papa))
-
-    def pcm_analysis_2(self, docx):
-        self.pcm_analysis_add_analysis(
-            docx, self.str_pcm_2.format(self.available_credits))
-
-    def pcm_analysis_3(self, docx):
+    def pcm_analysis_3_list(self):
+        analysis_subject_list = []
         for subject in self.subjects:
             current_credits = self.current_credits
             subject_credits = subject.credits
@@ -168,15 +153,9 @@ class CASI(Request):
                 'code': subject.code,
                 'name': subject.name
             }
-            self.pcm_analysis_subject(docx, subject_info)
-
-    def pcm_analysis_subject(self, docx, subject_info):
-        self.pcm_analysis_add_analysis(docx, self.str_pcm_3.format(
-            subject_info['name'], subject_info['code'], subject_info['remaining']))
-
-    def pcm_analysis_extra(self, docx):
-        for exa in self.extra_analysis:
-            self.pcm_analysis_add_analysis(docx, exa)
+            analysis_subject_list += [self.str_pcm_3.format(
+                subject_info['name'], subject_info['code'], subject_info['remaining'])]
+        return analysis_subject_list
 
     def pcm_answer_handler(self, docx):
         paragraph = docx.add_paragraph()
