@@ -1,33 +1,37 @@
+from docx.shared import Pt
 from num2words import num2words
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from mongoengine import IntField, FloatField, ObjectIdField
 from ..models import Request
+from .case_utils import add_analysis_paragraph
 
 
 class REEM(Request):
 
-    full_name = 'Cancelación de Asignaturas'
+    full_name = 'Reembolso'
 
     credits_refunded = IntField(display='Creditos Disponibles')
     percentage = FloatField(display='Porcentaje de créditos a cancelar')
     cancelation_case = ObjectIdField(
         display='Código del caso en el que fue cancelado el periodo')
 
-    str_ap = 'APRUEBA'
-    str_na = 'NO APRUEBA'
-    str_analysis = 'Analisis'
-    str_answer = 'Concepto'
-    str_regulation_1 = '(Acuerdo 032 de 2010 del Consejo Superior Universitario, Artículo ' + \
-        '1 Resolución 1416 de 2013 de Rectoría).'
+    regulation_list = (
+        '032|2010|CSU',
+        '1416|2013|REC'
+    )
 
-    str_cm_pre_1 = 'El Consejo de Facultad'
-    str_cm_pre_2 = 'reembolsar {} créditos al estudiante'
-    str_cm_pre_3 = 'debido a que {}.'
+    str_cm = [
+        'la devolución proporcional del {} por ciento ({}%) del valor pagado por concepto de der ' +
+        'echos de matrícula del periodo {}.',
+        'Teniendo en cuenta la fecha de presentación de la solicitud y que le fue aprobada la ca' +
+        'ncelación de periodo en el caso {} del Acta {} de {} del Consejo de Facultad.'
+    ]
 
-    str_cm_pos_1 = 'devolución proporcional del {} por ciento ({}%) del valor pagado por ' + \
-        'concepto de derechos de matrícula del periodo'
-    str_cm_pos_2 = 'teniendo en cuenta la fecha de presentación de la solicitud y que le fue ' + \
-        'aprobada la cancelación de periodo en el caso {} del Acta {} de {} del Consejo de Facultad'
+    str_pcm = [
+        'Fecha de presentación de solicitud: {}.',
+        'Créditos a reembolsar: {}.',
+        'Cancelación de periodo académico: Caso {}, consecutivo {}, año: {}.'
+    ]
 
     def cm(self, docx):
         paragraph = docx.add_paragraph()
@@ -35,56 +39,56 @@ class REEM(Request):
         self.cm_answer(paragraph)
 
     def cm_answer(self, paragraph):
-        if self.is_pre():
-            self.cm_answer_pre(paragraph)
-        else:
-            self.cm_answer_pos(paragraph)
-
-    def cm_answer_pre(self, paragraph):
-        paragraph.add_run(self.str_cm_pre_1 + ' ')
-        if self.approval_status == self.APPROVAL_STATUS_APRUEBA:
-            paragraph.add_run(self.str_ap + ' ').font.bold = True
-            paragraph.add_run(self.str_cm_pre_2.format(self.credits_refunded))
-        elif self.approval_status == self.APPROVAL_STATUS_NO_APRUEBA:
-            paragraph.add_run(self.str_na + ' ').font.bold = True
-            paragraph.add_run(self.str_cm_pre_2.format(
-                self.credits_refunded) + ', ')
-            paragraph.add_run(self.str_cm_pre_3.format(
-                self.council_decision) + ' ')
-        else:
-            raise AssertionError(
-                'Approval status is not AP nor NA, it is {}'.format(
-                    self.approval_status)
-            )
-        paragraph.add_run(self.str_regulation_1)
-
-    def cm_answer_pos(self, paragraph):
+        # pylint: disable=no-member
         cancelation_case = Request.objects.get(id=self.cancelation_case)
-        paragraph.add_run(self.str_cm_pre_1 + ' ')
-        if self.approval_status == self.APPROVAL_STATUS_APRUEBA:
-            paragraph.add_run(self.str_ap + ' ').font.bold = True
-        elif self.approval_status == self.APPROVAL_STATUS_NO_APRUEBA:
-            paragraph.add_run(self.str_na + ' ').font.bold = True
-        else:
-            raise AssertionError(
-                'Approval status is not AP nor NA, it is {}'.format(
-                    self.approval_status)
-            )
+        paragraph.add_run(self.str_council_header + ' ')
         paragraph.add_run(
-            self.str_cm_pos_1.format(
+            # pylint: disable=no-member
+            self.get_approval_status_display().upper() + ' ').font.bold = True
+        paragraph.add_run(
+            self.str_cm[0].format(
                 num2words(self.percentage, lang='es'),
-                self.percentage
-            )
+                self.percentage,
+                cancelation_case.academic_period
+            ) + ' '
         )
         paragraph.add_run(
-            self.str_cm_pos_2.format(
+            self.str_cm[1].format(
                 cancelation_case.id,
                 cancelation_case.consecutive_minute,
-                cancelation_case.date)
+                str(cancelation_case.date)[0:4])
         )
 
     def pcm(self, docx):
-        raise NotImplementedError('There are no examples.')
+        self.pcm_analysis(docx)
+        paragraph = docx.add_paragraph()
+        paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run('Analisis: ').font.bold = True
+        paragraph = docx.add_paragraph()
+        self.pcm_answer(paragraph)
 
-    def pcm_answer(self, docx):
-        raise NotImplementedError('There are no examples.')
+    def pcm_analysis(self, docx):
+        # pylint: disable=no-member
+        cancelation_case = Request.objects.get(id=self.cancelation_case)
+        analysis_list = []
+        analysis_list += [self.str_pcm[0].format(self.date)]
+        analysis_list += [self.str_pcm[1].format(self.credits_refunded)]
+        analysis_list += [self.str_pcm[2].format(cancelation_case.id,
+                                                 cancelation_case.consecutive_minute,
+                                                 str(cancelation_case.date)[0:4])]
+        analysis_list += self.extra_analysis
+        add_analysis_paragraph(docx, analysis_list)
+
+    def pcm_answer(self, paragraph):
+        # pylint: disable=no-member
+        cancelation_case = Request.objects.get(id=self.cancelation_case)
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.add_run(self.str_comittee_header)
+        paragraph.add_run(
+            # pylint: disable=no-member
+            ' ' + self.get_advisor_response_display().upper() + ' ').font.bold = True
+        paragraph.add_run(self.str_cm[0].format(
+            num2words(self.percentage, lang='es'),
+            self.percentage,
+            cancelation_case.academic_period
+        ))
