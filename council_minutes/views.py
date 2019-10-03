@@ -5,7 +5,7 @@ from mongoengine.errors import ValidationError
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Request, get_fields
-from .helpers import QuerySetEncoder, Translator
+from .helpers import QuerySetEncoder
 from .docx import CouncilMinuteGenerator
 from .docx import PreCouncilMinuteGenerator
 from .cases import *
@@ -19,7 +19,7 @@ def cases_defined(request):
     if request.method == 'GET':
         response = {
             'cases': [
-                {'code': type_case.__name__, 'name': type_case.full_name} 
+                {'code': type_case.__name__, 'name': type_case.full_name}
                 for type_case in Request.__subclasses__()]
         }
         return JsonResponse(response)
@@ -48,17 +48,17 @@ def filter_request(request):
 
 @csrf_exempt  # Esto va solo para evitar la verificacion de django
 def insert_request(request):
-    if request.method == 'POST':
-        new_request = Request().from_json(Translator.translate(request.body))
-        try:
-            new_request.save()
-            return HttpResponse(request.body, status=201)
-        except ValidationError as e:
-            print()
-            print(e)
-            return HttpResponse(e.message, status=400)
-    else:
-        return HttpResponse('Bad Request', status=400)
+    body = json.loads(request.body)
+    _cls = body['_cls'].split('.')[-1]
+    subs = [c.__name__ for c in Request.__subclasses__()]
+    case = Request.__subclasses__()[subs.index(_cls)]
+    new_request = case().from_json(case.translate(request.body))
+    try:
+        new_request.save()
+        return HttpResponse(request.body, status=201)
+    except ValidationError as e:
+        print(e)
+        return HttpResponse(e.message, status=400)
 
 
 @csrf_exempt
@@ -81,7 +81,8 @@ def update_cm(request, cm_id):
             acta = Request.objects.get(id=cm_id)
         except mongoengine.DoesNotExist:
             return HttpResponse('Does not exist', status=404)
-        json_body = json.loads(Translator.translate(request.body))
+        # TODO: Se realizaron cambios en la forma de traducir
+        json_body = json.loads(request.body)
         if hasattr(acta, 'old'):
             old = acta.old
         else:
