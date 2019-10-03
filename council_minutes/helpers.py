@@ -1,53 +1,31 @@
-import json
 from django.core.serializers.json import DjangoJSONEncoder
-from django.utils.dateparse import parse_date
-from .models import Request
+from mongoengine.base.datastructures import BaseList, EmbeddedDocumentList
+from mongoengine.queryset import QuerySet
 
 
 class QuerySetEncoder(DjangoJSONEncoder):
 
-    """def default(self, o):
-        json_obj = {}
-        try:
-            for element in o:
-                id_ = str(element.id)
-                json_obj[id_] = {}
-                for key, value in element._fields.items():
-                    print(key, end=' ')
-                    if callable(value):
-                        json_obj[id_][key] = element[key]()
-                    elif value.choices:
-                        k = 'get_{}_display'.format(key)
-                        json_obj[id_][key] = element.__dict__[k]()
-                    else:
-                        json_obj[id_][key] = element[key]
-                    print(json_obj[id_][key])
-        except TypeError:
-            print('error', o)
-        except Exception:
-            print(o.__dict__)
-
-        return json_obj"""
-
     def default(self, obj):
         json_obj = {}
-        for element in obj:
-            print('hola')
-            id_ = str(element.id)
-            json_obj[id_] = {}
-            for key in element._fields_ordered:
-                json_obj[id_][key] = str(element[key])
+        if isinstance(obj, QuerySet):
+            for element in obj:
+                json_obj[str(element.id)] = QuerySetEncoder.encode_object(
+                    element)
+        else:
+            json_obj = QuerySetEncoder.encode_object(obj)
 
         return json_obj
 
     @staticmethod
-    def encode_dict(obj):
+    def encode_object(obj):
         data = {}
-
-        for key in obj:
-            if(isinstance(obj[key], dict)):
-                data[key] = QuerySetEncoder.encode_dict(obj[key])
+        for key in obj._fields_ordered:
+            value = obj[key]
+            if isinstance(value, BaseList):
+                if isinstance(value, EmbeddedDocumentList):
+                    data[key] = value
+                else:
+                    data[key] = [str(e) for e in value]
             else:
-                data[key] = str(obj[key])
-
+                data[key] = str(value)
         return data
