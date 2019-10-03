@@ -1,38 +1,31 @@
-import json
 from django.core.serializers.json import DjangoJSONEncoder
-from django.utils.dateparse import parse_date
-from .models import Request
+from mongoengine.base.datastructures import BaseList, EmbeddedDocumentList
+from mongoengine.queryset import QuerySet
 
 
 class QuerySetEncoder(DjangoJSONEncoder):
 
-    def default(self, o):
+    def default(self, obj):
         json_obj = {}
-        for element in o:
-            id_ = str(element.id)
-            json_obj[id_] = {}
-            json_obj[id_]["Fecha Solicitud"] = str(element["date"])
-            json_obj[id_]["Tipo Solicitud"] = element.get_type_display()
-            json_obj[id_]["Nombre Estudiante"] = element["student_name"]
-            json_obj[id_]["Estado Aprobación"] = element.get_approval_status_display()
-            json_obj[id_]["Documento Identidad"] = element["student_dni"]
-            json_obj[id_]["Tipo Documento"] = element.get_student_dni_type_display()
-            json_obj[id_]["Periodo Academico"] = element["academic_period"]
-            json_obj[id_]["Programa"] = element.get_academic_program_display()
-            json_obj[id_]["Justificación"] = element["justification"]
-            json_obj[id_]["detail_cm"] = QuerySetEncoder.encode_dict(
-                element["detail_cm"])
+        if isinstance(obj, QuerySet):
+            for element in obj:
+                json_obj[str(element.id)] = QuerySetEncoder.encode_object(
+                    element)
+        else:
+            json_obj = QuerySetEncoder.encode_object(obj)
 
         return json_obj
 
     @staticmethod
-    def encode_dict(obj):
+    def encode_object(obj):
         data = {}
-
-        for key in obj:
-            if(isinstance(obj[key], dict)):
-                data[key] = QuerySetEncoder.encode_dict(obj[key])
+        for key in obj._fields_ordered:
+            value = obj[key]
+            if isinstance(value, BaseList):
+                if isinstance(value, EmbeddedDocumentList):
+                    data[key] = value
+                else:
+                    data[key] = [str(e) for e in value]
             else:
-                data[key] = str(obj[key])
-
+                data[key] = str(value)
         return data
