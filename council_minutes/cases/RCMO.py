@@ -1,6 +1,14 @@
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from mongoengine import StringField
-from ..models import Request
+from ..models import Request, Subject
+
+
+class SubjectMovility(Subject):
+    name_origin = StringField(
+        required=True, display='Nombre Asignatura Origen')
+    credits_origin = StringField(
+        required=True, display='Número Créditos Origen')
+    tipology_origin = StringField(required=True, display='Tipología Origen')
 
 
 class RCMO(Request):
@@ -22,7 +30,6 @@ class RCMO(Request):
 
     regulation_list = ['008|2008|CSU']  # List of regulations
 
-    str_cm_1 = 'El Consejo de Facultad'
     str_cm_2 = 'calificar {} la asignatura {} ({}) en el periodo {}.'
 
     def cm(self, docx):
