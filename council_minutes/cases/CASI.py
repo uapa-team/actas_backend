@@ -1,9 +1,8 @@
-from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.enum.table import WD_ALIGN_VERTICAL
-from mongoengine import DynamicDocument, DateField, StringField, ListField, IntField, FloatField, EmbeddedDocumentListField
+from docx.shared import Pt
+from mongoengine import StringField, IntField, FloatField, EmbeddedDocumentListField
 from ..models import Request, Subject
-from .case_utils import add_hyperlink, table_subjects
+from .case_utils import table_subjects
 
 
 class CASI(Request):
@@ -37,18 +36,11 @@ class CASI(Request):
     papa = FloatField(required=True, display='PAPA')
     available_credits = IntField(required=True, display='Creditos Disponibles')
     current_credits = IntField(required=True, display='Creditos Inscritos')
-    nrc_answer = StringField(choices=CN_ANSWER_CHOICES,
+    nrc_answer = StringField(choices=CN_ANSWER_CHOICES, default=CN_ANSWER_OTRO,
                              display='Motivo de rechazo')
 
-    str_ap = 'APRUEBA'
-    str_na = 'NO APRUEBA'
-    str_analysis = 'Analisis'
-    str_answer = 'Concepto'
-    str_regulation_1 = '(Artículo 15 Acuerdo 008 de 2008 del Consejo Superior Universitario).'
-    str_regulation_2 = 'Acuerdo 008 de 2008'
-    str_regulation_2_link = 'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34983'
+    regulation_list = ['008|2008|CSU']  # List of regulations
 
-    str_cm_1 = 'El Consejo de Facultad'
     str_cm_2 = 'cancelar la(s) siguiente(s) asignatura(s) inscrita(s) del periodo académico {}'
     str_cm_3 = 'porque {}justifica debidamente la solicitud.'
 
@@ -57,8 +49,8 @@ class CASI(Request):
     str_pcm_3 = 'SIA: Al aprobar la cancelación de la asignatura {} ({}) ' + \
         'el estudiante quedaría con {} créditos inscritos.'
 
-    str_pcm_ans_1 = 'El Comité Asesor {}recomienda al Consejo de Facultad cancelar la(s) ' + \
-        'siguiente(s) asignatura(s) inscrita(s) del periodo académico {}, '
+    str_pcm_ans_2 = ' cancelar la(s) siguiente(s) asignatura(s) inscrita(s) ' + \
+        'del periodo académico {}, '
     str_pcm_ans_cr = 'porque se justifica debidamente la solicitud.'
 
     str_pcm_ans_nc_1 = 'porque no existe coherencia entre la documentación y ' + \
@@ -69,8 +61,8 @@ class CASI(Request):
         'hasta el 50% del periodo académico, por tanto, no constituye causa  ' + \
         'extraña que justifique la cancelación de la(s) asignatura(s).'
 
-    str_pcm_ans_nc_3 = 'porque de acuerdo con la documentación que presenta, su situación laboral ' + \
-        'no le impide asistir a las clases y tiene el tiempo suficiente para ' + \
+    str_pcm_ans_nc_3 = 'porque de acuerdo con la documentación que presenta, su ' + \
+        'situación laboral no le impide asistir a las clases y tiene el tiempo suficiente para ' + \
         'responder por las actividades académicas de la(s) asignatura(s). '
 
     str_pcm_ans_nc_4 = 'porque verificada la información de los soportes, se encontró que el ' + \
@@ -89,35 +81,41 @@ class CASI(Request):
     def cm(self, docx):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
         self.cm_answer(paragraph)
         self.casi_subjects_table(docx)
 
     def cm_answer(self, paragraph):
-        paragraph.add_run(self.str_cm_1 + ' ')
-        if self.approval_status == self.APPROVAL_STATUS_APRUEBA:
+        paragraph.add_run(self.str_council_header + ' ')
+        paragraph.add_run(
+            # pylint: disable=no-member
+            self.get_approval_status_display().upper() + ' ').font.bold = True
+        paragraph.add_run(self.str_cm_2.format(self.academic_period) + ', ')
+        if self.is_affirmative_response_approval_status():
             self.cm_ap(paragraph)
-        elif self.approval_status == self.APPROVAL_STATUS_NO_APRUEBA:
+        else:
             self.cm_na(paragraph)
-        paragraph.add_run(self.str_regulation_1)
+        paragraph.add_run('({}).'.format(self.regulations['008|2008|CSU'][0]))
 
     def pcm(self, docx):
         self.pcm_analysis_handler(docx)
         self.pcm_answer_handler(docx)
 
     def pcm_answer(self, paragraph):
-        if self.advisor_response == self.ADVISOR_RESPONSE_COMITE_RECOMIENDA:
+        paragraph.add_run(self.str_comittee_header)
+        paragraph.add_run(
+            # pylint: disable=no-member
+            self.get_advisor_response_display().upper()).font.bold = True
+        paragraph.add_run(self.str_pcm_ans_2.format(self.academic_period))
+        if self.is_affirmative_response_advisor_response():
             self.pcm_answers_cr(paragraph)
-        elif self.advisor_response == self.ADVISOR_RESPONSE_COMITE_NO_RECOMIENDA:
+        else:
             self.pcm_answers_cn(paragraph)
 
     def cm_ap(self, paragraph):
-        paragraph.add_run(self.str_ap + ' ').font.bold = True
-        paragraph.add_run(self.str_cm_2.format(self.academic_period) + ', ')
         paragraph.add_run(self.str_cm_3.format('') + ' ')
 
     def cm_na(self, paragraph):
-        paragraph.add_run(self.str_na + ' ').font.bold = True
-        paragraph.add_run(self.str_cm_2.format(self.academic_period) + ', ')
         paragraph.add_run(self.str_cm_3.format('no ') + ' ')
 
     def casi_subjects_table(self, docx):
@@ -135,14 +133,16 @@ class CASI(Request):
 
     def pcm_analysis_handler(self, docx):
         paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(self.str_analysis + ': ').font.bold = True
-        add_hyperlink(paragraph, self.str_regulation_2,
-                      self.str_regulation_2_link)
         self.pcm_analysis(docx)
 
     def pcm_analysis_add_analysis(self, docx, analysis):
         paragraph = docx.add_paragraph()
         paragraph.style = 'List Bullet'
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(analysis)
 
     def pcm_analysis(self, docx):
@@ -181,18 +181,16 @@ class CASI(Request):
     def pcm_answer_handler(self, docx):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(self.str_answer + ': ').bold = True
         self.pcm_answer(paragraph)
         self.casi_subjects_table(docx)
 
     def pcm_answers_cr(self, paragraph):
-        paragraph.add_run(self.str_pcm_ans_1.format('', self.academic_period))
         paragraph.add_run(self.str_pcm_ans_cr)
-        paragraph.add_run(self.str_regulation_1)
+        paragraph.add_run(' ({}).'.format(self.regulations['008|2008|CSU'][0]))
 
     def pcm_answers_cn(self, paragraph):
-        paragraph.add_run(self.str_pcm_ans_1.format(
-            'no ', self.academic_period))
         if self.nrc_answer == self.CN_ANSWER_INCOHERENTE_O_INCONSECUENTE:
             paragraph.add_run(self.str_pcm_ans_nc_1 + ' ')
         elif self.nrc_answer == self.CN_ANSWER_NO_DILIGENTE:
@@ -211,5 +209,5 @@ class CASI(Request):
             paragraph.add_run(self.str_pcm_ans_nc_7 + ' ')
         else:
             raise AssertionError(
-                'NRC answer not understood. CASI.pcm_answers_cn')
-        paragraph.add_run(self.str_regulation_1)
+                self.assertionerror['CHOICES'].format('NRC_answer'))
+        paragraph.add_run(' ({}).'.format(self.regulations['008|2008|CSU'][0]))
