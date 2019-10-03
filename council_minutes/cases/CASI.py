@@ -1,4 +1,5 @@
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.shared import Pt
 from mongoengine import StringField, IntField, FloatField, EmbeddedDocumentListField
 from ..models import Request, Subject
 from .case_utils import table_subjects
@@ -48,7 +49,6 @@ class CASI(Request):
     str_pcm_3 = 'SIA: Al aprobar la cancelación de la asignatura {} ({}) ' + \
         'el estudiante quedaría con {} créditos inscritos.'
 
-    str_pcm_ans_1 = 'El Comité Asesor recomienda al Consejo de Facultad '
     str_pcm_ans_2 = ' cancelar la(s) siguiente(s) asignatura(s) inscrita(s) ' + \
         'del periodo académico {}, '
     str_pcm_ans_cr = 'porque se justifica debidamente la solicitud.'
@@ -81,6 +81,7 @@ class CASI(Request):
     def cm(self, docx):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
         self.cm_answer(paragraph)
         self.casi_subjects_table(docx)
 
@@ -101,7 +102,7 @@ class CASI(Request):
         self.pcm_answer_handler(docx)
 
     def pcm_answer(self, paragraph):
-        paragraph.add_run(self.str_pcm_ans_1)
+        paragraph.add_run(self.str_comittee_header)
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_advisor_response_display().upper()).font.bold = True
@@ -132,12 +133,16 @@ class CASI(Request):
 
     def pcm_analysis_handler(self, docx):
         paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(self.str_analysis + ': ').font.bold = True
         self.pcm_analysis(docx)
 
     def pcm_analysis_add_analysis(self, docx, analysis):
         paragraph = docx.add_paragraph()
         paragraph.style = 'List Bullet'
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(analysis)
 
     def pcm_analysis(self, docx):
@@ -176,6 +181,7 @@ class CASI(Request):
     def pcm_answer_handler(self, docx):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(self.str_answer + ': ').bold = True
         self.pcm_answer(paragraph)
         self.casi_subjects_table(docx)

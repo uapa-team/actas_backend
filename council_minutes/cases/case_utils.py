@@ -41,9 +41,9 @@ def add_hyperlink(paragraph_, text, url):
 
 
 def string_to_date(string):
-    ret = string[0:2]
-    ret += num_to_month(string[3:5])
-    ret += string[6:10]
+    ret = string[8:10]
+    ret += num_to_month(string[5:7])
+    ret += string[0:4]
     return ret
 
 
@@ -88,13 +88,13 @@ def header(request, docx_):
     para.add_run('Soportes:\t\t{}\n'.format(request.supports))
     para.add_run('Fecha radicación:\t{}\n'.format(request.date))
     para.add_run('Normatividad:')
+    para.paragraph_format.space_after = Pt(0)
     for regulation in request.regulation_list:
         para = docx_.add_paragraph(style='List Bullet')
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.paragraph_format.space_after = Pt(0)
         add_hyperlink(
             para, request.regulations[regulation][0], request.regulations[regulation][1])
-
     para.paragraph_format.space_after = Pt(0)
 
 
