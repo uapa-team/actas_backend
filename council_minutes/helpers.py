@@ -1,6 +1,7 @@
 from django.core.serializers.json import DjangoJSONEncoder
 from mongoengine.base.datastructures import BaseList, EmbeddedDocumentList
 from mongoengine.queryset import QuerySet
+from mongoengine.fields import BaseField
 
 
 class QuerySetEncoder(DjangoJSONEncoder):
@@ -19,7 +20,8 @@ class QuerySetEncoder(DjangoJSONEncoder):
     @staticmethod
     def encode_object(obj):
         data = {}
-        for key in obj._fields_ordered:
+        fields = obj.__class__._fields
+        for key in fields:
             value = obj[key]
             if isinstance(value, BaseList):
                 if isinstance(value, EmbeddedDocumentList):
@@ -27,5 +29,11 @@ class QuerySetEncoder(DjangoJSONEncoder):
                 else:
                     data[key] = [str(e) for e in value]
             else:
-                data[key] = str(value)
+                if key in fields and fields[key].choices is not None:
+                    for k, v in fields[key].choices:
+                        if k == value:
+                            data[key] = v
+                            break
+                else:
+                    data[key] = str(value)
         return data
