@@ -27,8 +27,7 @@ class DJCT(Request):
     regulation_list = []
 
     str_cm = [
-        'designar el jurado calificador de ',
-        ', cuyo título es ',
+        'designar el jurado calificador de {}, cuyo título es ',
         'al(los) profesor(es): '
     ]
 
@@ -45,11 +44,9 @@ class DJCT(Request):
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True
-        paragraph.add_run(self.str_cm[0])
-        paragraph.add_run(self.subject)
-        paragraph.add_run(self.str_cm[1])
+        paragraph.add_run(self.str_cm[0].format(self.subject))
         paragraph.add_run('"{}" '.format(self.title)).font.italic = True
-        paragraph.add_run(self.str_cm[2])
+        paragraph.add_run(self.str_cm[1])
 
     def pcm(self, docx):
         pass
