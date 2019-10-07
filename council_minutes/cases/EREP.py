@@ -10,7 +10,7 @@ class EREP(Request):
     full_name = 'Expedición de recibo'
 
     ah_active = BooleanField(
-        required=True, display='¿Tiene activa la historia académica?')
+        required=True, display='¿Tiene activa la historia académica?', default=False)
     payment_date = DateField(display='Fecha límite de pago')
 
     regulation_list = ['051|2003|CSU']  # List of regulations
