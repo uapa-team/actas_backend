@@ -7,13 +7,15 @@ from ..models import Request
 class Professor(EmbeddedDocument):
 
     name = StringField(required=True, display='Nombre')
-    institution = StringField(required=True, display='Institución')
-    country = StringField(required=True, display='Nombre')
+    # TODO: department choices + ' '
+    department = StringField(display='Departamento')
+    institution = StringField(display='Institución')
+    country = StringField(display='Nombre')
 
 
 class DJCT(Request):
 
-    full_name = 'Modificación de jurados calificadores'
+    full_name = 'Designación de jurados calificadores de Tesis/Trabajo de Grado'
 
     # TODO: subject choices
     subject = StringField(required=True, display='Asignatura')
@@ -24,7 +26,11 @@ class DJCT(Request):
 
     regulation_list = []
 
-    str_cm = []
+    str_cm = [
+        'designar el jurado calificador de ',
+        ', cuyo título es ',
+        'al(los) profesor(es): '
+    ]
 
     str_pcm = []
 
@@ -39,10 +45,11 @@ class DJCT(Request):
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True
-        if self.is_affirmative_response_approval_status():
-            pass
-        else:
-            pass
+        paragraph.add_run(self.str_cm[0])
+        paragraph.add_run(self.subject)
+        paragraph.add_run(self.str_cm[1])
+        paragraph.add_run('"{}" '.format(self.title)).font.italic = True
+        paragraph.add_run(self.str_cm[2])
 
     def pcm(self, docx):
         pass
