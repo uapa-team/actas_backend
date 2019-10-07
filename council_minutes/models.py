@@ -81,7 +81,7 @@ class Subject(EmbeddedDocument):
 
     TIP_CHOICES = (
         (TIP_PRE_FUND_OBLIGATORIA, 'Fundamentación Obligatoria'),
-        (TIP_PRE_FUND_OPTATIVA, 'Fundamentación Optativas'),
+        (TIP_PRE_FUND_OPTATIVA, 'Fundamentación Optativa'),
         (TIP_PRE_DISC_OBLIGATORIA, 'Disciplinar Obligatoria'),
         (TIP_PRE_DISC_OPTATIVA, 'Disciplinar Optativa'),
         (TIP_PRE_TRAB_GRADO, 'Trabajo de Grado Pregrado'),

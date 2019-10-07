@@ -128,8 +128,8 @@ class CASI(Request):
             data[index] += [subject.code]
             data[index] += [subject.name]
             data[index] += [subject.group]
-            data[index] += [subject.tipology]
-            data[index] += [subject.credits]
+            data[index] += [subject.get_tipology_display()]
+            data[index] += [str(subject.credits)]
             index = index + 1
         table_subjects(docx, data)
 
