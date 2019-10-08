@@ -50,8 +50,10 @@ class CPTE(Request):
                                    display='Departamento de adscripción del nuevo director')
     inst_new_co_advisor = StringField(choices=DP_CHOICES,
                                       display='Departamento de adscripción del nuevo codirector')
+    inst_old_co_advisor = StringField(choices=DP_CHOICES,
+                                      display='Departamento de adscripción del antiguo codirector')
     inst_old_advisor = StringField(choices=DP_CHOICES,
-                                   display='Departamento de adscripción del nuevo director')
+                                   display='Departamento de adscripción del antiguo director')
     enrolled_thesis = BooleanField(required=True, default=False,
                                    display='¿Tiene inscrita la asignatura tesis/trabajo final?')
     have_signature = BooleanField(required=True, default=False,
@@ -60,9 +62,16 @@ class CPTE(Request):
     regulation_list = ['002|2011|COFA', '056|2012|CSU']  # List of regulations
 
     str_cm = ['cambiar el título de {} del programa {} a: ',
-              '"{}"', 'ratifica director', 'designa nuevo director',
-              'al profesor', 'en reemplazo del profesor', 'Designa nuevo codirector',
-              'ratifica director', ' del ', 'debido a que']
+              '"{}"',
+              'ratifica director',
+              'designa nuevo director',
+              'al profesor',
+              'en reemplazo del profesor',
+              'Designa nuevo codirector',
+              'ratifica director',
+              ' del ',
+              'debido a que',
+              'Ratifica nuevo codirector']
 
     list_analysis = ['Perfil de {}.',
                      'El estudiante {}tiene la asignatura {}.',
@@ -112,7 +121,8 @@ class CPTE(Request):
             paragraph.add_run(
                 ', ' + self.str_cm[2] + ' ' + self.str_cm[4] + ' ')
             paragraph.add_run(self.new_advisor)
-            if self.inst_new_advisor != self.DP_EXTERNO_FACULTAD:
+            if self.inst_new_advisor != self.DP_EXTERNO_FACULTAD and \
+                    self.inst_new_advisor != '':
                 # pylint: disable=no-member
                 paragraph.add_run(
                     self.str_cm[8] + self.get_inst_new_advisor_display())
@@ -120,17 +130,44 @@ class CPTE(Request):
             paragraph.add_run(
                 ', ' + self.str_cm[3] + ' ' + self.str_cm[4] + ' ')
             paragraph.add_run(self.new_advisor)
-            if self.inst_new_advisor != self.DP_EXTERNO_FACULTAD:
+            if self.inst_new_advisor != self.DP_EXTERNO_FACULTAD and \
+                    self.inst_new_advisor != '':
                 # pylint: disable=no-member
                 paragraph.add_run(
                     self.str_cm[8] + self.get_inst_new_advisor_display())
             paragraph.add_run(' ' + self.str_cm[5] + ' ' + self.old_advisor)
             # pylint: disable=no-member
             paragraph.add_run(
-                self.str_cm[8] + self.get_inst_new_advisor_display())
+                self.str_cm[8] + self.get_inst_old_advisor_display())
         paragraph.add_run('.')
         if self.new_co_advisor != '':
-            paragraph.add_run(self.str_cm[6] + ' ' + self.str_cm[4] + ' ')
+            if self.old_co_advisor == self.new_co_advisor or\
+                    self.old_co_advisor == '':
+                paragraph.add_run(
+                    ' ' + self.str_cm[10] + ' ' + self.str_cm[4] + ' ')
+                paragraph.add_run(self.new_co_advisor)
+                if self.inst_new_co_advisor != self.DP_EXTERNO_FACULTAD and \
+                        self.inst_new_co_advisor != '':
+                    # pylint: disable=no-member
+                    paragraph.add_run(
+                        self.str_cm[8] + self.get_inst_new_co_advisor_display())
+            else:
+                paragraph.add_run(
+                    ' ' + self.str_cm[6] + ' ' + self.str_cm[4] + ' ')
+                paragraph.add_run(self.new_co_advisor)
+                if self.inst_new_co_advisor != self.DP_EXTERNO_FACULTAD and \
+                        self.inst_new_co_advisor != '':
+                    # pylint: disable=no-member
+                    paragraph.add_run(
+                        self.str_cm[8] + self.get_inst_new_co_advisor_display())
+                paragraph.add_run(' ' + self.str_cm[5] + ' ')
+                paragraph.add_run(self.old_co_advisor)
+                if self.inst_old_co_advisor != self.DP_EXTERNO_FACULTAD and \
+                        self.inst_old_co_advisor != '':
+                    # pylint: disable=no-member
+                    paragraph.add_run(
+                        self.str_cm[8] + self.get_inst_old_co_advisor_display())
+            paragraph.add_run('.')
 
     def cm_ng(self, paragraph):
         paragraph.add_run(
