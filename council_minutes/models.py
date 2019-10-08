@@ -323,7 +323,9 @@ class Request(DynamicDocument):
         '002|2011|COFA': ('Acuerdo 002 de 2011 de Consejo de Facultad',
                           'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=42724'),
         '056|2012|CSU': ('Acuerdo 056 de 2012 del Consejo Superior Universitario',
-                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=48208')
+                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=48208'),
+        '040|2017|COFA': ('Acuerdo 040 de 2017 de Consejo de Facultad',
+                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=89183'),
     }
 
     assertionerror = {
