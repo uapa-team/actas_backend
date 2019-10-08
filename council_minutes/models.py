@@ -317,6 +317,24 @@ class Request(DynamicDocument):
          'Modalidad de Asignaturas de Posgrado Facultad de Odontología'),
     )
 
+    # DP Departamento
+    DP_CIVIL_AGRICOLA = 'DCA'
+    DP_ELECTRICA_ELECTRONICA = 'DEE'
+    DP_MECANICA_MECATRONICA = 'DMM'
+    DP_SISTEMAS_INDUSTRIAL = 'DSI'
+    DP_QUIMICA_AMBIENTAL = 'DQA'
+    DP_EXTERNO_FACULTAD = 'EFA'
+    DP_EMPTY = ''
+    DP_CHOICES = (
+        (DP_CIVIL_AGRICOLA, 'Departamento de Ingeniería Civil y Agrícola'),
+        (DP_ELECTRICA_ELECTRONICA, 'Departamento de Ingeniería Eléctrica y Electrónica'),
+        (DP_MECANICA_MECATRONICA, 'Departamento de Ingeniería Mecánica y Mecatrónica'),
+        (DP_SISTEMAS_INDUSTRIAL, 'Departamento de Ingeniería de Sistemas e Industrial'),
+        (DP_QUIMICA_AMBIENTAL, 'Departamento de Ingeniería Química y Ambiental'),
+        (DP_EXTERNO_FACULTAD, 'Externo a la Facultad de Ingeniería'),
+        (DP_EMPTY, ''),
+    )
+
     _cls = StringField(required=True)
     date_stamp = DateField(required=True, default=datetime.date.today)
     user = StringField(max_length=255, required=True)
