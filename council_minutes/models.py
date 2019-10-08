@@ -356,6 +356,10 @@ class Request(DynamicDocument):
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34983'),
         '051|2003|CSU': ('Resolución 051 de 2003 del Consejo Superior Universitario',
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=35163'),
+        '056|2012|CSU': ('Acuerdo 056 de 2012 del Consejo Superior Universitario',
+                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=48208'),
+        '040|2017|COFA': ('Acuerdo 40 de 2017 del Consejo de Facultad',
+                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=89183')
     }
 
     assertionerror = {
