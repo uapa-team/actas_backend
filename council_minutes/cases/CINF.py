@@ -77,17 +77,18 @@ class CINF(Request):
                                                 self.regulations['008|2008|CSU'][0]))
 
     def pcm_analysis(self, docx):
-        self.list_analysis[0] = self.list_analysis[0].format(
-            self.advance_percentage)
-        self.list_analysis[1] = self.list_analysis[1].format(
-            self.enrolled_academic_periods)
-        self.list_analysis[2] = self.list_analysis[2].format(
-            self.papa)
-        self.list_analysis[3] = self.list_analysis[3].format(
-            self.available_creds)
+        final_analysis = []
+        final_analysis += [self.list_analysis[0].format(
+            self.advance_percentage)]
+        final_analysis += [self.list_analysis[1].format(
+            self.enrolled_academic_periods)]
+        final_analysis += [self.list_analysis[2].format(
+            self.papa)]
+        final_analysis += [self.list_analysis[3].format(
+            self.available_creds)]
         for extra_a in self.extra_analysis:
-            self.list_analysis.append(extra_a)
-        add_analysis_paragraph(docx, self.list_analysis)
+            final_analysis += [extra_a]
+        add_analysis_paragraph(docx, final_analysis)
 
     def pcm_answers_af(self, paragraph):
         paragraph.add_run(
