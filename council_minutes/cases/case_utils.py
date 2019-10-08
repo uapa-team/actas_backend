@@ -2,7 +2,7 @@ import docx
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
 from docx.shared import Pt
-from ..models import Request
+from ..models import Request, Subject
 
 
 def add_hyperlink(paragraph_, text, url):
@@ -205,20 +205,20 @@ def table_subjects(docx_, data):
     table.style.font.size = Pt(9)
     table.alignment = WD_ALIGN_PARAGRAPH.CENTER
     table.columns[0].width = 700000
-    table.columns[1].width = 2300000
-    table.columns[2].width = 800000
-    table.columns[3].width = 800000
-    table.columns[4].width = 800000
+    table.columns[1].width = 2250000
+    table.columns[2].width = 600000
+    table.columns[3].width = 1050000
+    table.columns[4].width = 600000
     for cell in table.columns[0].cells:
         cell.width = 700000
     for cell in table.columns[1].cells:
-        cell.width = 2300000
+        cell.width = 2250000
     for cell in table.columns[2].cells:
-        cell.width = 800000
+        cell.width = 600000
     for cell in table.columns[3].cells:
-        cell.width = 800000
+        cell.width = 1050000
     for cell in table.columns[4].cells:
-        cell.width = 800000
+        cell.width = 600000
     table.cell(0, 0).paragraphs[0].add_run('Código').font.bold = True
     table.cell(0, 1).paragraphs[0].add_run('Asignatura').font.bold = True
     table.cell(0, 2).paragraphs[0].add_run('Grupo').font.bold = True

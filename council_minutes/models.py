@@ -61,11 +61,47 @@ def clear_name(_class):
 
 
 class Subject(EmbeddedDocument):
+
+    meta = {'allow_inheritance': True}
+
+    TIP_PRE_FUND_OBLIGATORIA = 'PB'
+    TIP_PRE_FUND_OPTATIVA = 'PO'
+    TIP_PRE_DISC_OBLIGATORIA = 'PC'
+    TIP_PRE_DISC_OPTATIVA = 'PT'
+    TIP_PRE_TRAB_GRADO = 'PP'
+    TIP_PRE_LIBRE_ELECCION = 'PL'
+    TIP_PRE_NIVELACION = 'PE'
+    TIP_MOF_OBLIGATORIA = 'MO'
+    TIP_MOF_ACTIV_ACADEMICA = 'MC'
+    TIP_MOF_TRAB_GRADO = 'MP'
+    TIP_MOF_ELEGIBLE = 'ML'
+    TIP_DOC_ACTIV_ACADEMICA = 'DF'
+    TIP_DOC_TESIS = 'DS'
+    TIP_DOC_ELEGIBLE = 'DU'
+
+    TIP_CHOICES = (
+        (TIP_PRE_FUND_OBLIGATORIA, 'Fundamentación Obligatoria'),
+        (TIP_PRE_FUND_OPTATIVA, 'Fundamentación Optativa'),
+        (TIP_PRE_DISC_OBLIGATORIA, 'Disciplinar Obligatoria'),
+        (TIP_PRE_DISC_OPTATIVA, 'Disciplinar Optativa'),
+        (TIP_PRE_TRAB_GRADO, 'Trabajo de Grado Pregrado'),
+        (TIP_PRE_LIBRE_ELECCION, 'Libre Elección'),
+        (TIP_PRE_NIVELACION, 'Nivelación'),
+        (TIP_MOF_OBLIGATORIA, 'Obligatoria Maestría'),
+        (TIP_MOF_ACTIV_ACADEMICA, 'Actividad Académica Maestría'),
+        (TIP_MOF_TRAB_GRADO, 'Tesis o Trabajo Final de Maestría'),
+        (TIP_MOF_ELEGIBLE, 'Elegible Maestría'),
+        (TIP_DOC_ACTIV_ACADEMICA, 'Actividad Académica Doctorado'),
+        (TIP_DOC_TESIS, 'Tesis de Doctorado'),
+        (TIP_DOC_ELEGIBLE, 'Elegible Doctorado'),
+    )
+
     name = StringField(required=True, display='Nombre Asignatura')
     code = StringField(required=True, display='Código')
-    credits = StringField(required=True, display='Créditos')
+    credits = IntField(required=True, display='Créditos')
     group = StringField(required=True, display='Grupo')
-    tipology = StringField(required=True, display='Tipología')
+    tipology = StringField(
+        required=True, choices=TIP_CHOICES, display='Tipología')
 
 
 class Request(DynamicDocument):
@@ -279,6 +315,24 @@ class Request(DynamicDocument):
          'Modalidad de Asignaturas de Posgrado Facultad de Enfermería'),
         (BAP_ODONTOLOGIA,
          'Modalidad de Asignaturas de Posgrado Facultad de Odontología'),
+    )
+
+    # DP Departamento
+    DP_CIVIL_AGRICOLA = 'DCA'
+    DP_ELECTRICA_ELECTRONICA = 'DEE'
+    DP_MECANICA_MECATRONICA = 'DMM'
+    DP_SISTEMAS_INDUSTRIAL = 'DSI'
+    DP_QUIMICA_AMBIENTAL = 'DQA'
+    DP_EXTERNO_FACULTAD = 'EFA'
+    DP_EMPTY = ''
+    DP_CHOICES = (
+        (DP_CIVIL_AGRICOLA, 'Departamento de Ingeniería Civil y Agrícola'),
+        (DP_ELECTRICA_ELECTRONICA, 'Departamento de Ingeniería Eléctrica y Electrónica'),
+        (DP_MECANICA_MECATRONICA, 'Departamento de Ingeniería Mecánica y Mecatrónica'),
+        (DP_SISTEMAS_INDUSTRIAL, 'Departamento de Ingeniería de Sistemas e Industrial'),
+        (DP_QUIMICA_AMBIENTAL, 'Departamento de Ingeniería Química y Ambiental'),
+        (DP_EXTERNO_FACULTAD, 'Externo a la Facultad de Ingeniería'),
+        (DP_EMPTY, ''),
     )
 
     _cls = StringField(required=True)
