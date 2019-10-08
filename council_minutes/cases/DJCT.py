@@ -1,6 +1,6 @@
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import StringField, DateField, EmbeddedDocumentListField, EmbeddedDocument
+from mongoengine import StringField, DateField, BooleanField, EmbeddedDocumentListField, EmbeddedDocument
 from ..models import Request
 from .case_utils import add_analysis_paragraph
 
@@ -44,6 +44,7 @@ class DJCT(Request):
     title = StringField(
         requiered=True, display='Título de Tesis/Trabajo Final')
     date_approval = DateField(required=True, display='Fecha de Aprobación')
+    proposal_jury = BooleanField(required=True, display='¿Jurados Propuestos?')
     proffesors = EmbeddedDocumentListField(
         Professor, required=True, display='Docentes')
 
@@ -64,7 +65,21 @@ class DJCT(Request):
         'tesis de Maestría y cuatro jurados para tesis de Doctorado (Artículo 44).'
     ]
 
-    str_pcm_doc = []
+    str_pcm_doc = [
+        'El estudiante tiene la asignatura {} ({}).',
+        'Copia impresa y versión electrónica en formato PDF (Artículo 43)',
+        'El proyecto de tesis debe inscribirse y entregarse, antes de alcanzar ' +
+        'el 50% de la duración establecida para el programa (Artículo 33)',
+        'El documento Proyecto de Tesis de Doctorado será evaluado por un grupo ' +
+        'de evaluadores conformado por mínimo tres integrantes, designados por ' +
+        'el Comité Asesor de Posgrado. (Artículo 36). Jurados propuestos: {}',
+        'El estudiante deberá realizar una sustentación pública de su Proyecto ' +
+        'de Tesis de Doctorado ante los evaluadores. En la sustentación deberán ' +
+        'participar, presencialmente o mediante video conferencia, el estudiante, ' +
+        'los evaluadores, el profesor tutor del estudiante y un profesor activo ' +
+        'de la Universidad Nacional de Colombia delegado por el Comité Asesor de ' +
+        'Posgrado, quien hará las veces de coordinador de la sustentación (Artículo 37).'
+    ]
 
     def cm(self, docx):
         paragraph = docx.add_paragraph()
@@ -121,4 +136,13 @@ class DJCT(Request):
         ] + self.str_pcm_mag[3:]
 
     def pcm_analysis_phd(self):
-        return []
+        proposed = 'SI' if self.proposal_jury else 'NO'
+        return [
+            self.str_pcm_doc[0].format(
+                # pylint: disable=no-member
+                self.get_grade_option_display(), self.get_academic_program_display()),
+            self.str_pcm_doc[1],
+            self.str_pcm_doc[2],
+            self.str_pcm_doc[3].format(proposed),
+            self.str_pcm_doc[4]
+        ]
