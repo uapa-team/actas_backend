@@ -1,6 +1,6 @@
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from mongoengine import *
+from mongoengine import StringField, BooleanField
 from ..models import Request
 from .case_utils import add_analysis_paragraph
 
@@ -63,19 +63,19 @@ class CPTE(Request):
 
     str_cm = ['cambiar el título de {} del programa {} a: ',
               '"{}"',
-              'ratifica director',
-              'designa nuevo director',
+              'ratificar director',
+              'designar nuevo director',
               'al profesor',
               'en reemplazo del profesor',
-              'Designa nuevo codirector',
-              'ratifica director',
+              'Designar nuevo codirector',
+              'ratificar director',
               ' del ',
               'debido a que',
-              'Ratifica nuevo codirector']
+              'Ratificar nuevo codirector']
 
     list_analysis = ['Perfil de {}.',
                      'El estudiante {}tiene la asignatura {}.',
-                     'Tiene la firma de los directores de tesis/trabajo final: {}']
+                     'iene la firma de los directores de tesis/trabajo final: {}']
 
     def cm(self, docx):
         paragraph = docx.add_paragraph()
@@ -110,11 +110,14 @@ class CPTE(Request):
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_advisor_response_display().upper()).font.bold = True
-        paragraph.add_run(' ' + self.str_cm[0].format(self.academic_period))
-        if self.is_affirmative_response_advisor_response():
-            self.pcm_answers_af(paragraph)
+        # pylint: disable=no-member
+        paragraph.add_run(' ' + self.str_cm[0].format(
+            self.get_grade_option_display(), self.get_academic_program_display()))
+        paragraph.add_run(self.str_cm[1].format(self.title)).font.italic = True
+        if self.is_affirmative_response_approval_status():
+            self.cm_af(paragraph)
         else:
-            self.pcm_answers_ng(paragraph)
+            self.cm_ng(paragraph)
 
     def cm_af(self, paragraph):
         if self.old_advisor == self.new_advisor or self.old_advisor == '':
@@ -174,24 +177,19 @@ class CPTE(Request):
             ' ' + self.str_cm[9] + ' ' + self.council_decision + '.')
 
     def pcm_analysis(self, docx):
-        self.list_analysis[0] = self.list_analysis[0].format(
-            self.advance_percentage)
-        self.list_analysis[1] = self.list_analysis[1].format(
-            self.enrolled_academic_periods)
-        self.list_analysis[2] = self.list_analysis[2].format(
-            self.papa)
-        self.list_analysis[3] = self.list_analysis[3].format(
-            self.available_creds)
+        if self.grade_option in [self.GO_TESIS_MAESTRIA, self.GO_TESIS_DOCTORADO]:
+            profile = 'investigación'
+        else:
+            profile = 'profundización'
+        final_analysis = []
+        final_analysis += [self.list_analysis[0].format(profile)]
+        ets = '' if self.enrolled_thesis else 'no '
+        # pylint: disable=no-member
+        final_analysis += [self.list_analysis[1].format(
+            ets, self.get_grade_option_display())]
+        hss = 'T' if self.have_signature else 'No t'
+        final_analysis += [hss +
+                           self.list_analysis[2].format(self.new_advisor)]
         for extra_a in self.extra_analysis:
-            self.list_analysis.append(extra_a)
-        add_analysis_paragraph(docx, self.list_analysis)
-
-    def pcm_answers_af(self, paragraph):
-        paragraph.add_run(
-            self.str_cm[1] + self.str_cm[2].format(self.str_cm[3] +
-                                                   self.regulations['008|2008|CSU'][0]))
-
-    def pcm_answers_ng(self, paragraph):
-        paragraph.add_run(self.council_decision + '. ' +
-                          self.str_cm[2].format(self.str_cm[3] +
-                                                self.regulations['008|2008|CSU'][0]))
+            final_analysis += [extra_a]
+        add_analysis_paragraph(docx, final_analysis)
