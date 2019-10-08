@@ -9,8 +9,8 @@ from .case_utils import add_analysis_paragraph
 class Professor(EmbeddedDocument):
 
     name = StringField(required=True, display='Nombre')
-    # TODO: department choices + ' '
-    department = StringField(display='Departamento')
+    department = StringField(
+        display='Departamento', choices=Request.DP_CHOICES, default=Request.DP_EMPTY)
     institution = StringField(display='Institución')
     country = StringField(display='Nombre')
 
@@ -121,8 +121,8 @@ class DJCT(Request):
 
     def add_proffesors(self, paragraph):
         for i in range(len(self.proffesors)):
-            if self.proffesors[i].department != '':
-                mod = self.proffesors[i].department
+            if self.proffesors[i].department not in (self.DP_EMPTY, self.DP_EXTERNO_FACULTAD):
+                mod = self.proffesors[i].get_department_display()
             else:
                 mod = self.proffesors[i].institution
                 if self.proffesors[i].country != '':
