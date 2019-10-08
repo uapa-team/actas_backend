@@ -17,22 +17,6 @@ class CPTE(Request):
         (GO_TESIS_MAESTRIA, 'Tesis de Maestría'),
         (GO_TESIS_DOCTORADO, 'Tesis de Doctorado')
     )
-    DP_CIVIL_AGRICOLA = 'DCA'
-    DP_ELECTRICA_ELECTRONICA = 'DEE'
-    DP_MECANICA_MECATRONICA = 'DMM'
-    DP_SISTEMAS_INDUSTRIAL = 'DSI'
-    DP_QUIMICA_AMBIENTAL = 'DQA'
-    DP_EXTERNO_FACULTAD = 'EFA'
-    DP_EMPTY = ''
-    DP_CHOICES = (
-        (DP_CIVIL_AGRICOLA, 'Departamento de Ingeniería Civil y Agrícola'),
-        (DP_ELECTRICA_ELECTRONICA, 'Departamento de Ingeniería Eléctrica y Electrónica'),
-        (DP_MECANICA_MECATRONICA, 'Departamento de Ingeniería Mecánica y Mecatrónica'),
-        (DP_SISTEMAS_INDUSTRIAL, 'Departamento de Ingeniería de Sistemas e Industrial'),
-        (DP_QUIMICA_AMBIENTAL, 'Departamento de Ingeniería Química y Ambiental'),
-        (DP_EXTERNO_FACULTAD, 'Externo a la Facultad de Ingeniería'),
-        (DP_EMPTY, ''),
-    )
 
     title = StringField(
         required=True, display='Nuevo título de la tesis/trabajo final')
@@ -46,13 +30,13 @@ class CPTE(Request):
         display='Nuevo codirector de tesis/trabajo final', default='')
     old_co_advisor = StringField(
         display='Antiguo codirector de tesis/trabajo final', default='')
-    inst_new_advisor = StringField(choices=DP_CHOICES,
+    inst_new_advisor = StringField(choices=Request.DP_CHOICES,
                                    display='Departamento de adscripción del nuevo director')
-    inst_new_co_advisor = StringField(choices=DP_CHOICES,
+    inst_new_co_advisor = StringField(choices=Request.DP_CHOICES,
                                       display='Departamento de adscripción del nuevo codirector')
-    inst_old_co_advisor = StringField(choices=DP_CHOICES,
+    inst_old_co_advisor = StringField(choices=Request.DP_CHOICES,
                                       display='Departamento de adscripción del antiguo codirector')
-    inst_old_advisor = StringField(choices=DP_CHOICES,
+    inst_old_advisor = StringField(choices=Request.DP_CHOICES,
                                    display='Departamento de adscripción del antiguo director')
     enrolled_thesis = BooleanField(required=True, default=False,
                                    display='¿Tiene inscrita la asignatura tesis/trabajo final?')
