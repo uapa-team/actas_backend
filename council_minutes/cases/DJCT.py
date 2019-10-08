@@ -27,7 +27,7 @@ class DJCT(Request):
     regulation_list = []
 
     str_cm = [
-        'designar el jurado calificador de {}, cuyo título es ',
+        'designar como jurado calificador de {}, cuyo título es ',
         'al(los) profesor(es): '
     ]
 
@@ -47,6 +47,16 @@ class DJCT(Request):
         paragraph.add_run(self.str_cm[0].format(self.subject))
         paragraph.add_run('"{}" '.format(self.title)).font.italic = True
         paragraph.add_run(self.str_cm[1])
+        for i in range(len(self.proffesors)):
+            if self.proffesors[i].department != '':
+                mod = self.proffesors[i].department
+            else:
+                mod = self.proffesors[i].institution
+                if self.proffesors[i].country != '':
+                    mod += ' ({})'.format(self.proffesors[i].country)
+            end = ', ' if i + 1 < len(self.proffesors) else '.'
+            paragraph.add_run(
+                '{} - {}{}'.format(self.proffesors[i].name, mod, end))
 
     def pcm(self, docx):
         pass
