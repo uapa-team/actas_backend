@@ -1,6 +1,7 @@
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import StringField, DateField, BooleanField, EmbeddedDocumentListField, EmbeddedDocument
+from mongoengine import StringField, DateField, BooleanField
+from mongoengine import EmbeddedDocumentListField, EmbeddedDocument
 from ..models import Request
 from .case_utils import add_analysis_paragraph
 
@@ -55,6 +56,11 @@ class DJCT(Request):
         'al(los) profesor(es): '
     ]
 
+    str_pcm = [
+        'designar como jurado calificador de {}, cuyo título es ',
+        'al(los) profesor(es): '
+    ]
+
     str_pcm_mag = [
         'SIA: Perfil de {}. El estudiante tiene la asignatura {} ({}).',
         'Concepto motivado acerca del trabajo por parte del director {} (Artículo 43).',
@@ -88,13 +94,32 @@ class DJCT(Request):
         self.cm_answer(paragraph)
 
     def cm_answer(self, paragraph):
+        # pylint: disable=no-member
         paragraph.add_run(self.str_council_header + ' ')
         paragraph.add_run(
-            # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True
-        paragraph.add_run(self.str_cm[0].format(self.grade_option))
+        paragraph.add_run(self.str_cm[0].format(
+            self.get_grade_option_display()))
         paragraph.add_run('"{}" '.format(self.title)).font.italic = True
         paragraph.add_run(self.str_cm[1])
+        self.add_proffesors(paragraph)
+
+    def pcm(self, docx):
+        self.pcm_analysis_handler(docx)
+        self.pcm_answer_handler(docx)
+
+    def pcm_answer(self, paragraph):
+        paragraph.add_run(self.str_answer + ':\n').font.bold = True
+        paragraph.add_run(self.str_comittee_header + ' ')
+        paragraph.add_run(
+            # pylint: disable=no-member
+            self.get_advisor_response_display().upper() + ' ').font.bold = True
+        paragraph.add_run(self.str_pcm[0].format(self.grade_option))
+        paragraph.add_run('"{}" '.format(self.title)).font.italic = True
+        paragraph.add_run(self.str_pcm[1])
+        self.add_proffesors(paragraph)
+
+    def add_proffesors(self, paragraph):
         for i in range(len(self.proffesors)):
             if self.proffesors[i].department != '':
                 mod = self.proffesors[i].department
@@ -106,15 +131,11 @@ class DJCT(Request):
             paragraph.add_run(
                 '{} - {}{}'.format(self.proffesors[i].name, mod, end))
 
-    def pcm(self, docx):
-        self.pcm_analysis_handler(docx)
-        self.pcm_answer_handler(docx)
-
-    def pcm_answer(self, paragraph):
-        pass
-
     def pcm_answer_handler(self, docx):
-        pass
+        paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
+        self.pcm_answer(paragraph)
 
     def pcm_analysis_handler(self, docx):
         if self.grade_option != self.GO_TESIS_DOCTORADO:
@@ -124,14 +145,13 @@ class DJCT(Request):
         add_analysis_paragraph(docx, analysis + self.extra_analysis)
 
     def pcm_analysis_magister(self):
+        # pylint: disable=no-member
         return [
             self.str_pcm_mag[0].format(
-                # pylint: disable=no-member
                 self.get_node_display(), self.get_grade_option_display(),
                 self.get_academic_program_display()),
             self.str_pcm_mag[1].format(self.advisor),
             self.str_pcm_mag[2].format(
-                # pylint: disable=no-member
                 self.date_approval.strftime('%d/%m/%Y '), self.title)
         ] + self.str_pcm_mag[3:]
 
