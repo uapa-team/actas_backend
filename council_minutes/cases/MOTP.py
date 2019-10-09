@@ -47,12 +47,11 @@ class MOTP(Request):
 
     def cm_answer(self, paragraph):
         paragraph.add_run(self.str_council_header + ' ')
-        paragraph.add_run(
-            # pylint: disable=no-member
-            self.get_approval_status_display().upper() + ' ').font.bold = True
         # pylint: disable=no-member
-        paragraph.add_run(self.str_cm[0].format(
-            self.get_grade_option_display(), self.get_academic_program_display()))
+        paragraph.add_run(
+            self.get_approval_status_display().upper() + ' ').font.bold = True
+        paragraph.add_run(
+            self.str_cm[0] + self.get_grade_option_display() + ' ')
         paragraph.add_run(self.str_cm[1].format(self.title)).font.italic = True
         if self.is_affirmative_response_approval_status():
             self.cm_af(paragraph)
@@ -82,61 +81,17 @@ class MOTP(Request):
             self.cm_ng(paragraph)
 
     def cm_af(self, paragraph):
-        if self.old_advisor == self.new_advisor or self.old_advisor == '':
-            paragraph.add_run(
-                ', ' + self.str_cm[2] + ' ' + self.str_cm[4] + ' ')
-            paragraph.add_run(self.new_advisor)
-            if self.inst_new_advisor != self.DP_EXTERNO_FACULTAD and \
-                    self.inst_new_advisor != '':
-                # pylint: disable=no-member
-                paragraph.add_run(
-                    self.str_cm[8] + self.get_inst_new_advisor_display())
-        else:
-            paragraph.add_run(
-                ', ' + self.str_cm[3] + ' ' + self.str_cm[4] + ' ')
-            paragraph.add_run(self.new_advisor)
-            if self.inst_new_advisor != self.DP_EXTERNO_FACULTAD and \
-                    self.inst_new_advisor != '':
-                # pylint: disable=no-member
-                paragraph.add_run(
-                    self.str_cm[8] + self.get_inst_new_advisor_display())
-            paragraph.add_run(' ' + self.str_cm[5] + ' ' + self.old_advisor)
-            # pylint: disable=no-member
-            paragraph.add_run(
-                self.str_cm[8] + self.get_inst_old_advisor_display())
-        paragraph.add_run('.')
-        if self.new_co_advisor != '':
-            if self.old_co_advisor == self.new_co_advisor or\
-                    self.old_co_advisor == '':
-                paragraph.add_run(
-                    ' ' + self.str_cm[10] + ' ' + self.str_cm[4] + ' ')
-                paragraph.add_run(self.new_co_advisor)
-                if self.inst_new_co_advisor != self.DP_EXTERNO_FACULTAD and \
-                        self.inst_new_co_advisor != '':
-                    # pylint: disable=no-member
-                    paragraph.add_run(
-                        self.str_cm[8] + self.get_inst_new_co_advisor_display())
-            else:
-                paragraph.add_run(
-                    ' ' + self.str_cm[6] + ' ' + self.str_cm[4] + ' ')
-                paragraph.add_run(self.new_co_advisor)
-                if self.inst_new_co_advisor != self.DP_EXTERNO_FACULTAD and \
-                        self.inst_new_co_advisor != '':
-                    # pylint: disable=no-member
-                    paragraph.add_run(
-                        self.str_cm[8] + self.get_inst_new_co_advisor_display())
-                paragraph.add_run(' ' + self.str_cm[5] + ' ')
-                paragraph.add_run(self.old_co_advisor)
-                if self.inst_old_co_advisor != self.DP_EXTERNO_FACULTAD and \
-                        self.inst_old_co_advisor != '':
-                    # pylint: disable=no-member
-                    paragraph.add_run(
-                        self.str_cm[8] + self.get_inst_old_co_advisor_display())
-            paragraph.add_run('.')
+        paragraph.add_run(self.str_cm[2])
 
     def cm_ng(self, paragraph):
         paragraph.add_run(
             ' ' + self.str_cm[9] + ' ' + self.council_decision + '.')
+
+    def cm_ob(self, docx):
+        paragraph = docx.add_paragraph()
+        #paragraph.style = 'List Bullet'
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
 
     def pcm_analysis(self, docx):
         if self.grade_option in [self.GO_TESIS_MAESTRIA, self.GO_TESIS_DOCTORADO]:
