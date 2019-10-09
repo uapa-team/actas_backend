@@ -394,7 +394,11 @@ class Request(DynamicDocument):
         '056|2012|CSU': ('Acuerdo 056 de 2012 del Consejo Superior Universitario',
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=48208'),
         '040|2017|COFA': ('Acuerdo 40 de 2017 del Consejo de Facultad',
-                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=89183')
+                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=89183'),
+        '102|2013|CSU': ('Acuerdo 102 de 2013 del Consejo Superior Universitario',
+                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=56987'),
+        '001|2016|VRA': ('Circular 01 de 2016 de la Vicerectoría Académica',
+                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=86414#0')
     }
 
     assertionerror = {
