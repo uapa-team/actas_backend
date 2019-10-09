@@ -103,6 +103,23 @@ class Subject(EmbeddedDocument):
     tipology = StringField(
         required=True, choices=TIP_CHOICES, display='Tipología')
 
+    @staticmethod
+    def subjects_to_array(subjects):
+        """
+        A function that converts a List of Subjects into a classic array.
+        : param subjects: EmbeddedDocumentListField of Subjects to be converted
+        """
+        data = []
+        for subject in subjects:
+            data.append([
+                subject.code,
+                subject.name,
+                subject.group,
+                subject.get_tipology_display(),
+                str(subject.credits)
+            ])
+        return data
+
 
 class Request(DynamicDocument):
 
