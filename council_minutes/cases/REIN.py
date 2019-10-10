@@ -4,6 +4,22 @@ from mongoengine import StringField, IntField, FloatField, BooleanField
 
 
 class REIN(Request):
+    # http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34983
+    RL_ANSWER_RENOV_MATRICULA = 'RM'
+    RL_ANSWER_PAPA = 'PA'
+    RL_ANSWER_CUPO_CREDITOS = 'CC'
+    RL_ANSWER_SANCION = 'SA'
+    RL_ANSWER_OTRO = 'OT'
+    RL_ANSWER_CHOICES = (
+        (RL_ANSWER_RENOV_MATRICULA, 'No cumplir con los requisitos exigidos para la renovación de la matrícula, en los plazos señalados por la Universidad'),
+        (RL_ANSWER_PAPA,
+         'Presentar un Promedio Aritmético Ponderado Acumulado menor que tres punto cero (3.0)'),
+        (RL_ANSWER_CUPO_CREDITOS,
+         'No disponer de un cupo de créditos suficiente para inscribir las asignaturas del plan de estudios pendientes de aprobación'),
+        (RL_ANSWER_SANCION,
+         'Recibir sanción disciplinaria de expulsión o suspensión impuesta de acuerdo con las normas vigentes'),
+        (RL_ANSWER_OTRO, 'Otro')
+    )
 
     full_name = 'Reingreso'
 
@@ -20,7 +36,7 @@ class REIN(Request):
         ' de estudiante')
     papa = FloatField(required=True, display='PAPA')
     reason_of_loss = StringField(
-        required=True, display='Razón pérdida calidad de estudiante')
+        choices=RL_ANSWER_CHOICES, default=RL_ANSWER_OTRO, display='Razón pérdida calidad de estudiante')
     credits_minus_remaining = IntField(
         required=True, display='Cupo de créditos menos créditos pendientes')
     credits_remaining = IntField(required=True, display='Créditos restantes')
@@ -107,9 +123,17 @@ class REIN(Request):
                         ['DNI', self.student_dni],
                         ['Plan de estudios', self.get_academic_program_display()],
                         ['Código del plan de estudios', self.academic_program],
-                        ['Fecha de la solicitud', string_to_date(self.detail_cm['solic_date'])]]
+                        ['Fecha de la solicitud', string_to_date(str(self.date))]]
 
         case = 'REINGRESO'
+
+        paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
+        bullet = paragraph.add_run('1. Datos Generales')
+        bullet.font.bold = True
+        bullet.font.size = Pt(8)
+
         table_general_data(general_data, case, docx)
 
     def rein_academic_info(self, docx):
@@ -121,10 +145,11 @@ class REIN(Request):
     def rein_recommends(self, docx):
         pass
 
-    def cm_ap(self, paragraph):
-        pass
+    def cm_extra_credits(self, paragraph):
+        paragraph.add_run('y otorga ' + self.credits_granted +
+                          ' crédito adicional para culminar su plan de estudios. ')
 
-    def cm_na(self, paragraph):
+    def cm_no_extra_credits(self, paragraph):
         pass
 
     def cm(self, docx):
@@ -144,26 +169,15 @@ class REIN(Request):
             self.get_approval_status_display().upper() + ' ').font.bold = True
 
         paragraph.add_run(self.str_cm_pre[0])
-        paragraph.add_run(self.academic_period)
+        paragraph.add_run(self.academic_period + ' ')
 
-        if self.is_affirmative_response_approval_status():
-            self.cm_ap(paragraph)
-        else:
-            self.cm_na(paragraph)
+        if self.credits_granted > 0:
+            # Y otorga n créditos adicionales:
+            self.cm_extra_credits(paragraph)
 
         paragraph.add_run('({}).'.format(
             self.regulations['012|2014|VRA'][0] + "; Artículo 46, " +
             self.regulations['008|2008|CSU'][0]))
-
-        paragraph.add_run(self.str_cm_pre[0].format(
-            self.academic_period) + ', ')
-
-        paragraph.add_run('({}).'.format(self.regulations['008|2008|CSU'][0]))
-
-        # General Data Table Title
-        bullet = paragraph.add_run('1. Datos Generales')
-        bullet.font.bold = True
-        bullet.font.size = Pt(8)
 
     def pcm(self, docx):
         pass
