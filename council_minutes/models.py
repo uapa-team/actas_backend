@@ -355,7 +355,6 @@ class Request(DynamicDocument):
     _cls = StringField(required=True)
     date_stamp = DateField(required=True, default=datetime.date.today)
     user = StringField(max_length=255, required=True)
-
     consecutive_minute = IntField(
         min_value=1, required=True, display='Número del Acta')
     date = DateField(

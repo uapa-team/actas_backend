@@ -1,9 +1,15 @@
-from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.enum.table import WD_ALIGN_VERTICAL
-from mongoengine import DynamicDocument, DateField, StringField, ListField, IntField, FloatField, EmbeddedDocumentListField
+from mongoengine import StringField, IntField, FloatField, EmbeddedDocumentListField
 from ..models import Request, Subject
-from .case_utils import add_hyperlink, table_subjects
+from .case_utils import table_subjects, add_analysis_paragraph
+
+
+class SubjectMovility(Subject):
+    name_origin = StringField(
+        required=True, display='Nombre Asignatura Origen')
+    credits_origin = StringField(
+        required=True, display='Número Créditos Origen')
+    tipology_origin = StringField(required=True, display='Tipología Origen')
 
 
 class RCMO(Request):
@@ -13,8 +19,8 @@ class RCMO(Request):
     CALIFICATION_AP = 'AP'
     CALIFICATION_NA = 'NA'
     CALIFICATION_CHOICES = (
-        (CALIFICATION_AP, 'Aprueba'),
-        (CALIFICATION_NA, 'No aprueba')
+        (CALIFICATION_AP, 'Aprobada'),
+        (CALIFICATION_NA, 'No aprobada')
     )
 
     calification = StringField(
@@ -36,6 +42,7 @@ class RCMO(Request):
         'Convenio en la Universidad de los Andes de la siguiente manera (Artículo 35 de Acuerdo 0' +
         '08 de 2008 del Consejo Superior Universitario):'
     ]
+    regulation_list = ['008|2008|CSU']  # List of regulations
 
     def cm(self, docx):
         paragraph = docx.add_paragraph()
@@ -53,10 +60,10 @@ class RCMO(Request):
             # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True
         if self.calification == self.CALIFICATION_AP:
-            paragraph.add_run(self.str_cm_2.format(
+            paragraph.add_run(self.str_cm[0].format(
                 self.str_ap_p, self.subject_code, self.subject_code, self.subject_period))
         elif self.calification == self.CALIFICATION_NA:
-            paragraph.add_run(self.str_cm_2.format(
+            paragraph.add_run(self.str_cm[0].format(
                 self.str_na_p, self.subject_code, self.subject_code, self.subject_period))
 
     def cm_answer_subjects(self, paragraph):
@@ -68,12 +75,17 @@ class RCMO(Request):
 
     def pcm_analysis(self, docx):
         analysis_list = []
-        analysis_list += [self.str_pcm[0].format(
-            self.advance, self.enrolled_academic_periods, self.papa)]
-        analysis_list += [self.str_pcm[1].format(self.available_credits)]
-        analysis_list += self.pcm_analysis_subject_list()
         analysis_list += self.extra_analysis
         add_analysis_paragraph(docx, analysis_list)
 
     def pcm_answer(self, paragraph):
-        pass
+        paragraph.add_run(
+            # pylint: disable=no-member
+            self.get_approval_status_display().upper()).font.bold = True
+        paragraph.add_run(' ')
+        paragraph.add_run(self.str_cm[0].format(
+            # pylint: disable=no-member
+            self.get_calification_display().lower(),
+            self.subject_name,
+            self.subject_code,
+            self.subject_period))
