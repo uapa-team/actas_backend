@@ -12,16 +12,16 @@ class REIN(Request):
     RL_ANSWER_OTRO = 'OT'
     RL_ANSWER_CHOICES = (
         (RL_ANSWER_RENOV_MATRICULA, 'No cumplir con los requisitos exigidos para la' +
-         ' renovación de la matrícula, en los plazos señalados por la Universidad'),
+         ' renovación de la matrícula, en los plazos señalados por la Universidad.'),
         (RL_ANSWER_PAPA,
-         'Presentar un Promedio Aritmético Ponderado Acumulado menor que tres punto cero (3.0)'),
+         'Presentar un Promedio Aritmético Ponderado Acumulado menor que tres punto cero (3.0).'),
         (RL_ANSWER_CUPO_CREDITOS,
          'No disponer de un cupo de créditos suficiente para inscribir las asignaturas' +
-         ' del plan de estudios pendientes de aprobación'),
+         ' del plan de estudios pendientes de aprobación.'),
         (RL_ANSWER_SANCION,
          'Recibir sanción disciplinaria de expulsión o suspensión impuesta de acuerdo' +
-         ' con las normas vigentes'),
-        (RL_ANSWER_OTRO, 'Otro')
+         ' con las normas vigentes.'),
+        (RL_ANSWER_OTRO, 'Otro.')
     )
 
     full_name = 'Reingreso'
@@ -131,7 +131,14 @@ class REIN(Request):
         'Cupo de créditos menos créditos pendientes',
         'Créditos pendientes por ser aprobados del plan de estudios',
         'Créditos pendientes por ser aprobados de nivelación – Inglés',
-        '¿Cuántos créditos adicionales requiere para inscribir asignaturas?'
+        '¿Cuántos créditos adicionales requiere para inscribir asignaturas?',
+        # Optional: Grade needed with N credits to keep student condition.
+        'Al finalizar el semestre de reingreso para mantener la calidad de estudiante,' +
+        ' deberá obtener un Promedio Semestral mínimo de:',
+        'Si inscribe 12 Créditos',
+        'Si inscribe 15 Créditos',
+        'Si inscribe 18 Créditos',
+        'Si inscribe 21 Créditos'
     ]
 
     str_pcm_pre = [
@@ -222,6 +229,7 @@ class REIN(Request):
         table.cell(7, 0).merge(table.cell(7, 1)
                                ).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         table.cell(7, 2).paragraphs[0].add_run(
+            # pylint: disable=no-member
             self.get_reason_of_loss_display())
         table.cell(7, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(8, 0).merge(table.cell(8, 2)).paragraphs[0].add_run(
@@ -253,6 +261,40 @@ class REIN(Request):
         table.cell(11, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(12, 2).paragraphs[0].add_run(str(self.credits_add))
         table.cell(12, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Optional: Grade needed with N credits to keep student condition.
+        if (self.reason_of_loss == 'CC'):
+            para = docx.add_paragraph()
+            para.paragraph_format.space_after = Pt(0)
+            table = docx.add_table(rows=5, cols=2)
+            for col in table.columns:
+                for cell in col.cells:
+                    cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.style = 'Table Grid'
+            table.style.font.size = Pt(8)
+            table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            for cell in table.columns[0].cells:
+                cell.width = 3100000
+            for cell in table.columns[1].cells:
+                cell.width = 2100000
+            table.columns[0].width = 3100000
+            table.columns[1].width = 2100000
+            table.cell(0, 0).merge(table.cell(0, 1)
+                                   ).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+            table.cell(0, 0).merge(table.cell(0, 1)).paragraphs[0].add_run(
+                self.str_cm_pre_acadinfo[13])
+            table.cell(1, 0).paragraphs[0].add_run(
+                self.str_cm_pre_acadinfo[14])
+            table.cell(2, 0).paragraphs[0].add_run(
+                self.str_cm_pre_acadinfo[15])
+            table.cell(3, 0).paragraphs[0].add_run(
+                self.str_cm_pre_acadinfo[16])
+            table.cell(4, 0).paragraphs[0].add_run(
+                self.str_cm_pre_acadinfo[17])
+            table.cell(1, 1).paragraphs[0].add_run(self.min_grade_12c)
+            table.cell(2, 1).paragraphs[0].add_run(self.min_grade_15c)
+            table.cell(3, 1).paragraphs[0].add_run(self.min_grade_18c)
+            table.cell(4, 1).paragraphs[0].add_run(self.min_grade_21c)
 
     def rein_credits_summary(self, docx):
         paragraph = docx.add_paragraph()
