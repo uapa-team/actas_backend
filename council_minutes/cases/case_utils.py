@@ -1,9 +1,8 @@
 import docx
-from .case_utils import *
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
 from docx.shared import Pt
-from ..models import Request
+from ..models import Request, Subject
 
 
 def add_hyperlink(paragraph_, text, url):
@@ -36,19 +35,56 @@ def add_hyperlink(paragraph_, text, url):
     hyperlink.append(new_run)
     # pylint: disable=protected-access
     paragraph_._p.append(hyperlink)
+    # paragraph_.style.font.underline = True
 
     return hyperlink
 
 
+def add_analysis_paragraph(docx_, analysis_list):
+    """
+     A function that adds the analysis paragraph within a docx object.
+     : param docx_: The docx we are adding the analysis to.
+     : param analysis_list: A list of the analysis to be added
+     """
+    paragraph = docx_.add_paragraph()
+    paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    paragraph.paragraph_format.space_after = Pt(0)
+    paragraph.add_run('Analisis: ').font.bold = True
+    add_analysis_list(docx_, analysis_list)
+
+
+def add_analysis_list(docx_, analysis_list):
+    """
+    A function that adds several analysis within a docx object.
+    : param docx_: The docx we are adding the analysis to.
+    : param analysis_list: A list of the analysis to be added
+    """
+    for analysis in analysis_list:
+        add_analysis(docx_, analysis)
+
+
+def add_analysis(docx_, analysis):
+    """
+    A function that adds an unique analysis within a docx object.
+    : param docx_: The docx we are adding the analysis to.
+    : param analysis: The analysis to be added
+    """
+    paragraph = docx_.add_paragraph()
+    paragraph.style = 'List Bullet'
+    paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    paragraph.paragraph_format.space_after = Pt(0)
+    paragraph.add_run(analysis)
+
+
 def string_to_date(string):
-    ret = string[0:2]
-    ret += num_to_month(string[3:5])
-    ret += string[6:10]
+    ret = string[8:10]
+    ret += num_to_month(string[5:7])
+    ret += string[0:4]
     return ret
 
 
 def get_academic_program(cod_program):
-    for p in Request.PROGRAM_CHOICES:
+    for p in Request.PLAN_CHOICES:
         if p[0] == cod_program:
             return p[1]
 
@@ -82,11 +118,19 @@ def num_to_month(month):
 
 def header(request, docx_):
     para = docx_.add_paragraph()
-    para.add_run('Tipo de solicitud:\t{}\n'.format(request.full_name)) 
+    para.add_run('Tipo de solicitud:\t{}\n'.format(request.full_name))
     para.add_run('Justificación:\t\t{}\n'.format(
-        request.student_justification ))
+        request.student_justification))
     para.add_run('Soportes:\t\t{}\n'.format(request.supports))
-    para.add_run('Fecha radicación:\t{}'.format(request.date))
+    para.add_run('Fecha radicación:\t{}\n'.format(request.date))
+    para.add_run('Normatividad:')
+    para.paragraph_format.space_after = Pt(0)
+    for regulation in request.regulation_list:
+        para = docx_.add_paragraph(style='List Hyperlink')
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.paragraph_format.space_after = Pt(0)
+        add_hyperlink(
+            para, request.regulations[regulation][0], request.regulations[regulation][1])
     para.paragraph_format.space_after = Pt(0)
 
 
@@ -161,20 +205,20 @@ def table_subjects(docx_, data):
     table.style.font.size = Pt(9)
     table.alignment = WD_ALIGN_PARAGRAPH.CENTER
     table.columns[0].width = 700000
-    table.columns[1].width = 2300000
-    table.columns[2].width = 800000
-    table.columns[3].width = 800000
-    table.columns[4].width = 800000
+    table.columns[1].width = 2250000
+    table.columns[2].width = 600000
+    table.columns[3].width = 1050000
+    table.columns[4].width = 600000
     for cell in table.columns[0].cells:
         cell.width = 700000
     for cell in table.columns[1].cells:
-        cell.width = 2300000
+        cell.width = 2250000
     for cell in table.columns[2].cells:
-        cell.width = 800000
+        cell.width = 600000
     for cell in table.columns[3].cells:
-        cell.width = 800000
+        cell.width = 1050000
     for cell in table.columns[4].cells:
-        cell.width = 800000
+        cell.width = 600000
     table.cell(0, 0).paragraphs[0].add_run('Código').font.bold = True
     table.cell(0, 1).paragraphs[0].add_run('Asignatura').font.bold = True
     table.cell(0, 2).paragraphs[0].add_run('Grupo').font.bold = True
