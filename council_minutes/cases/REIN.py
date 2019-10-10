@@ -11,13 +11,16 @@ class REIN(Request):
     RL_ANSWER_SANCION = 'SA'
     RL_ANSWER_OTRO = 'OT'
     RL_ANSWER_CHOICES = (
-        (RL_ANSWER_RENOV_MATRICULA, 'No cumplir con los requisitos exigidos para la renovación de la matrícula, en los plazos señalados por la Universidad'),
+        (RL_ANSWER_RENOV_MATRICULA, 'No cumplir con los requisitos exigidos para la' +
+         ' renovación de la matrícula, en los plazos señalados por la Universidad'),
         (RL_ANSWER_PAPA,
          'Presentar un Promedio Aritmético Ponderado Acumulado menor que tres punto cero (3.0)'),
         (RL_ANSWER_CUPO_CREDITOS,
-         'No disponer de un cupo de créditos suficiente para inscribir las asignaturas del plan de estudios pendientes de aprobación'),
+         'No disponer de un cupo de créditos suficiente para inscribir las asignaturas' +
+         ' del plan de estudios pendientes de aprobación'),
         (RL_ANSWER_SANCION,
-         'Recibir sanción disciplinaria de expulsión o suspensión impuesta de acuerdo con las normas vigentes'),
+         'Recibir sanción disciplinaria de expulsión o suspensión impuesta de acuerdo' +
+         ' con las normas vigentes'),
         (RL_ANSWER_OTRO, 'Otro')
     )
 
@@ -101,8 +104,34 @@ class REIN(Request):
 
     str_cm_pre = [
         'reingreso por única vez a partir del periodo académico ',
-        '. Si el estudiante no renueva su matrícula en el semestre de reingreso, el acto académico expedido por el Consejo de Facultad queda sin efecto.'
+        '. Si el estudiante no renueva su matrícula en el semestre de reingreso, el acto' +
+        ' académico expedido por el Consejo de Facultad queda sin efecto.',
+        '1. Datos Generales:',
+        '2. Información Académica:',
+        '3. Resumen general de créditos del plan de estudios:',
+        '*Sin incluir los créditos correspondientes al cumplimiento del requisito de' +
+        ' suficiencia en idioma.'
+    ]
 
+    str_cm_pre_acadinfo = [
+        'Periodo para el cual fue admitido en este plan de estudios',
+        '¿Se trata de un primer reingreso?',
+        'Si la respuesta es NO, el Comité Asesor no debe recomendar al Consejo ' +
+        'de Facultad el reingreso',
+        'Es caso de ser primer reingreso en ¿qué periodo académico perdió la ' +
+        'calidad de estudiante?',
+        'Al momento de presentar la solicitud ¿cuántos periodos académicos (incluido' +
+        ' el periodo académico en que presentó la solicitud) han transcurridos a partir' +
+        ' del periodo académico en que registró su última matrícula?',
+        'En caso que la respuesta sea mayor de 6 periodos académicos no se debe ' +
+        'recomendar el reingreso',
+        'P.A.P.A.',
+        'Causa de la pérdida de la calidad de estudiante',
+        'Estudio de créditos',
+        'Cupo de créditos menos créditos pendientes',
+        'Créditos pendientes por ser aprobados del plan de estudios',
+        'Créditos pendientes por ser aprobados de nivelación – Inglés',
+        '¿Cuántos créditos adicionales requiere para inscribir asignaturas?'
     ]
 
     str_pcm_pre = [
@@ -130,24 +159,119 @@ class REIN(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
-        bullet = paragraph.add_run('1. Datos Generales')
+        bullet = paragraph.add_run(self.str_cm_pre[2])
         bullet.font.bold = True
         bullet.font.size = Pt(8)
 
         table_general_data(general_data, case, docx)
 
     def rein_academic_info(self, docx):
-        pass
+        paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
+        bullet = paragraph.add_run(self.str_cm_pre[3])
+        bullet.font.bold = True
+        bullet.font.size = Pt(8)
+
+        table = docx.add_table(rows=13, cols=3)
+        table.style = 'Table Grid'
+        table.style.font.size = Pt(8)
+        table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        for cell in table.columns[0].cells:
+            cell.width = 400000
+        for cell in table.columns[1].cells:
+            cell.width = 3200000
+        for cell in table.columns[2].cells:
+            cell.width = 1600000
+        table.columns[0].width = 400000
+        table.columns[1].width = 3200000
+        table.columns[2].width = 1600000
+        table.cell(0, 0).merge(table.cell(0, 1)).paragraphs[0].add_run(
+            self.str_cm_pre_acadinfo[0])
+        table.cell(0, 2).paragraphs[0].add_run(self.admission_period)
+        table.cell(0, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(1, 0).merge(table.cell(1, 1)).paragraphs[0].add_run(
+            self.str_cm_pre_acadinfo[1])
+
+        if(self.first_reing):
+            table.cell(1, 2).paragraphs[0].add_run('Sí')
+        else:
+            table.cell(1, 2).paragraphs[0].add_run('No')
+
+        table.cell(1, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(2, 0).merge(table.cell(2, 2)).paragraphs[0].add_run(
+            self.str_cm_pre_acadinfo[2])
+        table.cell(3, 0).merge(table.cell(3, 1)).paragraphs[0].add_run(
+            self.str_cm_pre_acadinfo[3])
+        table.cell(3, 2).paragraphs[0].add_run(self.loss_period)
+        table.cell(3, 2).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+        table.cell(3, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(4, 0).merge(table.cell(4, 1)).paragraphs[0].add_run(
+            self.str_cm_pre_acadinfo[4])
+        table.cell(4, 2).paragraphs[0].add_run(str(self.periods_since))
+        table.cell(4, 2).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+        table.cell(4, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(5, 0).merge(table.cell(5, 2)).paragraphs[0].add_run(
+            self.str_cm_pre_acadinfo[5])
+        table.cell(6, 0).merge(table.cell(6, 1)
+                               ).paragraphs[0].add_run(self.str_cm_pre_acadinfo[6])
+        table.cell(6, 2).paragraphs[0].add_run(str(self.papa))
+        table.cell(6, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(7, 0).merge(table.cell(7, 1)).paragraphs[0].add_run(
+            self.str_cm_pre_acadinfo[7])
+        table.cell(7, 0).merge(table.cell(7, 1)
+                               ).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+        table.cell(7, 2).paragraphs[0].add_run(
+            self.get_reason_of_loss_display())
+        table.cell(7, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(8, 0).merge(table.cell(8, 2)).paragraphs[0].add_run(
+            self.str_cm_pre_acadinfo[8]).font.bold = True
+        table.cell(9, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(9, 0).paragraphs[0].add_run('1').font.bold = True
+        table.cell(10, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(10, 0).paragraphs[0].add_run('2').font.bold = True
+        table.cell(11, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(11, 0).paragraphs[0].add_run('3').font.bold = True
+        table.cell(12, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(12, 0).paragraphs[0].add_run('4').font.bold = True
+        table.cell(9, 1).paragraphs[0].add_run(
+            self.str_cm_pre_acadinfo[9])
+        table.cell(10, 1).paragraphs[0].add_run(
+            self.str_cm_pre_acadinfo[10])
+        table.cell(11, 1).paragraphs[0].add_run(
+            self.str_cm_pre_acadinfo[11])
+        table.cell(12, 1).paragraphs[0].add_run(
+            self.str_cm_pre_acadinfo[12])
+        table.cell(9, 2).paragraphs[0].add_run(
+            str(self.credits_minus_remaining))
+        table.cell(9, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(10, 2).paragraphs[0].add_run(
+            str(self.credits_remaining))
+        table.cell(10, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(11, 2).paragraphs[0].add_run(
+            str(self.credits_english))
+        table.cell(11, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(12, 2).paragraphs[0].add_run(str(self.credits_add))
+        table.cell(12, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
 
     def rein_credits_summary(self, docx):
-        pass
+        paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
+        bullet = paragraph.add_run(self.str_cm_pre[4])
+        bullet.font.bold = True
+        bullet.font.size = Pt(8)
 
     def rein_recommends(self, docx):
-        pass
+        paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
+        bullet = paragraph.add_run(self.str_cm_pre[5])
+        bullet.font.size = Pt(8)
 
     def cm_extra_credits(self, paragraph):
-        paragraph.add_run('y otorga ' + self.credits_granted +
-                          ' crédito adicional para culminar su plan de estudios. ')
+        paragraph.add_run('y otorga ' + str(self.credits_granted) +
+                          ' crédito(s) adicional(es) para culminar su plan de estudios. ')
 
     def cm_no_extra_credits(self, paragraph):
         pass
