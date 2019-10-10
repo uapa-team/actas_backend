@@ -63,7 +63,7 @@ class REEM(Request):
         self.pcm_analysis(docx)
         paragraph = docx.add_paragraph()
         paragraph.paragraph_format.space_after = Pt(0)
-        paragraph.add_run('Analisis: ').font.bold = True
+        paragraph.add_run('{}: '.format(self.str_answer)).font.bold = True
         paragraph = docx.add_paragraph()
         self.pcm_answer(paragraph)
 
