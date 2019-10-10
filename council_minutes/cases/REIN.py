@@ -1,147 +1,23 @@
-'''
-case_simple Reingreso Posgrado (preacta):
-
-def case_REINGRESO_POSGRADO(request, docx, redirected=False):
-        ### Frequently used ###
-        pre_cm = request['pre_cm']
-        details_pre = pre_cm['detail_pre_cm']
-        is_recommended = request['approval_status'] == 'CR'
-
-        ### Finishing last paragraph ###
-        para = docx.paragraphs[-1]
-        para.add_run('Análisis:\t')
-        para.add_run(
-            'Resolución 239 de 2009,Acuerdo 008 de 2008,Resolución 012 de 2014').underline = True
-
-        ### Analysis Paragraphs ###
-        ## Last Reentry ##
-        para = docx.add_paragraph(style='List Number')
-        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        p_aux = 'El estudiante {} ha tenido otro reingreso posterior al 2009-1S{} '
-        p_aux += '(Artículo 46, Acuerdo 008 de 2008 del Consejo Superior Universitario).'
-        last = details_pre['last_reentry']
-        modifier = ('no', '') if last == '' else (
-            'ya', ' en el periodo {}'.format(last))
-        para.add_run(p_aux.format(*modifier))
-
-        ## Retirement Cause ##
-        para = docx.add_paragraph(style='List Number')
-        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run(
-            '{}. Plan de estudios {} - Perfil de {}.'.format(
-                details_pre['retirement_cause'],
-                get_academic_program(request['academic_program']),
-                details_pre['academic_profile']
-            )
-        )
-
-        ## P.A.P.A. ##
-        para = docx.add_paragraph(style='List Number')
-        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        p_aux = '{}iene PAPA superior o igual a 3.5 '
-        p_aux += '(literal 3a – Artículo 3, Resolución 239 de 2009 de ' + \
-            'Vicerrectoría Académica; Artículo 46, Acuerdo 008 de 2008 ' + \
-                'del Consejo Superior Universitario).'
-        modifier = 'T' if float(details_pre['PAPA']) >= 3.5 else 'No t'
-        p_aux += 'SIA PAPA: '
-        para.add_run(p_aux.format(modifier))
-        para.add_run('{}.'.format(details_pre['PAPA'])).bold = True
-
-        ## Remaining Subjects ##
-        para = docx.add_paragraph(style='List Number')
-        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        p_aux = 'En caso de ser por máximo tiempo de permanencia o por tener ' + \
-            'dos calificaciones NA en su historia académica:'
-        p_aux += 'las asignaturas que le faltan por aprobar pueden cursarse ' + \
-            'en un solo periodo académico adicional (literal 5 – Artículo 3, '
-        p_aux += 'Resolución 239 de 2009 de Vicerrectoría Académica; parágrafo' + \
-            ' 2 Artículo 46, Acuerdo 008 de 2008 del Consejo Superior Universitario).'
-        p_aux += 'SIA: Le falta por aprobar '
-        para.add_run(p_aux)
-        para.add_run('{}.'.format(
-            details_pre['remaining_subjects'])).bold = True
-
-        ## On Time ##
-        para = docx.add_paragraph(style='List Number')
-        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        p_aux = 'La solicitud {}se hace en fechas de calendario de sede ' + \
-            '(parágrafo Artículo 3).'
-        modifier = '' if details_pre['on_time'] == 'si' else 'no '
-        para.add_run(p_aux.format(modifier))
-
-        ## Extra Analysis ##
-        for analysis in pre_cm['extra_analysis']:
-            para = docx.add_paragraph(style='List Number')
-            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-            para.add_run(analysis)
-
-        ### Concept Paragraph ###
-        para = docx.add_paragraph()
-        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.add_run('Concepto: ').bold = True
-        para.add_run('El Comité Asesor recomienda al Consejo de Facultad ')
-        modifier = 'APROBAR' if is_recommended else 'NO APROBAR'
-        para.add_run(modifier).bold = True
-        para.add_run(' reingreso por única vez al programa {}, '.format(
-            get_academic_program(request['academic_program'])))
-        if is_recommended:
-            para.add_run('a partir del periodo académico {}, '.format(
-                details_pre['reentry_period']))
-
-        ## Final Comment ##
-        p_aux = 'el reingreso del estudiante estará regido por el Acuerdo ' + \
-            '008 de 2008 del Consejo Superior Universitario.'
-        p_aux += 'Durante el periodo académico adicional otorgado, el estudiante' + \
-            ' deberá solicitar el nombramiento de jurados de su'
-        p_aux += ' {}, con el fin de obtener su título, previo cumplimiento de ' + \
-            'las demás exigencias académicas y administrativas vigentes.'
-        p_aux += '(Artículo 7 de la Resolución 012 de 2014 de la Vicerrectoría Académica).'
-        aditional = details_pre['aditional_comments'] + '.'
-        modifier = p_aux.format(
-            details_pre['grade_option']) if aditional == '.' else aditional
-        para.add_run(modifier)
-
-'''
-
-
-'''
-case_simple Reingreso Posgrado:
-
-@staticmethod
-    def case_REINGRESO_POSGRADO(request, docx, redirected=False):
-        if redirected:
-            para = docx.paragraphs[-1]
-        else:
-            para = docx.add_paragraph()
-            para.add_run('El Consejo de Facultad ')
-        common = 'reingreso por única vez en el programa de {}, a partir del periodo {}'
-        common = common.format(request.get_academic_program_display(), request.academic_period)
-        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        if request.approval_status == 'AP':
-            para.add_run('APRUEBA ').font.bold = True
-            para.add_run(common + '. El reingreso del estudiante estará regido por'+\
-                ' el Acuerdo 008 de 2008 del Consejo Superior Universitario')
-            if request.observation:
-                para.add_run('. {}'.format(request.observation))
-        else:
-            para.add_run('NO APRUEBA ').font.bold = True
-            para.add_run(common + ', debido a que {}'.format(request.justification))
-        para.add_run('.')
-
-'''
+from .case_utils import *
+from ..models import Request
+from mongoengine import StringField, IntField, FloatField, BooleanField
 
 
 class REIN(Request):
 
     full_name = 'Reingreso'
 
+    regulation_list = ['008|2008|CSU', '012|2014|VRA']  # List of regulations
+
     reing_period = StringField(required=True, display='Periodo de reingreso')
     loss_period = StringField(
         required=True, display='Periodo de pérdida de calidad de estudiante')
-    first_reing = StringField(required=True, display='')
-    admission_period =
+    first_reing = BooleanField(required=True, display='Primer reingreso')
+    admission_period = StringField(
+        required=True, display='Periodo de admisión')
     periods_since = IntField(
-        required=True, display='# de periodos transcurridos desde la pérdida de la calidad de estudiante')
+        required=True, display='# de periodos transcurridos desde la pérdida de la calidad' +
+        ' de estudiante')
     papa = FloatField(required=True, display='PAPA')
     reason_of_loss = StringField(
         required=True, display='Razón pérdida calidad de estudiante')
@@ -153,13 +29,17 @@ class REIN(Request):
         required=True, display='Créditos requeridos para inscribir asignaturas')
 
     min_grade_12c = StringField(
-        required=True, display='Promedio semestral mínimo requerido para mantener la calidad de estudiante con 12 créditos inscritos: ')
+        required=True, display='Promedio semestral mínimo requerido para mantener la ' +
+        'calidad de estudiante con 12 créditos inscritos: ')
     min_grade_15c = StringField(
-        required=True, display='Promedio semestral mínimo requerido para mantener la calidad de estudiante con 15 créditos inscritos: ')
+        required=True, display='Promedio semestral mínimo requerido para mantener la ' +
+        'calidad de estudiante con 15 créditos inscritos: ')
     min_grade_18c = StringField(
-        required=True, display='Promedio semestral mínimo requerido para mantener la calidad de estudiante con 18 créditos inscritos: ')
+        required=True, display='Promedio semestral mínimo requerido para mantener la ' +
+        'calidad de estudiante con 18 créditos inscritos: ')
     min_grade_21c = StringField(
-        required=True, display='Promedio semestral mínimo requerido para mantener la calidad de estudiante con 21 créditos inscritos: ')
+        required=True, display='Promedio semestral mínimo requerido para mantener la ' +
+        'calidad de estudiante con 21 créditos inscritos: ')
 
     # Exiged credits
     exi_fund_m = IntField(
@@ -204,6 +84,8 @@ class REIN(Request):
     credits_granted = IntField(display='Créditos otorgados')
 
     str_cm_pre = [
+        'reingreso por única vez a partir del periodo académico ',
+        '. Si el estudiante no renueva su matrícula en el semestre de reingreso, el acto académico expedido por el Consejo de Facultad queda sin efecto.'
 
     ]
 
@@ -219,14 +101,82 @@ class REIN(Request):
 
     ]
 
-    def cm(self, docx):
+    def rein_general_data_table(self, docx):
+        # pylint: disable=no-member
+        general_data = [['Estudiante', self.student_name],
+                        ['DNI', self.student_dni],
+                        ['Plan de estudios', self.get_academic_program_display()],
+                        ['Código del plan de estudios', self.academic_program],
+                        ['Fecha de la solicitud', string_to_date(self.detail_cm['solic_date'])]]
+
+        case = 'REINGRESO'
+        table_general_data(general_data, case, docx)
+
+    def rein_academic_info(self, docx):
         pass
 
-    def cm_answer(self, paragraph):
+    def rein_credits_summary(self, docx):
         pass
+
+    def rein_recommends(self, docx):
+        pass
+
+    def cm_ap(self, paragraph):
+        pass
+
+    def cm_na(self, paragraph):
+        pass
+
+    def cm(self, docx):
+        paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
+        self.cm_answer(paragraph)
+        self.rein_general_data_table(docx)
+        self.rein_academic_info(docx)
+        self.rein_credits_summary(docx)
+        self.rein_recommends(docx)
+
+    def cm_answer(self, paragraph):
+        paragraph.add_run(self.str_council_header + ' ')
+        paragraph.add_run(
+            # pylint: disable=no-member
+            self.get_approval_status_display().upper() + ' ').font.bold = True
+
+        paragraph.add_run(self.str_cm_pre[0])
+        paragraph.add_run(self.academic_period)
+
+        if self.is_affirmative_response_approval_status():
+            self.cm_ap(paragraph)
+        else:
+            self.cm_na(paragraph)
+
+        paragraph.add_run('({}).'.format(
+            self.regulations['012|2014|VRA'][0] + "; Artículo 46, " +
+            self.regulations['008|2008|CSU'][0]))
+
+        paragraph.add_run(self.str_cm_pre[0].format(
+            self.academic_period) + ', ')
+
+        paragraph.add_run('({}).'.format(self.regulations['008|2008|CSU'][0]))
+
+        # General Data Table Title
+        bullet = paragraph.add_run('1. Datos Generales')
+        bullet.font.bold = True
+        bullet.font.size = Pt(8)
 
     def pcm(self, docx):
         pass
+        # self.pcm_analysis_handler(docx)
+        # self.pcm_answer_handler(docx)
 
     def pcm_answer(self, paragraph):
-        pass
+        paragraph.add_run(self.str_comittee_header)
+        paragraph.add_run(
+            # pylint: disable=no-member
+            ' ' + self.get_advisor_response_display().upper()).font.bold = True
+        # paragraph.add_run(self.str_pcmap[0].format(self.academic_period))
+        # if self.is_affirmative_response_advisor_response():
+        #    self.pcm_answers_cr(paragraph)
+        # else:
+        #    self.pcm_answers_cn(paragraph)
