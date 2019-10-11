@@ -81,7 +81,7 @@ class Subject(EmbeddedDocument):
 
     TIP_CHOICES = (
         (TIP_PRE_FUND_OBLIGATORIA, 'Fundamentación Obligatoria'),
-        (TIP_PRE_FUND_OPTATIVA, 'Fundamentación Optativas'),
+        (TIP_PRE_FUND_OPTATIVA, 'Fundamentación Optativa'),
         (TIP_PRE_DISC_OBLIGATORIA, 'Disciplinar Obligatoria'),
         (TIP_PRE_DISC_OPTATIVA, 'Disciplinar Optativa'),
         (TIP_PRE_TRAB_GRADO, 'Trabajo de Grado Pregrado'),
@@ -102,6 +102,23 @@ class Subject(EmbeddedDocument):
     group = StringField(required=True, display='Grupo')
     tipology = StringField(
         required=True, choices=TIP_CHOICES, display='Tipología')
+
+    @staticmethod
+    def subjects_to_array(subjects):
+        """
+        A function that converts a List of Subjects into a classic array.
+        : param subjects: EmbeddedDocumentListField of Subjects to be converted
+        """
+        data = []
+        for subject in subjects:
+            data.append([
+                subject.code,
+                subject.name,
+                subject.group,
+                subject.get_tipology_display(),
+                str(subject.credits)
+            ])
+        return data
 
 
 class Request(DynamicDocument):
@@ -315,6 +332,24 @@ class Request(DynamicDocument):
          'Modalidad de Asignaturas de Posgrado Facultad de Enfermería'),
         (BAP_ODONTOLOGIA,
          'Modalidad de Asignaturas de Posgrado Facultad de Odontología'),
+    )
+
+    # DP Departamento
+    DP_CIVIL_AGRICOLA = 'DCA'
+    DP_ELECTRICA_ELECTRONICA = 'DEE'
+    DP_MECANICA_MECATRONICA = 'DMM'
+    DP_SISTEMAS_INDUSTRIAL = 'DSI'
+    DP_QUIMICA_AMBIENTAL = 'DQA'
+    DP_EXTERNO_FACULTAD = 'EFA'
+    DP_EMPTY = ''
+    DP_CHOICES = (
+        (DP_CIVIL_AGRICOLA, 'Departamento de Ingeniería Civil y Agrícola'),
+        (DP_ELECTRICA_ELECTRONICA, 'Departamento de Ingeniería Eléctrica y Electrónica'),
+        (DP_MECANICA_MECATRONICA, 'Departamento de Ingeniería Mecánica y Mecatrónica'),
+        (DP_SISTEMAS_INDUSTRIAL, 'Departamento de Ingeniería de Sistemas e Industrial'),
+        (DP_QUIMICA_AMBIENTAL, 'Departamento de Ingeniería Química y Ambiental'),
+        (DP_EXTERNO_FACULTAD, 'Externo a la Facultad de Ingeniería'),
+        (DP_EMPTY, ''),
     )
 
     _cls = StringField(required=True)

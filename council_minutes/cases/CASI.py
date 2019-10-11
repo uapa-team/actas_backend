@@ -2,7 +2,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
 from mongoengine import StringField, IntField, FloatField, EmbeddedDocumentListField
 from ..models import Request, Subject
-from .case_utils import table_subjects, add_analysis_list
+from .case_utils import table_subjects, add_analysis_paragraph
 
 
 class CASI(Request):
@@ -85,7 +85,7 @@ class CASI(Request):
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
         self.cm_answer(paragraph)
-        self.casi_subjects_table(docx)
+        table_subjects(docx, Subject.subjects_to_array(self.subjects))
 
     def cm_answer(self, paragraph):
         paragraph.add_run(self.str_council_header + ' ')
@@ -120,19 +120,6 @@ class CASI(Request):
     def cm_na(self, paragraph):
         paragraph.add_run(self.str_cm[1].format('no ') + ' ')
 
-    def casi_subjects_table(self, docx):
-        data = []
-        index = 0
-        for subject in self.subjects:
-            data.append([])
-            data[index] += [subject.code]
-            data[index] += [subject.name]
-            data[index] += [subject.group]
-            data[index] += [subject.tipology]
-            data[index] += [subject.credits]
-            index = index + 1
-        table_subjects(docx, data)
-
     def pcm_analysis_handler(self, docx):
         self.pcm_analysis(docx)
 
@@ -141,11 +128,11 @@ class CASI(Request):
         analysis_list += [self.str_pcm[0].format(
             self.advance, self.enrolled_academic_periods, self.papa)]
         analysis_list += [self.str_pcm[1].format(self.available_credits)]
-        analysis_list += self.pcm_analysis_3_list()
+        analysis_list += self.pcm_analysis_subject_list()
         analysis_list += self.extra_analysis
-        add_analysis_list(docx, analysis_list)
+        add_analysis_paragraph(docx, analysis_list)
 
-    def pcm_analysis_3_list(self):
+    def pcm_analysis_subject_list(self):
         analysis_subject_list = []
         for subject in self.subjects:
             current_credits = self.current_credits
@@ -165,7 +152,7 @@ class CASI(Request):
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(self.str_answer + ': ').bold = True
         self.pcm_answer(paragraph)
-        self.casi_subjects_table(docx)
+        table_subjects(docx, Subject.subjects_to_array(self.subjects))
 
     def pcm_answers_cr(self, paragraph):
         paragraph.add_run(self.str_pcma_cap[0])
