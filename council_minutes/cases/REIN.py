@@ -1,6 +1,6 @@
 from .case_utils import *
 from ..models import Request
-from mongoengine import StringField, IntField, FloatField, BooleanField
+from mongoengine import StringField, IntField, FloatField, BooleanField, DateField
 
 
 class REIN(Request):
@@ -95,8 +95,13 @@ class REIN(Request):
         required=True, display='Créditos disciplinares optativos restantes')
     rem_free = IntField(
         required=True, display='Créditos de libre elección restantes')
+
     comitee_act = StringField(
         required=True, display='Número de acta de comité')
+
+    comitee_date = DateField(
+        required=True, display='Fecha de reunión del comité'
+    )
 
     # Pre-cm variables
     request_in_date = BooleanField(display='Solicitud a tiempo')
@@ -134,7 +139,7 @@ class REIN(Request):
         '¿Cuántos créditos adicionales requiere para inscribir asignaturas?',
         # Optional: Grade needed with N credits to keep student condition.
         'Al finalizar el semestre de reingreso para mantener la calidad de estudiante,' +
-        ' deberá obtener un Promedio Semestral mínimo de:',
+        ' deberá obtener un promedio semestral mínimo de:',
         'Si inscribe 12 Créditos',
         'Si inscribe 15 Créditos',
         'Si inscribe 18 Créditos',
@@ -263,9 +268,7 @@ class REIN(Request):
         table.cell(12, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
 
         # Optional: Grade needed with N credits to keep student condition.
-        if (self.reason_of_loss == 'CC'):
-            para = docx.add_paragraph()
-            para.paragraph_format.space_after = Pt(0)
+        if (self.reason_of_loss == self.RL_ANSWER_CUPO_CREDITOS):
             table = docx.add_table(rows=5, cols=2)
             for col in table.columns:
                 for cell in col.cells:
@@ -291,10 +294,10 @@ class REIN(Request):
                 self.str_cm_pre_acadinfo[16])
             table.cell(4, 0).paragraphs[0].add_run(
                 self.str_cm_pre_acadinfo[17])
-            table.cell(1, 1).paragraphs[0].add_run(self.min_grade_12c)
-            table.cell(2, 1).paragraphs[0].add_run(self.min_grade_15c)
-            table.cell(3, 1).paragraphs[0].add_run(self.min_grade_18c)
-            table.cell(4, 1).paragraphs[0].add_run(self.min_grade_21c)
+            table.cell(1, 1).paragraphs[0].add_run(str(self.min_grade_12c))
+            table.cell(2, 1).paragraphs[0].add_run(str(self.min_grade_15c))
+            table.cell(3, 1).paragraphs[0].add_run(str(self.min_grade_18c))
+            table.cell(4, 1).paragraphs[0].add_run(str(self.min_grade_21c))
 
     def rein_credits_summary(self, docx):
         paragraph = docx.add_paragraph()
@@ -304,12 +307,37 @@ class REIN(Request):
         bullet.font.bold = True
         bullet.font.size = Pt(8)
 
+        credits = [[self.exi_fund_m, self.exi_fund_o, self.exi_disc_m,
+                    self.exi_disc_o, self.exi_free],
+                   [self.app_fund_m, self.app_fund_o, self.app_disc_m,
+                    self.app_disc_o, self.app_free],
+                   [self.rem_fund_m, self.rem_fund_o, self.rem_disc_m,
+                    self.rem_disc_o, self.rem_free]]
+        case = 'REINGRESO'
+        table_credits_summary(docx, credits, case)
+
     def rein_recommends(self, docx):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
         bullet = paragraph.add_run(self.str_cm_pre[5])
         bullet.font.size = Pt(8)
+
+        details = []
+        details.append(self.get_academic_program_display())
+
+        # Migrate to case_utils?
+        year = str(self.comitee_date)[0:4]
+        month = str(self.comitee_date)[5:7]
+        day = str(self.comitee_date)[8:10]
+        details.append(day + '-' + month + '-' + year)
+        details.append(self.comitee_act)
+        details.append(str(self.comitee_date)[0:4])
+        if (self.advisor_response == self.ARCR_APROBAR):
+            details.append(True)
+        else:
+            details.append(False)
+        table_recommend(docx, details)
 
     def cm_extra_credits(self, paragraph):
         paragraph.add_run('y otorga ' + str(self.credits_granted) +
