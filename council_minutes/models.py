@@ -393,7 +393,7 @@ class Request(DynamicDocument):
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=35163'),
         '026|2012|CSU': ('Acuerdo 026 de 2012 del Consejo Superior Universitario',
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=47025'),
-        '40|2017|CSU':  ('Acuerdo 026 de 2012 del Consejo Superior Universitario',
+        '40|2017|CSU':  ('Acuerdo 40 de 2012 del Consejo Superior Universitario',
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=89183')
     }
 
