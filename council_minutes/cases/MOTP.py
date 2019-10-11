@@ -1,6 +1,6 @@
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from mongoengine import StringField, BooleanField
+from mongoengine import StringField, BooleanField, ListField
 from ..models import Request
 from .case_utils import add_analysis_paragraph
 
@@ -24,26 +24,30 @@ class MOTP(Request):
         required=True, display='Tipo de tesis/trabajo final', choices=GO_CHOICES)
     general_objetive = StringField(
         required=True, display='Objetivo general')
-    specific_objetives = StringField(
-        display='Objetivos específicos', default='')
-    enrolled_thesis = BooleanField(required=True, default=False,
-                                   display='¿Tiene inscrita la asignatura tesis/trabajo final?')
+    specific_objetives = ListField(
+        display='Objetivos específicos', default=[])
+    enrolled_thesis = BooleanField(
+        required=True, default=False, display='¿Tiene inscrita la asignatura tesis/trabajo final?')
 
     regulation_list = ['040|2017|COFA', '056|2012|CSU']  # List of regulations
 
     str_cm = ['cambiar los objetivos de ',
               '"{}"',
-              'a:']
+              'a:',
+              'debido a que']
 
-    list_analysis = ['Título: {}.',
-                     'Objetivo general: {}.',
-                     'Objetivos específicos:']
+    list_analysis = ['Título:',
+                     'Objetivo general:',
+                     'Objetivos específicos:',
+                     'Perfil de {}.',
+                     'El estudiante {}tiene inscrita la asignatura {}.']
 
     def cm(self, docx):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
         self.cm_answer(paragraph)
+        self.cm_ob(docx)
 
     def cm_answer(self, paragraph):
         paragraph.add_run(self.str_council_header + ' ')
@@ -61,6 +65,7 @@ class MOTP(Request):
     def pcm(self, docx):
         self.pcm_analysis(docx)
         self.pcm_answer(docx)
+        self.cm_ob(docx)
 
     def pcm_answer(self, docx):
         paragraph = docx.add_paragraph()
@@ -81,17 +86,36 @@ class MOTP(Request):
             self.cm_ng(paragraph)
 
     def cm_af(self, paragraph):
-        paragraph.add_run(self.str_cm[2])
+        paragraph.add_run(' ' + self.str_cm[2])
 
     def cm_ng(self, paragraph):
         paragraph.add_run(
-            ' ' + self.str_cm[9] + ' ' + self.council_decision + '.')
+            ' ' + self.str_cm[3] + ' ' + self.council_decision + '.')
 
     def cm_ob(self, docx):
+        if not self.is_affirmative_response_approval_status():
+            return
         paragraph = docx.add_paragraph()
-        #paragraph.style = 'List Bullet'
+        paragraph.style = 'List Bullet'
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.list_analysis[1]).font.bold = True
+        paragraph = docx.add_paragraph()
+        paragraph.style = 'List Bullet 2'
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.general_objetive + '.')
+        paragraph = docx.add_paragraph()
+        paragraph.style = 'List Bullet'
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.list_analysis[2]).font.bold = True
+        for spec in self.specific_objetives:
+            paragraph = docx.add_paragraph()
+            paragraph.style = 'List Bullet 2'
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.add_run(spec + '.')
 
     def pcm_analysis(self, docx):
         if self.grade_option in [self.GO_TESIS_MAESTRIA, self.GO_TESIS_DOCTORADO]:
@@ -99,14 +123,17 @@ class MOTP(Request):
         else:
             profile = 'profundización'
         final_analysis = []
-        final_analysis += [self.list_analysis[0].format(profile)]
+        final_analysis += [self.list_analysis[3].format(profile)]
         ets = '' if self.enrolled_thesis else 'no '
         # pylint: disable=no-member
-        final_analysis += [self.list_analysis[1].format(
+        final_analysis += [self.list_analysis[4].format(
             ets, self.get_grade_option_display())]
-        hss = 'T' if self.have_signature else 'No t'
-        final_analysis += [hss +
-                           self.list_analysis[2].format(self.new_advisor)]
         for extra_a in self.extra_analysis:
             final_analysis += [extra_a]
         add_analysis_paragraph(docx, final_analysis)
+        paragraph = docx.add_paragraph()
+        paragraph.style = 'List Bullet'
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.list_analysis[0] + ' ').font.bold = True
+        paragraph.add_run(self.title + '.').font.italic = True

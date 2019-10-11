@@ -58,7 +58,7 @@ class CPTE(Request):
               'Ratificar nuevo codirector']
 
     list_analysis = ['Perfil de {}.',
-                     'El estudiante {}tiene la asignatura {}.',
+                     'El estudiante {}tiene inscrita la asignatura {}.',
                      'iene la firma de los directores de tesis/trabajo final: {}']
 
     def cm(self, docx):

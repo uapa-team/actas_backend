@@ -2,7 +2,7 @@ import docx
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
 from docx.shared import Pt
-from ..models import Request, Subject
+from ..models import Request
 
 
 def add_hyperlink(paragraph_, text, url):
