@@ -1,4 +1,5 @@
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.shared import Pt
 from mongoengine import StringField, IntField, FloatField, EmbeddedDocumentListField
 from ..models import Request, Subject
 from .case_utils import table_approvals, add_analysis_paragraph
@@ -8,7 +9,13 @@ class SubjectMovility(Subject):
     name_origin = StringField(
         required=True, display='Nombre Asignatura Origen')
     grade_origin = StringField(required=True, display='Nota obtenida')
-    grade_sia = StringField(required=True, display='Nota homologada')
+    grade = StringField(required=True, display='Nota homologada')
+    min_grade_origin = StringField(
+        required=True, display='Mínima nota', default='0.0')
+    max_grade_origin = StringField(
+        required=True, display='Máxima nota', default='5.0')
+    approval_grade_origin = StringField(
+        required=True, display='Mínima nota aprobatoria', default='3.0')
 
     @staticmethod
     def subjects_to_table_array(subjects, period):
@@ -24,7 +31,7 @@ class SubjectMovility(Subject):
                 subject.name,
                 str(subject.credits),
                 subject.tipology[1],
-                subject.grade_sia,
+                subject.grade,
                 subject.name_origin,
                 subject.grade_origin
             ])
@@ -51,13 +58,19 @@ class RCMO(Request):
     subjects = EmbeddedDocumentListField(
         SubjectMovility, required=True, display='Asignaturas')
 
-    str_analysis = 'Analisis'
-    str_answer = 'Concepto'
-
     str_cm = [
         'calificar {} la asignatura {} ({}) en el periodo {}.',
         'Homologar en el periodo académico {}, la(s) siguiente(s) asignatura(s) cursada(s) bajo l' +
-        'a asignatura {}.'
+        'a asignatura {}.',
+    ]
+    str_pcm = [
+        'El estudiante realizó movilidad bajo la modalidad de la materia {} ({}) en el periodo {}' +
+        ', en la institución {}.',
+        'El estudiante cursó la asignatura {}, obteniendo una calificación {}, con nota mínima ap' +
+        'robatoria {} en el rango de notas {} a {}, y se solicita homologar bajo el contenido de ' +
+        'la materia {} ({}), con una nota {}; la cantidad de créditos {} y tipología {}.',
+        'calificar {} la asignatura {} ({}) en el periodo {} y {} homologar en el periodo académi' +
+        'co {}, la(s) asignatura(s) cursada(s) bajo la asignatura.',
     ]
     regulation_list = ['008|2008|CSU']  # List of regulations
 
@@ -101,20 +114,46 @@ class RCMO(Request):
 
     def pcm(self, docx):
         self.pcm_analysis(docx)
+        paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_answer + ': ').bold = True
+        self.pcm_answer(paragraph)
 
     def pcm_analysis(self, docx):
         analysis_list = []
+        analysis_list += [self.str_pcm[0].format(
+            self.subject_name,
+            self.subject_code,
+            self.subject_period,
+            self.institution)]
+        for subject in self.subjects:
+            analysis_list += [self.str_pcm[1].format(
+                subject.name_origin,
+                subject.grade_origin,
+                subject.approval_grade_origin,
+                subject.min_grade_origin,
+                subject.max_grade_origin,
+                subject.name,
+                subject.code,
+                subject.grade,
+                subject.credits,
+                subject.get_tipology_display(),
+            )]
         analysis_list += self.extra_analysis
         add_analysis_paragraph(docx, analysis_list)
 
     def pcm_answer(self, paragraph):
+        paragraph.add_run(self.str_comittee_header)
         paragraph.add_run(
             # pylint: disable=no-member
-            self.get_approval_status_display().upper()).font.bold = True
+            ' ' + self.get_advisor_response_display().upper()).font.bold = True
         paragraph.add_run(' ')
-        paragraph.add_run(self.str_cm[0].format(
+        paragraph.add_run(self.str_pcm[2].format(
             # pylint: disable=no-member
             self.get_calification_display().lower(),
             self.subject_name,
             self.subject_code,
+            self.subject_period,
+            self.get_advisor_response_display().upper(),
             self.subject_period))
