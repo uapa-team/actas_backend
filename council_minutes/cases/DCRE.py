@@ -44,7 +44,7 @@ class DCRE(Request):
         ))
 
     def pcm(self, docx):
-        add_analysis_paragraph(docx, [])
+        add_analysis_paragraph(docx, self.extra_analysis)
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
