@@ -20,9 +20,7 @@ class EBAP(Request):
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
         self.cm_answer(paragraph)
-        paragraph.add_run(self.str_cm[1].format(
-            '' if self.is_affirmative_response_approval_status() else 'no ') + '. ')
-        paragraph.add_run('({}). '.format(
+        paragraph.add_run(' ({}). '.format(
             self.regulations[self.regulation_list[0]][0]))
 
     def cm_answer(self, paragraph):
