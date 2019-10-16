@@ -16,6 +16,12 @@ class AAUT(Request):
         'Debido a que {}justifica debidamente la solicitud.'
     ]
 
+    str_pcm = [
+        'El estudiante completó plan de estudios en {}.',
+        'Cupo de admisión automática en resolución {}.',
+        'Solicita admisión al plan de estudios {} - perfil de {}.',
+    ]
+
     def cm(self, docx):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
@@ -37,3 +43,18 @@ class AAUT(Request):
             self.academic_program,
             self.academic_period,
             '' if self.is_affirmative_response_approval_status() else 'no ') + ' ')
+
+    def pcm(self, docx):
+        self.pcm_analysis(self, docx)
+
+    def pcm_analysis(self, docx):
+        analysis_list = []
+        analysis_list += [self.str_pcm[0].format(
+            self.advance, self.enrolled_academic_periods, self.papa)]
+        analysis_list += [self.str_pcm[1].format(self.available_credits)]
+        analysis_list += self.pcm_analysis_subject_list()
+        analysis_list += self.extra_analysis
+        add_analysis_paragraph(docx, analysis_list)
+
+    def pcm_answer(self, paragraph):
+        pass
