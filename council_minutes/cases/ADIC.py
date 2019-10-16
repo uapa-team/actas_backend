@@ -9,6 +9,7 @@ class ADIC(Request):
 
     full_name = 'Adición de codirector'
 
+    # TODO: node choices
     node = StringField(required=True, display='Perfil')
     title = StringField(required=True, display='Título de Tesis/Trabajo Final')
     council_number = StringField(
@@ -20,8 +21,15 @@ class ADIC(Request):
 
     regulation_list = []
 
-    str_cm = []
-    str_pcm = []
+    str_cm = [
+        'designar codirector de Tesis de {} con título ',
+        'aprobado en el acta {} de {}, al profesor {} del {}.'
+    ]
+    str_pcm = [
+        'SIA: {}, perfil de {}.',
+        'Aprobación de propuesta y designación de director en el Acta no. {} de {} ' +
+        'del Consejo de la Facultad de Ingeniería.'
+    ]
 
     def cm(self, docx):
         paragraph = docx.add_paragraph()
@@ -36,7 +44,7 @@ class ADIC(Request):
             self.get_approval_status_display().upper() + ' ').font.bold = True
 
     def pcm(self, docx):
-        add_analysis_paragraph(docx, self.extra_analysis)
+        add_analysis_paragraph(docx, self.fill_analysis())
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
@@ -48,3 +56,11 @@ class ADIC(Request):
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_advisor_response_display().upper() + ' ').font.bold = True
+
+    def fill_analysis(self):
+        return [
+            str_pcm[0].format(self.get_academic_program_display(), self.node),
+            str_pcm[1].format(
+                self.council_number, self.council_year
+            )
+        ] + self.extra_analysis
