@@ -100,8 +100,13 @@ class CASI(Request):
         paragraph.add_run('({}).'.format(self.regulations['008|2008|CSU'][0]))
 
     def pcm(self, docx):
-        self.pcm_analysis_handler(docx)
-        self.pcm_answer_handler(docx)
+        self.pcm_analysis(docx)
+        paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_answer + ': ').bold = True
+        self.pcm_answer(paragraph)
+        table_subjects(docx, Subject.subjects_to_array(self.subjects))
 
     def pcm_answer(self, paragraph):
         paragraph.add_run(self.str_comittee_header)
@@ -119,9 +124,6 @@ class CASI(Request):
 
     def cm_na(self, paragraph):
         paragraph.add_run(self.str_cm[1].format('no ') + ' ')
-
-    def pcm_analysis_handler(self, docx):
-        self.pcm_analysis(docx)
 
     def pcm_analysis(self, docx):
         analysis_list = []
@@ -145,14 +147,6 @@ class CASI(Request):
             analysis_subject_list += [self.str_pcm[2].format(
                 subject_info['name'], subject_info['code'], subject_info['remaining'])]
         return analysis_subject_list
-
-    def pcm_answer_handler(self, docx):
-        paragraph = docx.add_paragraph()
-        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        paragraph.paragraph_format.space_after = Pt(0)
-        paragraph.add_run(self.str_answer + ': ').bold = True
-        self.pcm_answer(paragraph)
-        table_subjects(docx, Subject.subjects_to_array(self.subjects))
 
     def pcm_answers_cr(self, paragraph):
         paragraph.add_run(self.str_pcma_cap[0])
