@@ -121,6 +121,15 @@ class Subject(EmbeddedDocument):
         return data
 
 
+class Professor(EmbeddedDocument):
+
+    name = StringField(required=True, display='Nombre')
+    department = StringField(
+        display='Departamento', choices=Request.DP_CHOICES, default=Request.DP_EMPTY)
+    institution = StringField(display='Institución')
+    country = StringField(display='Nombre')
+
+
 class Request(DynamicDocument):
 
     meta = {'allow_inheritance': True}

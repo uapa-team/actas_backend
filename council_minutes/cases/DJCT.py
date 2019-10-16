@@ -2,17 +2,8 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
 from mongoengine import StringField, DateField, BooleanField
 from mongoengine import EmbeddedDocumentListField, EmbeddedDocument
-from ..models import Request
+from ..models import Request, Professor
 from .case_utils import add_analysis_paragraph
-
-
-class Professor(EmbeddedDocument):
-
-    name = StringField(required=True, display='Nombre')
-    department = StringField(
-        display='Departamento', choices=Request.DP_CHOICES, default=Request.DP_EMPTY)
-    institution = StringField(display='Institución')
-    country = StringField(display='Nombre')
 
 
 class DJCT(Request):
