@@ -11,13 +11,6 @@ class AAUT(Request):
 
     regulation_list = ['008|2008|CSU', '070|2009|CA']  # List of regulations
 
-    PROFILE_INVE = 'I'
-    PROFILE_PROF = 'P'
-    PROFILE_CHOICES = (
-        (PROFILE_INVE, 'Investigación'),
-        (PROFILE_PROF, 'Profundización'),
-    )
-
     academic_profile = StringField(
         default='I', choices=PROFILE_CHOICES, display='Perfil de programa curricular')
     places_resolution = StringField(
