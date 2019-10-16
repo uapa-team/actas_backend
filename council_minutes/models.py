@@ -402,7 +402,11 @@ class Request(DynamicDocument):
         '001|2019|VRS': ('Circular 001 de 2019 de Vicerrectoría de Sede Bogotá',
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=92579'),
         '230|2016|CSU': ('Acuerdo 230 de 2016 del Consejo Superior Universitario',
-                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=87737')
+                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=87737'),
+        '032|2010|CSU': ('Acuerdo 032 de 2010 del Consejo Superior Universitario',
+                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=39424'),
+        '1416|2013|RE': ('Resolución 1416 de 2013 de Rectoría',
+                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=60849')
     }
 
     assertionerror = {
