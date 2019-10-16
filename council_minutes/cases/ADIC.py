@@ -1,6 +1,6 @@
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import StringField, FloatField
+from mongoengine import StringField, EmbeddedDocumentListField
 from ..models import Request, Professor
 from .case_utils import add_analysis_paragraph
 
@@ -23,11 +23,11 @@ class ADIC(Request):
 
     str_cm = [
         'designar codirector de Tesis de {} con título ',
-        'aprobado en el acta {} de {}, al profesor {} del {}.'
+        'aprobado en el acta {} de {}, al(los) profesor(es) '
     ]
     str_pcm = [
         'SIA: {}, perfil de {}.',
-        'Aprobación de propuesta y designación de director en el Acta no. {} de {} ' +
+        'Aprobación de propuesta y designación de director en el Acta No. {} de {} ' +
         'del Consejo de la Facultad de Ingeniería.'
     ]
 
@@ -42,6 +42,7 @@ class ADIC(Request):
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True
+        self.add_text(paragraph)
 
     def pcm(self, docx):
         add_analysis_paragraph(docx, self.fill_analysis())
@@ -56,11 +57,33 @@ class ADIC(Request):
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_advisor_response_display().upper() + ' ').font.bold = True
+        self.add_text(paragraph)
 
     def fill_analysis(self):
         return [
-            str_pcm[0].format(self.get_academic_program_display(), self.node),
-            str_pcm[1].format(
+            self.str_pcm[0].format(
+                self.get_academic_program_display(), self.node),
+            self.str_pcm[1].format(
                 self.council_number, self.council_year
             )
         ] + self.extra_analysis
+
+    def add_text(self, paragraph):
+        paragraph.add_run(self.str_cm[0].format(
+            self.get_academic_program_display()))
+        paragraph.add_run('"{}" '.format(self.title)).font.italic = True
+        paragraph.add_run(self.str_cm[1].format(
+            self.council_number, self.council_year))
+        self.add_proffesors(paragraph)
+
+    def add_proffesors(self, paragraph):
+        for i in range(len(self.proffesors)):
+            if self.proffesors[i].department not in (self.DP_EMPTY, self.DP_EXTERNO_FACULTAD):
+                mod = self.proffesors[i].get_department_display()
+            else:
+                mod = self.proffesors[i].institution
+                if self.proffesors[i].country != '':
+                    mod += ' ({})'.format(self.proffesors[i].country)
+            end = ', ' if i + 1 < len(self.proffesors) else '.'
+            paragraph.add_run(
+                '{} - {}{}'.format(self.proffesors[i].name, mod, end))
