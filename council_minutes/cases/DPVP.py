@@ -32,6 +32,7 @@ class DPVP(Request):
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
         self.cm_answer(paragraph)
+        self.add_text(paragraph)
 
     def cm_answer(self, paragraph):
         paragraph.add_run(self.str_council_header + ' ')
@@ -45,6 +46,7 @@ class DPVP(Request):
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
         self.pcm_answer(paragraph)
+        self.add_text(paragraph)
 
     def pcm_answer(self, paragraph):
         paragraph.add_run(self.str_answer + ' ').font.bold = True
