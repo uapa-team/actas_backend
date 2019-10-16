@@ -107,7 +107,7 @@ class REIN(Request):
     request_in_date = BooleanField(display='Solicitud a tiempo')
     credits_granted = IntField(display='Créditos otorgados')
 
-    str_cm_pre = [
+    str_pcm_pre = [
         'reingreso por única vez a partir del periodo académico ',
         '. Si el estudiante no renueva su matrícula en el semestre de reingreso, el acto' +
         ' académico expedido por el Consejo de Facultad queda sin efecto.',
@@ -118,7 +118,7 @@ class REIN(Request):
         ' suficiencia en idioma.'
     ]
 
-    str_cm_pre_acadinfo = [
+    str_pcm_pre_acadinfo = [
         'Periodo para el cual fue admitido en este plan de estudios',
         '¿Se trata de un primer reingreso?',
         'Si la respuesta es NO, el Comité Asesor no debe recomendar al Consejo ' +
@@ -146,15 +146,15 @@ class REIN(Request):
         'Si inscribe 21 Créditos'
     ]
 
-    str_pcm_pre = [
+    str_pcm_pos = [
+
+    ]
+
+    str_cm_pre = [
 
     ]
 
     str_cm_pos = [
-
-    ]
-
-    str_pcm_pos = [
 
     ]
 
@@ -171,7 +171,7 @@ class REIN(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
-        bullet = paragraph.add_run(self.str_cm_pre[2])
+        bullet = paragraph.add_run(self.str_pcm_pre[2])
         bullet.font.bold = True
         bullet.font.size = Pt(8)
 
@@ -181,7 +181,7 @@ class REIN(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
-        bullet = paragraph.add_run(self.str_cm_pre[3])
+        bullet = paragraph.add_run(self.str_pcm_pre[3])
         bullet.font.bold = True
         bullet.font.size = Pt(8)
 
@@ -199,11 +199,11 @@ class REIN(Request):
         table.columns[1].width = 3200000
         table.columns[2].width = 1600000
         table.cell(0, 0).merge(table.cell(0, 1)).paragraphs[0].add_run(
-            self.str_cm_pre_acadinfo[0])
+            self.str_pcm_pre_acadinfo[0])
         table.cell(0, 2).paragraphs[0].add_run(self.admission_period)
         table.cell(0, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(1, 0).merge(table.cell(1, 1)).paragraphs[0].add_run(
-            self.str_cm_pre_acadinfo[1])
+            self.str_pcm_pre_acadinfo[1])
 
         if(self.first_reing):
             table.cell(1, 2).paragraphs[0].add_run('Sí')
@@ -212,25 +212,25 @@ class REIN(Request):
 
         table.cell(1, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(2, 0).merge(table.cell(2, 2)).paragraphs[0].add_run(
-            self.str_cm_pre_acadinfo[2])
+            self.str_pcm_pre_acadinfo[2])
         table.cell(3, 0).merge(table.cell(3, 1)).paragraphs[0].add_run(
-            self.str_cm_pre_acadinfo[3])
+            self.str_pcm_pre_acadinfo[3])
         table.cell(3, 2).paragraphs[0].add_run(self.loss_period)
         table.cell(3, 2).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         table.cell(3, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(4, 0).merge(table.cell(4, 1)).paragraphs[0].add_run(
-            self.str_cm_pre_acadinfo[4])
+            self.str_pcm_pre_acadinfo[4])
         table.cell(4, 2).paragraphs[0].add_run(str(self.periods_since))
         table.cell(4, 2).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         table.cell(4, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(5, 0).merge(table.cell(5, 2)).paragraphs[0].add_run(
-            self.str_cm_pre_acadinfo[5])
+            self.str_pcm_pre_acadinfo[5])
         table.cell(6, 0).merge(table.cell(6, 1)
-                               ).paragraphs[0].add_run(self.str_cm_pre_acadinfo[6])
+                               ).paragraphs[0].add_run(self.str_pcm_pre_acadinfo[6])
         table.cell(6, 2).paragraphs[0].add_run(str(self.papa))
         table.cell(6, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(7, 0).merge(table.cell(7, 1)).paragraphs[0].add_run(
-            self.str_cm_pre_acadinfo[7])
+            self.str_pcm_pre_acadinfo[7])
         table.cell(7, 0).merge(table.cell(7, 1)
                                ).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         table.cell(7, 2).paragraphs[0].add_run(
@@ -238,7 +238,7 @@ class REIN(Request):
             self.get_reason_of_loss_display())
         table.cell(7, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(8, 0).merge(table.cell(8, 2)).paragraphs[0].add_run(
-            self.str_cm_pre_acadinfo[8]).font.bold = True
+            self.str_pcm_pre_acadinfo[8]).font.bold = True
         table.cell(9, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(9, 0).paragraphs[0].add_run('1').font.bold = True
         table.cell(10, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -248,13 +248,13 @@ class REIN(Request):
         table.cell(12, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(12, 0).paragraphs[0].add_run('4').font.bold = True
         table.cell(9, 1).paragraphs[0].add_run(
-            self.str_cm_pre_acadinfo[9])
+            self.str_pcm_pre_acadinfo[9])
         table.cell(10, 1).paragraphs[0].add_run(
-            self.str_cm_pre_acadinfo[10])
+            self.str_pcm_pre_acadinfo[10])
         table.cell(11, 1).paragraphs[0].add_run(
-            self.str_cm_pre_acadinfo[11])
+            self.str_pcm_pre_acadinfo[11])
         table.cell(12, 1).paragraphs[0].add_run(
-            self.str_cm_pre_acadinfo[12])
+            self.str_pcm_pre_acadinfo[12])
         table.cell(9, 2).paragraphs[0].add_run(
             str(self.credits_minus_remaining))
         table.cell(9, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -285,15 +285,15 @@ class REIN(Request):
             table.cell(0, 0).merge(table.cell(0, 1)
                                    ).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
             table.cell(0, 0).merge(table.cell(0, 1)).paragraphs[0].add_run(
-                self.str_cm_pre_acadinfo[13])
+                self.str_pcm_pre_acadinfo[13])
             table.cell(1, 0).paragraphs[0].add_run(
-                self.str_cm_pre_acadinfo[14])
+                self.str_pcm_pre_acadinfo[14])
             table.cell(2, 0).paragraphs[0].add_run(
-                self.str_cm_pre_acadinfo[15])
+                self.str_pcm_pre_acadinfo[15])
             table.cell(3, 0).paragraphs[0].add_run(
-                self.str_cm_pre_acadinfo[16])
+                self.str_pcm_pre_acadinfo[16])
             table.cell(4, 0).paragraphs[0].add_run(
-                self.str_cm_pre_acadinfo[17])
+                self.str_pcm_pre_acadinfo[17])
             table.cell(1, 1).paragraphs[0].add_run(str(self.min_grade_12c))
             table.cell(2, 1).paragraphs[0].add_run(str(self.min_grade_15c))
             table.cell(3, 1).paragraphs[0].add_run(str(self.min_grade_18c))
@@ -303,7 +303,7 @@ class REIN(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
-        bullet = paragraph.add_run(self.str_cm_pre[4])
+        bullet = paragraph.add_run(self.str_pcm_pre[4])
         bullet.font.bold = True
         bullet.font.size = Pt(8)
 
@@ -320,7 +320,7 @@ class REIN(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
-        bullet = paragraph.add_run(self.str_cm_pre[5])
+        bullet = paragraph.add_run(self.str_pcm_pre[5])
         bullet.font.size = Pt(8)
 
         details = []
@@ -339,18 +339,42 @@ class REIN(Request):
             details.append(False)
         table_recommend(docx, details)
 
-    def cm_extra_credits(self, paragraph):
+    def extra_credits(self, paragraph):
         paragraph.add_run('y otorga ' + str(self.credits_granted) +
                           ' crédito(s) adicional(es) para culminar su plan de estudios. ')
 
-    def cm_no_extra_credits(self, paragraph):
-        pass
+    def pcm(self, docx):
+        paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
+        self.pcm_answer(paragraph)
+        self.rein_general_data_table(docx)
+        self.rein_academic_info(docx)
+        self.rein_credits_summary(docx)
+        self.rein_recommends(docx)
+
+    def pcm_answer(self, paragraph):
+        paragraph.add_run(self.str_council_header + ' ')
+        paragraph.add_run(
+            # pylint: disable=no-member
+            self.get_approval_status_display().upper() + ' ').font.bold = True
+
+        paragraph.add_run(self.str_pcm_pre[0])
+        paragraph.add_run(self.academic_period + ' ')
+
+        if self.credits_granted > 0:
+            # Y otorga n créditos adicionales:
+            self.extra_credits(paragraph)
+
+        paragraph.add_run('({}).'.format(
+            self.regulations['012|2014|VRA'][0] + "; Artículo 46, " +
+            self.regulations['008|2008|CSU'][0]))
 
     def cm(self, docx):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
-        self.cm_answer(paragraph)
+        self.pcm_answer(paragraph)
         self.rein_general_data_table(docx)
         self.rein_academic_info(docx)
         self.rein_credits_summary(docx)
@@ -362,29 +386,13 @@ class REIN(Request):
             # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True
 
-        paragraph.add_run(self.str_cm_pre[0])
+        paragraph.add_run(self.str_pcm_pre[0])
         paragraph.add_run(self.academic_period + ' ')
 
         if self.credits_granted > 0:
             # Y otorga n créditos adicionales:
-            self.cm_extra_credits(paragraph)
+            self.extra_credits(paragraph)
 
         paragraph.add_run('({}).'.format(
             self.regulations['012|2014|VRA'][0] + "; Artículo 46, " +
             self.regulations['008|2008|CSU'][0]))
-
-    def pcm(self, docx):
-        pass
-        # self.pcm_analysis_handler(docx)
-        # self.pcm_answer_handler(docx)
-
-    def pcm_answer(self, paragraph):
-        paragraph.add_run(self.str_comittee_header)
-        paragraph.add_run(
-            # pylint: disable=no-member
-            ' ' + self.get_advisor_response_display().upper()).font.bold = True
-        # paragraph.add_run(self.str_pcmap[0].format(self.academic_period))
-        # if self.is_affirmative_response_advisor_response():
-        #    self.pcm_answers_cr(paragraph)
-        # else:
-        #    self.pcm_answers_cn(paragraph)
