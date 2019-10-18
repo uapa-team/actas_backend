@@ -2,16 +2,20 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
 from mongoengine import StringField, IntField, FloatField, EmbeddedDocumentListField, BooleanField, DateField
 from ..models import Request, Subject
-from .case_utils import table_subjects, add_analysis_paragraph, num_to_month, table_change_typology
+from .case_utils import table_subjects, add_analysis_paragraph, num_to_month, table_change_typology, table_approvals
 
 
 class ChangeTipologySubject(Subject):
     new_tipology = StringField(
-        required=True, choices=Subject.TIP_CHOICES, display='Tipología')
+        required=True, choices=Subject.TIP_CHOICES, display='Nueva tipología')
+    grade = StringField(display='Nota obtenida')
 
 
 class HomologationSubject(Subject):
-    pass
+    period = StringField(display='Periodo de vista la materia')
+    grade = StringField(display='Nota obtenida')
+    new_grade = StringField(display='Nota a homologar')
+    new_name = StringField(display='Nombre de la materia a homologar')
 
 
 class CPER(Request):
@@ -27,6 +31,8 @@ class CPER(Request):
     subjects_homologations = EmbeddedDocumentListField(
         HomologationSubject, display='Asignaturas equivalencia')
 
+    regulation_list = ['032|2010|CSU', '1416|2013|REC']  # List of regulations
+
     str_cm = [
         'traslado intrafacultad del estudiante de {} ({}) en el perfil de {} al plan de estudios ' +
         '{} ({}) en el perfil de {}, debido a que {}justifica adecuadamente su solicitud.',
@@ -36,10 +42,13 @@ class CPER(Request):
     ]
 
     def cm(self, docx):
-        if len(self.subjects_change_tipology) == 0 and len(self.subjects_homologations) == 0:
-            self.cm_answer_no_subjects(docx)
+        affirmative = self.is_affirmative_response_approval_status()
+        has_subjects = len(self.subjects_change_tipology) + \
+            len(self.subjects_homologations) > 0
+        if affirmative and has_subjects:
+            self.answer_subjects(docx, self.str_council_header + ': ')
         else:
-            self.cm_answer_subjects(docx)
+            self.answer_no_subjects(docx, self.str_council_header + ': ')
 
     def cm_answer(self, paragraph):
         paragraph.add_run(
@@ -53,42 +62,42 @@ class CPER(Request):
             self.get_academic_program_display(),
             self.academic_program,
             self.get_destin_profile_display(),
-            '' if self.is_affirmative_response_approval_status else 'no'))
+            '' if self.is_affirmative_response_approval_status() else 'no'))
 
-    def cm_answer_no_subjects(self, docx):
-        paragraph = docx.add_paragraph()
-        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        paragraph.paragraph_format.space_after = Pt(0)
-        paragraph.add_run(self.str_council_header + ': ')
+    def answer_no_subjects(self, docx, str_in):
+        paragraph = self.answer_paragraph_normal(docx)
+        paragraph.add_run(str_in)
         self.cm_answer(paragraph)
 
-    def cm_answer_w_bullets(self, docx):
+    def answer_paragraph(self, docx, style):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
-        paragraph.add_run(self.str_council_header + ': ')
-
-    def cm_answer_w_bullets_add_bullet(self, docx):
-        paragraph = docx.add_paragraph()
-        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        paragraph.paragraph_format.space_after = Pt(0)
-        paragraph.style = 'List Bullet'
+        paragraph.style = style
         return paragraph
 
-    def cm_answer_subjects(self, docx):
-        self.cm_answer_w_bullets(docx)
-        paragraph = self.cm_answer_w_bullets_add_bullet(docx)
+    def answer_paragraph_normal(self, docx):
+        return self.answer_paragraph(docx, 'Normal')
+
+    def answer_add_bullet(self, docx):
+        return self.answer_paragraph(docx, 'List Bullet')
+
+    def answer_subjects(self, docx, str_in):
+        paragraph = self.answer_paragraph_normal(docx)
+        paragraph.add_run(str_in)
+        paragraph = self.answer_add_bullet(docx)
         self.cm_answer(paragraph)
         if len(self.subjects_change_tipology) != 0:
-            paragraph = self.cm_answer_w_bullets_add_bullet(docx)
+            paragraph = self.answer_add_bullet(docx)
             paragraph.add_run(
                 # pylint: disable=no-member
                 self.get_approval_status_display().upper() + ' ').font.bold = True
             paragraph.add_run(self.str_cm[1].format(
                 # pylint: disable=no-member
                 self.get_academic_program_display(), self.academic_program))
+            self.add_subjects_change_tipology_table(docx)
         if len(self.subjects_homologations) != 0:
-            paragraph = self.cm_answer_w_bullets_add_bullet(docx)
+            paragraph = self.answer_add_bullet(docx)
             paragraph.add_run(
                 # pylint: disable=no-member
                 self.get_approval_status_display().upper() + ' ').font.bold = True
@@ -100,9 +109,62 @@ class CPER(Request):
                 self.get_academic_program_display(),
                 self.academic_program,
                 self.get_destin_profile_display()))
+            self.add_subjects_homologation_table(docx)
+
+    def add_subjects_change_tipology_table(self, docx):
+        subjects = []
+        for subject in self.subjects_change_tipology:
+            subjects.append([
+                subject.code,
+                subject.name,
+                subject.grade,
+                subject.tipology[1],
+                subject.new_tipology[1]
+            ])
+        table_change_typology(docx, subjects)
+
+    def add_subjects_homologation_table(self, docx):
+        subjects = []
+        for subject in self.subjects_homologations:
+            subjects.append([
+                subject.period,
+                subject.code,
+                subject.name,
+                str(subject.credits),
+                subject.tipology[1],
+                subject.new_grade,
+                subject.new_name,
+                subject.grade
+            ])
+        table_approvals(docx, subjects, [
+            self.student_name,
+            self.student_dni,
+            self.academic_program,
+            'perfil de {}'.format(
+                # pylint: disable=no-member
+                self.get_destin_profile_display()
+            )
+        ])
 
     def pcm(self, docx):
-        pass
+        affirmative = self.is_affirmative_response_advisor_response()
+        has_subjects = len(self.subjects_change_tipology) + \
+            len(self.subjects_homologations) > 0
+        if affirmative and has_subjects:
+            self.answer_subjects(docx, self.str_comittee_header + ': ')
+        else:
+            self.answer_no_subjects(docx, self.str_comittee_header + ': ')
 
     def pcm_answer(self, paragraph):
-        pass
+        paragraph.add_run(
+            # pylint: disable=no-member
+            self.get_advisor_response_display().upper() + ' ').font.bold = True
+        paragraph.add_run(self.str_cm[0].format(
+            # pylint: disable=no-member
+            self.get_academic_program_display(),
+            self.academic_program,
+            self.get_origin_profile_display(),
+            self.get_academic_program_display(),
+            self.academic_program,
+            self.get_destin_profile_display(),
+            '' if self.is_affirmative_response_advisor_response() else 'no'))
