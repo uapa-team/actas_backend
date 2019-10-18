@@ -108,6 +108,7 @@ class REIN(Request):
     credits_granted = IntField(display='Créditos otorgados')
 
     str_pcm_pre = [
+        # Used in pcm and cm:
         'reingreso por única vez a partir del periodo académico ',
         '. Si el estudiante no renueva su matrícula en el semestre de reingreso, el acto' +
         ' académico expedido por el Consejo de Facultad queda sin efecto.',
@@ -115,7 +116,29 @@ class REIN(Request):
         '2. Información Académica:',
         '3. Resumen general de créditos del plan de estudios:',
         '*Sin incluir los créditos correspondientes al cumplimiento del requisito de' +
-        ' suficiencia en idioma.'
+        ' suficiencia en idioma.',
+
+        # Used only in pcm:
+        'El señor ',
+        ' tiene pendiente por aprobar ',
+        ' créditos del plan de estudios de ',
+        ' y ',
+        ' créditos del requisito de nivelación',
+        ' - inglés, con un cupo disponible para inscripción de ',
+        ' créditos.',
+        'El parágrafo del artículo 11 del ',
+        'Superior Universitario establece: ',
+        '"Los créditos adicionales que como resultado del ' +
+        'proceso de clasificación en la admisión deba aprobar ' +
+        'un estudiante de pregrado, se sumarán por única vez al "' +
+        'cupo adicional de créditos para inscripción"',
+        ', por lo tanto solo es viable otorgar ',
+        ' crédito(s) para la inscripción de asignaturas pendientes del plan de estudios de ',
+
+        # Extra credits (optional):
+        'y otorga ',
+        ' crédito(s) adicional(es) para culminar su plan de estudios. '
+
     ]
 
     str_pcm_pre_acadinfo = [
@@ -353,35 +376,49 @@ class REIN(Request):
         self.rein_credits_summary(docx)
         self.rein_recommends(docx)
 
-    def pcm_answer(self, paragraph):
-        paragraph.add_run(self.str_council_header + ' ')
-        paragraph.add_run(
-            # pylint: disable=no-member
-            self.get_approval_status_display().upper() + ' ').font.bold = True
-
-        paragraph.add_run(self.str_pcm_pre[0])
-        paragraph.add_run(self.academic_period + ' ')
-
-        if self.credits_granted > 0:
-            # Y otorga n créditos adicionales:
-            self.extra_credits(paragraph)
-
-        paragraph.add_run('({}).'.format(
-            self.regulations['012|2014|VRA'][0] + "; Artículo 46, " +
-            self.regulations['008|2008|CSU'][0]))
-
     def cm(self, docx):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
-        self.pcm_answer(paragraph)
+        self.cm_answer(paragraph)
         self.rein_general_data_table(docx)
         self.rein_academic_info(docx)
         self.rein_credits_summary(docx)
         self.rein_recommends(docx)
 
+    def pcm_answer(self, paragraph):
+        paragraph.add_run(self.str_comittee_header + ' ')
+        standard_answer(self, paragraph)
+
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.paragraph_format.space_after = Pt(0)
+        para.add_run(str_pcm_pre[6] + self.student_name +
+                     str_pcm_pre[7] + str(self.credits_remaining))
+        para.add_run(str_pcm_pre[8] +
+                     self.get_academic_program_display())
+        para.add_run(
+            str_pcm_pre[9] + str(self.credits_english) + str_pcm_pre[10])
+        para.add_run(str_pcm_pre[11])
+        para.add_run(str(self.credits_remaining +
+                         self.credits_minus_remaining))
+        para.add_run(str_pcm_pre[12])
+        para = docx.add_paragraph()
+        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        para.paragraph_format.space_after = Pt(0)
+        para.add_run(
+            str_pcm_pre[13] + self.regulations['008|2008|CSU'][0])
+        para.add_run(str_pcm_pre[14])
+        para.add_run(str_pcm_pre[15]).font.italic = True
+        para.add_run(str_pcm_pre[16] + str(self.credits_granted))
+        para.add_run(str_pcm_pre[17])
+        para.add_run(self.get_academic_program_display() + '.')
+
     def cm_answer(self, paragraph):
         paragraph.add_run(self.str_council_header + ' ')
+        standard_answer(self, paragraph)
+
+    def standard_answer(self, paragraph):
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True
