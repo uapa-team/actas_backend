@@ -3,7 +3,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from mongoengine import StringField, BooleanField, IntField, ListField, \
     EmbeddedDocument, EmbeddedDocumentListField
 from ..models import Request
-from .case_utils import add_analysis_paragraph, string_to_date
+from .case_utils import add_analysis_paragraph
 
 
 class APGD(Request):
@@ -85,18 +85,19 @@ class APGD(Request):
               'del',
               'de la institución',
               'de',
-              'cuyo título es']
+              'cuyo título es',
+              'Debido a que']
 
-    list_analysis = ['Perfil de {}',
+    list_analysis = ['Perfil de {}.',
                      'El estudiante {}tiene inscrita la asignatura {}.',
-                     'Estudiante de {} matrícula.',
-                     'regó CD.',
-                     'Tiene la firma del (los) director(es) de tesis/trabajo final:',
+                     'Estudiante de matrícula número {}.',
+                     'ntregó CD.',
+                     'iene la firma del (los) director(es) de tesis/trabajo final:',
                      'El proyecto de tesis debe inscribirse y entregarse, antes de alcanzar el 50' +
                      '% de la duración establecida para el programa (Parágrafo Artículo 14 del ' +
                      '{})',
                      'Título:',
-                     'Objetivo general',
+                     'Objetivo general:',
                      'Objetivos específicos:']
 
     def cm(self, docx):
@@ -105,7 +106,14 @@ class APGD(Request):
         paragraph.paragraph_format.space_after = Pt(0)
         self.cm_answer(paragraph)
         self.cm_grade(docx)
-        self.cm_design(docx)
+        if self.is_affirmative_response_approval_status():
+            self.cm_design(docx)
+        else:
+            paragraph = docx.add_paragraph()
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.add_run(
+                ' ' + self.str_cm[8] + ' ' + self.council_decision + '.')
 
     def cm_answer(self, paragraph):
         paragraph.add_run(self.str_council_header + ' ')
@@ -115,42 +123,78 @@ class APGD(Request):
 
     def pcm(self, docx):
         self.pcm_analysis(docx)
-        self.pcm_answer(docx)
-
-    def pcm_answer(self, docx):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        self.pcm_answer(paragraph)
+        self.cm_grade(docx)
+        if self.is_affirmative_response_advisor_response():
+            self.cm_design(docx)
+        else:
+            paragraph = docx.add_paragraph()
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.add_run(
+                ' ' + self.str_cm[8] + ' ' + self.council_decision + '.')
+
+    def pcm_answer(self, paragraph):
         paragraph.add_run(self.str_answer + ': ').font.bold = True
         paragraph.add_run(self.str_comittee_header + ' ')
-        # pylint: disable=no-member
         paragraph.add_run(
-            self.get_advisor_response_display().upper() + ' ').font.bold = True
-        paragraph.add_run(self.str_cm[0].format(
-            self.grade_proyect, self.get_grade_proyect_display(),
-            self.get_grade_option_display(), self.get_academic_program_display()))
+            self.get_advisor_response_display().upper() + ':').font.bold = True
 
     def pcm_analysis(self, docx):
+        # pylint: disable=no-member
         if self.grade_option in [self.GO_TESIS_MAESTRIA, self.GO_TESIS_DOCTORADO]:
             profile = 'investigación'
         else:
             profile = 'profundización'
+        type_subject = 'Proyecto' if self.grade_option in [
+            self.GO_TESIS_MAESTRIA, self.GO_TESIS_DOCTORADO] else 'Propuesta'
         final_analysis = []
         final_analysis += [self.list_analysis[0].format(profile)]
-        ets = ''  # if self.enrolled_thesis else 'no '
-        # pylint: disable=no-member
+        ets = '' if self.enrolled_proyect else 'no '
         final_analysis += [self.list_analysis[1].format(
-            ets, self.get_grade_option_display())]
+            ets, type_subject + ' ' + self.get_grade_option_display())]
         final_analysis += [self.list_analysis[2].format(
-            string_to_date(str(self.date_start)),
-            string_to_date(str(self.date_finish)))]
-        final_analysis += [self.list_analysis[3].format(
-            self.place)]
-        pss = '' if self.format_present else 'no '
-        final_analysis += [self.list_analysis[4].format(pss)]
-        for extra_a in self.extra_analysis:
-            final_analysis += [extra_a]
+            self.enrroled_periods)]
+        cdd = 'E' if self.cd_delivered else 'No e'
+        final_analysis += [cdd + self.list_analysis[3]]
+        hss = 'T' if self.have_signature else 'No t'
+        final_analysis += [hss + self.list_analysis[4] +
+                           ' ' + self.advisor + '.']
+        final_analysis += [self.list_analysis[5].format(
+            Request.regulations['056|2012|CSU'][0]) + '.']
         add_analysis_paragraph(docx, final_analysis)
+        paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.style = 'List Bullet'
+        paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.list_analysis[6] + ' ').font.bold = True
+        paragraph.add_run(self.title + '.').font.italic = True
+        paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.style = 'List Bullet'
+        paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.list_analysis[7] + ' ').font.bold = True
+        paragraph.add_run(self.general_objetive + '.')
+        paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.style = 'List Bullet'
+        paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.list_analysis[8]).font.bold = True
+        for spec_ob in self.specific_objetives:
+            paragraph = docx.add_paragraph()
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            paragraph.style = 'List Bullet 2'
+            paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.add_run(spec_ob + '.')
+        for ex_an in self.extra_analysis:
+            paragraph = docx.add_paragraph()
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            paragraph.style = 'List Bullet'
+            paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.add_run(ex_an + '.')
 
     def cm_grade(self, docx):
         # pylint: disable=no-member
@@ -176,7 +220,27 @@ class APGD(Request):
         paragraph.add_run(self.str_cm[3] + ' ')
         paragraph.add_run(self.advisor)
         if self.advisor_inst == Request.DP_EXTERNO_FACULTAD:
-            paragraph.add_run(' ' + self.str_cm[5] + ' ' + self.advisor_ext)
+            paragraph.add_run(
+                ' ' + self.str_cm[5] + ' ' + self.advisor_ext + '.')
         else:
             paragraph.add_run(
                 ' ' + self.str_cm[4] + ' ' + self.get_advisor_inst_display() + '.')
+        if self.co_advisor_list != []:
+            for co_advc in self.co_advisor_list:
+                paragraph = docx.add_paragraph()
+                paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+                paragraph.style = 'List Bullet'
+                paragraph.paragraph_format.space_after = Pt(0)
+                paragraph.add_run(self.str_cm[2] + ' ')
+                paragraph.add_run(
+                    self.str_cm[6] + ' ' + self.get_grade_option_display() + ' ' + self.str_cm[7])
+                paragraph.add_run(' "{}" '.format(
+                    self.title)).font.italic = True
+                paragraph.add_run(self.str_cm[3] + ' ')
+                paragraph.add_run(co_advc.name_co_advisor)
+                if co_advc.inst_co_advisor == Request.DP_EXTERNO_FACULTAD:
+                    paragraph.add_run(
+                        ' ' + self.str_cm[5] + ' ' + co_advc.co_advisor_ext + '.')
+                else:
+                    paragraph.add_run(
+                        ' ' + self.str_cm[4] + ' ' + co_advc.get_inst_co_advisor_display() + '.')
