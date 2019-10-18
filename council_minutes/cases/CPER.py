@@ -41,6 +41,15 @@ class CPER(Request):
         ' programa {} ({}) perfil de {}:'
     ]
 
+    str_pcm = [
+        'traslado intrafacultad del estudiante de {} ({}) en el perfil de {} al plan de estudios ' +
+        '{} ({}) en el perfil de {}.',
+        'Se cursa la materia {} ({}), con la tipología {} ({}) y se solicita hacer el cambio a la' +
+        ' tipología {} ({}).',
+        'Se cursa la materia {} ({}), en el periodo {}, y se solicita equivaler a la materia {} (' +
+        '{}), con nota obtenida {} y nota equivalente {}.'
+    ]
+
     def cm(self, docx):
         affirmative = self.is_affirmative_response_approval_status()
         has_subjects = len(self.subjects_change_tipology) + \
@@ -147,6 +156,7 @@ class CPER(Request):
         ])
 
     def pcm(self, docx):
+        self.pcm_analysis(docx)
         affirmative = self.is_affirmative_response_advisor_response()
         has_subjects = len(self.subjects_change_tipology) + \
             len(self.subjects_homologations) > 0
@@ -168,3 +178,36 @@ class CPER(Request):
             self.academic_program,
             self.get_destin_profile_display(),
             '' if self.is_affirmative_response_advisor_response() else 'no'))
+
+    def pcm_analysis(self, docx):
+        analysis_list = []
+        analysis_list += [self.str_pcm[0].format(
+            # pylint: disable=no-member
+            self.get_academic_program_display(),
+            self.academic_program,
+            self.get_origin_profile_display(),
+            self.get_academic_program_display(),
+            self.academic_program,
+            self.get_destin_profile_display(),
+        )]
+        for subject in self.subjects_change_tipology:
+            analysis_list += [self.str_pcm[1].format(
+                subject.name,
+                subject.code,
+                subject.get_tipology_display(),
+                subject.tipology[1],
+                subject.get_new_tipology_display(),
+                subject.new_tipology[1],
+            )]
+        for subject in self.subjects_homologations:
+            analysis_list += [self.str_pcm[2].format(
+                subject.name,
+                subject.code,
+                subject.period,
+                subject.new_name,
+                subject.code,
+                subject.grade,
+                subject.new_grade
+            )]
+        analysis_list += self.extra_analysis
+        add_analysis_paragraph(docx, analysis_list)
