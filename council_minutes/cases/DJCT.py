@@ -10,19 +10,10 @@ class DJCT(Request):
 
     full_name = 'Designación de jurados calificadores de Tesis/Trabajo Final'
 
-    GO_TRABAJO_FINAL_MAESTRIA = 'TFM'
-    GO_TESIS_MAESTRIA = 'TSM'
-    GO_TESIS_DOCTORADO = 'TSD'
-    GO_CHOICES = (
-        (GO_TRABAJO_FINAL_MAESTRIA, 'Trabajo Final de Maestría'),
-        (GO_TESIS_MAESTRIA, 'Tesis de Maestría'),
-        (GO_TESIS_DOCTORADO, 'Tesis de Doctorado')
-    )
-
     node = StringField(
         display='Perfil', choices=Request.PROFILE_CHOICES, default=Request.PROFILE_DEFAULT)
     grade_option = StringField(
-        required=True, choices=GO_CHOICES, display='Opción de grado')
+        required=True, choices=Request.GRADE_OPTION_CHOICES, display='Opción de grado')
     advisor = StringField(required=True, display='Director')
     title = StringField(
         requiered=True, display='Título de Tesis/Trabajo Final')
@@ -120,7 +111,7 @@ class DJCT(Request):
         self.pcm_answer(paragraph)
 
     def pcm_analysis_handler(self, docx):
-        if self.grade_option != self.GO_TESIS_DOCTORADO:
+        if self.grade_option != Request.GRADE_OPTION_TESIS_DOCTORADO:
             analysis = self.pcm_analysis_magister()
         else:
             analysis = self.pcm_analysis_phd()

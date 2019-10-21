@@ -361,6 +361,15 @@ class Request(DynamicDocument):
         (PROFILE_DEFAULT, ''),
     )
 
+    GRADE_OPTION_TRABAJO_FINAL_MAESTRIA = 'TFM'
+    GRADE_OPTION_TESIS_MAESTRIA = 'TSM'
+    GRADE_OPTION_TESIS_DOCTORADO = 'TSD'
+    GRADE_OPTION_CHOICES = (
+        (GRADE_OPTION_TRABAJO_FINAL_MAESTRIA, 'Trabajo Final de Maestría'),
+        (GRADE_OPTION_TESIS_MAESTRIA, 'Tesis de Maestría'),
+        (GRADE_OPTION_TESIS_DOCTORADO, 'Tesis de Doctorado')
+    )
+
     _cls = StringField(required=True)
     date_stamp = DateField(required=True, default=datetime.date.today)
     user = StringField(max_length=255, required=True)
