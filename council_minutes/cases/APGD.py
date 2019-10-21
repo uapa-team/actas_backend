@@ -138,6 +138,7 @@ class APGD(Request):
                 ' ' + self.str_cm[8] + ' ' + self.council_decision + '.')
 
     def pcm_answer(self, paragraph):
+        # pylint: disable=no-member
         paragraph.add_run(self.str_answer + ': ').font.bold = True
         paragraph.add_run(self.str_comittee_header + ' ')
         paragraph.add_run(
