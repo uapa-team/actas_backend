@@ -386,20 +386,22 @@ class Request(DynamicDocument):
         StringField(), default=[], display='Analisis Extra')
 
     regulations = {
-        '008|2008|CSU': ('Acuerdo 008 de 2008 del Consejo Superior Universitario',
-                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34983'),
-        '051|2003|CSU': ('Resolución 051 de 2003 del Consejo Superior Universitario',
-                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=35163'),
-        '070|2009|CA': ('Acuerdo 070 de 2009 de Consejo Académico',
-                        'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=35443'),
-        '026|2012|CSU': ('Acuerdo 026 de 2012 del Consejo Superior Universitario',
-                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=47025'),
-        '40|2017|CSU':  ('Acuerdo 40 de 2012 del Consejo Superior Universitario',
-                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=89183'),
-        '032|2010|CSU': ('Acuerdo 032 de 2010 del Consejo Superior Universitario',
-                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=39424'),
+        '008|2008|CSU':  ('Acuerdo 008 de 2008 del Consejo Superior Universitario',
+                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34983'),
+        '051|2003|CSU':  ('Resolución 051 de 2003 del Consejo Superior Universitario',
+                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=35163'),
+        '070|2009|CA':   ('Acuerdo 070 de 2009 de Consejo Académico',
+                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=35443'),
+        '026|2012|CSU':  ('Acuerdo 026 de 2012 del Consejo Superior Universitario',
+                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=47025'),
+        '40|2017|CSU':   ('Acuerdo 40 de 2012 del Consejo Superior Universitario',
+                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=89183'),
+        '032|2010|CSU':  ('Acuerdo 032 de 2010 del Consejo Superior Universitario',
+                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=39424'),
         '1416|2013|REC': ('Resolución 1416 de 2013 de Rectoría',
-                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=60849')
+                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=60849'),
+        '2|2012|CFA':    ('Acuerdo 2 de 2012 de Consejo de Facultad',
+                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=50509')
     }
 
     assertionerror = {
