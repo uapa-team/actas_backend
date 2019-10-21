@@ -1,7 +1,7 @@
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
 from mongoengine import StringField, DateField, BooleanField
-from mongoengine import EmbeddedDocumentListField, EmbeddedDocument
+from mongoengine import EmbeddedDocumentListField
 from ..models import Request, Professor
 from .case_utils import add_analysis_paragraph
 
@@ -9,15 +9,6 @@ from .case_utils import add_analysis_paragraph
 class DJCT(Request):
 
     full_name = 'Designación de jurados calificadores de Tesis/Trabajo Final'
-
-    NODE_PROFUNDIZACION = 'PF'
-    NODE_INVESTIGACION = 'IN'
-    NODE_DEFAULT = ''
-    NODE_CHOICES = (
-        (NODE_PROFUNDIZACION, 'Profundización'),
-        (NODE_INVESTIGACION, 'Investigación'),
-        (NODE_DEFAULT, '')
-    )
 
     GO_TRABAJO_FINAL_MAESTRIA = 'TFM'
     GO_TESIS_MAESTRIA = 'TSM'
@@ -29,7 +20,7 @@ class DJCT(Request):
     )
 
     node = StringField(
-        display='Perfil', choices=NODE_CHOICES, default=NODE_DEFAULT)
+        display='Perfil', choices=Request.PROFILE_CHOICES, default=Request.PROFILE_DEFAULT)
     grade_option = StringField(
         required=True, choices=GO_CHOICES, display='Opción de grado')
     advisor = StringField(required=True, display='Director')

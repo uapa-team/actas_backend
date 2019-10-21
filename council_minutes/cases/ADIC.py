@@ -9,8 +9,8 @@ class ADIC(Request):
 
     full_name = 'Adición de codirector'
 
-    # TODO: node choices
-    node = StringField(required=True, display='Perfil')
+    node = StringField(required=True, choices=Request.PROFILE_CHOICES,
+                       default=Request.PROFILE_DEFAULT, display='Perfil')
     title = StringField(required=True, display='Título de Tesis/Trabajo Final')
     council_number = StringField(
         required=True, max_length=2, default='00', display='# Acta de cancelación')
@@ -26,7 +26,8 @@ class ADIC(Request):
         'aprobado en el acta {} de {}, al(los) profesor(es) '
     ]
     str_pcm = [
-        'SIA: {}, perfil de {}.',
+        'SIA: {}{}.',
+        ', perfil de {}',
         'Aprobación de propuesta y designación de director en el Acta No. {} de {} ' +
         'del Consejo de la Facultad de Ingeniería.'
     ]
@@ -60,16 +61,23 @@ class ADIC(Request):
         self.add_text(paragraph)
 
     def fill_analysis(self):
+        # pylint: disable=no-member
+        if self.node != Request.PROFILE_DEFAULT:
+            modifier = self.str_pcm[1].format(self.get_node_display())
+        else:
+            modifier = ''
+
         return [
             self.str_pcm[0].format(
-                self.get_academic_program_display(), self.node),
-            self.str_pcm[1].format(
+                self.get_academic_program_display(), modifier),
+            self.str_pcm[2].format(
                 self.council_number, self.council_year
             )
         ] + self.extra_analysis
 
     def add_text(self, paragraph):
         paragraph.add_run(self.str_cm[0].format(
+            # pylint: disable=no-member
             self.get_academic_program_display()))
         paragraph.add_run('"{}" '.format(self.title)).font.italic = True
         paragraph.add_run(self.str_cm[1].format(

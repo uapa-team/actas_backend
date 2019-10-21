@@ -352,6 +352,15 @@ class Request(DynamicDocument):
         (DP_EMPTY, ''),
     )
 
+    PROFILE_INVE = 'I'
+    PROFILE_PROF = 'P'
+    PROFILE_DEFAULT = ''
+    PROFILE_CHOICES = (
+        (PROFILE_INVE, 'Investigación'),
+        (PROFILE_PROF, 'Profundización'),
+        (PROFILE_DEFAULT, ''),
+    )
+
     _cls = StringField(required=True)
     date_stamp = DateField(required=True, default=datetime.date.today)
     user = StringField(max_length=255, required=True)
