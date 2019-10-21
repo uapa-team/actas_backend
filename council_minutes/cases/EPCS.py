@@ -49,6 +49,16 @@ class EPCS(Request):
         'ecido en el Artículo 2 del {}.'
     ]
 
+    str_pcm = [
+        'SIA: Admitido al programa {} en perfil de {}.',
+        'e matriculó en un programa de posgrado de la Universidad en el año siguiente a la culmin' +
+        'ación de sus estudios de pregrado. Culminó sus estudios en el periodo {} e ingresó al po' +
+        'sgrado en {}.',
+        'Presenta la solicitud dentro de las fechas límite establecidas por el reglamento: 2 sema' +
+        'nas después de la publicación de resultados de admitidos.',
+        'La fecha límite para presentar la solicitud fue el {}.',
+    ]
+
     str_pcm = ['']
 
     def cm(self, docx):
