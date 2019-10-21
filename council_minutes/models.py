@@ -380,6 +380,8 @@ class Request(DynamicDocument):
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=48208'),
         '040|2017|COFA': ('Acuerdo 040 de 2017 de Consejo de Facultad',
                           'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=89183'),
+        '089|2014|CAC': ('Acuerdo 089 de 2014 del Consejo Académico',
+                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=66330'),
     }
 
     assertionerror = {
