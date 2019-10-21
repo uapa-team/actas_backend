@@ -1,7 +1,7 @@
 from docx.shared import Pt
 from num2words import num2words
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from mongoengine import StringField, IntField
+from mongoengine import StringField, IntField, BooleanField
 from ..models import Request
 from .case_utils import string_to_date, add_analysis_paragraph
 
@@ -23,7 +23,14 @@ class EPTU(Request):
         (CNA_OTRO, 'Otro')
     )
 
+    target_period = StringField(
+        display='Periodo para el que se realiza la solicitud')
     points = IntField(display='Cantidad de puntos a eximir')
+    academic_profile = StringField(
+        default='I', choices=Request.PROFILE_CHOICES, display='Perfil de programa curricular')
+    right_dates = BooleanField(
+        display='Realiza la solicitud en fecha adecuada')
+    periods_in = IntField(display='Periodos de exensión aplicada')
     cna = StringField(
         choices=CNA_CHOICES, default=CNA_OTRO, display='Motivo de rechazo')
 
@@ -40,12 +47,12 @@ class EPTU(Request):
 
     str_pcm = [
         'SIA: {} ({}), perfil de {}.',
-        'La solicitud {}está en fechas adecuadas para ser realizada.',
+        'La solicitud {}fue realizada en fechas adecuadas para ser válida.',
         'El incentivo se aplicará hasta por dos periodos académicos maestría y 5 periodos para do' +
         'ctorado (Literal c, Artículo 16). Ha tenido el incentivo {} periodos.',
         'Para solicitar o renovar este estímulo la evaluación por parte del director, del trabajo' +
         ' desarrollado por el estudiante, en la tesis o en el trabajo final, deberá ser "Avance S' +
-        'atisfactorio", si aplica.'
+        'atisfactorio", si aplica.',
         'Se exceptúa el caso en el cual un estudiante también cursa el último seminario del progr' +
         'ama simultáneamente con la tesis, en cuyo caso se le podrá conceder dicho estímulo.',
         'Estos beneficios no se podrán renovar si el estudiante pierde calidad de estudiante o en' +
@@ -68,8 +75,6 @@ class EPTU(Request):
         'porque no realiza debidamente la solicitud.',
     ]
 
-    str_pcm = ['']
-
     def cm(self, docx):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
@@ -85,10 +90,10 @@ class EPTU(Request):
             # pylint: disable=no-member
             num2words(self.points, lang='es'),
             self.points,
-            self.academic_period,
+            self.target_period,
             self.get_academic_program_display(),
             self.academic_program,
-            self.academic_period
+            self.target_period
         ) + '. ')
         paragraph.add_run(self.str_cm[1].format(
             Request.regulations[self.regulation_list[0]][0]))
@@ -113,14 +118,14 @@ class EPTU(Request):
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_advisor_response_display().upper()).font.bold = True
-        paragraph.add_run(self.str_cm[0].format(
+        paragraph.add_run(' ' + self.str_cm[0].format(
             # pylint: disable=no-member
             num2words(self.points, lang='es'),
             self.points,
-            self.academic_period,
+            self.target_period,
             self.get_academic_program_display(),
             self.academic_program,
-            self.academic_period
+            self.target_period
         ))
 
     def pcm_cna(self, paragraph):
@@ -139,13 +144,19 @@ class EPTU(Request):
     def pcm_analysis(self, docx):
         analysis_list = []
         analysis_list += [self.str_pcm[0].format(
+            # pylint: disable=no-member
             self.get_academic_program_display(),
             self.academic_program,
-            self.
+            self.get_academic_profile_display()
         )]
-        analysis_list += [self.str_pcm[1]]
-        analysis_list += [self.str_pcm[2]]
+        analysis_list += [self.str_pcm[1].format(
+            '' if self.right_dates else 'no '
+        )]
+        analysis_list += [self.str_pcm[2].format(
+            self.periods_in
+        )]
         analysis_list += [self.str_pcm[3]]
         analysis_list += [self.str_pcm[4]]
+        analysis_list += [self.str_pcm[5]]
         analysis_list += self.extra_analysis
         add_analysis_paragraph(docx, analysis_list)
