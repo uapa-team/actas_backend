@@ -1,9 +1,9 @@
 from docx.shared import Pt
 from num2words import num2words
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from mongoengine import DateField, StringField, IntField
+from mongoengine import DateField, StringField, IntField, BooleanField
 from ..models import Request
-from .case_utils import string_to_date, add_analysis_paragraph
+from .case_utils import num_to_month, add_analysis_paragraph
 
 
 class EPCS(Request):
@@ -31,6 +31,18 @@ class EPCS(Request):
         (HC_TUMACO, 'Sede Tumaco')
     )
 
+    academic_profile = StringField(
+        default='I', choices=Request.PROFILE_CHOICES, display='Perfil de programa curricular')
+    enrolled_before_preprogram = BooleanField(
+        display='Matriculado periodo posterior al pregrado')
+    finalized_period = StringField(
+        display='Periodo de culminación de estudios de pregrado')
+    initial_period = StringField(
+        display='Periodo de ingreso del posgrado')
+    is_in_right_date = BooleanField(
+        display='Solicitud realizada en fechas debidas')
+    right_date = DateField(
+        display='Fecha máxima para realizar solicitud.')
     points = IntField(display='Cantidad de puntos a eximir')
     # CARE: Choices must be all the programas in the university not only engineering faculty
     bacheilor_program = StringField(
@@ -50,22 +62,22 @@ class EPCS(Request):
     ]
 
     str_pcm = [
-        'SIA: Admitido al programa {} en perfil de {}.',
-        'e matriculó en un programa de posgrado de la Universidad en el año siguiente a la culmin' +
-        'ación de sus estudios de pregrado. Culminó sus estudios en el periodo {} e ingresó al po' +
-        'sgrado en {}.',
-        'Presenta la solicitud dentro de las fechas límite establecidas por el reglamento: 2 sema' +
-        'nas después de la publicación de resultados de admitidos.',
+        'SIA: Admitido al programa {} ({}) en perfil de {}.',
+        'En el año posterior a la culminación de sus estudios de pregrado, el estudiante {}estuvo' +
+        ' matriculado en un programa de posgrado. Culminó sus estudios en el periodo {} e ingresó' +
+        ' al posgrado en el periodo {}.',
+        'La solicitud {}es presentada dentro de las fechas límite establecidas por el reglamento:' +
+        ' 2 semanas después de la publicación de resultados de admitidos.',
         'La fecha límite para presentar la solicitud fue el {}.',
     ]
-
-    str_pcm = ['']
 
     def cm(self, docx):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
         self.cm_answer(paragraph)
+        paragraph.add_run(self.str_cm[1].format(
+            Request.regulations[self.regulation_list[0]][0]))
 
     def cm_answer(self, paragraph):
         paragraph.add_run(self.str_council_header + ' ')
@@ -81,31 +93,52 @@ class EPCS(Request):
             self.bacheilor_program,
             self.get_headquarters_display()
         ))
-        paragraph.add_run(self.str_cm[1].format(
-            Request.regulations[self.regulation_list[0]][0]))
 
     def pcm(self, docx):
         self.pcm_analysis(docx)
-        self.pcm_answer(docx)
-
-    def pcm_answer(self, docx):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(self.str_answer + ': ').font.bold = True
         paragraph.add_run(self.str_comittee_header + ' ')
+        self.pcm_answer(paragraph)
+        paragraph.add_run(self.str_cm[1].format(
+            Request.regulations[self.regulation_list[0]][0]))
+
+    def pcm_answer(self, paragraph):
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_advisor_response_display().upper()).font.bold = True
-        paragraph.add_run(' ' + self.str_cm[0].format(self.academic_period))
-        if self.is_affirmative_response_advisor_response():
-            self.pcm_answers_af(paragraph)
-        else:
-            self.pcm_answers_ng(paragraph)
+        paragraph.add_run(' ' + self.str_cm[0].format(
+            # pylint: disable=no-member
+            num2words(self.points, lang='es'),
+            self.points,
+            self.academic_period,
+            self.get_bacheilor_program_display(),
+            self.bacheilor_program,
+            self.get_headquarters_display()
+        ))
 
     def pcm_analysis(self, docx):
         analysis_list = []
-        analysis_list += [self.str_pcm[0].format()]
-        analysis_list += self.pcm_analysis_subject_list()
+        analysis_list += [self.str_pcm[0].format(
+            self.get_academic_program_display(),
+            self.academic_program,
+            self.get_academic_profile_display()
+        )]
+        analysis_list += [self.str_pcm[1].format(
+            '' if self.enrolled_before_preprogram else 'no ',
+            self.finalized_period,
+            self.initial_period
+        )]
+        analysis_list += [self.str_pcm[2].format(
+            '' if self.is_in_right_date else 'no '
+        )]
+        analysis_list += [self.str_pcm[3].format(
+            '{} de {} del {}'.format(
+                self.right_date.day,
+                num_to_month(self.right_date.month),
+                self.right_date.year
+            ))]
         analysis_list += self.extra_analysis
         add_analysis_paragraph(docx, analysis_list)
