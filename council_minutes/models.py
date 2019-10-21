@@ -411,6 +411,8 @@ class Request(DynamicDocument):
                           'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=50509')
         '002|2011|CFA':  ('Acuerdo No.002 de 2011 del Consejo de Facultad',
                           'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=42724')
+        '014|2008|CA':   ('Acuerdo 014 de 2008 del Consejo Académico',
+                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34127')
     }
 
     assertionerror = {
