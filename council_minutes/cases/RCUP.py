@@ -11,9 +11,13 @@ class RCUP(Request):
 
     index = IntField(min_value=0, default=1, display='No se')
 
-    regulation_list = []
+    regulation_list = ['008|2008|CSU']
 
-    str_cm = []
+    str_cm = [
+        'reserva de cupo adicional en el periodo académico {}, debido a que {}.',
+        'justifica debidamente la solicitud.',
+        '(Artículo 20 del {}).'
+    ]
     str_pcm = []
 
     def cm(self, docx):
@@ -27,6 +31,14 @@ class RCUP(Request):
         paragraph.add_run(self.str_council_header + ' ')
         paragraph.add_run(
             self.get_approval_status_display().upper() + ' ').font.bold = True
+        if self.is_affirmative_response_approval_status():
+            modifier = self.str_cm[1]
+        else:
+            modifier = self.council_decision
+        paragraph.add_run(self.str_cm[0].format(
+            self.academic_period, modifier))
+        paragraph.add_run(self.str_cm[2].format(
+            self.regulation[self.regulation_list[0]][0]))
 
     def pcm(self, docx):
         add_analysis_paragraph(docx, self.extra_analysis)
