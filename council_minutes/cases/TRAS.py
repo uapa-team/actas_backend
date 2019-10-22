@@ -1,11 +1,20 @@
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-#from mongoengine import StringField, BooleanField, ListField
-from ..models import Request
+from mongoengine import StringField, BooleanField, DateField, IntField
+from mongoengine import EmbeddedDocumentListField, FloatField
+from ..models import Request, Subject
 from .case_utils import add_analysis_paragraph
 
 
 class TRAS(Request):
+
+    class HomologatedSubject(Subject):
+        group = StringField()
+        name2 = StringField(required=True, display='Nuevo Nombre Asignatura')
+        code2 = StringField(required=True, display='Nuevo Código')
+        agroup = StringField(required=True, display='Agrupación')
+        grade = FloatField(min_value=0.0, required=True, display='Nota')
+        period = StringField(required=True, display='Periodo')
 
     full_name = 'Traslado de programa curricular'
 
@@ -17,6 +26,101 @@ class TRAS(Request):
         (TT_INTERFACULTY, 'Traslado Interfacultad'),
         (TT_INTRAFACULTY, 'Traslado Intrafacultad'),
     )
+    TC_BOGOTA = 'BOG'
+    TC_MEDELLIN = 'MED'
+    TC_MANIZALES = 'MAN'
+    TC_PALMIRA = 'PAL'
+    TC_LAPAZ = 'PAZ'
+    TC_CHOICES = (
+        (TC_BOGOTA, 'Bogotá'),
+        (TC_MEDELLIN, 'Medellín'),
+        (TC_MANIZALES, 'Manizales'),
+        (TC_PALMIRA, 'Palmira'),
+        (TC_LAPAZ, 'La Paz'),
+    )
+
+    at_least_one_period = BooleanField(
+        required=True, default=True,
+        display='¿Ha cursado por lo menos un periodo académico del primer plan de estudios?')
+    finish_first_plan = BooleanField(
+        required=True, default=False,
+        display='¿Ha culminado el primer plan de estudios?')
+    have_entitled_to_enrrol = BooleanField(
+        required=True, default=True,
+        display='¿Tiene derecho a renovar matrícula?')
+    enroled_number = IntField(
+        required=True, min_value=1, default=1,
+        display='Número de matrículas')
+    currently_studying_double_degree = BooleanField(
+        required=True, default=False,
+        display='¿Está cursando actualmente doble titulación?')
+    available_quota_for_transit = BooleanField(
+        required=True, default=True,
+        display='El cupo de créditos para traslado es suficiente?')
+    availabe_quota_number = IntField(
+        required=True, default=0, min_value=0,
+        display='Número de cupos ofertados para traslado')
+    campus_origin = StringField(
+        required=True, default=TC_BOGOTA, choices=TC_CHOICES,
+        display='Sede de origen')
+    transit_type = StringField(
+        required=True, default=TT_INTRAFACULTY, choices=TT_CHOICES,
+        display='Tipo de traslado')
+    admission_period = StringField(
+        required=True, display='Periodo de admisión del estudiante')
+    same_degree = BooleanField(
+        required=True, default=False,
+        display='¿Estos planes de estudios conducen al mismo título?')
+    transit_program_code = StringField(
+        required=True,
+        display='Código del plan de estudios de destino')
+    transit_program_name = StringField(
+        required=True,
+        display='Nombre del plan de estudios de destino')
+    enrroled = BooleanField(
+        required=True, default=True,
+        display='¿Se encuentra matriculado en el semestre de presentar la solicitud?')
+    prev_plan = BooleanField(
+        required=True, default=False,
+        display='¿Tuvo calidad de estudiante en el plan de estudios destino?')
+    completion_percentage = FloatField(
+        required=True, default=0.0, min_value=0.0, max_value=100.0,
+        display='Porcentaje de créditos aprobados en el plan de estudios origen')
+    student_admission_score = FloatField(
+        default=600.0, min_value=0.0,
+        display='Puntaje de admisión del solicitante')
+    last_admitted_score = FloatField(
+        default=600.0, min_value=0.0,
+        display='Puntaje de admisión del último admitido')
+    PAPA = FloatField(
+        default=3.0, min_value=0.0, max_value=5.0,
+        display='P.A.P.A.')
+    PAPA_in_threshold = BooleanField(
+        default=True,
+        display='¿El P.A.P.A. se encuentra dentro de la franja del 30% de los mejores?')
+    creds_miunus_remaining = IntField(
+        required=True, default=0, min_value=0,
+        display='Cupo de créditos menos pendientes en el plan de origen')
+    creds_for_transit = IntField(
+        required=True, default=0, min_value=0,
+        display='Cupo de créditos para traslado')
+    advisor_meeting_date = DateField(
+        display='Fecha de reunión del comité')
+    exiged_b_ob = IntField(
+        min_value=0, default=0, required=True,
+        display='Créditos exigidos fundamentación obligatorios')
+    exiged_b_op = IntField(
+        min_value=0, default=0, required=True,
+        display='Créditos exigidos fundamentación optativos')
+    exiged_c_ob = IntField(
+        min_value=0, default=0, required=True,
+        display='Créditos exigidos disciplinares obligatorios')
+    exiged_c_op = IntField(
+        min_value=0, default=0, required=True,
+        display='Créditos exigidos disciplinares optativos')
+    exiged_l = IntField(
+        min_value=0, default=0, required=True,
+        display='Créditos exigidos libre elección')
 
     regulation_list = ['008|2008|CSU', '089|2014|CAC']  # List of regulations
 
