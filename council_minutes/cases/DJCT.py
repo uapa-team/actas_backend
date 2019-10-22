@@ -25,14 +25,16 @@ class DJCT(Request):
     regulation_list = ['040|2017|COFA', '056|2012|CSU']
 
     str_cm = [
-        'designar como jurado calificador de {}, cuyo título es ',
+        'designar como {} de {}, cuyo título es ',
         'al(los) profesor(es): '
     ]
 
     str_pcm = [
-        'designar como jurado calificador de {}, cuyo título es ',
+        'designar como {} de {}, cuyo título es ',
         'al(los) profesor(es): '
     ]
+
+    names = ['jurado calificador', 'evaluador']
 
     str_pcm_mag = [
         'SIA: Perfil de {}. El estudiante tiene la asignatura {} ({}).',
@@ -67,15 +69,11 @@ class DJCT(Request):
         self.cm_answer(paragraph)
 
     def cm_answer(self, paragraph):
-        # pylint: disable=no-member
         paragraph.add_run(self.str_council_header + ' ')
         paragraph.add_run(
+            # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True
-        paragraph.add_run(self.str_cm[0].format(
-            self.get_grade_option_display()))
-        paragraph.add_run('"{}" '.format(self.title)).font.italic = True
-        paragraph.add_run(self.str_cm[1])
-        self.add_proffesors(paragraph)
+        self.add_text(paragraph)
 
     def pcm(self, docx):
         self.pcm_analysis_handler(docx)
@@ -87,7 +85,16 @@ class DJCT(Request):
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_advisor_response_display().upper() + ' ').font.bold = True
-        paragraph.add_run(self.str_pcm[0].format(self.grade_option))
+        self.add_text(paragraph)
+
+    def add_text(self, paragraph):
+        if self.grade_option == Request.GRADE_OPTION_TRABAJO_FINAL_MAESTRIA:
+            name = self.names[1]
+        else:
+            name = self.names[0]
+        paragraph.add_run(self.str_cm[0].format(
+            # pylint: disable=no-member
+            name, self.get_grade_option_display()))
         paragraph.add_run('"{}" '.format(self.title)).font.italic = True
         paragraph.add_run(self.str_pcm[1])
         self.add_proffesors(paragraph)
