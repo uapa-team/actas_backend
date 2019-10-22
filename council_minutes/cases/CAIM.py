@@ -22,6 +22,13 @@ class CAIM(Request):
         '(Artículo 15 del {}).'
     ]
 
+    str_pcm = [
+        'SIA: Porcentaje de avance en el plan: {}%. Número de matrículas: {}. P.A.P.A.: {}.',
+        ' SIA: Créditos disponibles: {}. ',
+        'SIA: Al aprobar la cancelación de la(s) asignatura(s) solicitada(s) el estudiante ' +
+        'quedaría con {} créditos inscritos.'
+    ]
+
     def cm(self, docx):
         if self.is_affirmative_response_advisor_response():
             self.cm_ap(docx)
@@ -69,3 +76,25 @@ class CAIM(Request):
             self.get_approval_status_display().upper() + ' ').font.bold = True
         # pylint: disable=no-member
         paragraph.add_run(self.str_cm[0].format(self.academic_period))
+
+    def pcm(self, docx):
+        self.pcm_analysis(docx)
+        paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_answer + ': ').bold = True
+        self.pcm_answer(paragraph)
+        table_subjects(docx, Subject.subjects_to_array(self.subjects))
+
+    def pcm_answer(self, paragraph):
+        paragraph.add_run(
+            # pylint: disable=no-member
+            self.get_approval_status_display().upper() + ' ').font.bold = True
+        # pylint: disable=no-member
+        paragraph.add_run(self.str_cm[0].format(self.academic_period))
+
+    def pcm_analysis(self, docx):
+        analysis_list = []
+        analysis_list += [self.str_pcm[0].format()]
+        analysis_list += self.extra_analysis
+        add_analysis_paragraph(docx, analysis_list)
