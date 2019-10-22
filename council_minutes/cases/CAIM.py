@@ -15,37 +15,53 @@ class CAIM(Request):
     regulation_list = ['008|2008|CSU']  # List of regulations
 
     str_cm = [
-        'cursar el periodo académico {} con un número de créditos inferior al mínimo exigido.',
+        'cursar el periodo académico {} con un número de créditos inferior al mínimo exigido, ',
         'Cancelar la(s) siguiente(s) asignatura(s) inscrita(s) del periodo {}.',
-        'debido a que {}realiza debidamente la solicitud.'
-        '(Artículo 10 del {}).'
+        'debido a que {}realiza debidamente la solicitud.',
+        '(Artículo 10 del {}).',
         '(Artículo 15 del {}).'
     ]
 
     def cm(self, docx):
+        if self.is_affirmative_response_advisor_response():
+            self.cm_ap(docx)
+        else:
+            self.cm_na(docx)
+
+    def cm_ap(self, docx):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(self.str_council_header + ':')
-        if self.is_affirmative_response_approval_status():
-            paragraph = docx.add_paragraph()
-            paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-            paragraph.style = 'List Bullet'
+        paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.style = 'List Bullet'
         self.cm_answer(paragraph)
         paragraph.add_run(self.str_cm[2].format(
             '' if self.is_affirmative_response_approval_status() else 'no '
-        ))
-        if self.is_affirmative_response_approval_status():
-            paragraph.add_run(self.str_cm[3].format(
-                Request.regulations[self.regulation_list[0]][0]))
-            paragraph = docx.add_paragraph()
-            paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-            paragraph.style = 'List Bullet'
-            paragraph.add_run(self.str_cm[1].format(
-                self.academic_period) + ' ')
-            paragraph.add_run(self.str_cm[4].format(
-                Request.regulations[self.regulation_list[0]][0]))
-            table_subjects(docx, Subject.subjects_to_array(self.subjects))
+        ) + ' ')
+        paragraph.add_run(self.str_cm[3].format(
+            Request.regulations[self.regulation_list[0]][0]))
+        paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.style = 'List Bullet'
+        paragraph.add_run(self.str_cm[1].format(
+            self.academic_period) + ' ')
+        paragraph.add_run(self.str_cm[4].format(
+            Request.regulations[self.regulation_list[0]][0]))
+        table_subjects(docx, Subject.subjects_to_array(self.subjects))
+
+    def cm_na(self, docx):
+        paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_council_header + ' ')
+        self.cm_answer(paragraph)
+        paragraph.add_run(self.str_cm[2].format(
+            '' if self.is_affirmative_response_approval_status() else 'no '
+        ) + ' ')
+        paragraph.add_run(self.str_cm[3].format(
+            Request.regulations[self.regulation_list[0]][0]))
 
     def cm_answer(self, paragraph):
         paragraph.add_run(
