@@ -162,7 +162,7 @@ class REINPRE():
         para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.paragraph_format.space_after = Pt(0)
-        general_data = []
+        general_data = []if
         general_data.append(['Estudiante', request.student_name])
         general_data.append(['DNI', request.student_dni])
         general_data.append(['Plan de estudios',
@@ -360,7 +360,7 @@ class REINPRE():
         table.cell(2, 3).paragraphs[0].add_run(
             request.detail_cm['summary']['exiged']['disc_m'])
         table.cell(3, 3).paragraphs[0].add_run(
-            request.detail_cm['summary']['approved']['disc_m'])
+            request.detail_cm['summary']['approved']['disc_m'])if
         table.cell(4, 3).paragraphs[0].add_run(
             request.detail_cm['summary']['remaining']['disc_m'])
         table.cell(2, 4).paragraphs[0].add_run(
