@@ -390,11 +390,13 @@ class Request(DynamicDocument):
         '051|2003|CSU': ('Resolución 051 de 2003 del Consejo Superior Universitario',
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=35163'),
         '008|2008|CSU': ('Acuerdo 008 de 2008 del Consejo Superior Universitario',
-                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34983'),  
+                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34983'),
         '239|2009|VRA': ('Resolución 239 de 2009 de Vicerrectoría Académica',
-                        'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34644'),
+                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34644'),
         '012|2014|VRA': ('Resolución 012 de 2014 de Vicerrectoría Académica',
-                        'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=62849')       
+                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=62849'),
+        '026|2012|CAC': ('Acuerdo 026 de 2012 del Consejo Académico',
+                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=47025'),
     }
 
     assertionerror = {

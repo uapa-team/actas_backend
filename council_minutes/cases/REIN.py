@@ -26,7 +26,8 @@ class REIN(Request):
 
     full_name = 'Reingreso'
 
-    regulation_list = ['008|2008|CSU', '012|2014|VRA', '239|2009|VRA']  # List of regulations
+    regulation_list = ['008|2008|CSU', '012|2014|VRA',
+                       '239|2009|VRA']  # List of regulations
 
     reing_period = StringField(required=True, display='Periodo de reingreso')
     loss_period = StringField(
@@ -425,16 +426,15 @@ class REIN(Request):
             # Y otorga n créditos adicionales:
             self.extra_credits(paragraph)
 
-        if(self.ispre()){
+        if self.ispre():
             paragraph.add_run('({}).'.format(
-            self.regulations['239|2009|VRA'][0] +
-            self.regulations['012|2014|VRA'][0] + "; Artículo 46, " +
-            self.regulations['008|2008|CSU'][0]))
-        }else{
+                self.regulations['239|2009|VRA'][0] +
+                self.regulations['012|2014|VRA'][0] + "; Artículo 46, " +
+                self.regulations['008|2008|CSU'][0]))
+        else:
             paragraph.add_run('({}).'.format(
-            self.regulations['012|2014|VRA'][0] + "; Artículo 46, " +
-            self.regulations['008|2008|CSU'][0]))
-        }
+                self.regulations['012|2014|VRA'][0] + "; Artículo 46, " +
+                self.regulations['008|2008|CSU'][0]))
 
     def pcm_pos_reasons(self, paragraph):
         ### Frequently used ###
@@ -476,7 +476,7 @@ class REIN(Request):
         p_aux = '{}iene PAPA superior o igual a 3.5 '
         p_aux += '(literal 3a – Artículo 3, Resolución 239 de 2009 de ' + \
             'Vicerrectoría Académica; Artículo 46, Acuerdo 008 de 2008 ' + \
-                'del Consejo Superior Universitario).'
+            'del Consejo Superior Universitario).'
         modifier = 'T' if float(details_pre['PAPA']) >= 3.5 else 'No t'
         p_aux += 'SIA PAPA: '
         para.add_run(p_aux.format(modifier))
