@@ -9,16 +9,32 @@ class RCUP(Request):
 
     full_name = 'Reserva de cupo adicional'
 
-    index = IntField(min_value=0, default=1, display='No se')
+    index = IntField(min_value=0, default=1,
+                     display='Reservas adicionales aprobadas')
 
     regulation_list = ['008|2008|CSU']
 
     str_cm = [
         'reserva de cupo adicional en el periodo académico {}, debido a que {}.',
-        'justifica debidamente la solicitud.',
+        'justifica debidamente la solicitud',
         '(Artículo 20 del {}).'
     ]
-    str_pcm = []
+
+    str_pcm_aff = [
+        'reserva de cupo adicional en el periodo académico {}, debido a que ' +
+        'justifica debidamente la solicitud. (Artículo 20 del {}).'
+    ]
+
+    str_pcm_neg = [
+        'reserva de cupo adicional en el periodo académico {}, teniendo ' +
+        'en cuenta que esta posibilidad es viable a continuación de la segunda reserva ' +
+        'de cupo automática. (Artículo 20 del {}).'
+    ]
+
+    analysis = [
+        'El comité de {} considera que la situación personal está debidamente justificada.',
+        'Se le han aprobado {} reservas de cupo adicionales.'
+    ]
 
     def cm(self, docx):
         paragraph = docx.add_paragraph()
@@ -38,10 +54,10 @@ class RCUP(Request):
         paragraph.add_run(self.str_cm[0].format(
             self.academic_period, modifier))
         paragraph.add_run(self.str_cm[2].format(
-            self.regulation[self.regulation_list[0]][0]))
+            self.regulations[self.regulation_list[0]][0]))
 
     def pcm(self, docx):
-        add_analysis_paragraph(docx, self.extra_analysis)
+        add_analysis_paragraph(docx, self.add_analysis())
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
@@ -53,3 +69,20 @@ class RCUP(Request):
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_advisor_response_display().upper() + ' ').font.bold = True
+
+        if self.is_affirmative_response_advisor_response():
+            value = self.str_pcm_aff[0]
+        else:
+            value = self.str_pcm_neg[0]
+        paragraph.add_run(value.format(
+            self.academic_period, self.regulations[self.regulation_list[0]][0]))
+
+    def add_analysis(self):
+        # pylint: disable=no-member
+        modifier = self.get_academic_program_display()
+        if not self.is_affirmative_response_advisor_response():
+            modifier += ' no'
+        return [
+            self.analysis[0].format(modifier),
+            self.analysis[1].format(self.index)
+        ] + self.extra_analysis
