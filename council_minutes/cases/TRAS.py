@@ -1,7 +1,7 @@
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from mongoengine import StringField, BooleanField, DateField, IntField
-from mongoengine import EmbeddedDocumentListField, FloatField
+from mongoengine import EmbeddedDocumentListField, FloatField, EmbeddedDocument
 from ..models import Request, Subject
 from .case_utils import add_analysis_paragraph
 
@@ -15,6 +15,20 @@ class TRAS(Request):
         agroup = StringField(required=True, display='Agrupación')
         grade = FloatField(min_value=0.0, required=True, display='Nota')
         period = StringField(required=True, display='Periodo')
+
+    class PendingSubject(EmbeddedDocument):
+        TIP_FUNDAMENTACION = 'B'
+        TIP_DISCIPLINAR = 'C'
+        TIP_CHOICES = (
+            (TIP_FUNDAMENTACION, 'Fundamentación'),
+            (TIP_DISCIPLINAR, 'Disciplinar'),
+        )
+        group = StringField(required=True, display='Agrupación')
+        name = StringField(required=True, display='Nombre Asignatura')
+        code = StringField(required=True, display='Código')
+        credits = IntField(required=True, display='Créditos')
+        tipology = StringField(
+            required=True, choices=TIP_CHOICES, display='Tipología')
 
     full_name = 'Traslado de programa curricular'
 
@@ -121,6 +135,14 @@ class TRAS(Request):
     exiged_l = IntField(
         min_value=0, default=0, required=True,
         display='Créditos exigidos libre elección')
+    equivalence = EmbeddedDocumentListField(
+        HomologatedSubject, required=True,
+        display="Asignaturas a homologar en el segundo plan de estudios")
+    remaining = EmbeddedDocumentListField(
+        PendingSubject, required=True,
+        display="Asignaturas pendientes por cursar en el segundo plan de estudios")
+    free_choice_pending = IntField(min_value=0, required=True,
+                                   display='Créditos pendientes de libre elección')
 
     regulation_list = ['008|2008|CSU', '089|2014|CAC']  # List of regulations
 
