@@ -11,9 +11,6 @@ class CGRU(Request):
 
     name = StringField(required=True, display='Nombre Asignatura')
     code = StringField(required=True, display='Código')
-    credits = IntField(required=True, display='Créditos')
-    tipology = StringField(
-        required=True, choices=Subject.TIP_CHOICES, display='Tipología')
     group = StringField(required=True, display='Grupo')
     new_group = StringField(required=True, display='Nuevo Grupo')
     free_places = IntField(required=True, min_value=0,
@@ -24,8 +21,18 @@ class CGRU(Request):
 
     regulation_list = ['008|2008|CSU']
 
-    str_cm = []
-    str_pcm = []
+    str_cm = [
+        'el cambio de grupo de la asignatura {} ({}) al grupo {} en el periodo {}, ' +
+        'debido a que {}.',
+        'justifica debidamente la solicitud'
+    ]
+
+    str_pcm = [
+        'El grupo {} de la asignatura {} ({}) cuenta con {} cupos.',
+        'cambio de grupo de la asignatura/actividad {}, código {}, ' +
+        'inscrita en el periodo {}, del grupo {} al grupo {} con ' +
+        'el profesor {} del {}, debido a que {}justifica debidamente la solicitud.'
+    ]
 
     def cm(self, docx):
         paragraph = docx.add_paragraph()
@@ -38,9 +45,16 @@ class CGRU(Request):
         paragraph.add_run(self.str_council_header + ' ')
         paragraph.add_run(
             self.get_approval_status_display().upper() + ' ').font.bold = True
+        if self.is_affirmative_response_approval_status():
+            modifier = self.str_cm[1]
+        else:
+            modifier = self.council_decision
+        paragraph.add_run(self.str_cm[0].format(
+            self.name, self.code, self.new_group, self.academic_period, modifier
+        ))
 
     def pcm(self, docx):
-        add_analysis_paragraph(docx, self.extra_analysis)
+        add_analysis_paragraph(docx, self.create_analysis())
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
@@ -52,3 +66,17 @@ class CGRU(Request):
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_advisor_response_display().upper() + ' ').font.bold = True
+        if self.is_affirmative_response_advisor_response():
+            modifier = ''
+        else:
+            modifier = 'no '
+        paragraph.add_run(self.str_pcm[1].format(
+            self.name, self.code, self.academic_period, self.group,
+            self.new_group, self.professor, self.get_department_display(), modifier
+        ))
+
+    def create_analysis(self):
+        return [
+            self.str_pcm[0].format(self.group, self.name,
+                                   self.code, self.free_places)
+        ] + self.extra_analysis
