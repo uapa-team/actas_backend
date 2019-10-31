@@ -36,9 +36,32 @@ class PEST(Request):
     documentation = BooleanField(
         required=True, display='¿Documentación Completa?')
 
-    regulation_list = []
+    regulation_list = ['008|2008|CSU', '102|2013|CSU', '016|2011|CAC']
 
-    str_cm = []
+    str_cm = [
+        'inscribir la asignatura {} ({}) con carga de {} créditos, ',
+        'en el periodo {}, a desarrollar en la empresa {}, a cargo del docente ' +
+        '{} por parte de la Universidad Nacional de Colombia y {} por parte de la entidad ' +
+        '(Artículo 15 {}).',
+        'debido a que {} ({}).'
+    ]
+
+    str_analysis = [
+        'El estudiante {}cumple con el requisito de haber aprobado el ' +
+        '70% de los créditos del plan de estudios. SIA: {:0.1f}% de avance en ' +
+        'los créditos exigidos del plan de estudios.',
+        'El estudiante {}ha cursado otra de las asignaturas con ' +
+        'el nombre Práctica Estudiantil.',
+        'Requisitos: Pertinencia, objetivos, alcance, empresa {}, duración: {} ' +
+        'horas/semana durante {}, costos, descripción de actividades ' +
+        'a cargo de un profesor de la Facultad: {}, porcentajes de evaluación definidos ' +
+        '(Artículo 3 del {}).',
+        'Documentación {}cumple con requisitos: Formato está completamente diligenciado, ' +
+        'adjunta copia del Acuerdo firmado, ' +
+        'adjunta el recibido de la carta de presentación de la Universidad, ' +
+        'están fijados los porcentajes de evaluación.'
+    ]
+
     str_pcm = []
 
     def cm(self, docx):
@@ -52,9 +75,11 @@ class PEST(Request):
         paragraph.add_run(self.str_council_header + ' ')
         paragraph.add_run(
             self.get_approval_status_display().upper() + ' ').font.bold = True
+        self.add_text(
+            paragraph, self.is_affirmative_response_approval_status())
 
     def pcm(self, docx):
-        add_analysis_paragraph(docx, self.extra_analysis)
+        add_analysis_paragraph(docx, self.add_analysis())
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
@@ -66,3 +91,40 @@ class PEST(Request):
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_advisor_response_display().upper() + ' ').font.bold = True
+        self.add_text(
+            paragraph, self.is_affirmative_response_advisor_response())
+
+    def add_text(self, paragraph, affirmative):
+        code, _credits = self.SUBJECT_INFO[self.subject]
+        # pylint: disable=no-member
+        paragraph.add_run(self.str_cm[0].format(
+            self.get_subject_display(), code, _credits))
+
+        if affirmative:
+            paragraph.add_run(self.str_cm[1].format(
+                self.academic_period, self.institution,
+                self.proffesor, self.ins_person,
+                self.regulations[self.regulation_list[0]][0]
+            ))
+        else:
+            paragraph.add_run(self.str_cm[2].format(
+                self.council_decision,
+                self.regulations[self.regulation_list[1]][0]
+            ))
+
+    def add_analysis(self):
+        analysis = []
+        modifier = '' if self.advance >= 70 else 'no '
+        analysis.append(self.str_analysis[0].format(modifier, self.advance))
+
+        modifier = '' if self.another_practice else 'no '
+        analysis.append(self.str_analysis[1].format(modifier))
+
+        analysis.append(self.str_analysis[2].format(
+            self.institution, self.hours, self.duration, self.proffesor,
+            self.regulations[self.regulation_list[2]][0]))
+
+        modifier = '' if self.documentation else 'no '
+        self.str_analysis[3].format(self.str_analysis[3].format(modifier))
+
+        return analysis + self.extra_analysis

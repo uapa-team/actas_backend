@@ -424,7 +424,9 @@ class Request(DynamicDocument):
         '032|2010|CSU': ('Acuerdo 032 de 2010 del Consejo Superior Universitario',
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=39424'),
         '1416|2013|RE': ('Resolución 1416 de 2013 de Rectoría',
-                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=60849')
+                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=60849'),
+        '016|2011|CAC': ('Acuerdo 016 de 2011 del Consejo Academico',
+                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=44965')
     }
 
     assertionerror = {
