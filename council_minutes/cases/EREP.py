@@ -10,7 +10,7 @@ class EREP(Request):
     full_name = 'Expedición de recibo'
 
     ah_active = BooleanField(
-        required=True, display='¿Tiene activa la historia académica?')
+        required=True, display='¿Tiene activa la historia académica?', default=False)
     payment_date = DateField(display='Fecha límite de pago')
 
     regulation_list = ['051|2003|CSU']  # List of regulations
@@ -66,14 +66,12 @@ class EREP(Request):
         paragraph.add_run(self.council_decision + '.')
 
     def pcm_analysis(self, docx):
-        if self.ah_active:
-            active = ''
-        else:
-            active = 'no '
-        self.list_analysis[0] = self.list_analysis[0].format(active)
+        active = '' if self.ah_active else 'no '
+        final_analysis = []
+        final_analysis += [self.list_analysis[0].format(active)]
         for extra_a in self.extra_analysis:
-            self.list_analysis.append(extra_a)
-        add_analysis_paragraph(docx, self.list_analysis)
+            final_analysis += [extra_a]
+        add_analysis_paragraph(docx, final_analysis)
 
     def pcm_answers_af(self, paragraph):
         paragraph.add_run(self.str_cm[1].format(
