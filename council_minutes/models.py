@@ -413,6 +413,8 @@ class Request(DynamicDocument):
                           'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=42724'),
         '014|2008|CA':   ('Acuerdo 014 de 2008 del Consejo Académico',
                           'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34127'),
+        '035|2014|VA':   ('Resolución 035 de 2018 de La Vicerrectoría Académica',
+                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=69990'),
     }
 
     assertionerror = {
