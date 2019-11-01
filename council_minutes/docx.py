@@ -2,17 +2,13 @@ import dateparser
 from docx import Document
 from docx.shared import RGBColor
 from docx.shared import Pt
-from docx.enum.style import WD_STYLE_TYPE
 from .models import Request
-from .cm_cases.spliter import CasesSpliter
-from .pre_cm_cases.splitter import PreCasesSpliter
 from .cases.case_utils import header
 
 
 class CouncilMinuteGenerator():
 
     def __init__(self):
-        self.spliter = CasesSpliter()
         self.document = Document()
         for style in self.document.styles:
             try:
@@ -31,7 +27,7 @@ class CouncilMinuteGenerator():
         request_by_date = Request.objects(date__gte=dateparser.parse(
             start_date), date__lte=dateparser.parse(end_date))
         request_by_date_ordered = request_by_date.order_by(
-            'academic_program', 'type')
+            'academic_program', 'cls')
         requests_pre = [
             request for request in request_by_date_ordered if request.is_pre()]
         requests_pos = [
@@ -46,7 +42,7 @@ class CouncilMinuteGenerator():
             date__lte=dateparser.parse(end_date),
             approval_status__ne=app_status)
         request_by_date_ordered = request_by_date.order_by(
-            'academic_program', 'type')
+            'academic_program', 'cls')
         requests_pre = [
             request for request in request_by_date_ordered if request.is_pre()]
         requests_pos = [
@@ -76,11 +72,11 @@ class CouncilMinuteGenerator():
                 run.font.bold = True
                 run.font.size = Pt(12)
                 list_level_3 = 0
-            if actual_case != request.type:
+            if actual_case != request.full_name:
                 list_level_3 = list_level_3 + 1
-                actual_case = request.type
+                actual_case = request.full_name
                 para = self.document.add_paragraph(style='Heading 2')
-                run = para.add_run(request.get_type_display().upper())
+                run = para.add_run(request.full_name.upper())
                 run.font.bold = True
                 run.font.size = Pt(12)
             para = self.document.add_paragraph(style='Heading 3')
@@ -90,11 +86,11 @@ class CouncilMinuteGenerator():
             run.font.bold = True
             run.font.size = Pt(12)
             try:
-                self.spliter.request_case(request, self.document)
+                request.cm(self.document)
             except NotImplementedError:
                 self.document.add_paragraph()
                 self.document.add_paragraph(
-                    'Not Implemented case {}'.format(request.type))
+                    'Not Implemented case {}'.format(request.full_name))
                 self.document.add_paragraph()
             except Exception as err:  # pylint: disable=broad-except
                 self.document.add_paragraph()
@@ -110,7 +106,6 @@ class CouncilMinuteGenerator():
 class PreCouncilMinuteGenerator():
 
     def __init__(self):
-        self.spliter = PreCasesSpliter()
         self.document = Document()
         for style in self.document.styles:
             try:
@@ -124,7 +119,7 @@ class PreCouncilMinuteGenerator():
     def add_case_from_request(self, request):
         hyperlink_style = self.document.styles.add_style(
             # pylint: disable=no-member
-            'List Hyperlink', WD_STYLE_TYPE.PARAGRAPH)
+            'List Hyperlink', WD_STYLE_cls.PARAGRAPH)
         hyperlink_style.base_style = self.document.styles['List Bullet']
         hyperlink_style.font.color.rgb = RGBColor(
             0x00, 0x00, 0xFF)
@@ -137,7 +132,7 @@ class PreCouncilMinuteGenerator():
         request_by_date = Request.objects(date__gte=dateparser.parse(
             start_date), date__lte=dateparser.parse(end_date))
         request_by_date_ordered = request_by_date.order_by(
-            'academic_program', 'type')
+            'academic_program', 'cls')
         requests_pre = [
             request for request in request_by_date_ordered if request.is_pre()]
         requests_pos = [
@@ -167,11 +162,11 @@ class PreCouncilMinuteGenerator():
                 run.font.bold = True
                 run.font.size = Pt(12)
                 list_level_3 = 0
-            if actual_case != request.type:
+            if actual_case != request.full_name:
                 list_level_3 = list_level_3 + 1
-                actual_case = request.type
+                actual_case = request.full_name
                 para = self.document.add_paragraph(style='Heading 2')
-                run = para.add_run(request.get_type_display().upper())
+                run = para.add_run(request.full_name.upper())
                 run.font.bold = True
                 run.font.size = Pt(12)
             para = self.document.add_paragraph(style='Heading 3')
@@ -181,11 +176,11 @@ class PreCouncilMinuteGenerator():
             run.font.bold = True
             run.font.size = Pt(12)
             try:
-                self.spliter.request_case(request, self.document)
+                request.pcm(self.document)
             except NotImplementedError:
                 self.document.add_paragraph()
                 self.document.add_paragraph(
-                    'Not Implemented case {}'.format(request.type))
+                    'Not Implemented case {}'.format(request.full_name))
                 self.document.add_paragraph()
             except Exception as err:  # pylint: disable=broad-except
                 self.document.add_paragraph()
