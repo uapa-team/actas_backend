@@ -15,7 +15,8 @@ class CPAC(Request):
     regulation_list = ['DU|MM|Y']  # List of regulations
 
     str_cm = [
-        'dummy str'
+        'cancelar la totalidad de las asignaturas en el periodo {}, en el programa de {} ({})',
+        'debido a que {}realiza debidamente la solicitud.'
     ]
 
     str_pcm = [
@@ -35,7 +36,9 @@ class CPAC(Request):
         paragraph.add_run(
             self.str_cm[0].format(
                 # pylint: disable=no-member
-                self.dummy
+                self.academic_period,
+                self.get_academic_program_display(),
+                self.academic_program,
             ) + ', '
         )
         paragraph.add_run(
