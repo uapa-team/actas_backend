@@ -354,16 +354,9 @@ class Request(DynamicDocument):
 
     PROFILE_INVE = 'I'
     PROFILE_PROF = 'P'
-<<<<<<< HEAD
     PROFILE_CHOICES = (
         (PROFILE_INVE, 'Investigación'),
-        (PROFILE_PROF, 'Profundización'),
-=======
-    PROFILE_DEFAULT = ''
-    PROFILE_CHOICES = (
-        (PROFILE_INVE, 'Investigación'),
-        (PROFILE_PROF, 'Profundización'),
-        (PROFILE_DEFAULT, ''),
+        (PROFILE_PROF, 'Profundización')
     )
 
     GRADE_OPTION_TRABAJO_FINAL_MAESTRIA = 'TFM'
@@ -373,7 +366,6 @@ class Request(DynamicDocument):
         (GRADE_OPTION_TRABAJO_FINAL_MAESTRIA, 'Trabajo Final de Maestría'),
         (GRADE_OPTION_TESIS_MAESTRIA, 'Tesis de Maestría'),
         (GRADE_OPTION_TESIS_DOCTORADO, 'Tesis de Doctorado')
->>>>>>> Angel
     )
 
     _cls = StringField(required=True)
@@ -437,9 +429,9 @@ class Request(DynamicDocument):
         '002|2012|CFA': ('Acuerdo 002 de 2012 de Consejo de Facultad',
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=50509'),
         '002|2011|CFA': ('Acuerdo 002 de 2011 de Consejo de Facultad',
-                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=42724'),
+                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=42724'),
         '040|2017|CFA': ('Acuerdo 40 de 2017 del Consejo de Facultad',
-                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=89183'),
+                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=89183'),
         '001|2016|VAC': ('Circular 01 de 2016 de la Vicerectoría Académica',
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=86414#0'),
         '012|2014|VAC': ('Resolución 012 de 2014 de Vicerrectoría Académica',
@@ -454,7 +446,6 @@ class Request(DynamicDocument):
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=92579'),
         '1416|2013|RE': ('Resolución 1416 de 2013 de Rectoría',
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=60849'),
-        
     }
 
     assertionerror = {
