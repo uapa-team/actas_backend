@@ -28,7 +28,7 @@ class TGRA(Request):
     commite_cm = IntField(default=1, display='Acta de comité')
     commite_cm_date = DateField(display='Fecha acta de comité')
 
-    regulation_list = ['026|2012|CSU', '40|2017|CSU']  # List of regulations
+    regulation_list = ['026|2012|CSU', '040|2017|CSU']  # List of regulations
 
     str_cm = [
         'inscribir la(s) siguiente(s) asignatura(s) en el periodo académico {}, en modalidad {}, ' +

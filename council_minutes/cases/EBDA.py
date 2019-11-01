@@ -14,7 +14,7 @@ class EBDA(Request):
         display='Periodo en el que se obtiene el promedio')
     target_period = StringField(display='Periodo en el que aplica la beca')
 
-    regulation_list = ['2|2012|CFA']  # List of regulations
+    regulation_list = ['002|2012|CFA']  # List of regulations
 
     str_case = [
         'Se obtiene el promedio {}/5.0, en el periodo académico {} y se solicita la beca para el ' +

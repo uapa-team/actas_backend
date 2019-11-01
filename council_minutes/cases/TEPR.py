@@ -21,8 +21,8 @@ class TEPR(Request):
     on_time = BooleanField(
         display='Cumple fechas establecidas')
 
-    regulation_list = ['035|2014|VA', '002|2011|CFA',
-                       '241|2009|VA']  # List of regulations
+    regulation_list = ['035|2014|VAC', '002|2011|CFA',
+                       '241|2009|VAC']  # List of regulations
 
     str_cm = [
         'tránsito del programa {} ({}) al programa {} ({}), a partir del periodo académico {}',

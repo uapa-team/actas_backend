@@ -51,7 +51,7 @@ class EPCS(Request):
         choices=HEAD_CHOICES, display='Sede donde culminó sus estudios de pregrado')
 
     # List of regulations
-    regulation_list = ['014|2008|CA']
+    regulation_list = ['014|2008|CAC']
 
     str_cm = [
         'otorgar exención del pago de {} ({}) puntos de Derechos Académicos, a partir del periodo' +

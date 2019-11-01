@@ -9,7 +9,7 @@ class AAUT(Request):
 
     full_name = 'Admisión automática al posgrado'
 
-    regulation_list = ['008|2008|CSU', '070|2009|CA']  # List of regulations
+    regulation_list = ['008|2008|CSU', '070|2009|CAC']  # List of regulations
 
     academic_profile = StringField(
         default='I', choices=Request.PROFILE_CHOICES, display='Perfil de programa curricular')
@@ -97,4 +97,4 @@ class AAUT(Request):
             self.admission_academic_period
         ))
         paragraph.add_run(' ({}. {}).'.format(
-            self.regulations['070|2009|CA'][0], self.regulations['008|2008|CSU'][0]))
+            self.regulations['070|2009|CAC'][0], self.regulations['008|2008|CSU'][0]))

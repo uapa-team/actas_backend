@@ -31,7 +31,7 @@ class REINPRE():
         elif int(month) == 10:
             return ' de octubre de '
         elif int(month) == 11:
-            return ' de nomviembre de '
+            return ' de noviembre de '
         elif int(month) == 12:
             return ' de diciembre de '
 
