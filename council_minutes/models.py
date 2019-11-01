@@ -354,9 +354,26 @@ class Request(DynamicDocument):
 
     PROFILE_INVE = 'I'
     PROFILE_PROF = 'P'
+<<<<<<< HEAD
     PROFILE_CHOICES = (
         (PROFILE_INVE, 'Investigación'),
         (PROFILE_PROF, 'Profundización'),
+=======
+    PROFILE_DEFAULT = ''
+    PROFILE_CHOICES = (
+        (PROFILE_INVE, 'Investigación'),
+        (PROFILE_PROF, 'Profundización'),
+        (PROFILE_DEFAULT, ''),
+    )
+
+    GRADE_OPTION_TRABAJO_FINAL_MAESTRIA = 'TFM'
+    GRADE_OPTION_TESIS_MAESTRIA = 'TSM'
+    GRADE_OPTION_TESIS_DOCTORADO = 'TSD'
+    GRADE_OPTION_CHOICES = (
+        (GRADE_OPTION_TRABAJO_FINAL_MAESTRIA, 'Trabajo Final de Maestría'),
+        (GRADE_OPTION_TESIS_MAESTRIA, 'Tesis de Maestría'),
+        (GRADE_OPTION_TESIS_DOCTORADO, 'Tesis de Doctorado')
+>>>>>>> Angel
     )
 
     _cls = StringField(required=True)
@@ -403,14 +420,26 @@ class Request(DynamicDocument):
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=89183'),
         '051|2003|CSU': ('Resolución 051 de 2003 del Consejo Superior Universitario',
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=35163'),
+        '056|2012|CSU': ('Acuerdo 056 de 2012 del Consejo Superior Universitario',
+                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=48208'),
+        '102|2013|CSU': ('Acuerdo 102 de 2013 del Consejo Superior Universitario',
+                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=56987'),
+        '230|2016|CSU': ('Acuerdo 230 de 2016 del Consejo Superior Universitario',
+                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=87737'),
         '014|2008|CAC': ('Acuerdo 014 de 2008 del Consejo Académico',
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34127'),
+        '016|2011|CAC': ('Acuerdo 016 de 2011 del Consejo Academico',
+                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=44965'),
         '070|2009|CAC': ('Acuerdo 070 de 2009 de Consejo Académico',
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=35443'),
         '002|2012|CFA': ('Acuerdo 2 de 2012 de Consejo de Facultad',
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=50509'),
         '002|2011|CFA': ('Acuerdo No.002 de 2011 del Consejo de Facultad',
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=42724'),
+        '040|2017|CFA': ('Acuerdo 40 de 2017 del Consejo de Facultad',
+                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=89183'),
+        '001|2016|VAC': ('Circular 01 de 2016 de la Vicerectoría Académica',
+                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=86414#0'),
         '012|2014|VAC': ('Resolución 012 de 2014 de Vicerrectoría Académica',
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=62849'),
         '035|2014|VAC': ('Resolución 035 de 2018 de La Vicerrectoría Académica',
@@ -419,8 +448,11 @@ class Request(DynamicDocument):
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34644'),
         '241|2009|VAC': ('Resolución 241 DE 2009 de la Vicerrectoría Académica',
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34651'),
-        '1416|2013|REC': ('Resolución 1416 de 2013 de Rectoría',
-                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=60849'),
+        '001|2019|VSB': ('Circular 001 de 2019 de Vicerrectoría de Sede Bogotá',
+                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=92579'),
+        '1416|2013|RE': ('Resolución 1416 de 2013 de Rectoría',
+                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=60849'),
+        
     }
 
     assertionerror = {
@@ -459,3 +491,12 @@ class Request(DynamicDocument):
             except KeyError:
                 pass
         return json.dumps(data_json)
+
+
+class Professor(EmbeddedDocument):
+
+    name = StringField(required=True, display='Nombre')
+    department = StringField(
+        display='Departamento', choices=Request.DP_CHOICES, default=Request.DP_EMPTY)
+    institution = StringField(display='Institución')
+    country = StringField(display='Nombre')

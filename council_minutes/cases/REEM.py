@@ -17,7 +17,7 @@ class REEM(Request):
 
     regulation_list = (
         '032|2010|CSU',
-        '1416|2013|REC'
+        '1416|2013|RE'
     )
 
     str_cm = [

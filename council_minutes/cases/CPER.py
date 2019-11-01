@@ -31,7 +31,7 @@ class CPER(Request):
     subjects_homologations = EmbeddedDocumentListField(
         HomologationSubject, display='Asignaturas equivalencia')
 
-    regulation_list = ['032|2010|CSU', '1416|2013|REC']  # List of regulations
+    regulation_list = ['032|2010|CSU', '1416|2013|RE']  # List of regulations
 
     str_cm = [
         'traslado intrafacultad del estudiante de {} ({}) en el perfil de {} al plan de estudios ' +
