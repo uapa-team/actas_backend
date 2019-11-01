@@ -10,9 +10,11 @@ class CPAC(Request):
 
     full_name = 'Tránsito entre programas'
 
-    dummy = StringField(display='Dummy field')
+    academic_profile = StringField(
+        default='I', choices=Request.PROFILE_CHOICES, display='Perfil de programa curricular en caso de posgrado')
+    is_fortuitous = BooleanField(display='Se considera caso fortuito')
 
-    regulation_list = ['DU|MM|Y']  # List of regulations
+    regulation_list = ['008|2008|CSU']  # List of regulations
 
     str_cm = [
         'cancelar la totalidad de las asignaturas en el periodo {}, en el programa de {} ({})',
@@ -20,7 +22,9 @@ class CPAC(Request):
     ]
 
     str_pcm = [
-        'dummy str'
+        'SIA: {} ({}).',
+        'Perfil de {}.',
+        'El comité {}lo considera fuerza mayor o caso fortuito.'
     ]
 
     def cm(self, docx):
@@ -43,7 +47,7 @@ class CPAC(Request):
         )
         paragraph.add_run(
             self.str_cm[1].format(
-                '' if self.is_affirmative_response_advisor_response() else 'no '
+                '' if self.is_affirmative_response_approval_status() else 'no '
             )
         )
 
@@ -60,18 +64,32 @@ class CPAC(Request):
 
     def pcm_analysis(self, docx):
         analysis_list = []
-        analysis_list += [self.str_pcm[0].format()]
+        analysis_list += [self.str_pcm[0].format(
+            # pylint: disable=no-member
+            self.get_academic_program_display(),
+            self.academic_program
+        )]
+        if not self.is_pre():
+            analysis_list += [self.str_pcm[1].format(
+                # pylint: disable=no-member
+                self.get_academic_profile_display()
+            )]
+        analysis_list += [self.str_pcm[2].format(
+            '' if self.is_fortuitous else 'no '
+        )]
         analysis_list += self.extra_analysis
         add_analysis_paragraph(docx, analysis_list)
 
     def pcm_answer(self, paragraph):
         paragraph.add_run(
             # pylint: disable=no-member
-            self.get_approval_status_display().upper() + ' ').font.bold = True
+            self.get_advisor_response_display().upper() + ' ').font.bold = True
         paragraph.add_run(
             self.str_cm[0].format(
                 # pylint: disable=no-member
-                self.dummy
+                self.academic_period,
+                self.get_academic_program_display(),
+                self.academic_program,
             ) + ', '
         )
         paragraph.add_run(
