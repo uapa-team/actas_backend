@@ -6,6 +6,8 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 class CBAP(Request):
 
+    full_name = 'Créditos excedentes BAPI'
+
     credits = IntField(required=True, display='Créditos excedentes')
 
     str_cm = [

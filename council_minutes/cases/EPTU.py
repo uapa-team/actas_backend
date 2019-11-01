@@ -8,7 +8,7 @@ from .case_utils import string_to_date, add_analysis_paragraph
 
 class EPTU(Request):
 
-    full_name = 'Exención de pago por créditos sobrantes de pregrado'
+    full_name = 'Exención de pago por cursar tesis como única actividad académica'
 
     CNA_MAXIMO_EXCEDIDO = 'ME'
     CNA_AVANCE_NO_SATISFACTORIO = 'NS'
