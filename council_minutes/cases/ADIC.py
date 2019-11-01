@@ -10,7 +10,7 @@ class ADIC(Request):
     full_name = 'Adición de codirector'
 
     node = StringField(required=True, choices=Request.PROFILE_CHOICES,
-                       default=Request.PROFILE_DEFAULT, display='Perfil')
+                       default=Request.PROFILE_INVE, display='Perfil')
     title = StringField(required=True, display='Título de Tesis/Trabajo Final')
     council_number = StringField(
         required=True, max_length=2, default='00', display='# Acta de cancelación')

@@ -11,7 +11,7 @@ class DJCT(Request):
     full_name = 'Designación de jurados calificadores de Tesis/Trabajo Final'
 
     node = StringField(
-        display='Perfil', choices=Request.PROFILE_CHOICES, default=Request.PROFILE_DEFAULT)
+        display='Perfil', choices=Request.PROFILE_CHOICES, default=Request.PROFILE_INVE)
     grade_option = StringField(
         required=True, choices=Request.GRADE_OPTION_CHOICES, display='Opción de grado')
     advisor = StringField(required=True, display='Director')
