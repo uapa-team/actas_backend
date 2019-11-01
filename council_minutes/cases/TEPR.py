@@ -21,7 +21,8 @@ class TEPR(Request):
     on_time = BooleanField(
         display='Cumple fechas establecidas')
 
-    regulation_list = ['035|2014|VA', '002|2011|CFA']  # List of regulations
+    regulation_list = ['035|2014|VA', '002|2011|CFA',
+                       '241|2009|VA']  # List of regulations
 
     str_cm = [
         'tránsito del programa {} ({}) al programa {} ({}), a partir del periodo académico {}',
@@ -33,8 +34,7 @@ class TEPR(Request):
         'Viene del programa {} ({}).',
         'El estudiante {}cumple con la suficiencia de idioma exigida.',
         'La solicitud {}se hace luego de completar el plan de estudios y antes del grado (a menos' +
-        ' que no se haya abierto convocatorio durante el periodo)(Parágrafo 2, Resolución 241 de ' +
-        '2009).'
+        ' que no se haya abierto convocatorio durante el periodo)(Parágrafo 2, {}).'
     ]
 
     def cm(self, docx):
@@ -88,7 +88,8 @@ class TEPR(Request):
             '' if self.languaje else 'no '
         )]
         analysis_list += [self.str_pcm[3].format(
-            '' if self.on_time else 'no '
+            '' if self.on_time else 'no ',
+            Request.regulations[self.regulation_list[2]]
         )]
         analysis_list += self.extra_analysis
         add_analysis_paragraph(docx, analysis_list)

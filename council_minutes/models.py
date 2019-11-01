@@ -415,6 +415,8 @@ class Request(DynamicDocument):
                           'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34127'),
         '035|2014|VA':   ('Resolución 035 de 2018 de La Vicerrectoría Académica',
                           'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=69990'),
+        '241|2009|VA':   ('RESOLUCIÓN 241 DE 2009 de la Vicerrectoría Académica',
+                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34651')
     }
 
     assertionerror = {
