@@ -36,10 +36,11 @@ def info_cases(request, case_id):
 @csrf_exempt  # Esto va solo para evitar la verificacion de django
 def filter_request(request):
     if request.method == 'POST':
-        # Generic Query for Request model
+        # Generic Query for Request modelstart_date.split(':')[0] + '_' + end_date.split(':')[0]
         # To make a request check http://docs.mongoengine.org/guide/querying.html#query-operators
         params = json.loads(request.body)
-        response = Request.objects.filter(**params).order_by('academic_program')
+        response = Request.objects.filter(
+            **params).order_by('academic_program')
         return JsonResponse(response, safe=False, encoder=QuerySetEncoder)
 
     else:
@@ -170,6 +171,24 @@ def docx_gen_by_date(request):
 
 
 @csrf_exempt
+def docx_gen_with_array(request):
+    try:
+        body = json.loads(request.body)
+        array = body['array']
+    except json.decoder.JSONDecodeError:
+        return HttpResponse("Bad Request", status=400)
+    filename = 'public/acta' + \
+        str(datetime.date.today()) + '.docx'
+    generator = CouncilMinuteGenerator()
+    try:
+        generator.add_cases_from_array(array)
+    except IndexError:
+        return HttpResponse('Empty list', status=400)
+    generator.generate(filename)
+    return HttpResponse(filename)
+
+
+@csrf_exempt
 def docx_gen_pre_by_id(request, cm_id):
     filename = 'public/preacta' + cm_id + '.docx'
     try:
@@ -197,5 +216,23 @@ def docx_gen_pre_by_date(request):
         generator.add_cases_from_date(start_date, end_date)
     except IndexError:
         return HttpResponse('No cases in date range specified', status=401)
+    generator.generate(filename)
+    return HttpResponse(filename)
+
+
+@csrf_exempt
+def docx_gen_pre_with_array(request):
+    try:
+        body = json.loads(request.body)
+        array = body['array']
+    except json.decoder.JSONDecodeError:
+        return HttpResponse("Bad Request", status=400)
+    filename = 'public/preacta' + \
+        str(datetime.date.today()) + '.docx'
+    generator = PreCouncilMinuteGenerator()
+    try:
+        generator.add_cases_from_array(array)
+    except IndexError:
+        return HttpResponse('Empty list', status=400)
     generator.generate(filename)
     return HttpResponse(filename)

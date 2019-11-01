@@ -23,7 +23,7 @@ class CouncilMinuteGenerator():
         request.cm(self.document)
 
     def add_cases_from_date(self, start_date, end_date):
-        #pylint: disable=no-member
+        # pylint: disable=no-member
         request_by_date = Request.objects(date__gte=dateparser.parse(
             start_date), date__lte=dateparser.parse(end_date))
         request_by_date_ordered = request_by_date.order_by(
@@ -35,8 +35,21 @@ class CouncilMinuteGenerator():
         self.__add_cases_from_date_pre_pos(requests_pre, 'PREGRADO')
         self.__add_cases_from_date_pre_pos(requests_pos, 'POSGRADO')
 
+    def add_cases_from_array(self, array):
+        case_list = Request.objects.filter(id__in=array)
+        request_from_array_ordered = case_list.order_by(
+            'academic_program', 'cls')
+
+        requests_pre = [
+            request for request in request_from_array_ordered if request.is_pre()]
+        requests_pos = [
+            request for request in request_from_array_ordered if not request.is_pre()]
+
+        self.__add_cases_from_date_pre_pos(requests_pre, 'PREGRADO')
+        # self.__add_cases_from_date_pre_pos(requests_pos, 'POSGRADO') #TODO: Add support for empty lists.
+
     def add_cases_from_date_except_app_status(self, start_date, end_date, app_status):
-        #pylint: disable=no-member
+        # pylint: disable=no-member
         request_by_date = Request.objects(
             date__gte=dateparser.parse(start_date),
             date__lte=dateparser.parse(end_date),
@@ -139,6 +152,19 @@ class PreCouncilMinuteGenerator():
             request for request in request_by_date_ordered if not request.is_pre()]
         self.__add_cases_from_date_pre_pos(requests_pre, 'PREGRADO')
         self.__add_cases_from_date_pre_pos(requests_pos, 'POSGRADO')
+
+    def add_cases_from_array(self, array):
+        case_list = Request.objects.filter(id__in=array)
+        request_from_array_ordered = case_list.order_by(
+            'academic_program', 'cls')
+
+        requests_pre = [
+            request for request in request_from_array_ordered if request.is_pre()]
+        requests_pos = [
+            request for request in request_from_array_ordered if not request.is_pre()]
+
+        self.__add_cases_from_date_pre_pos(requests_pre, 'PREGRADO')
+        # self.__add_cases_from_date_pre_pos(requests_pos, 'POSGRADO') #TODO: Add support for empty lists.
 
     def __add_cases_from_date_pre_pos(self, requests, pre_pos):
         actual_academic_program = requests[0].academic_program
