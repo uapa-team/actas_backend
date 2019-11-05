@@ -1,9 +1,10 @@
 from .case_utils import *
 from ..models import Request
+from .REINPOS import REINPOS
 from mongoengine import StringField, IntField, FloatField, BooleanField, DateField
 
 
-class REIN(Request):
+class REINPRE(REINPOS):
 
     #### NOT IMPLEMENTED YET! ####
 

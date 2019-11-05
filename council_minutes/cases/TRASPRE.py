@@ -6,7 +6,7 @@ from ..models import Request, Subject
 from .case_utils import add_analysis_paragraph
 
 
-class TRAS(Request):
+class TRASPRE(Request):
 
     ### Not Implemented yet ###
 
