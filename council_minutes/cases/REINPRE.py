@@ -26,7 +26,7 @@ class REINPRE(Request):
 
     full_name = 'Reingreso'
 
-    regulation_list = ['008|2008|CSU', '012|2014|VRA']  # List of regulations
+    regulation_list = ['008|2008|CSU', '012|2014|VAC']  # List of regulations
 
     reing_period = StringField(required=True, display='Periodo de reingreso')
     loss_period = StringField(
@@ -431,5 +431,5 @@ class REINPRE(Request):
             self.extra_credits(paragraph)
 
         paragraph.add_run('({}).'.format(
-            self.regulations['012|2014|VRA'][0] + "; Artículo 46, " +
+            self.regulations['012|2014|VAC'][0] + "; Artículo 46, " +
             self.regulations['008|2008|CSU'][0]))

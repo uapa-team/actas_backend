@@ -1,7 +1,9 @@
+
 import dateparser
 from docx import Document
 from docx.shared import RGBColor
 from docx.shared import Pt
+from docx.enum.style import WD_STYLE_TYPE
 from .models import Request
 from .cases.case_utils import header
 
@@ -132,7 +134,7 @@ class PreCouncilMinuteGenerator():
     def add_case_from_request(self, request):
         hyperlink_style = self.document.styles.add_style(
             # pylint: disable=no-member
-            'List Hyperlink', WD_STYLE_cls.PARAGRAPH)
+            'List Hyperlink', WD_STYLE_TYPE.PARAGRAPH)
         hyperlink_style.base_style = self.document.styles['List Bullet']
         hyperlink_style.font.color.rgb = RGBColor(
             0x00, 0x00, 0xFF)
