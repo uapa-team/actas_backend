@@ -62,7 +62,7 @@ class ADIC(Request):
 
     def fill_analysis(self):
         # pylint: disable=no-member
-        if self.node != Request.PROFILE_DEFAULT:
+        if self.node != Request.PROFILE_INVE:
             modifier = self.str_pcm[1].format(self.get_node_display())
         else:
             modifier = ''
