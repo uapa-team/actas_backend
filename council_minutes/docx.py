@@ -47,7 +47,7 @@ class CouncilMinuteGenerator():
             request for request in request_from_array_ordered if not request.is_pre()]
 
         self.__add_cases_from_date_pre_pos(requests_pre, 'PREGRADO')
-        # self.__add_cases_from_date_pre_pos(requests_pos, 'POSGRADO') #TODO: Add support for empty lists.
+        self.__add_cases_from_date_pre_pos(requests_pos, 'POSGRADO')
 
     def add_cases_from_date_except_app_status(self, start_date, end_date, app_status):
         # pylint: disable=no-member
@@ -165,9 +165,11 @@ class PreCouncilMinuteGenerator():
             request for request in request_from_array_ordered if not request.is_pre()]
 
         self.__add_cases_from_date_pre_pos(requests_pre, 'PREGRADO')
-        # self.__add_cases_from_date_pre_pos(requests_pos, 'POSGRADO') #TODO: Add support for empty lists.
+        self.__add_cases_from_date_pre_pos(requests_pos, 'POSGRADO')
 
     def __add_cases_from_date_pre_pos(self, requests, pre_pos):
+        if len(requests) == 0:
+            return
         actual_academic_program = requests[0].academic_program
         para = self.document.add_paragraph(style='Heading 1')
         list_level_1 = 9 if pre_pos == 'PREGRADO' else 10
@@ -179,6 +181,15 @@ class PreCouncilMinuteGenerator():
         run.font.size = Pt(12)
         actual_academic_program = 'dummy'
         actual_case = 'dummy'
+
+        hyperlink_style = self.document.styles.add_style(
+            # pylint: disable=no-member
+            'List Hyperlink', WD_STYLE_TYPE.PARAGRAPH)
+        hyperlink_style.base_style = self.document.styles['List Bullet']
+        hyperlink_style.font.color.rgb = RGBColor(
+            0x00, 0x00, 0xFF)
+        hyperlink_style.font.underline = True
+
         for request in requests:
             if actual_academic_program != request.academic_program:
                 list_level_2 = list_level_2 + 1
@@ -203,6 +214,8 @@ class PreCouncilMinuteGenerator():
             run.font.bold = True
             run.font.size = Pt(12)
             try:
+
+                header(request, self.document)
                 request.pcm(self.document)
             except NotImplementedError:
                 self.document.add_paragraph()
