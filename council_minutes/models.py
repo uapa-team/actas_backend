@@ -8,6 +8,8 @@ from mongoengine import ListField, IntField, EmbeddedDocumentField
 def get_fields(obj):
     fields = {}
     _dir = obj.__class__.__dict__
+    if 'full_name' in _dir:
+        fields['full_name'] = obj.full_name
     for key, value in _dir.items():
         if isinstance(value, BaseField):
             fields[key] = {'type': clear_name(value.__class__)}
