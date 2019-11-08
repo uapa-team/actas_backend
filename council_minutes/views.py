@@ -39,6 +39,7 @@ def filter_request(request):
         # Generic Query for Request modelstart_date.split(':')[0] + '_' + end_date.split(':')[0]
         # To make a request check http://docs.mongoengine.org/guide/querying.html#query-operators
         params = json.loads(request.body)
+        # pylint: disable=no-member
         response = Request.objects.filter(
             **params).order_by('academic_program')
         return JsonResponse(response, safe=False, encoder=QuerySetEncoder)
@@ -55,10 +56,9 @@ def insert_request(request):
     case = Request.__subclasses__()[subs.index(_cls)]
     new_request = case().from_json(case.translate(request.body))
     try:
-        new_request.save()
-        return HttpResponse(request.body, status=201)
+        response = new_request.save()
+        return JsonResponse(response, safe=False, encoder=QuerySetEncoder)
     except ValidationError as e:
-        print(e)
         return HttpResponse(e.message, status=400)
 
 
@@ -66,6 +66,7 @@ def insert_request(request):
 def docx_gen_by_id(request, cm_id):
     filename = 'public/acta' + cm_id + '.docx'
     try:
+        # pylint: disable=no-member
         request_by_id = Request.objects.get(id=cm_id)
     except mongoengine.DoesNotExist:
         return HttpResponse('Does not exist', status=404)
@@ -79,6 +80,7 @@ def docx_gen_by_id(request, cm_id):
 def update_cm(request, cm_id):
     if request.method == 'PATCH':
         try:
+            # pylint: disable=no-member
             acta = Request.objects.get(id=cm_id)
         except mongoengine.DoesNotExist:
             return HttpResponse('Does not exist', status=404)
@@ -192,6 +194,7 @@ def docx_gen_with_array(request):
 def docx_gen_pre_by_id(request, cm_id):
     filename = 'public/preacta' + cm_id + '.docx'
     try:
+        # pylint: disable=no-member
         request_by_id = Request.objects.get(id=cm_id)
     except mongoengine.DoesNotExist:
         return HttpResponse('Does not exist', status=404)
