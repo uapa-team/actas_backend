@@ -130,7 +130,8 @@ class TRASPOS(Request):
     agreement_year = IntField(
         required=True, display='Año del acuerdo del CF que reglamenta el plan de estudios')
 
-    regulation_list = ['008|2008|CSU', '089|2014|CAC']  # List of regulations
+    regulation_list = ['008|2008|CSU', '089|2014|CAC',
+                       '155|2014|CSU']  # List of regulations
 
     str_cm = ['traslado {} del programa {}, plan de estudios de {} al programa {}, plan de ' +
               'estudios de {}, en el periodo académico {}', ', condicionado a conservar la ' +
@@ -155,7 +156,19 @@ class TRASPOS(Request):
 
     srt_titles = ['I) Datos Generales', 'II) Información Académica']
 
-    list_analysis = ['']
+    list_analysis = ['Viene del plan {} de la sede {}.',
+                     'a tenido calidad de estudiante en ese programa previamente ' +
+                     '(Parágrafo 1. Artículo 2, {}). Universitas: OK.',
+                     'a Culminado el primer plan de estudios.',
+                     'iene derecho a renovar la matrícula. Universitas: OK.',
+                     'a cursado por lo menos un periodo académico del primer plan ' +
+                     'de estudios (Artículo 39, {}). SIA: OK.', 'Ha cursado {} periodos ' +
+                     'académicos desde {}.', 'stá cursando doble titulación (Artículo ' +
+                     '7. {}). SIA: OK.', 'ay cupos disponibles en el plan de estudios ' +
+                     'del programa curricular solicitado (Estipulados por Consejo de ' +
+                     'Facultad).', 'El estudiante {}cuenta con el suficiente cupo ' +
+                     'de créditos para inscribir las asignaturas pendientes de ' +
+                     'aprobación en el nuevo plan (Artículo 3, {}).']
 
     def get_next_period(self, actual_period):
         year = int(actual_period[0:4])
