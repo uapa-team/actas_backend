@@ -3,7 +3,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from mongoengine import StringField, BooleanField, IntField
 from mongoengine import EmbeddedDocumentListField, FloatField
 from ..models import Request, Subject
-from .case_utils import add_analysis_paragraph, table_general_data, string_to_date
+from .case_utils import add_analysis_paragraph, table_general_data, string_to_date, table_approvals
 
 
 class TRASPOS(Request):
@@ -143,7 +143,8 @@ class TRASPOS(Request):
                  ' de estudiante en el plan de estudios de destino (2° plan)?',
                  'Porcentaje de créditos aprobados en el plan de estudios origen (1er plan)',
                  'CUADRO EQUIVALENCIAS Y CONVALIDACIONES DE ASIGNATURAS CURSADAS Y APROBADAS' +
-                 ' HASTA LA FECHA DE PRESENTACIÓN DE LA SOLICITUD POR PARTE DEL ESTUDIANTE.']
+                 ' HASTA LA FECHA DE PRESENTACIÓN DE LA SOLICITUD POR PARTE DEL ESTUDIANTE.',
+                 'Universidad Nacional de Colombia plan de estudios de {}']
 
     srt_titles = ['I) Datos Generales', 'II) Información Académica']
 
@@ -272,3 +273,17 @@ class TRASPOS(Request):
             'Porcentaje de créditos aprobados en el plan de estudios origen (1er plan)')
         table.cell(3, 1).paragraphs[0].add_run(
             str(self.completion_percentage) + '%')
+        paragraph = docx.add_paragraph()
+        paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        run = paragraph.add_run(self.str_table[12])
+        run.font.bold = True
+        run.font.underline = True
+        run.font.size = Pt(8)
+        subjects = []
+        for sbj in self.homologated_subjects:
+            subjects.append([self.academic_period, sbj.new_code, sbj.new_name,
+                             str(sbj.credits), sbj.tipology, sbj.grade, sbj.name, sbj.grade])
+        details = [self.student_dni, self.student_name,
+                   self.transit_program_code, self.str_table[13].format(self.origin_program_name)]
+        table_approvals(docx, subjects, details)
