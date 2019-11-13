@@ -259,18 +259,14 @@ class TRASPOS(Request):
             cell.width = 4350000
         for cell in table.columns[1].cells:
             cell.width = 850000
-        table.cell(0, 0).paragraphs[0].add_run(
-            'Periodo para el cual fue admitido')
+        table.cell(0, 0).paragraphs[0].add_run(self.str_table[8])
         table.cell(0, 1).paragraphs[0].add_run(self.admission_period)
-        table.cell(1, 0).paragraphs[0].add_run(
-            '¿El solicitante se encuentra matriculado en el semestre de presentar la solicitud?')
+        table.cell(1, 0).paragraphs[0].add_run(self.str_table[9])
         table.cell(1, 1).paragraphs[0].add_run('Sí' if self.enrroled else 'No')
-        table.cell(2, 0).paragraphs[0].add_run(
-            '¿El solicitante tuvo calidad de estudiante en el plan de estudios destino (2° plan)?')
+        table.cell(2, 0).paragraphs[0].add_run(self.str_table[10])
         table.cell(2, 1).paragraphs[0].add_run(
             'Sí' if self.prev_plan else 'No')
-        table.cell(3, 0).paragraphs[0].add_run(
-            'Porcentaje de créditos aprobados en el plan de estudios origen (1er plan)')
+        table.cell(3, 0).paragraphs[0].add_run(self.str_table[11])
         table.cell(3, 1).paragraphs[0].add_run(
             str(self.completion_percentage) + '%')
         paragraph = docx.add_paragraph()
@@ -287,3 +283,4 @@ class TRASPOS(Request):
         details = [self.student_dni, self.student_name,
                    self.transit_program_code, self.str_table[13].format(self.origin_program_name)]
         table_approvals(docx, subjects, details)
+        # TODO table approvals and general data don't hava the same size
