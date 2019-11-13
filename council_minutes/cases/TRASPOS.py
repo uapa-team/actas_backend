@@ -289,7 +289,7 @@ class TRASPOS(Request):
         for sbj in self.homologated_subjects:
             subjects.append([self.academic_period, sbj.new_code, sbj.new_name,
                              str(sbj.credits), sbj.tipology, sbj.grade, sbj.name, sbj.grade])
-        details = [self.student_dni, self.student_name,
+        details = [self.student_name, self.student_dni,
                    self.transit_program_code, self.str_table[13].format(self.origin_program_name)]
         table_approvals(docx, subjects, details)
         paragraph = docx.add_paragraph()
