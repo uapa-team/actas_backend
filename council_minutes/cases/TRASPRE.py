@@ -4,9 +4,10 @@ from mongoengine import StringField, BooleanField, DateField, IntField
 from mongoengine import EmbeddedDocumentListField, FloatField, EmbeddedDocument
 from ..models import Request, Subject
 from .case_utils import add_analysis_paragraph
+from .TRASPOS import TRASPOS
 
 
-class TRASPOS(Request):
+class TRASPRE(TRASPOS):
 
     class HomologatedSubject(Subject):
         group = StringField()
