@@ -125,6 +125,10 @@ class TRASPOS(Request):
         display='Porcentaje de créditos aprobados en el plan de estudios origen')
     homologated_subjects = EmbeddedDocumentListField(
         HomologatedSubject, required=True, display='Cuadro de equivalencias y convalidaciones')
+    agreement_number = StringField(
+        required=True, display='Número del acuerdo del CF que reglamenta el plan de estudios')
+    agreement_year = IntField(
+        required=True, display='Año del acuerdo del CF que reglamenta el plan de estudios')
 
     regulation_list = ['008|2008|CSU', '089|2014|CAC']  # List of regulations
 
@@ -144,7 +148,10 @@ class TRASPOS(Request):
                  'Porcentaje de créditos aprobados en el plan de estudios origen (1er plan)',
                  'CUADRO EQUIVALENCIAS Y CONVALIDACIONES DE ASIGNATURAS CURSADAS Y APROBADAS' +
                  ' HASTA LA FECHA DE PRESENTACIÓN DE LA SOLICITUD POR PARTE DEL ESTUDIANTE.',
-                 'Universidad Nacional de Colombia plan de estudios de {}']
+                 'Universidad Nacional de Colombia plan de estudios de {}',
+                 'La oferta de asignaturas en cada una de las agrupaciones y componentes del' +
+                 ' plan de estudios del programa de {} - perfil {}, la encuentra en el Acuerdo' +
+                 ' No. {} del año {}, expedido por Consejo de Facultad de Ingeniería.']
 
     srt_titles = ['I) Datos Generales', 'II) Información Académica']
 
@@ -174,8 +181,8 @@ class TRASPOS(Request):
             self.str_cm[0].format(
                 self.get_transit_type_display().split(
                     ' ')[1].lower(), self.origin_program_name,
-                self.get_origin_program_profile_display(), self.transit_program_name,
-                self.get_transit_program_profile_display(), self.get_next_period(
+                self.get_origin_program_profile_display().lower(), self.transit_program_name,
+                self.get_transit_program_profile_display().lower(), self.get_next_period(
                     self.academic_period)))
         if self.is_affirmative_response_approval_status():
             self.cm_af(paragraph)
@@ -255,6 +262,8 @@ class TRASPOS(Request):
         run.font.size = Pt(8)
         table = docx.add_table(rows=4, cols=2, style='Table Grid')
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.columns[0].width = 4350000
+        table.columns[1].width = 850000
         for cell in table.columns[0].cells:
             cell.width = 4350000
         for cell in table.columns[1].cells:
@@ -283,4 +292,12 @@ class TRASPOS(Request):
         details = [self.student_dni, self.student_name,
                    self.transit_program_code, self.str_table[13].format(self.origin_program_name)]
         table_approvals(docx, subjects, details)
-        # TODO table approvals and general data don't hava the same size
+        paragraph = docx.add_paragraph()
+        paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        run = paragraph.add_run(self.str_table[14].format(
+            self.transit_program_name,
+            self.get_transit_program_profile_display().lower(), self.agreement_number,
+            str(self.agreement_year)))
+        run.font.underline = True
+        run.font.size = Pt(8)
