@@ -254,13 +254,10 @@ class TRASPOS(Request):
                            .format(Request.regulations['008|2008|CSU'][0])]
         final_analysis += [self.list_analysis[5].format(
             self.enroled_number, self.admission_period)]
-        aux_str = 'E' if self.currently_studying_double_degree else 'No e'
-        final_analysis += [aux_str + self.list_analysis[6]
-                           .format(Request.regulations['155|2014|CSU'][0])]
         aux_str = 'H' if self.availabe_quota_number > 0 else 'No h'
-        final_analysis += [aux_str + self.list_analysis[7]]
+        final_analysis += [aux_str + self.list_analysis[6]]
         aux_str = '' if self.available_quota_for_transit else 'no '
-        final_analysis += [self.list_analysis[8].format(
+        final_analysis += [self.list_analysis[7].format(
             aux_str, Request.regulations['089|2014|CAC'][0])]
         for extra_a in self.extra_analysis:
             final_analysis += [extra_a]
