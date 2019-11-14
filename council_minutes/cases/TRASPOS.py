@@ -156,15 +156,14 @@ class TRASPOS(Request):
 
     srt_titles = ['I) Datos Generales', 'II) Información Académica']
 
-    list_analysis = ['Viene del plan {} de la sede {}.',
+    list_analysis = ['Viene del plan {}, perfil de {} de la sede {}.',
                      'a tenido calidad de estudiante en ese programa previamente ' +
                      '(Parágrafo 1. Artículo 2, {}). Universitas: OK.',
                      'a Culminado el primer plan de estudios.',
                      'iene derecho a renovar la matrícula. Universitas: OK.',
                      'a cursado por lo menos un periodo académico del primer plan ' +
                      'de estudios (Artículo 39, {}). SIA: OK.', 'Ha cursado {} periodos ' +
-                     'académicos desde {}.', 'stá cursando doble titulación (Artículo ' +
-                     '7. {}). SIA: OK.', 'ay cupos disponibles en el plan de estudios ' +
+                     'académicos desde {}.', 'ay cupos disponibles en el plan de estudios ' +
                      'del programa curricular solicitado (Estipulados por Consejo de ' +
                      'Facultad).', 'El estudiante {}cuenta con el suficiente cupo ' +
                      'de créditos para inscribir las asignaturas pendientes de ' +
@@ -204,19 +203,25 @@ class TRASPOS(Request):
 
     def pcm(self, docx):
         self.pcm_analysis(docx)
-        self.pcm_answer(docx)
-
-    def pcm_answer(self, docx):
-        # pylint: disable=no-member
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        self.pcm_answer(paragraph)
+        self.add_tables(docx)
+
+    def pcm_answer(self, paragraph):
+        # pylint: disable=no-member
         paragraph.add_run(self.str_answer + ': ').font.bold = True
         paragraph.add_run(self.str_comittee_header + ' ')
         paragraph.add_run(
-            self.get_advisor_response_display().upper()).font.bold = True
-        paragraph.add_run(' ' + self.str_cm[0].format(
-            self.get_grade_option_display(), self.get_academic_program_display()))
+            self.get_advisor_response_display().upper() + ' ').font.bold = True
+        paragraph.add_run(
+            self.str_cm[0].format(
+                self.get_transit_type_display().split(
+                    ' ')[1].lower(), self.origin_program_name,
+                self.get_origin_program_profile_display().lower(), self.transit_program_name,
+                self.get_transit_program_profile_display().lower(), self.get_next_period(
+                    self.academic_period)))
         if self.is_affirmative_response_approval_status():
             self.cm_af(paragraph)
         else:
@@ -232,21 +237,34 @@ class TRASPOS(Request):
             ', ' + self.str_cm[2] + ' ' + self.council_decision + '.')
 
     def pcm_analysis(self, docx):
-        final_analysis = []
-        final_analysis += [self.list_analysis[3]]
-        ets = ''
         # pylint: disable=no-member
-        final_analysis += [self.list_analysis[4].format(
-            ets, self.get_grade_option_display())]
+        final_analysis = []
+        final_analysis += [self.list_analysis[0].format(
+            self.origin_program_name, self.get_origin_program_profile_display().lower(),
+            self.get_campus_origin_display())]
+        aux_str = 'H' if self.prev_plan else 'No h'
+        final_analysis += [aux_str + self.list_analysis[1]
+                           .format(Request.regulations['089|2014|CAC'][0])]
+        aux_str = 'H' if self.finish_first_plan else 'No h'
+        final_analysis += [aux_str + self.list_analysis[2]]
+        aux_str = 'T' if self.have_entitled_to_enrrol else 'No t'
+        final_analysis += [aux_str + self.list_analysis[3]]
+        aux_str = 'H' if self.at_least_one_period else 'No h'
+        final_analysis += [aux_str + self.list_analysis[4]
+                           .format(Request.regulations['008|2008|CSU'][0])]
+        final_analysis += [self.list_analysis[5].format(
+            self.enroled_number, self.admission_period)]
+        aux_str = 'E' if self.currently_studying_double_degree else 'No e'
+        final_analysis += [aux_str + self.list_analysis[6]
+                           .format(Request.regulations['155|2014|CSU'][0])]
+        aux_str = 'H' if self.availabe_quota_number > 0 else 'No h'
+        final_analysis += [aux_str + self.list_analysis[7]]
+        aux_str = '' if self.available_quota_for_transit else 'no '
+        final_analysis += [self.list_analysis[8].format(
+            aux_str, Request.regulations['089|2014|CAC'][0])]
         for extra_a in self.extra_analysis:
             final_analysis += [extra_a]
         add_analysis_paragraph(docx, final_analysis)
-        paragraph = docx.add_paragraph()
-        paragraph.style = 'List Bullet'
-        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        paragraph.paragraph_format.space_after = Pt(0)
-        paragraph.add_run(self.list_analysis[0] + ' ').font.bold = True
-        paragraph.add_run(self.title + '.').font.italic = True
 
     def add_tables(self, docx):
         paragraph = docx.add_paragraph()
