@@ -165,7 +165,7 @@ class TRASPOS(Request):
                      'de estudios (Artículo 39, {}). SIA: OK.', 'Ha cursado {} periodos ' +
                      'académicos desde {}.', 'ay cupos disponibles en el plan de estudios ' +
                      'del programa curricular solicitado (Estipulados por Consejo de ' +
-                     'Facultad).', 'El estudiante {}cuenta con el suficiente cupo ' +
+                     'Facultad): {} cupos.', 'El estudiante {}cuenta con el suficiente cupo ' +
                      'de créditos para inscribir las asignaturas pendientes de ' +
                      'aprobación en el nuevo plan (Artículo 3, {}).']
 
@@ -255,7 +255,8 @@ class TRASPOS(Request):
         final_analysis += [self.list_analysis[5].format(
             self.enroled_number, self.admission_period)]
         aux_str = 'H' if self.availabe_quota_number > 0 else 'No h'
-        final_analysis += [aux_str + self.list_analysis[6]]
+        final_analysis += [aux_str +
+                           self.list_analysis[6].format(self.availabe_quota_number)]
         aux_str = '' if self.available_quota_for_transit else 'no '
         final_analysis += [self.list_analysis[7].format(
             aux_str, Request.regulations['089|2014|CAC'][0])]
