@@ -110,7 +110,7 @@ class REINPRE(Request):
     str_pcm_pre = [
         # Used in pcm and cm:
         'reingreso por única vez a partir del periodo académico ',
-        '. Si el estudiante no renueva su matrícula en el semestre de reingreso, el acto' +
+        'Si el estudiante no renueva su matrícula en el semestre de reingreso, el acto' +
         ' académico expedido por el Consejo de Facultad queda sin efecto.',
         '1. Datos Generales:',
         '2. Información Académica:',
@@ -376,7 +376,7 @@ class REINPRE(Request):
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
         self.cm_answer(paragraph)
-        self.cm_pcm_paragraph(docx)
+        # self.cm_pcm_paragraph(docx)
         self.rein_general_data_table(docx)
         self.rein_academic_info(docx)
         self.rein_credits_summary(docx)
@@ -384,12 +384,14 @@ class REINPRE(Request):
 
     def pcm_answer(self, paragraph):
         paragraph.add_run(self.str_comittee_header + ' ')
-        self.standard_answer(paragraph)
+        aff = self.is_affirmative_response_advisor_response()
+        self.standard_answer(paragraph, aff)
 
     def cm_pcm_paragraph(self, docx):
         para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.paragraph_format.space_after = Pt(0)
+        print(123)
         para.add_run(self.str_pcm_pre[6] + self.student_name +
                      self.str_pcm_pre[7] + str(self.credits_remaining))
         para.add_run(self.str_pcm_pre[8] +
@@ -416,9 +418,10 @@ class REINPRE(Request):
 
     def cm_answer(self, paragraph):
         paragraph.add_run(self.str_council_header + ' ')
-        self.standard_answer(paragraph)
+        aff = self.is_affirmative_response_approval_status()
+        self.standard_answer(paragraph, aff)
 
-    def standard_answer(self, paragraph):
+    def standard_answer(self, paragraph, affirmative):
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True
@@ -429,6 +432,11 @@ class REINPRE(Request):
         if self.credits_granted > 0:
             # Y otorga n créditos adicionales:
             self.extra_credits(paragraph)
+
+        if affirmative:
+            paragraph.add_run(self.str_pcm_pre[1])
+        else:
+            paragraph.add_run(self.council_decision + '.')
 
         paragraph.add_run('({}).'.format(
             self.regulations['012|2014|VAC'][0] + "; Artículo 46, " +
