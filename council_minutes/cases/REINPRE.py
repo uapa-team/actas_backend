@@ -26,7 +26,7 @@ class REINPRE(Request):
 
     full_name = 'Reingreso'
 
-    regulation_list = ['008|2008|CSU', '012|2014|VAC']  # List of regulations
+    regulation_list = ['008|2008|CSU', '239|2009|VAC', '012|2014|VAC']
 
     reing_period = StringField(required=True, display='Periodo de reingreso')
     loss_period = StringField(
@@ -139,6 +139,22 @@ class REINPRE(Request):
         'y otorga ',
         ' crédito(s) adicional(es) para culminar su plan de estudios. '
 
+    ]
+
+    str_analysis = [
+        '{}a tenido otro reingreso después de 2009-01 (Artículo 46, {}). ' +
+        'Universitas y SIA: Revisado.',
+        'Si perdió calidad antes de 2009-01: Equivalencias incluyendo las asignaturas ' +
+        'perdidas. Comité Asesor asigna créditos a las que no tengan equivalencias ' +
+        '(Artículo 3, {}). Universitas y SIA: Pérdida de calidad de estudiante al ' +
+        'finalizar {} por {}',
+        '{}iene PAPA superior o igual a 2.7 (literal 3b – Artículo 3, {}; Artículo 46, ' +
+        '{}). SIA: PAPA de {}.',
+        '{}ispone de un cupo suficiente de créditos: Cupo adicional de 10 créditos a lo sumo ' +
+        '(parágrafo 1 Artículo 46, {}). SIA: {} creditos. En caso de otorgarle un cupo adicional ' +
+        'de créditos, éste no podrá ser mayor que el requerido para inscribir las asignaturas ' +
+        'pendientes del plan de estudios. (Artículo 6, {}).',
+        'La solicitud {}se hace en fechas de calendario de sede.'
     ]
 
     str_pcm_pre_acadinfo = [
@@ -360,12 +376,38 @@ class REINPRE(Request):
         paragraph.add_run(self.str_pcm_pre[18] + str(self.credits_granted) +
                           self.str_pcm_pre[19])
 
+    def get_analysis(self):
+        analysis = []
+        modifier = 'No h' if self.first_reing else 'H'
+        analysis.append(self.str_analysis[0].format(
+            modifier, self.regulations['008|2008|CSU'][0]
+        ))
+        analysis.append(self.str_analysis[1].format(
+            self.regulations['239|2009|VAC'][0],
+            # pylint: disable=no-member
+            self.loss_period, self.get_reason_of_loss_display()
+        ))
+        modifier = 'T' if self.papa >= 2.7 else 'No t'
+        analysis.append(self.str_analysis[2].format(
+            modifier, self.regulations['239|2009|VAC'][0],
+            self.regulations['008|2008|CSU'][0], self.papa
+        ))
+        modifier = 'D' if self.credits_remaining > 0 else 'No d'
+        analysis.append(self.str_analysis[3].format(
+            modifier, self.regulations['008|2008|CSU'][0],
+            self.credits_remaining, self.regulations['012|2014|VAC'][0]
+        ))
+        modifier = '' if self.request_in_date else 'no '
+        analysis.append(self.str_analysis[4].format(modifier))
+        return analysis + self.extra_analysis
+
     def pcm(self, docx):
+        add_analysis_paragraph(docx, self.get_analysis())
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
         self.pcm_answer(paragraph)
-        self.cm_pcm_paragraph(docx)
+        # self.cm_pcm_paragraph(docx)
         self.rein_general_data_table(docx)
         self.rein_academic_info(docx)
         self.rein_credits_summary(docx)
@@ -376,7 +418,6 @@ class REINPRE(Request):
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
         self.cm_answer(paragraph)
-        # self.cm_pcm_paragraph(docx)
         self.rein_general_data_table(docx)
         self.rein_academic_info(docx)
         self.rein_credits_summary(docx)
@@ -391,7 +432,6 @@ class REINPRE(Request):
         para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.paragraph_format.space_after = Pt(0)
-        print(123)
         para.add_run(self.str_pcm_pre[6] + self.student_name +
                      self.str_pcm_pre[7] + str(self.credits_remaining))
         para.add_run(self.str_pcm_pre[8] +
