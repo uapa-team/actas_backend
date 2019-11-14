@@ -3,14 +3,14 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from mongoengine import StringField, BooleanField, DateField, IntField
 from mongoengine import EmbeddedDocumentListField, FloatField, EmbeddedDocument
 from ..models import Request, Subject
-from .case_utils import add_analysis_paragraph
+from .case_utils import add_analysis_paragraph, table_general_data, string_to_date, table_approvals
 from .TRASPOS import TRASPOS
 
 
 class TRASPRE(TRASPOS):
 
     class HomologatedSubject(Subject):
-        group = StringField()
+        group = None
         name2 = StringField(required=True, display='Nuevo Nombre Asignatura')
         code2 = StringField(required=True, display='Nuevo Código')
         agroup = StringField(required=True, display='Agrupación')
@@ -31,7 +31,7 @@ class TRASPRE(TRASPOS):
         tipology = StringField(
             required=True, choices=TIP_CHOICES, display='Tipología')
 
-    full_name = 'Traslado de programa curricular'
+    full_name = 'Traslado de programa curricular (Pregrado)'
 
     TT_INTERCAMPUS = 'TTIC'
     TT_INTERFACULTY = 'TTIF'
@@ -147,15 +147,35 @@ class TRASPRE(TRASPOS):
 
     regulation_list = ['008|2008|CSU', '089|2014|CAC']  # List of regulations
 
-    str_cm = ['']
+    str_cm = ['traslado {} del programa {} ({}) - Sede {}, al programa {} ({}) - Sede ' +
+              '{}, en el periodo académico {}', ', condicionado a conservar la ' +
+              'calidad de estudiante al finalizar el periodo académico {}. (Artículo 39 ' +
+              'del {} y {}).', 'debido a que']
 
-    list_analysis = ['']
+    list_analysis = ['Viene del plan {} de la sede {}.',
+                     'a tenido calidad de estudiante en ese programa previamente ' +
+                     '(Parágrafo 1. Artículo 2, {}). Universitas: OK.',
+                     'a Culminado el primer plan de estudios.',
+                     'iene derecho a renovar la matrícula. Universitas: OK.',
+                     'a cursado por lo menos un periodo académico del primer plan ' +
+                     'de estudios (Artículo 39, {}). SIA: OK.', 'Ha cursado {} periodos ' +
+                     'académicos desde {}.', 'stá cursando doble titulación (Artículo ' +
+                     '7. {}). SIA: OK.', 'ay cupos disponibles en el plan de estudios ' +
+                     'del programa curricular solicitado (Estipulados por Consejo de ' +
+                     'Facultad).', 'El estudiante {}cuenta con el suficiente cupo ' +
+                     'de créditos para inscribir las asignaturas pendientes de ' +
+                     'aprobación en el nuevo plan (Artículo 3, {}).', 'iene puntaje de ' +
+                     'admisión igual o superior al puntaje del útimo admitido regular ' +
+                     'al plan de estudios de destino (Artículo 3, {}).', 'e encuentra ' +
+                     'dentro de la franja del 30% de los mejores promedios en el plan ' +
+                     'de estudios origen.']
 
     def cm(self, docx):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
         self.cm_answer(paragraph)
+        self.add_tables(docx)
 
     def cm_answer(self, paragraph):
         paragraph.add_run(self.str_council_header + ' ')
@@ -163,8 +183,12 @@ class TRASPRE(TRASPOS):
         paragraph.add_run(
             self.get_approval_status_display().upper() + ' ').font.bold = True
         paragraph.add_run(
-            self.str_cm[0] + self.get_grade_option_display() + ' ')
-        paragraph.add_run(self.str_cm[1].format(self.title)).font.italic = True
+            self.str_cm[0].format(
+                self.get_transit_type_display().split(
+                    ' ')[1].lower(), self.origin_program_name, self.origin_program_code,
+                self.campus_origin, self.transit_program_name,
+                self.transit_program_code, self.campus_destination,
+                self.get_next_period(self.academic_period)))
         if self.is_affirmative_response_approval_status():
             self.cm_af(paragraph)
         else:
@@ -172,46 +196,130 @@ class TRASPRE(TRASPOS):
 
     def pcm(self, docx):
         self.pcm_analysis(docx)
-        self.pcm_answer(docx)
-
-    def pcm_answer(self, docx):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        self.pcm_answer(paragraph)
+        self.add_tables(docx)
+
+    def pcm_answer(self, paragraph):
+        # pylint: disable=no-member
         paragraph.add_run(self.str_answer + ': ').font.bold = True
         paragraph.add_run(self.str_comittee_header + ' ')
         paragraph.add_run(
-            # pylint: disable=no-member
-            self.get_advisor_response_display().upper()).font.bold = True
-        # pylint: disable=no-member
-        paragraph.add_run(' ' + self.str_cm[0].format(
-            self.get_grade_option_display(), self.get_academic_program_display()))
-        paragraph.add_run(self.str_cm[1].format(self.title)).font.italic = True
+            self.get_advisor_response_display().upper() + ' ').font.bold = True
+        paragraph.add_run(
+            self.str_cm[0].format(
+                self.get_transit_type_display().split(
+                    ' ')[1].lower(), self.origin_program_name, self.origin_program_code,
+                self.campus_origin, self.transit_program_name,
+                self.transit_program_code, self.campus_destination,
+                self.get_next_period(self.academic_period)))
         if self.is_affirmative_response_approval_status():
             self.cm_af(paragraph)
         else:
             self.cm_ng(paragraph)
 
     def cm_af(self, paragraph):
-        paragraph.add_run(' ' + self.str_cm[2])
+        paragraph.add_run(self.str_cm[1].format(
+            self.academic_period, Request.regulations['008|2008|CSU'][0],
+            Request.regulations['089|2014|CAC'][0]))
 
     def cm_ng(self, paragraph):
         paragraph.add_run(
-            ' ' + self.str_cm[3] + ' ' + self.council_decision + '.')
+            ', ' + self.str_cm[2] + ' ' + self.council_decision + '.')
 
     def pcm_analysis(self, docx):
-        final_analysis = []
-        final_analysis += [self.list_analysis[3]]
-        ets = ''
         # pylint: disable=no-member
-        final_analysis += [self.list_analysis[4].format(
-            ets, self.get_grade_option_display())]
+        final_analysis = []
+        final_analysis += [self.list_analysis[0].format(
+            self.origin_program_name, self.get_origin_program_profile_display().lower(),
+            self.get_campus_origin_display())]
+        aux_str = 'H' if self.prev_plan else 'No h'
+        final_analysis += [aux_str + self.list_analysis[1]
+                           .format(Request.regulations['089|2014|CAC'][0])]
+        aux_str = 'H' if self.finish_first_plan else 'No h'
+        final_analysis += [aux_str + self.list_analysis[2]]
+        aux_str = 'T' if self.have_entitled_to_enrrol else 'No t'
+        final_analysis += [aux_str + self.list_analysis[3]]
+        aux_str = 'H' if self.at_least_one_period else 'No h'
+        final_analysis += [aux_str + self.list_analysis[4]
+                           .format(Request.regulations['008|2008|CSU'][0])]
+        final_analysis += [self.list_analysis[5].format(
+            self.enroled_number, self.admission_period)]
+        aux_str = 'H' if self.availabe_quota_number > 0 else 'No h'
+        final_analysis += [aux_str +
+                           self.list_analysis[6].format(self.availabe_quota_number)]
+        aux_str = '' if self.available_quota_for_transit else 'no '
+        final_analysis += [self.list_analysis[7].format(
+            aux_str, Request.regulations['089|2014|CAC'][0])]
         for extra_a in self.extra_analysis:
             final_analysis += [extra_a]
         add_analysis_paragraph(docx, final_analysis)
+
+    def add_tables(self, docx):
         paragraph = docx.add_paragraph()
-        paragraph.style = 'List Bullet'
-        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
-        paragraph.add_run(self.list_analysis[0] + ' ').font.bold = True
-        paragraph.add_run(self.title + '.').font.italic = True
+        run = paragraph.add_run(self.srt_titles[0])
+        run.font.bold = True
+        run.font.size = Pt(8)
+        # pylint: disable=no-member
+        general_data = [
+            [self.str_table[0], self.student_name],
+            [self.str_table[1], self.student_dni],
+            [self.str_table[2].format(
+                self.get_campus_origin_display()), self.origin_program_name],
+            [self.str_table[3], self.origin_program_code],
+            [self.str_table[4].format(
+                self.get_campus_destination_display()), self.transit_program_name],
+            [self.str_table[5], self.transit_program_code],
+            [self.str_table[6], string_to_date(str(self.date))],
+            [self.str_table[7], 'Sí' if self.same_degree else 'No'],
+        ]
+        table_general_data(general_data, 'TRASLADO', docx)
+        paragraph = docx.add_paragraph()
+        paragraph.paragraph_format.space_after = Pt(0)
+        run = paragraph.add_run(self.srt_titles[1])
+        run.font.bold = True
+        run.font.size = Pt(8)
+        table = docx.add_table(rows=4, cols=2, style='Table Grid')
+        table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.columns[0].width = 4350000
+        table.columns[1].width = 850000
+        for cell in table.columns[0].cells:
+            cell.width = 4350000
+        for cell in table.columns[1].cells:
+            cell.width = 850000
+        table.cell(0, 0).paragraphs[0].add_run(self.str_table[8])
+        table.cell(0, 1).paragraphs[0].add_run(self.admission_period)
+        table.cell(1, 0).paragraphs[0].add_run(self.str_table[9])
+        table.cell(1, 1).paragraphs[0].add_run('Sí' if self.enrroled else 'No')
+        table.cell(2, 0).paragraphs[0].add_run(self.str_table[10])
+        table.cell(2, 1).paragraphs[0].add_run(
+            'Sí' if self.prev_plan else 'No')
+        table.cell(3, 0).paragraphs[0].add_run(self.str_table[11])
+        table.cell(3, 1).paragraphs[0].add_run(
+            str(self.completion_percentage) + '%')
+        paragraph = docx.add_paragraph()
+        paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        run = paragraph.add_run(self.str_table[12])
+        run.font.bold = True
+        run.font.underline = True
+        run.font.size = Pt(8)
+        subjects = []
+        for sbj in self.homologated_subjects:
+            subjects.append([self.academic_period, sbj.new_code, sbj.new_name,
+                             str(sbj.credits), sbj.tipology, sbj.grade, sbj.name, sbj.grade])
+        details = [self.student_name, self.student_dni,
+                   self.transit_program_code, self.str_table[13].format(self.origin_program_name)]
+        table_approvals(docx, subjects, details)
+        paragraph = docx.add_paragraph()
+        paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        run = paragraph.add_run(self.str_table[14].format(
+            self.transit_program_name,
+            self.get_transit_program_profile_display().lower(), self.agreement_number,
+            str(self.agreement_year)))
+        run.font.underline = True
+        run.font.size = Pt(8)
