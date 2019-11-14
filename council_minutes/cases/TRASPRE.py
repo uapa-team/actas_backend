@@ -170,6 +170,27 @@ class TRASPRE(TRASPOS):
                      'dentro de la franja del 30% de los mejores promedios en el plan ' +
                      'de estudios origen.']
 
+    str_table = ['Estudiante', 'DNI', 'Plan de estudios de origen (1er plan) - Sede {}',
+                 'Código del plan de estudios de origen (1er plan)',
+                 'Plan de estudios de destino (2° plan) - Sede {}',
+                 'Código del plan de estudios de destino (2° plan)',
+                 'Fecha de la solicitud', '¿Estos planes de estudios conducen al mismo título?',
+                 'Periodo para el cual fue admitido', '¿El solicitante se encuentra matriculado' +
+                 ' en el semestre de presentar la solicitud?', '¿El solicitante tuvo calidad' +
+                 ' de estudiante en el plan de estudios de destino (2° plan)?',
+                 'Porcentaje de créditos aprobados en el plan de estudios origen (1er plan)',
+                 'CUADRO EQUIVALENCIAS Y CONVALIDACIONES DE ASIGNATURAS CURSADAS Y APROBADAS' +
+                 ' HASTA LA FECHA DE PRESENTACIÓN DE LA SOLICITUD POR PARTE DEL ESTUDIANTE.',
+                 'Universidad Nacional de Colombia plan de estudios de {}',
+                 'La oferta de asignaturas en cada una de las agrupaciones y componentes del' +
+                 ' plan de estudios del programa de {} - perfil {}, la encuentra en el Acuerdo' +
+                 ' No. {} del año {}, expedido por Consejo de Facultad de Ingeniería.',
+                 '¿Cuál fue el puntaje de admisión del solicitante?', 'Puntaje de admisión del ' +
+                 'último admitido regular al plan destino (2° plan) en la misma prueba de ' +
+                 'ingreso del solicitante* ', 'P.A.P.A. a la fecha de la solicitud', '¿El ' +
+                 'PAPA se encuentra en la franja del 30 % de los mejores promedios en el plan' +
+                 ' de estudios origen (1er plan)?']
+
     def cm(self, docx):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
@@ -300,26 +321,47 @@ class TRASPRE(TRASPOS):
         table.cell(3, 0).paragraphs[0].add_run(self.str_table[11])
         table.cell(3, 1).paragraphs[0].add_run(
             str(self.completion_percentage) + '%')
-        paragraph = docx.add_paragraph()
-        paragraph.paragraph_format.space_after = Pt(0)
-        paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        run = paragraph.add_run(self.str_table[12])
-        run.font.bold = True
-        run.font.underline = True
-        run.font.size = Pt(8)
-        subjects = []
-        for sbj in self.homologated_subjects:
-            subjects.append([self.academic_period, sbj.new_code, sbj.new_name,
-                             str(sbj.credits), sbj.tipology, sbj.grade, sbj.name, sbj.grade])
-        details = [self.student_name, self.student_dni,
-                   self.transit_program_code, self.str_table[13].format(self.origin_program_name)]
-        table_approvals(docx, subjects, details)
-        paragraph = docx.add_paragraph()
-        paragraph.paragraph_format.space_after = Pt(0)
-        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        run = paragraph.add_run(self.str_table[14].format(
-            self.transit_program_name,
-            self.get_transit_program_profile_display().lower(), self.agreement_number,
-            str(self.agreement_year)))
-        run.font.underline = True
-        run.font.size = Pt(8)
+        table = docx.add_table(rows=2, cols=2, style='Table Grid')
+        table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.columns[0].width = 4350000
+        table.columns[1].width = 850000
+        for cell in table.columns[0].cells:
+            cell.width = 4350000
+        for cell in table.columns[1].cells:
+            cell.width = 850000
+        if self.completion_percentage < 30.0:
+            table.cell(0, 0).paragraphs[0].add_run(self.str_table[15])
+            table.cell(0, 1).paragraphs[0].add_run(
+                str(self.student_admission_score))
+            table.cell(1, 0).paragraphs[0].add_run(self.str_table[16])
+            table.cell(1, 1).paragraphs[0].add_run(
+                str(self.last_admitted_score))
+        else:
+            table.cell(0, 0).paragraphs[0].add_run(self.str_table[17])
+            table.cell(0, 1).paragraphs[0].add_run(str(self.PAPA))
+            table.cell(1, 0).paragraphs[0].add_run(self.str_table[18])
+            table.cell(1, 1).paragraphs[0].add_run(
+                'Sí' if self.PAPA_in_threshold else 'No')
+        # paragraph = docx.add_paragraph()
+        # paragraph.paragraph_format.space_after = Pt(0)
+        # paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        # run = paragraph.add_run(self.str_table[12])
+        # run.font.bold = True
+        # run.font.underline = True
+        # run.font.size = Pt(8)
+        # subjects = []
+        # for sbj in self.homologated_subjects:
+        #     subjects.append([self.academic_period, sbj.new_code, sbj.new_name,
+        #                      str(sbj.credits), sbj.tipology, sbj.grade, sbj.name, sbj.grade])
+        # details = [self.student_name, self.student_dni,
+        #            self.transit_program_code, self.str_table[13].format(self.origin_program_name)]
+        # table_approvals(docx, subjects, details)
+        # paragraph = docx.add_paragraph()
+        # paragraph.paragraph_format.space_after = Pt(0)
+        # paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        # run = paragraph.add_run(self.str_table[14].format(
+        #     self.transit_program_name,
+        #     self.get_transit_program_profile_display().lower(), self.agreement_number,
+        #     str(self.agreement_year)))
+        # run.font.underline = True
+        # run.font.size = Pt(8)
