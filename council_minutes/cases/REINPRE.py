@@ -119,7 +119,7 @@ class REINPRE(Request):
         ' suficiencia en idioma.',
 
         # Used only in pcm:
-        'El señor ',
+        'El estudiante ',
         ' tiene pendiente por aprobar ',
         ' créditos del plan de estudios de ',
         ' y ',
@@ -185,8 +185,10 @@ class REINPRE(Request):
         'Si inscribe 21 Créditos'
     ]
 
-    str_cm_pos = [
-
+    str_out_date = [
+        'reingreso por única vez a partir del periodo académico {}, porque el estudiante ' +
+        'presentó la solicitud fuera de las fechas establecidas en el Calendario Académico ' +
+        'de la Sede Bogotá.'
     ]
 
     def rein_general_data_table(self, docx):
@@ -347,13 +349,13 @@ class REINPRE(Request):
         case = 'REINGRESO'
         table_credits_summary(docx, credits, case)
 
-    def rein_recommends(self, docx):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
         bullet = paragraph.add_run(self.str_pcm_pre[5])
         bullet.font.size = Pt(8)
 
+    def rein_recommends(self, docx):
         details = []
         details.append(
             # pylint: disable=no-member
@@ -407,10 +409,11 @@ class REINPRE(Request):
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
         self.pcm_answer(paragraph)
-        # self.cm_pcm_paragraph(docx)
-        self.rein_general_data_table(docx)
-        self.rein_academic_info(docx)
-        self.rein_credits_summary(docx)
+        if self.request_in_date:
+            self.cm_pcm_paragraph(docx)
+            self.rein_general_data_table(docx)
+            self.rein_academic_info(docx)
+            self.rein_credits_summary(docx)
         self.rein_recommends(docx)
 
     def cm(self, docx):
@@ -424,11 +427,20 @@ class REINPRE(Request):
         self.rein_recommends(docx)
 
     def pcm_answer(self, paragraph):
+        paragraph.add_run(self.str_answer + ':\n').font.bold = True
         paragraph.add_run(self.str_comittee_header + ' ')
-        aff = self.is_affirmative_response_advisor_response()
-        self.standard_answer(paragraph, aff)
+        paragraph.add_run(
+            # pylint: disable=no-member
+            self.get_approval_status_display().upper() + ' ').font.bold = True
+        if not self.request_in_date:
+            self.out_of_date_answer(paragraph)
+        else:
+            aff = self.is_affirmative_response_advisor_response()
+            self.standard_answer(paragraph, aff)
 
     def cm_pcm_paragraph(self, docx):
+        if not self.request_in_date:
+            return  # Skip when it's out of date
         para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.paragraph_format.space_after = Pt(0)
@@ -462,9 +474,6 @@ class REINPRE(Request):
         self.standard_answer(paragraph, aff)
 
     def standard_answer(self, paragraph, affirmative):
-        paragraph.add_run(
-            # pylint: disable=no-member
-            self.get_approval_status_display().upper() + ' ').font.bold = True
 
         paragraph.add_run(self.str_pcm_pre[0])
         paragraph.add_run(self.academic_period + ' ')
@@ -481,3 +490,6 @@ class REINPRE(Request):
         paragraph.add_run('({}).'.format(
             self.regulations['012|2014|VAC'][0] + "; Artículo 46, " +
             self.regulations['008|2008|CSU'][0]))
+
+    def out_of_date_answer(self, paragraph):
+        paragraph.add_run(self.str_out_date[0].format(self.reing_period))
