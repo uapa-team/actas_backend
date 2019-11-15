@@ -24,7 +24,7 @@ class REINPRE(Request):
         (RL_ANSWER_OTRO, 'Otro.')
     )
 
-    full_name = 'Reingreso'
+    full_name = 'Reingreso Pregrado'
 
     regulation_list = ['008|2008|CSU', '239|2009|VAC', '012|2014|VAC']
 
@@ -38,8 +38,9 @@ class REINPRE(Request):
         required=True, display='# de periodos transcurridos desde la pérdida de la calidad' +
         ' de estudiante')
     papa = FloatField(required=True, display='PAPA')
-    reason_of_loss = StringField(
-        choices=RL_ANSWER_CHOICES, default=RL_ANSWER_OTRO, display='Razón pérdida calidad de estudiante')
+    reason_of_loss = StringField(choices=RL_ANSWER_CHOICES,
+                                 default=RL_ANSWER_OTRO,
+                                 display='Razón pérdida calidad de estudiante')
     credits_minus_remaining = IntField(
         required=True, display='Cupo de créditos menos créditos pendientes')
     credits_remaining = IntField(required=True, display='Créditos restantes')
