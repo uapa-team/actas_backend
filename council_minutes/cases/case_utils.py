@@ -152,12 +152,18 @@ def table_general_data(general_data, case, docx_):
                             cols=3, style='Table Grid')
     table.style.font.size = Pt(8)
     table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    table.columns[0].width = 400000
+    table.columns[1].width = 2400000
+    table.columns[2].width = 2400000
     for cell in table.columns[0].cells:
         cell.width = 400000
+        cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
     for cell in table.columns[1].cells:
         cell.width = 2400000
+        cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
     for cell in table.columns[2].cells:
         cell.width = 2400000
+        cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
     cellp = table.cell(0, 0).merge(table.cell(0, 2)).paragraphs[0]
     cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
     cellp.add_run(case + '\n').font.bold = True
@@ -386,9 +392,10 @@ def table_approvals(docx_, subjects, details):
     table = docx_.add_table(
         rows=(4+asign_number+tipology_number), cols=8, style='Table Grid')
     table.style.font.size = Pt(8)
+    table.alignment = WD_ALIGN_PARAGRAPH.CENTER
     table.columns[0].width = 500000
     table.columns[1].width = 550000
-    table.columns[2].width = 1600000
+    table.columns[2].width = 1350000
     table.columns[3].width = 300000
     table.columns[4].width = 300000
     table.columns[5].width = 400000
@@ -399,7 +406,7 @@ def table_approvals(docx_, subjects, details):
     for cell in table.columns[1].cells:
         cell.width = 550000
     for cell in table.columns[2].cells:
-        cell.width = 1600000
+        cell.width = 1350000
     for cell in table.columns[3].cells:
         cell.width = 300000
     for cell in table.columns[4].cells:
