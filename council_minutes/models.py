@@ -371,35 +371,34 @@ class Request(DynamicDocument):
     )
 
     _cls = StringField(required=True)
-    date_stamp = DateField(required=True, default=datetime.date.today)
+    date_stamp = DateField(default=datetime.date.today)
     user = StringField(max_length=255, required=True)
     consecutive_minute = IntField(
-        min_value=1, required=True, display='Número del Acta')
-    date = DateField(
-        required=True, default=datetime.date.today, display='Fecha')
+        min_value=1, display='Número del Acta')
+    date = DateField(default=datetime.date.today, display='Fecha')
     academic_program = StringField(
         min_length=4, max_length=4, choices=PLAN_CHOICES,
-        required=True, display='Programa Académico')
+        display='Programa Académico')
     student_dni_type = StringField(
-        min_length=2, choices=DNI_TYPE_CHOICES, required=True,
+        min_length=2, choices=DNI_TYPE_CHOICES,
         default=DNI_TYPE_CEDULA_DE_CIUDADANIA, display='Tipo de Documento')
     student_dni = StringField(
-        max_length=22, required=True, display='Documento')
+        max_length=22, display='Documento')
     student_name = StringField(
-        max_length=512, required=True, display='Nombre del Estudiante')
+        max_length=512, display='Nombre del Estudiante')
     academic_period = StringField(
-        max_length=10, required=True, display='Periodo')
+        max_length=10, display='Periodo')
     approval_status = StringField(
-        min_length=2, max_length=2, choices=AS_CHOICES, required=True,
+        min_length=2, max_length=2, choices=AS_CHOICES,
         default=AS_EN_ESPERA, display='Estado de Aprobación')
     advisor_response = StringField(
-        min_length=3, max_length=3, choices=ARCR_CHOICES, required=True,
+        min_length=3, max_length=3, choices=ARCR_CHOICES,
         default=ARCR_EN_ESPERA, display='Respuesta del Comité')
     council_decision = StringField(
-        max_length=255, required=True, default='', display='Justificación del Consejo')
+        max_length=255, default='', display='Justificación del Consejo')
     student_justification = StringField(
-        required=True, default='', display='Justificación del Estudiante')
-    supports = StringField(required=True, default='', display='Soportes')
+        default='', display='Justificación del Estudiante')
+    supports = StringField(default='', display='Soportes')
     extra_analysis = ListField(
         StringField(), default=[], display='Analisis Extra')
 

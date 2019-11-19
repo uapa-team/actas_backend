@@ -51,13 +51,18 @@ def filter_request(request):
 @csrf_exempt  # Esto va solo para evitar la verificacion de django
 def insert_request(request):
     body = json.loads(request.body)
+    shell = json.dumps({'_cls': 'Request'})
     _cls = body['_cls'].split('.')[-1]
     subs = [c.__name__ for c in Request.__subclasses__()]
     case = Request.__subclasses__()[subs.index(_cls)]
-    new_request = case().from_json(case.translate(request.body))
+    new_request = case().from_json(
+        case.translate(shell.encode('utf-8')))
+    new_request.user = body['user']
     try:
         response = new_request.save()
-        return JsonResponse(response, safe=False, encoder=QuerySetEncoder)
+        response._cls = body['_cls']
+        response.save()
+        return JsonResponse({'id': str(response.id)}, safe=False)
     except ValidationError as e:
         return HttpResponse(e.message, status=400)
 
