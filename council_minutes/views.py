@@ -86,76 +86,17 @@ def update_cm(request, cm_id):
     if request.method == 'PATCH':
         try:
             # pylint: disable=no-member
-            acta = Request.objects.get(id=cm_id)
+            case = Request.objects.get(id=cm_id)
         except mongoengine.DoesNotExist:
             return HttpResponse('Does not exist', status=404)
-        # TODO: Se realizaron cambios en la forma de traducir
-        json_body = json.loads(request.body)
-        if hasattr(acta, 'old'):
-            old = acta.old
-        else:
-            old = []
-        old_obj = {}
-        some_change = False
-        if 'type_case' in json_body:
-            if acta.type_case != json_body['type_case']:
-                some_change = some_change or True
-                old_obj.update({'type_case': acta.type_case})
-                acta.type_case = json_body['type_case']
-        if 'student_name' in json_body:
-            if acta.student_name != json_body['student_name']:
-                some_change = some_change or True
-                old_obj.update({'student_name': acta.student_name})
-                acta.student_name = json_body['student_name']
-        if 'approval_status' in json_body:
-            if acta.approval_status != json_body['approval_status']:
-                some_change = some_change or True
-                old_obj.update({'approval_status': acta.approval_status})
-                acta.approval_status = json_body['approval_status']
-        if 'student_dni' in json_body:
-            if acta.student_dni != json_body['student_dni']:
-                some_change = some_change or True
-                old_obj.update({'student_dni': acta.student_dni})
-                acta.student_dni = json_body['student_dni']
-        if 'student_dni_type_case' in json_body:
-            if acta.student_dni_type_case != json_body['student_dni_type_case']:
-                some_change = some_change or True
-                old_obj.update(
-                    {'student_dni_type_case': acta.student_dni_type_case})
-                acta.student_dni_type_case = json_body['student_dni_type_case']
-        if 'academic_period' in json_body:
-            if acta.academic_period != json_body['academic_period']:
-                some_change = some_change or True
-                old_obj.update({'academic_period': acta.academic_period})
-                acta.academic_period = json_body['academic_period']
-        if 'academic_program' in json_body:
-            if acta.academic_program != json_body['academic_program']:
-                some_change = some_change or True
-                old_obj.update({'academic_program': acta.academic_program})
-                acta.academic_program = json_body['academic_program']
-        if 'justification' in json_body:
-            if acta.justification != json_body['justification']:
-                some_change = some_change or True
-                old_obj.update({'justification': acta.justification})
-                acta.justification = json_body['justification']
-        if 'user' in json_body:
-            if acta.user != json_body['user']:
-                some_change = some_change or True
-                old_obj.update({'user': acta.user})
-                acta.user = json_body['user']
-        if 'detail_cm' in json_body:
-            if acta.detail_cm != json_body['detail_cm']:
-                some_change = some_change or True
-                old_obj.update({'detail_cm': acta.detail_cm})
-                acta.detail_cm = json_body['detail_cm']
-        if some_change:
-            old_obj.update({'user_who_update': acta.user})
-            old_obj.update({'datetime_update': datetime.datetime.now()})
-            old.append(old_obj)
-            acta.old = old
-            acta.save()
-            return HttpResponse('Changes updated successfully', status=200)
-        return HttpResponse('No changes detected', status=204)
+        body = json.loads(request.body)
+        _cls = body['_cls'].split('.')[-1]
+        subs = [c.__name__ for c in Request.__subclasses__()]
+        case = Request.__subclasses__()[subs.index(_cls)]
+        obj = case.from_json(case.translate(request.body), True)
+        #obj.id = cm_id
+        obj.save()
+        return HttpResponse(obj.to_json(), status=204)
 
 
 @csrf_exempt
