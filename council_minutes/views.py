@@ -178,6 +178,26 @@ def docx_gen_by_date(request):
 
 
 @csrf_exempt
+def docx_gen_by_number(request):
+    try:
+        body = json.loads(request.body)
+        consecutive_minute = body['consecutive_minute']
+        year = body['year']
+    except json.decoder.JSONDecodeError:
+        return HttpResponse("Bad Request", status=400)
+    filename = 'public/acta' + \
+        year + '_' + consecutive_minute + '.docx'
+    generator = CouncilMinuteGenerator()
+    try:
+        generator.add_case_from_year_and_council_number(
+            consecutive_minute, year)
+    except IndexError:
+        return HttpResponse('No cases with specified number and year', status=401)
+    generator.generate(filename)
+    return HttpResponse(filename)
+
+
+@csrf_exempt
 def docx_gen_with_array(request):
     try:
         body = json.loads(request.body)

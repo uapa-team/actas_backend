@@ -374,7 +374,9 @@ class Request(DynamicDocument):
     date_stamp = DateField(default=datetime.date.today)
     user = StringField(max_length=255, required=True)
     consecutive_minute = IntField(
-        min_value=1, display='Número del Acta')
+        min_value=0, default=0, display='Número del Acta')
+    year = IntField(
+        min_value=2000, max_value=2010, display='Año del Acta')
     date = DateField(default=datetime.date.today, display='Fecha')
     academic_program = StringField(
         min_length=4, max_length=4, choices=PLAN_CHOICES,

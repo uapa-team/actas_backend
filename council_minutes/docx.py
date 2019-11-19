@@ -23,6 +23,18 @@ class CouncilMinuteGenerator():
     def add_case_from_request(self, request):
         request.cm(self.document)
 
+    def add_case_from_year_and_council_number(self, council_number, year):
+        request_by_number = Request.objects(
+            year=year, consecutive_minute=council_number)
+        request_by_number_ordered = request_by_number.order_by(
+            'academic_program', 'cls')
+        requests_pre = [
+            request for request in request_by_number_ordered if request.is_pre()]
+        requests_pos = [
+            request for request in request_by_number_ordered if not request.is_pre()]
+        self.__add_cases_from_date_pre_pos(requests_pre, 'PREGRADO')
+        self.__add_cases_from_date_pre_pos(requests_pos, 'POSGRADO')
+
     def add_cases_from_date(self, start_date, end_date):
         # pylint: disable=no-member
         request_by_date = Request.objects(date__gte=dateparser.parse(
