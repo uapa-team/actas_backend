@@ -153,6 +153,18 @@ class PreCouncilMinuteGenerator():
         header(request, self.document)
         request.pcm(self.document)
 
+    def add_case_from_year_and_council_number(self, council_number, year):
+        request_by_number = Request.objects(
+            year=year, consecutive_minute=council_number)
+        request_by_number_ordered = request_by_number.order_by(
+            'academic_program', 'cls')
+        requests_pre = [
+            request for request in request_by_number_ordered if request.is_pre()]
+        requests_pos = [
+            request for request in request_by_number_ordered if not request.is_pre()]
+        self.__add_cases_from_date_pre_pos(requests_pre, 'PREGRADO')
+        self.__add_cases_from_date_pre_pos(requests_pos, 'POSGRADO')
+
     def add_cases_from_date(self, start_date, end_date):
         # pylint: disable=no-member
         request_by_date = Request.objects(date__gte=dateparser.parse(
@@ -194,13 +206,16 @@ class PreCouncilMinuteGenerator():
         actual_academic_program = 'dummy'
         actual_case = 'dummy'
 
-        hyperlink_style = self.document.styles.add_style(
+        try:
+            hyperlink_style = self.document.styles.add_style(
             # pylint: disable=no-member
             'List Hyperlink', WD_STYLE_TYPE.PARAGRAPH)
-        hyperlink_style.base_style = self.document.styles['List Bullet']
-        hyperlink_style.font.color.rgb = RGBColor(
-            0x00, 0x00, 0xFF)
-        hyperlink_style.font.underline = True
+            hyperlink_style.base_style = self.document.styles['List Bullet']
+            hyperlink_style.font.color.rgb = RGBColor(
+                0x00, 0x00, 0xFF)
+            hyperlink_style.font.underline = True
+        except ValueError:
+            pass
 
         for request in requests:
             if actual_academic_program != request.academic_program:
