@@ -122,6 +122,28 @@ class Subject(EmbeddedDocument):
             ])
         return data
 
+    @staticmethod
+    def creds_summary(subjects):
+        """
+        A function that returns a summary of credits by tipology.
+        : param subjects: EmbeddedDocumentListField of Subjects to be computed
+        """
+        data = [0, 0, 0, 0, 0]
+        TIP_FUNDAMENTACION = 'B'
+        TIP_DISCIPLINAR = 'C'
+        for sbj in subjects:
+            if sbj.tipology == Subject.TIP_PRE_FUND_OBLIGATORIA:
+                data[0] += sbj.credits
+            elif sbj.tipology == Subject.TIP_PRE_FUND_OPTATIVA:
+                data[1] += sbj.credits
+            elif sbj.tipology == Subject.TIP_PRE_DISC_OBLIGATORIA:
+                data[2] += sbj.credits
+            elif sbj.tipology == Subject.TIP_PRE_DISC_OPTATIVA:
+                data[3] += sbj.credits
+            elif sbj.tipology == Subject.TIP_PRE_LIBRE_ELECCION:
+                data[4] += sbj.credits
+        return data
+
 
 class Request(DynamicDocument):
 

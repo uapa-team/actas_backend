@@ -1,23 +1,31 @@
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.enum.table import WD_ALIGN_VERTICAL
 from mongoengine import StringField, BooleanField, DateField, IntField
 from mongoengine import EmbeddedDocumentListField, FloatField, EmbeddedDocument
 from ..models import Request, Subject
-from .case_utils import add_analysis_paragraph, table_general_data, string_to_date, table_approvals
+from .case_utils import add_analysis_paragraph, table_general_data, string_to_date
+from .case_utils import table_approvals, table_credits_summary, table_recommend
 from .TRASPOS import TRASPOS
 
 
 class TRASPRE(TRASPOS):
 
     class HomologatedSubject(Subject):
-        group = None
+        TIP_CHOICES = (
+            (Subject.TIP_PRE_FUND_OBLIGATORIA, 'Disciplinar Obligatoria'),
+            (Subject.TIP_PRE_FUND_OPTATIVA, 'Disciplinar Optativa'),
+            (Subject.TIP_PRE_DISC_OBLIGATORIA, 'Fundamentación Obligatoria'),
+            (Subject.TIP_PRE_DISC_OPTATIVA, 'Fundamentación Optativa'),
+            (Subject.TIP_PRE_LIBRE_ELECCION, 'Libre Elección'),
+        )
         name2 = StringField(required=True, display='Nuevo Nombre Asignatura')
         code2 = StringField(required=True, display='Nuevo Código')
-        agroup = StringField(required=True, display='Agrupación')
+        group = StringField(required=True, display='Agrupación')
         grade = FloatField(min_value=0.0, required=True, display='Nota')
         period = StringField(required=True, display='Periodo')
 
-    class PendingSubject(EmbeddedDocument):
+    class PendingSubject(Subject):
         TIP_FUNDAMENTACION = 'B'
         TIP_DISCIPLINAR = 'C'
         TIP_CHOICES = (
@@ -25,9 +33,6 @@ class TRASPRE(TRASPOS):
             (TIP_DISCIPLINAR, 'Disciplinar'),
         )
         group = StringField(required=True, display='Agrupación')
-        name = StringField(required=True, display='Nombre Asignatura')
-        code = StringField(required=True, display='Código')
-        credits = IntField(required=True, display='Créditos')
         tipology = StringField(
             required=True, choices=TIP_CHOICES, display='Tipología')
 
@@ -92,6 +97,12 @@ class TRASPRE(TRASPOS):
     transit_program_name = StringField(
         required=True,
         display='Nombre del plan de estudios de destino')
+    origin_program_code = StringField(
+        required=True,
+        display='Código del plan de estudios de origen')
+    origin_program_name = StringField(
+        required=True,
+        display='Nombre del plan de estudios de origen')
     enrroled = BooleanField(
         required=True, default=True,
         display='¿Se encuentra matriculado en el semestre de presentar la solicitud?')
@@ -121,6 +132,12 @@ class TRASPRE(TRASPOS):
         display='Cupo de créditos para traslado')
     advisor_meeting_date = DateField(
         display='Fecha de reunión del comité')
+    council_number_advisor = IntField(
+        required=True, default=1, min_value=1,
+        display='Número del acta del comité')
+    council_year_advisor = IntField(
+        required=True, default=2000, min_value=2000,
+        display='Año del acta del comité')
     exiged_b_ob = IntField(
         min_value=0, default=0, required=True,
         display='Créditos exigidos fundamentación obligatorios')
@@ -150,7 +167,7 @@ class TRASPRE(TRASPOS):
     str_cm = ['traslado {} del programa {} ({}) - Sede {}, al programa {} ({}) - Sede ' +
               '{}, en el periodo académico {}', ', condicionado a conservar la ' +
               'calidad de estudiante al finalizar el periodo académico {}. (Artículo 39 ' +
-              'del {} y {}).', 'debido a que']
+              'del {} y {}).', 'debido a que', 'Comité Asesor de {}']
 
     list_analysis = ['Viene del plan {} de la sede {}.',
                      'a tenido calidad de estudiante en ese programa previamente ' +
@@ -179,7 +196,7 @@ class TRASPRE(TRASPOS):
                  ' en el semestre de presentar la solicitud?', '¿El solicitante tuvo calidad' +
                  ' de estudiante en el plan de estudios de destino (2° plan)?',
                  'Porcentaje de créditos aprobados en el plan de estudios origen (1er plan)',
-                 'CUADRO EQUIVALENCIAS Y CONVALIDACIONES DE ASIGNATURAS CURSADAS Y APROBADAS' +
+                 'CUADRO EQUIVALENCIAS Y CONVALIDACIONES DE ASIGNATURAS CURSADAS Y {}APROBADAS' +
                  ' HASTA LA FECHA DE PRESENTACIÓN DE LA SOLICITUD POR PARTE DEL ESTUDIANTE.',
                  'Universidad Nacional de Colombia plan de estudios de {}',
                  'La oferta de asignaturas en cada una de las agrupaciones y componentes del' +
@@ -189,7 +206,18 @@ class TRASPRE(TRASPOS):
                  'último admitido regular al plan destino (2° plan) en la misma prueba de ' +
                  'ingreso del solicitante* ', 'P.A.P.A. a la fecha de la solicitud', '¿El ' +
                  'PAPA se encuentra en la franja del 30 % de los mejores promedios en el plan' +
-                 ' de estudios origen (1er plan)?']
+                 ' de estudios origen (1er plan)?', 'Estudio de créditos', 'Cupo de créditos ' +
+                 'menos créditos pendientes en el plan de estudios origen (1er plan):', 'Cupo ' +
+                 'de créditos para traslado (literal d del artículo 3 del {})', '¿El cupo de ' +
+                 'créditos para traslado es igual o mayor al número de créditos pendientes de ' +
+                 'aprobación en el plan de estudios destino (2° plan)?', '* en caso que el ' +
+                 'plan destino sea de convocatoria anual el puntaje será con la anterior ' +
+                 'convocatoria.', '3. Resumen general de créditos del segundo plan de estudios:',
+                 '*Sin incluir los créditos correspondientes al cumplimiento del requisito de ' +
+                 'suficiencia en idioma extranjero ', 'PLAN DE ESTUDIOS ({})', 'Periodo', 'Código',
+                 'Asignatura', 'T*', 'Agrupación', 'C*', 'Nota', '*T: tipología (C/T/B/O/L). ' +
+                 'C*: créditos', 'ASIGNATURAS PENDIENTES POR CURSAR EN EL SEGUNDO PLAN DE ESTUDIOS',
+                 '']
 
     def cm(self, docx):
         paragraph = docx.add_paragraph()
@@ -233,8 +261,8 @@ class TRASPRE(TRASPOS):
             self.str_cm[0].format(
                 self.get_transit_type_display().split(
                     ' ')[1].lower(), self.origin_program_name, self.origin_program_code,
-                self.campus_origin, self.transit_program_name,
-                self.transit_program_code, self.campus_destination,
+                self.get_campus_origin_display(), self.get_academic_program_display(),
+                self.academic_program, self.get_campus_destination_display(),
                 self.get_next_period(self.academic_period)))
         if self.is_affirmative_response_approval_status():
             self.cm_af(paragraph)
@@ -254,8 +282,7 @@ class TRASPRE(TRASPOS):
         # pylint: disable=no-member
         final_analysis = []
         final_analysis += [self.list_analysis[0].format(
-            self.origin_program_name, self.get_origin_program_profile_display().lower(),
-            self.get_campus_origin_display())]
+            self.origin_program_name, self.get_campus_origin_display())]
         aux_str = 'H' if self.prev_plan else 'No h'
         final_analysis += [aux_str + self.list_analysis[1]
                            .format(Request.regulations['089|2014|CAC'][0])]
@@ -292,14 +319,15 @@ class TRASPRE(TRASPOS):
                 self.get_campus_origin_display()), self.origin_program_name],
             [self.str_table[3], self.origin_program_code],
             [self.str_table[4].format(
-                self.get_campus_destination_display()), self.transit_program_name],
-            [self.str_table[5], self.transit_program_code],
+                self.get_campus_destination_display()), self.get_academic_program_display()],
+            [self.str_table[5], self.academic_program],
             [self.str_table[6], string_to_date(str(self.date))],
             [self.str_table[7], 'Sí' if self.same_degree else 'No'],
         ]
         table_general_data(general_data, 'TRASLADO', docx)
         paragraph = docx.add_paragraph()
         paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         run = paragraph.add_run(self.srt_titles[1])
         run.font.bold = True
         run.font.size = Pt(8)
@@ -311,6 +339,9 @@ class TRASPRE(TRASPOS):
             cell.width = 4350000
         for cell in table.columns[1].cells:
             cell.width = 850000
+        for i in range(4):
+            table.cell(
+                i, 1).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(0, 0).paragraphs[0].add_run(self.str_table[8])
         table.cell(0, 1).paragraphs[0].add_run(self.admission_period)
         table.cell(1, 0).paragraphs[0].add_run(self.str_table[9])
@@ -329,6 +360,7 @@ class TRASPRE(TRASPOS):
             cell.width = 4350000
         for cell in table.columns[1].cells:
             cell.width = 850000
+        creds_study = True
         if self.completion_percentage < 30.0:
             table.cell(0, 0).paragraphs[0].add_run(self.str_table[15])
             table.cell(0, 1).paragraphs[0].add_run(
@@ -336,32 +368,335 @@ class TRASPRE(TRASPOS):
             table.cell(1, 0).paragraphs[0].add_run(self.str_table[16])
             table.cell(1, 1).paragraphs[0].add_run(
                 str(self.last_admitted_score))
+            creds_study = creds_study and self.student_admission_score < self.last_admitted_score
         else:
             table.cell(0, 0).paragraphs[0].add_run(self.str_table[17])
             table.cell(0, 1).paragraphs[0].add_run(str(self.PAPA))
             table.cell(1, 0).paragraphs[0].add_run(self.str_table[18])
             table.cell(1, 1).paragraphs[0].add_run(
                 'Sí' if self.PAPA_in_threshold else 'No')
-        # paragraph = docx.add_paragraph()
-        # paragraph.paragraph_format.space_after = Pt(0)
-        # paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        # run = paragraph.add_run(self.str_table[12])
-        # run.font.bold = True
-        # run.font.underline = True
-        # run.font.size = Pt(8)
-        # subjects = []
-        # for sbj in self.homologated_subjects:
-        #     subjects.append([self.academic_period, sbj.new_code, sbj.new_name,
-        #                      str(sbj.credits), sbj.tipology, sbj.grade, sbj.name, sbj.grade])
-        # details = [self.student_name, self.student_dni,
-        #            self.transit_program_code, self.str_table[13].format(self.origin_program_name)]
-        # table_approvals(docx, subjects, details)
-        # paragraph = docx.add_paragraph()
-        # paragraph.paragraph_format.space_after = Pt(0)
-        # paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        # run = paragraph.add_run(self.str_table[14].format(
-        #     self.transit_program_name,
-        #     self.get_transit_program_profile_display().lower(), self.agreement_number,
-        #     str(self.agreement_year)))
-        # run.font.underline = True
-        # run.font.size = Pt(8)
+            table.cell(
+                1, 1).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            creds_study = creds_study and self.PAPA_in_threshold
+        for i in range(2):
+            table.cell(
+                i, 1).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        if creds_study:
+            paragraph = docx.add_paragraph()
+            paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            run = paragraph.add_run(' ').font.size = Pt(8)
+            table = docx.add_table(rows=4, cols=3, style='Table Grid')
+            table.style.font.size = Pt(8)
+            table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.columns[0].width = 200000
+            table.columns[1].width = 4150000
+            table.columns[2].width = 850000
+            for cell in table.columns[0].cells:
+                cell.width = 200000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            for cell in table.columns[1].cells:
+                cell.width = 4150000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            for cell in table.columns[2].cells:
+                cell.width = 850000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(0, 0).merge(table.cell(
+                0, 2)).paragraphs[0].add_run(self.str_table[19]).font.bold = True
+            table.cell(1, 0).paragraphs[0].add_run('1')
+            table.cell(1, 1).paragraphs[0].add_run(self.str_table[20])
+            table.cell(1, 2).paragraphs[0].add_run(
+                str(self.creds_miunus_remaining))
+            table.cell(2, 0).paragraphs[0].add_run('2')
+            table.cell(2, 1).paragraphs[0].add_run(
+                self.str_table[21].format(Request.regulations['089|2014|CAC'][0]))
+            table.cell(2, 2).paragraphs[0].add_run(str(self.creds_for_transit))
+            table.cell(3, 0).paragraphs[0].add_run('3')
+            table.cell(3, 1).paragraphs[0].add_run(self.str_table[22])
+            table.cell(3, 2).paragraphs[0].add_run(
+                'Sí' if self.creds_for_transit >= self.creds_miunus_remaining else 'No')
+            for i in range(1, 4):
+                table.cell(
+                    i, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            paragraph = docx.add_paragraph()
+            paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            paragraph.add_run(self.str_table[23]).font.size = Pt(8)
+            paragraph = docx.add_paragraph()
+            paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            run = paragraph.add_run(self.str_table[24])
+            run.font.size = Pt(8)
+            run.font.bold = True
+            equivalence_creds = Subject.creds_summary(
+                self.equivalence)
+            pending_creds = [self.exiged_b_ob - equivalence_creds[0], self.exiged_b_op - equivalence_creds[1],
+                             self.exiged_c_ob - equivalence_creds[2], self.exiged_c_op - equivalence_creds[3], self.exiged_l - equivalence_creds[4]]
+            table_credits_summary(docx, [[self.exiged_b_ob, self.exiged_b_op, self.exiged_c_ob,
+                                          self.exiged_c_op, self.exiged_l], equivalence_creds, pending_creds], 'TRASLADO')
+            paragraph = docx.add_paragraph()
+            paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            paragraph.add_run(self.str_table[25]).font.size = Pt(8)
+            paragraph = docx.add_paragraph()
+            paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            paragraph.add_run(' ').font.size = Pt(8)
+            date = self.advisor_meeting_date.strftime('%d-%m-%Y')
+            details = [self.str_cm[3].format(
+                self.get_academic_program_display()), self.advisor_meeting_date.strftime('%d/%m/%Y '),
+                self.council_number_advisor, self.council_year_advisor, self.is_affirmative_response_advisor_response]
+            table_recommend(docx, details)
+            paragraph = docx.add_paragraph()
+            paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            paragraph.add_run(' ').font.size = Pt(8)
+            paragraph = docx.add_paragraph()
+            paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            run = paragraph.add_run(self.str_table[12].format(''))
+            run.font.underline = True
+            run.font.bold = True
+            run.font.size = Pt(8)
+            paragraph = docx.add_paragraph()
+            paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            paragraph.add_run(' ').font.size = Pt(8)
+            reproved = 0
+            for sbj in self.equivalence:
+                if sbj.grade < 3.0:
+                    reproved += 1
+            table = docx.add_table(
+                rows=(len(self.equivalence) + 3 - reproved), cols=9, style='Table Grid')
+            table.style.font.size = Pt(8)
+            table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.columns[0].width = 550000
+            table.columns[1].width = 550000
+            table.columns[2].width = 900000
+            table.columns[3].width = 500000
+            table.columns[4].width = 900000
+            table.columns[5].width = 250000
+            table.columns[6].width = 900000
+            table.columns[7].width = 250000
+            table.columns[8].width = 400000
+            for cell in table.columns[0].cells:
+                cell.width = 550000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            for cell in table.columns[1].cells:
+                cell.width = 550000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            for cell in table.columns[2].cells:
+                cell.width = 900000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            for cell in table.columns[3].cells:
+                cell.width = 500000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            for cell in table.columns[4].cells:
+                cell.width = 900000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            for cell in table.columns[5].cells:
+                cell.width = 250000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            for cell in table.columns[6].cells:
+                cell.width = 900000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            for cell in table.columns[7].cells:
+                cell.width = 250000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            for cell in table.columns[8].cells:
+                cell.width = 400000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            cellm = table.cell(0, 0).merge(table.cell(0, 2)).paragraphs[0]
+            cellm.add_run(
+                self.str_table[26].format('1')).font.bold = True
+            cellm.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            cellm = table.cell(0, 3).merge(table.cell(0, 8)).paragraphs[0]
+            cellm.add_run(
+                self.str_table[26].format('2')).font.bold = True
+            cellm.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.cell(1, 0).paragraphs[0].add_run(
+                self.str_table[27]).font.bold = True
+            table.cell(1, 1).paragraphs[0].add_run(
+                self.str_table[28]).font.bold = True
+            table.cell(1, 2).paragraphs[0].add_run(
+                self.str_table[29]).font.bold = True
+            table.cell(1, 3).paragraphs[0].add_run(
+                self.str_table[28]).font.bold = True
+            table.cell(1, 4).paragraphs[0].add_run(
+                self.str_table[29]).font.bold = True
+            table.cell(1, 5).paragraphs[0].add_run(
+                self.str_table[30]).font.bold = True
+            table.cell(1, 6).paragraphs[0].add_run(
+                self.str_table[31]).font.bold = True
+            table.cell(1, 7).paragraphs[0].add_run(
+                self.str_table[32]).font.bold = True
+            table.cell(1, 8).paragraphs[0].add_run(
+                self.str_table[33]).font.bold = True
+            for i in range(9):
+                table.cell(
+                    1, i).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            index = 2
+            total_creds = 0
+            for sbj in self.equivalence:
+                if sbj.grade < 3.0:
+                    continue
+                table.cell(index, 0).paragraphs[0].add_run(sbj.period)
+                table.cell(index, 1).paragraphs[0].add_run(sbj.code)
+                table.cell(index, 2).paragraphs[0].add_run(sbj.name)
+                table.cell(index, 3).paragraphs[0].add_run(sbj.code2)
+                table.cell(index, 4).paragraphs[0].add_run(sbj.name2)
+                table.cell(index, 5).paragraphs[0].add_run(sbj.tipology[-1])
+                table.cell(index, 6).paragraphs[0].add_run(sbj.group)
+                table.cell(index, 7).paragraphs[0].add_run(str(sbj.credits))
+                table.cell(index, 8).paragraphs[0].add_run(str(sbj.grade))
+                total_creds += sbj.credits
+                for i in range(9):
+                    table.cell(
+                        index, i).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+                index += 1
+            table.cell(index, 0).merge(table.cell(index, 6)).paragraphs[0].add_run(
+                'Total créditos que se equivalen/convalidan').font.bold = True
+            table.cell(index, 0).merge(table.cell(index, 6)
+                                       ).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.cell(index, 7).merge(table.cell(index, 8)).paragraphs[0].add_run(
+                str(total_creds)).font.bold = True
+            table.cell(index, 7).merge(table.cell(index, 8)
+                                       ).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            if reproved > 0:
+                paragraph = docx.add_paragraph()
+                paragraph.paragraph_format.space_after = Pt(0)
+                paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                paragraph.add_run(' ').font.size = Pt(8)
+                paragraph = docx.add_paragraph()
+                paragraph.paragraph_format.space_after = Pt(0)
+                paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                run = paragraph.add_run(self.str_table[12].format('NO '))
+                run.font.underline = True
+                run.font.bold = True
+                run.font.size = Pt(8)
+                paragraph = docx.add_paragraph()
+                paragraph.paragraph_format.space_after = Pt(0)
+                paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                paragraph.add_run(' ').font.size = Pt(8)
+                table = docx.add_table(
+                    rows=(reproved + 3), cols=9, style='Table Grid')
+                table.style.font.size = Pt(8)
+                table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                table.columns[0].width = 550000
+                table.columns[1].width = 550000
+                table.columns[2].width = 900000
+                table.columns[3].width = 500000
+                table.columns[4].width = 900000
+                table.columns[5].width = 250000
+                table.columns[6].width = 900000
+                table.columns[7].width = 250000
+                table.columns[8].width = 400000
+                for cell in table.columns[0].cells:
+                    cell.width = 550000
+                    cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                for cell in table.columns[1].cells:
+                    cell.width = 550000
+                    cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                for cell in table.columns[2].cells:
+                    cell.width = 900000
+                    cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                for cell in table.columns[3].cells:
+                    cell.width = 500000
+                    cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                for cell in table.columns[4].cells:
+                    cell.width = 900000
+                    cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                for cell in table.columns[5].cells:
+                    cell.width = 250000
+                    cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                for cell in table.columns[6].cells:
+                    cell.width = 900000
+                    cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                for cell in table.columns[7].cells:
+                    cell.width = 250000
+                    cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                for cell in table.columns[8].cells:
+                    cell.width = 400000
+                    cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                cellm = table.cell(0, 0).merge(table.cell(0, 2)).paragraphs[0]
+                cellm.add_run(
+                    self.str_table[26].format('1')).font.bold = True
+                cellm.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                cellm = table.cell(0, 3).merge(table.cell(0, 8)).paragraphs[0]
+                cellm.add_run(
+                    self.str_table[26].format('2')).font.bold = True
+                cellm.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                table.cell(1, 0).paragraphs[0].add_run(
+                    self.str_table[27]).font.bold = True
+                table.cell(1, 1).paragraphs[0].add_run(
+                    self.str_table[28]).font.bold = True
+                table.cell(1, 2).paragraphs[0].add_run(
+                    self.str_table[29]).font.bold = True
+                table.cell(1, 3).paragraphs[0].add_run(
+                    self.str_table[28]).font.bold = True
+                table.cell(1, 4).paragraphs[0].add_run(
+                    self.str_table[29]).font.bold = True
+                table.cell(1, 5).paragraphs[0].add_run(
+                    self.str_table[30]).font.bold = True
+                table.cell(1, 6).paragraphs[0].add_run(
+                    self.str_table[31]).font.bold = True
+                table.cell(1, 7).paragraphs[0].add_run(
+                    self.str_table[32]).font.bold = True
+                table.cell(1, 8).paragraphs[0].add_run(
+                    self.str_table[33]).font.bold = True
+                for i in range(9):
+                    table.cell(
+                        1, i).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+                index = 2
+                total_creds = 0
+                losses = False
+                for sbj in self.equivalence:
+                    if sbj.grade >= 3.0:
+                        losses = True
+                        continue
+                    table.cell(index, 0).paragraphs[0].add_run(sbj.period)
+                    table.cell(index, 1).paragraphs[0].add_run(sbj.code)
+                    table.cell(index, 2).paragraphs[0].add_run(sbj.name)
+                    table.cell(index, 3).paragraphs[0].add_run(sbj.code2)
+                    table.cell(index, 4).paragraphs[0].add_run(sbj.name2)
+                    table.cell(index, 5).paragraphs[0].add_run(
+                        sbj.tipology[-1])
+                    table.cell(index, 6).paragraphs[0].add_run(sbj.group)
+                    table.cell(index, 7).paragraphs[0].add_run(
+                        str(sbj.credits))
+                    table.cell(index, 8).paragraphs[0].add_run(str(sbj.grade))
+                    total_creds += sbj.credits
+                    for i in range(9):
+                        table.cell(
+                            index, i).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+                    index += 1
+                table.cell(index, 0).merge(table.cell(index, 6)).paragraphs[0].add_run(
+                    'Total créditos que se equivalen/convalidan').font.bold = True
+                table.cell(index, 0).merge(table.cell(index, 6)
+                                           ).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+                table.cell(index, 7).merge(table.cell(index, 8)).paragraphs[0].add_run(
+                    str(total_creds)).font.bold = True
+                table.cell(index, 7).merge(table.cell(index, 8)
+                                           ).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+                paragraph = docx.add_paragraph()
+                paragraph.paragraph_format.space_after = Pt(0)
+                paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                paragraph.add_run(' ').font.size = Pt(8)
+                paragraph = docx.add_paragraph()
+                paragraph.paragraph_format.space_after = Pt(0)
+                paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+                run = paragraph.add_run(self.str_table[34])
+                run.font.size = Pt(8)
+                run.font.underline = True
+                run.font.italic = True
+                paragraph = docx.add_paragraph()
+                paragraph.paragraph_format.space_after = Pt(0)
+                paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                paragraph.add_run(' ').font.size = Pt(8)
+                paragraph = docx.add_paragraph()
+                paragraph.paragraph_format.space_after = Pt(0)
+                paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                run = paragraph.add_run(self.str_table[35])
+                run.font.size = Pt(8)
+                run.font.underline = True
+                run.font.bold = True

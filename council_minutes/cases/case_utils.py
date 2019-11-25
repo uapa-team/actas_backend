@@ -524,19 +524,26 @@ def table_credits_summary(docx_, credits_, case):
     table.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
     for cell in table.columns[0].cells:
-        cell.width = 720000
+        cell.width = 1610000
     for cell in table.columns[1].cells:
-        cell.width = 300000
+        cell.width = 690000
     for cell in table.columns[2].cells:
-        cell.width = 300000
+        cell.width = 610000
     for cell in table.columns[3].cells:
-        cell.width = 300000
+        cell.width = 690000
     for cell in table.columns[4].cells:
-        cell.width = 300000
+        cell.width = 610000
     for cell in table.columns[5].cells:
-        cell.width = 900000
+        cell.width = 675000
     for cell in table.columns[6].cells:
-        cell.width = 700000
+        cell.width = 375000
+    table.columns[0].width = 1610000
+    table.columns[1].width = 690000
+    table.columns[2].width = 610000
+    table.columns[3].width = 690000
+    table.columns[4].width = 610000
+    table.columns[5].width = 675000
+    table.columns[6].width = 375000
     for column in table.columns:
         for cell in column.cells:
             cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
@@ -621,7 +628,7 @@ def table_recommend(docx_, details):
     table.cell(0, 0).paragraphs[0].add_run(
         str(details[1])[0:2] + num_to_month(int(str(details[1])[4:5])) + str(details[1])[6:10])
     table.cell(0, 0).paragraphs[0].add_run(
-        '. Acta ' + details[2] + ' de ' + details[3] + '.')
+        '. Acta ' + str(details[2]) + ' de ' + str(details[3]) + '.')
     table.cell(0, 1).paragraphs[0].add_run('Recomienda')
     table.cell(0, 1).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
     table.cell(0, 1).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
