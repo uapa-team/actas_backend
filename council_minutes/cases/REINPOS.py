@@ -31,22 +31,29 @@ class REINPOS(Request):
 
     str_cm = [
         'reingreso por única vez en el programa de {}, a partir del periodo {}',
-        '.El reingreso del estudiante estará regido por el {}.',
+        '. El reingreso del estudiante estará regido por el {}.',
         ', debido a que {}.'
     ]
 
-    str_pcm = []
+    str_pcm = [
+        'reingreso por única vez al programa {}, a partir del periodo académico {}, ' +
+        'el reingreso del estudiante estará regido por el {}. ',
+        'Durante el periodo académico adicional otorgado, el estudiante deberá solicitar ' +
+        'el nombramiento de jurados de su {}, con el fin de obtener su título, ' +
+        'previo cumplimiento de las demás exigencias académicas y administrativas vigentes.' +
+        '(Artículo 7 de la {}).'
+    ]
 
     str_analysis = [
         'El estudiante {} ha tenido otro reingreso posterior al 2009-1S, ' +
         '(Artículo 46, {}).',
-        '{}. Plan de estudios {} - Perfil de {}.',
+        'Causa de retiro: {}. Plan de estudios {} - Perfil de {}.',
         '{}iene PAPA superior o igual a 3.5 (literal 3a – Artículo 3, {};' +
         'Artículo 46, {}). SIA PAPA: {}.',
         'En caso de ser por máximo tiempo de permanencia o por tener dos calificaciones ' +
         'NA en su historia académica: las asignaturas que le faltan por aprobar pueden cursarse ' +
         'en un solo periodo académico adicional (literal 5 – Artículo 3, {}; ' +
-        'parágrafo 2 Artículo 46, {}).\nSIA: Le falta por aprobar: {}.',
+        'parágrafo 2 Artículo 46, {}).SIA: Le falta por aprobar: {}.',
         'La solicitud {}se hace en fechas de calendario de sede.'
     ]
 
@@ -66,9 +73,9 @@ class REINPOS(Request):
             self.reing_period
         ))
         if self.is_affirmative_response_approval_status():
-            self.add_run(self.str_cm[1].format(self.regulations['008|2008|CSU'][0]))
+            paragraph.add_run(self.str_cm[1].format(self.regulations['008|2008|CSU'][0]))
         else:
-            self.add_run(self.str_cm[2].format(self.council_decision))
+            paragraph.add_run(self.str_cm[2].format(self.council_decision))
 
 
     def pcm(self, docx):
@@ -79,11 +86,20 @@ class REINPOS(Request):
         self.pcm_answer(paragraph)
 
     def pcm_answer(self, paragraph):
-        paragraph.add_run(self.str_answer + ' ').font.bold = True
+        # pylint: disable=no-member
+        paragraph.add_run(self.str_answer + ':\n').font.bold = True
         paragraph.add_run(self.str_comittee_header + ' ')
         paragraph.add_run(
-            # pylint: disable=no-member
             self.get_advisor_response_display().upper() + ' ').font.bold = True
+        paragraph.add_run(self.str_pcm[0].format(  
+            self.get_academic_program_display(),
+            self.reing_period,
+            self.regulations['008|2008|CSU'][0]
+        ))
+        paragraph.add_run(self.str_pcm[1].format(
+            self.get_grade_option_display(),
+            self.regulations['012|2014|VAC'][0]
+        ))
     
     def add_analysis(self):
         analysis = []
@@ -97,7 +113,7 @@ class REINPOS(Request):
             self.reason_of_loss,
             # pylint: disable=no-member
             self.get_academic_program_display(),
-            self.node
+            self.get_node_display()
         ))
 
         modifier = 'T' if self.papa >= 3.5 else 'No t'
@@ -112,7 +128,7 @@ class REINPOS(Request):
         analysis.append(self.str_analysis[3].format(
             self.regulations['239|2009|VAC'][0],
             self.regulations['008|2008|CSU'][0],
-            subjects[:-1]
+            subjects[:-2]
         ))
 
         modifier = '' if self.on_time else 'no '
