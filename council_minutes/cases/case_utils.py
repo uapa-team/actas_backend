@@ -546,6 +546,9 @@ def table_credits_summary(docx_, credits_, case):
     table.cell(2, 0).paragraphs[0].add_run('Exigidos*')
     if case == "DOBLE TITULACIÓN":
         table.cell(3, 0).paragraphs[0].add_run('Convalidados/equivalentes**')
+    elif case == 'REINGRESO':
+        table.cell(3, 0).paragraphs[0].add_run(
+            'Aprobados del plan de estudios')
     else:
         table.cell(3, 0).paragraphs[0].add_run('Convalidados/equivalentes')
 
