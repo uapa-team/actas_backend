@@ -20,14 +20,14 @@ def cases_defined(request):
         response = {
             'cases': [
                 {'code': type_case.__name__, 'name': type_case.full_name}
-                for type_case in Request.__subclasses__()]
+                for type_case in Request.get_subclasses()]
         }
         return JsonResponse(response)
 
 
 def info_cases(request, case_id):
     if request.method == 'GET':
-        for type_case in Request.__subclasses__():
+        for type_case in Request.get_subclasses():
             if type_case.__name__ == case_id:
                 return JsonResponse(get_fields(type_case()))
         return JsonResponse({'response': 'Not found'}, status=404)
@@ -52,15 +52,14 @@ def filter_request(request):
 def insert_request(request):
     body = json.loads(request.body)
     shell = json.dumps({'_cls': 'Request'})
-    _cls = body['_cls'].split('.')[-1]
-    subs = [c.__name__ for c in Request.__subclasses__()]
-    case = Request.__subclasses__()[subs.index(_cls)]
+    subs = [c.__name__ for c in Request.get_subclasses()]
+    case = Request.get_subclasses()[subs.index(body['_cls'])]
     new_request = case().from_json(
         case.translate(shell.encode('utf-8')))
     new_request.user = body['user']
     try:
         response = new_request.save()
-        response._cls = body['_cls']
+        response._cls = case.get_entire_name()
         response.save()
         return JsonResponse({'id': str(response.id)}, safe=False)
     except ValidationError as e:
@@ -91,8 +90,8 @@ def update_cm(request, cm_id):
             return HttpResponse('Does not exist', status=404)
         body = json.loads(request.body)
         _cls = body['_cls'].split('.')[-1]
-        subs = [c.__name__ for c in Request.__subclasses__()]
-        case = Request.__subclasses__()[subs.index(_cls)]
+        subs = [c.__name__ for c in Request.get_subclasses()]
+        case = Request.get_subclasses()[subs.index(_cls)]
         obj = case.from_json(case.translate(request.body), True)
         #obj.id = cm_id
         obj.save()

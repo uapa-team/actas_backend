@@ -511,6 +511,23 @@ class Request(DynamicDocument):
             except KeyError:
                 pass
         return json.dumps(data_json)
+    
+    @classmethod
+    def get_entire_name(cls):
+        parents = cls.mro()
+        index = parents.index(Request)
+        name = 'Request.'
+        for _cls in reversed(parents[:index]):
+            name += _cls.__name__ + '.'
+        return name[:-1]
+
+    @classmethod
+    def get_subclasses(cls):
+        subs = []
+        for subclass in cls.__subclasses__():
+            subs.append(subclass)
+            subs += subclass.get_subclasses()
+        return subs
 
 
 class Professor(EmbeddedDocument):
