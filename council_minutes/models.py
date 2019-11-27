@@ -2,7 +2,7 @@ import datetime
 import json
 from mongoengine.fields import BaseField
 from mongoengine import DynamicDocument, EmbeddedDocument, DateField, StringField
-from mongoengine import ListField, IntField, EmbeddedDocumentField
+from mongoengine import ListField, IntField, EmbeddedDocumentField, EmbeddedDocumentListField
 
 
 def get_fields(obj):
@@ -508,6 +508,16 @@ class Request(DynamicDocument):
                         if item[1] == data_json[key]:
                             data_json[key] = item[0]
                             break
+                elif isinstance(cls._fields[key], EmbeddedDocumentListField):
+                    _cls = cls._fields[key].field.document_type_obj
+                    for field in _cls._fields:
+                        choices = _cls._fields[field].choices
+                        if choices:
+                            _dict = dict((y, x) for x, y in choices)
+                            for element in data_json[key]:
+                                if element[field] in _dict:
+                                    element[field] = _dict[element[field]]
+
             except KeyError:
                 pass
         return json.dumps(data_json)
