@@ -22,7 +22,7 @@ class TRASPRE(TRASPOS):
         name2 = StringField(required=True, display='Nuevo Nombre Asignatura')
         code2 = StringField(required=True, display='Nuevo Código')
         group = StringField(required=True, display='Agrupación')
-        grade = FloatField(min_value=0.0, required=True, display='Nota')
+        grade = StringField(required=True, display='Nota')
         period = StringField(required=True, display='Periodo')
 
     class PendingSubject(Subject):
@@ -35,6 +35,21 @@ class TRASPRE(TRASPOS):
         group = StringField(required=True, display='Agrupación')
         tipology = StringField(
             required=True, choices=TIP_CHOICES, display='Tipología')
+
+    class Optative(EmbeddedDocument):
+        TIP_FUNDAMENTACION = 'B'
+        TIP_DISCIPLINAR = 'C'
+        TIP_CHOICES = (
+            (TIP_FUNDAMENTACION, 'Fundamentación'),
+            (TIP_DISCIPLINAR, 'Disciplinar'),
+        )
+        group = StringField(required=True, display='Agrupación')
+        tipology = StringField(
+            required=True, choices=TIP_CHOICES, display='Tipología')
+        required_creds = IntField(min_value=0, required=True,
+                                  display='Créditos requeridos')
+        pending_creds = IntField(min_value=0, required=True,
+                                 display='Créditos pendientes')
 
     full_name = 'Traslado de programa curricular (Pregrado)'
 
@@ -58,6 +73,18 @@ class TRASPRE(TRASPOS):
         (TC_PALMIRA, 'Palmira'),
         (TC_LAPAZ, 'La Paz'),
     )
+
+    offer_regulation = {
+        '2541': ('030', 2016),
+        '2542': ('027', 2015),
+        '2544': ('034', 2016),
+        '2545': ('087', 2014),
+        '2546': ('024', 2014),
+        '2547': ('068', 2018),
+        '2548': ('018', 2014),
+        '2549': ('002', 2013),
+        '2879': ('026', 2014),
+    }
 
     at_least_one_period = BooleanField(
         required=True, default=True,
@@ -159,6 +186,9 @@ class TRASPRE(TRASPOS):
     remaining = EmbeddedDocumentListField(
         PendingSubject, required=True,
         display="Asignaturas pendientes por cursar en el segundo plan de estudios")
+    optative_remaining = EmbeddedDocumentListField(
+        Optative, required=True,
+        display='Agrupaciones de las asignaturas pendientes optativas')
     free_choice_pending = IntField(min_value=0, required=True,
                                    display='Créditos pendientes de libre elección')
 
@@ -185,7 +215,10 @@ class TRASPRE(TRASPOS):
                      'admisión igual o superior al puntaje del útimo admitido regular ' +
                      'al plan de estudios de destino (Artículo 3, {}).', 'e encuentra ' +
                      'dentro de la franja del 30% de los mejores promedios en el plan ' +
-                     'de estudios origen.']
+                     'de estudios origen.', 'La oferta de asignatura optativas en cada ' +
+                     'una de las agrupaciones y componentes del plan de estudios del ' +
+                     'programa de {}, la encuentra el acuerdo No. {} del año {}, ' +
+                     'expedido por el Consejo de Facultad.']
 
     str_table = ['Estudiante', 'DNI', 'Plan de estudios de origen (1er plan) - Sede {}',
                  'Código del plan de estudios de origen (1er plan)',
@@ -217,7 +250,14 @@ class TRASPRE(TRASPOS):
                  'suficiencia en idioma extranjero ', 'PLAN DE ESTUDIOS ({})', 'Periodo', 'Código',
                  'Asignatura', 'T*', 'Agrupación', 'C*', 'Nota', '*T: tipología (C/T/B/O/L). ' +
                  'C*: créditos', 'ASIGNATURAS PENDIENTES POR CURSAR EN EL SEGUNDO PLAN DE ESTUDIOS',
-                 '']
+                 'Componente de Fundamentación (B)', 'Obligatorias', 'Créditos Asignatura',
+                 'Créditos pendientes por cursar por el estudiante', 'Total créditos pendientes',
+                 'Nombre de la Agrupación', 'Créditos requeridos', 'Componente Disciplinar/' +
+                 'Profesional (C)', 'Componente de Libre Elección (L) (Créditos Pendientes)',
+                 'Optativas', 'La oferta de asignaturas optativas en cada una de las ' +
+                 'agrupaciones y componentes del plan de estudios del programa curricular de {}' +
+                 ', la encuentra en el Acuerdo No. {} del año {}, expedido por el Consejo de ' +
+                 'la Facultad de Ingeniería.', 'Total créditos que se equivalen/convalidan']
 
     def cm(self, docx):
         paragraph = docx.add_paragraph()
@@ -555,7 +595,7 @@ class TRASPRE(TRASPOS):
                         index, i).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
                 index += 1
             table.cell(index, 0).merge(table.cell(index, 6)).paragraphs[0].add_run(
-                'Total créditos que se equivalen/convalidan').font.bold = True
+                self.str_table[47]).font.bold = True
             table.cell(index, 0).merge(table.cell(index, 6)
                                        ).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
             table.cell(index, 7).merge(table.cell(index, 8)).paragraphs[0].add_run(
@@ -649,10 +689,8 @@ class TRASPRE(TRASPOS):
                         1, i).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
                 index = 2
                 total_creds = 0
-                losses = False
                 for sbj in self.equivalence:
                     if sbj.grade >= 3.0:
-                        losses = True
                         continue
                     table.cell(index, 0).paragraphs[0].add_run(sbj.period)
                     table.cell(index, 1).paragraphs[0].add_run(sbj.code)
@@ -671,32 +709,361 @@ class TRASPRE(TRASPOS):
                             index, i).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
                     index += 1
                 table.cell(index, 0).merge(table.cell(index, 6)).paragraphs[0].add_run(
-                    'Total créditos que se equivalen/convalidan').font.bold = True
+                    self.str_table[47]).font.bold = True
                 table.cell(index, 0).merge(table.cell(index, 6)
                                            ).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
                 table.cell(index, 7).merge(table.cell(index, 8)).paragraphs[0].add_run(
                     str(total_creds)).font.bold = True
                 table.cell(index, 7).merge(table.cell(index, 8)
                                            ).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-                paragraph = docx.add_paragraph()
-                paragraph.paragraph_format.space_after = Pt(0)
-                paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                paragraph.add_run(' ').font.size = Pt(8)
-                paragraph = docx.add_paragraph()
-                paragraph.paragraph_format.space_after = Pt(0)
-                paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-                run = paragraph.add_run(self.str_table[34])
-                run.font.size = Pt(8)
-                run.font.underline = True
-                run.font.italic = True
-                paragraph = docx.add_paragraph()
-                paragraph.paragraph_format.space_after = Pt(0)
-                paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                paragraph.add_run(' ').font.size = Pt(8)
-                paragraph = docx.add_paragraph()
-                paragraph.paragraph_format.space_after = Pt(0)
-                paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                run = paragraph.add_run(self.str_table[35])
-                run.font.size = Pt(8)
-                run.font.underline = True
-                run.font.bold = True
+            paragraph = docx.add_paragraph()
+            paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            paragraph.add_run(' ').font.size = Pt(8)
+            paragraph = docx.add_paragraph()
+            paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            run = paragraph.add_run(self.str_table[34])
+            run.font.size = Pt(8)
+            run.font.underline = True
+            run.font.italic = True
+            paragraph = docx.add_paragraph()
+            paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            paragraph.add_run(' ').font.size = Pt(8)
+            paragraph = docx.add_paragraph()
+            paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            run = paragraph.add_run(self.str_table[35])
+            run.font.size = Pt(8)
+            run.font.underline = True
+            run.font.bold = True
+            paragraph = docx.add_paragraph()
+            paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            paragraph.add_run(' ').font.size = Pt(8)
+            disciplinare = 0
+            for sbj in self.remaining:
+                if sbj.tipology == self.PendingSubject.TIP_DISCIPLINAR:
+                    disciplinare += 1
+            table = docx.add_table(
+                rows=(len(self.remaining) - disciplinare + 4), cols=5, style='Table Grid')
+            table.style.font.size = Pt(8)
+            table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.columns[0].width = 1000000
+            table.columns[1].width = 600000
+            table.columns[2].width = 1700000
+            table.columns[3].width = 700000
+            table.columns[4].width = 1200000
+            for cell in table.columns[0].cells:
+                cell.width = 1000000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            for cell in table.columns[1].cells:
+                cell.width = 600000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            for cell in table.columns[2].cells:
+                cell.width = 1700000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            for cell in table.columns[3].cells:
+                cell.width = 700000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            for cell in table.columns[4].cells:
+                cell.width = 1200000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(0, 0).merge(table.cell(0, 4)).paragraphs[0].add_run(
+                self.str_table[36]).font.bold = True
+            table.cell(1, 0).merge(table.cell(1, 4)).paragraphs[0].add_run(
+                self.str_table[37]).font.bold = True
+            table.cell(0, 0).merge(table.cell(
+                0, 4)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.cell(1, 0).merge(table.cell(
+                1, 4)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.cell(2, 0).paragraphs[0].add_run(self.str_table[31])
+            table.cell(2, 1).paragraphs[0].add_run(self.str_table[28])
+            table.cell(2, 2).paragraphs[0].add_run(self.str_table[29])
+            table.cell(2, 3).paragraphs[0].add_run(self.str_table[38])
+            table.cell(2, 4).paragraphs[0].add_run(self.str_table[39])
+            for i in range(5):
+                table.cell(
+                    2, i).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            index = 3
+            total_creds = 0
+            proceced_remaining = {}
+            proceced_creds = {}
+            for sbj in self.remaining:
+                if sbj.tipology == self.PendingSubject.TIP_DISCIPLINAR:
+                    continue
+                total_creds += sbj.credits
+                if sbj.group in proceced_remaining.keys():
+                    proceced_remaining[sbj.group].append(sbj)
+                    proceced_creds[sbj.group] += sbj.credits
+                else:
+                    proceced_remaining[sbj.group] = [sbj]
+                    proceced_creds[sbj.group] = sbj.credits
+            ordered_list = []
+            for i in proceced_remaining:
+                fc = table.cell(index, 0).merge(table.cell(
+                    index + len(proceced_remaining[i]) - 1, 0)).paragraphs[0]
+                fc.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                fc.add_run(i)
+                sc = table.cell(index, 4).merge(table.cell(
+                    index + len(proceced_remaining[i]) - 1, 4)).paragraphs[0]
+                sc.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                sc.add_run(str(proceced_creds[i]))
+                index += len(proceced_remaining[i])
+                ordered_list += proceced_remaining[i]
+            index = 3
+            for sbj in ordered_list:
+                table.cell(index, 1).paragraphs[0].add_run(sbj.code)
+                table.cell(index, 2).paragraphs[0].add_run(sbj.name)
+                table.cell(index, 3).paragraphs[0].add_run(
+                    str(sbj.credits))
+                for i in range(1, 4):
+                    table.cell(
+                        index, i).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+                index += 1
+            table.cell(index, 0).merge(
+                table.cell(index, 2)).paragraphs[0].add_run(self.str_table[40]).font.bold = True
+            table.cell(index, 0).merge(
+                table.cell(index, 2)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.cell(index, 3).merge(
+                table.cell(index, 4)).paragraphs[0].add_run(str(total_creds))
+            table.cell(index, 3).merge(
+                table.cell(index, 4)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            fundam = 0
+            for agr in self.optative_remaining:
+                if agr.tipology == self.Optative.TIP_DISCIPLINAR:
+                    continue
+                fundam += 1
+            table = docx.add_table(
+                rows=(fundam + 3), cols=3, style='Table Grid')
+            table.style.font.size = Pt(8)
+            table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.columns[0].width = 2000000
+            table.columns[1].width = 2000000
+            table.columns[2].width = 1200000
+            for cell in table.columns[0].cells:
+                cell.width = 2000000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            for cell in table.columns[1].cells:
+                cell.width = 2000000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            for cell in table.columns[2].cells:
+                cell.width = 1200000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            cell = table.cell(0, 0).merge(table.cell(0, 2)).paragraphs[0]
+            cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            cell.add_run(self.str_table[45]).font.bold = True
+            cell = table.cell(1, 0).paragraphs[0]
+            cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            cell.add_run(self.str_table[41]).font.bold = True
+            cell = table.cell(1, 1).paragraphs[0]
+            cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            cell.add_run(self.str_table[39]).font.bold = True
+            cell = table.cell(1, 2).paragraphs[0]
+            cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            cell.add_run(self.str_table[41]).font.bold = True
+            index = 2
+            total = 0
+            for agr in self.optative_remaining:
+                if agr.tipology == self.Optative.TIP_DISCIPLINAR:
+                    continue
+                cell = table.cell(index, 0).paragraphs[0]
+                cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                cell.add_run(agr.group)
+                cell = table.cell(index, 1).paragraphs[0]
+                cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                cell.add_run(str(agr.required_creds))
+                cell = table.cell(index, 2).paragraphs[0]
+                cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                cell.add_run(str(agr.pending_creds))
+                total += agr.pending_creds
+                index += 1
+            cell = table.cell(index, 0).merge(
+                table.cell(index, 1)).paragraphs[0]
+            cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            cell.add_run(self.str_table[40]).font.bold = True
+            cell = table.cell(index, 2).paragraphs[0]
+            cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            cell.add_run(str(total))
+            paragraph = docx.add_paragraph()
+            paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            paragraph.add_run(' ').font.size = Pt(8)
+            fundam = 0
+            for sbj in self.remaining:
+                if sbj.tipology == self.PendingSubject.TIP_FUNDAMENTACION:
+                    fundam += 1
+            table = docx.add_table(
+                rows=(len(self.remaining) - fundam + 4), cols=5, style='Table Grid')
+            table.style.font.size = Pt(8)
+            table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.columns[0].width = 1000000
+            table.columns[1].width = 600000
+            table.columns[2].width = 1700000
+            table.columns[3].width = 700000
+            table.columns[4].width = 1200000
+            for cell in table.columns[0].cells:
+                cell.width = 1000000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            for cell in table.columns[1].cells:
+                cell.width = 600000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            for cell in table.columns[2].cells:
+                cell.width = 1700000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            for cell in table.columns[3].cells:
+                cell.width = 700000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            for cell in table.columns[4].cells:
+                cell.width = 1200000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(0, 0).merge(table.cell(0, 4)).paragraphs[0].add_run(
+                self.str_table[43]).font.bold = True
+            table.cell(1, 0).merge(table.cell(1, 4)).paragraphs[0].add_run(
+                self.str_table[37]).font.bold = True
+            table.cell(0, 0).merge(table.cell(
+                0, 4)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.cell(1, 0).merge(table.cell(
+                1, 4)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.cell(2, 0).paragraphs[0].add_run(self.str_table[31])
+            table.cell(2, 1).paragraphs[0].add_run(self.str_table[28])
+            table.cell(2, 2).paragraphs[0].add_run(self.str_table[29])
+            table.cell(2, 3).paragraphs[0].add_run(self.str_table[38])
+            table.cell(2, 4).paragraphs[0].add_run(self.str_table[39])
+            for i in range(5):
+                table.cell(
+                    2, i).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            index = 3
+            total_creds = 0
+            proceced_remaining = {}
+            proceced_creds = {}
+            for sbj in self.remaining:
+                if sbj.tipology == self.PendingSubject.TIP_FUNDAMENTACION:
+                    continue
+                total_creds += sbj.credits
+                if sbj.group in proceced_remaining.keys():
+                    proceced_remaining[sbj.group].append(sbj)
+                    proceced_creds[sbj.group] += sbj.credits
+                else:
+                    proceced_remaining[sbj.group] = [sbj]
+                    proceced_creds[sbj.group] = sbj.credits
+            ordered_list = []
+            for i in proceced_remaining:
+                fc = table.cell(index, 0).merge(table.cell(
+                    index + len(proceced_remaining[i]) - 1, 0)).paragraphs[0]
+                fc.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                fc.add_run(i)
+                sc = table.cell(index, 4).merge(table.cell(
+                    index + len(proceced_remaining[i]) - 1, 4)).paragraphs[0]
+                sc.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                sc.add_run(str(proceced_creds[i]))
+                index += len(proceced_remaining[i])
+                ordered_list += proceced_remaining[i]
+            index = 3
+            for sbj in ordered_list:
+                table.cell(index, 1).paragraphs[0].add_run(sbj.code)
+                table.cell(index, 2).paragraphs[0].add_run(sbj.name)
+                table.cell(index, 3).paragraphs[0].add_run(
+                    str(sbj.credits))
+                for i in range(1, 4):
+                    table.cell(
+                        index, i).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+                index += 1
+            table.cell(index, 0).merge(
+                table.cell(index, 2)).paragraphs[0].add_run(self.str_table[40]).font.bold = True
+            table.cell(index, 0).merge(
+                table.cell(index, 2)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.cell(index, 3).merge(
+                table.cell(index, 4)).paragraphs[0].add_run(str(total_creds))
+            table.cell(index, 3).merge(
+                table.cell(index, 4)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            disc = 0
+            for agr in self.optative_remaining:
+                if agr.tipology == self.Optative.TIP_FUNDAMENTACION:
+                    continue
+                disc += 1
+            table = docx.add_table(
+                rows=(disc + 3), cols=3, style='Table Grid')
+            table.style.font.size = Pt(8)
+            table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.columns[0].width = 2000000
+            table.columns[1].width = 2000000
+            table.columns[2].width = 1200000
+            for cell in table.columns[0].cells:
+                cell.width = 2000000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            for cell in table.columns[1].cells:
+                cell.width = 2000000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            for cell in table.columns[2].cells:
+                cell.width = 1200000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            cell = table.cell(0, 0).merge(table.cell(0, 2)).paragraphs[0]
+            cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            cell.add_run(self.str_table[45]).font.bold = True
+            cell = table.cell(1, 0).paragraphs[0]
+            cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            cell.add_run(self.str_table[41]).font.bold = True
+            cell = table.cell(1, 1).paragraphs[0]
+            cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            cell.add_run(self.str_table[39]).font.bold = True
+            cell = table.cell(1, 2).paragraphs[0]
+            cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            cell.add_run(self.str_table[41]).font.bold = True
+            index = 2
+            total = 0
+            for agr in self.optative_remaining:
+                if agr.tipology == self.Optative.TIP_FUNDAMENTACION:
+                    continue
+                cell = table.cell(index, 0).paragraphs[0]
+                cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                cell.add_run(agr.group)
+                cell = table.cell(index, 1).paragraphs[0]
+                cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                cell.add_run(str(agr.required_creds))
+                cell = table.cell(index, 2).paragraphs[0]
+                cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                cell.add_run(str(agr.pending_creds))
+                total += agr.pending_creds
+                index += 1
+            cell = table.cell(index, 0).merge(
+                table.cell(index, 1)).paragraphs[0]
+            cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            cell.add_run(self.str_table[40]).font.bold = True
+            cell = table.cell(index, 2).paragraphs[0]
+            cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            cell.add_run(str(total))
+            paragraph = docx.add_paragraph()
+            paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            paragraph.add_run(' ').font.size = Pt(8)
+            table = docx.add_table(rows=1, cols=2, style='Table Grid')
+            table.style.font.size = Pt(8)
+            table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.columns[0].width = 4350000
+            table.columns[1].width = 850000
+            for cell in table.columns[0].cells:
+                cell.width = 4350000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            for cell in table.columns[1].cells:
+                cell.width = 850000
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(0, 0).paragraphs[0].add_run(
+                self.str_table[44]).font.bold = True
+            table.cell(0, 1).paragraphs[0].add_run(
+                str(self.free_choice_pending))
+            table.cell(
+                0, 1).paragraphs[0].alignment = WD_ALIGN_VERTICAL.CENTER
+            paragraph = docx.add_paragraph()
+            paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            paragraph.add_run(' ').font.size = Pt(8)
+            paragraph = docx.add_paragraph()
+            paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            run = paragraph.add_run(self.str_table[46].format(
+                self.get_academic_program_display(), *self.offer_regulation[self.academic_program]))
+            run.font.size = Pt(8)
+            run.font.italic = True
+            run.font.underline = True
