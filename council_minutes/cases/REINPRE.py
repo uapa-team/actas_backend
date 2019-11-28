@@ -1,7 +1,7 @@
 from .case_utils import *
 from ..models import Request
 from mongoengine import StringField, IntField, FloatField, BooleanField, DateField
-
+import datetime
 
 class REINPRE(Request):
     # http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34983
@@ -28,85 +28,84 @@ class REINPRE(Request):
 
     regulation_list = ['008|2008|CSU', '239|2009|VAC', '012|2014|VAC']
 
-    reing_period = StringField(required=True, display='Periodo de reingreso')
+    reing_period = StringField(required=True, display='Periodo de reingreso', default='0000-0S')
     loss_period = StringField(
-        required=True, display='Periodo de pérdida de calidad de estudiante')
-    first_reing = BooleanField(required=True, display='Primer reingreso')
+        required=True, display='Periodo de pérdida de calidad de estudiante', default='0000-0S')
+    first_reing = BooleanField(required=True, display='Primer reingreso', default=True)
     admission_period = StringField(
-        required=True, display='Periodo de admisión')
+        required=True, display='Periodo de admisión', default='0000-0S')
     periods_since = IntField(
-        required=True, display='# de periodos transcurridos desde la pérdida de la calidad' +
-        ' de estudiante')
-    papa = FloatField(required=True, display='PAPA')
+        required=True, display='periodos desde pérdida de calidad de estudiante', default=0)
+    papa = FloatField(required=True, display='PAPA', default=0.0)
     reason_of_loss = StringField(choices=RL_ANSWER_CHOICES,
                                  default=RL_ANSWER_OTRO,
                                  display='Razón pérdida calidad de estudiante')
     credits_minus_remaining = IntField(
         required=True, display='Cupo de créditos menos créditos pendientes')
-    credits_remaining = IntField(required=True, display='Créditos restantes')
-    credits_english = IntField(required=True, display='Créditos inglés')
+    credits_remaining = IntField(required=True, display='Créditos restantes', default=0)
+    credits_english = IntField(required=True, display='Créditos inglés', default=0)
     credits_add = IntField(
-        required=True, display='Créditos requeridos para inscribir asignaturas')
+        required=True, display='Créditos requeridos para inscribir asignaturas', default=0)
 
     min_grade_12c = StringField(
         required=True, display='Promedio semestral mínimo requerido para mantener la ' +
-        'calidad de estudiante con 12 créditos inscritos: ')
+        'calidad de estudiante con 12 créditos inscritos: ', default=0)
     min_grade_15c = StringField(
         required=True, display='Promedio semestral mínimo requerido para mantener la ' +
-        'calidad de estudiante con 15 créditos inscritos: ')
+        'calidad de estudiante con 15 créditos inscritos: ', default=0)
     min_grade_18c = StringField(
         required=True, display='Promedio semestral mínimo requerido para mantener la ' +
-        'calidad de estudiante con 18 créditos inscritos: ')
+        'calidad de estudiante con 18 créditos inscritos: ', default=0)
     min_grade_21c = StringField(
         required=True, display='Promedio semestral mínimo requerido para mantener la ' +
-        'calidad de estudiante con 21 créditos inscritos: ')
+        'calidad de estudiante con 21 créditos inscritos: ', default=0)
 
     # Exiged credits
     exi_fund_m = IntField(
-        required=True, display='Créditos de fundamentación obligatorios exigidos')
+        required=True, display='Créditos de fundamentación obligatorios exigidos', default=0)
     exi_fund_o = IntField(
-        required=True, display='Créditos de fundamentación optativos exigidos')
+        required=True, display='Créditos de fundamentación optativos exigidos', default=0)
     exi_disc_m = IntField(
-        required=True, display='Créditos disciplinares obligatorios exigidos')
+        required=True, display='Créditos disciplinares obligatorios exigidos', default=0)
     exi_disc_o = IntField(
-        required=True, display='Créditos disciplinares optativos exigidos')
+        required=True, display='Créditos disciplinares optativos exigidos', default=0)
     exi_free = IntField(
-        required=True, display='Créditos de libre elección exigidos')
+        required=True, display='Créditos de libre elección exigidos', default=0)
 
     # Approved credits
     app_fund_m = IntField(
-        required=True, display='Créditos de fundamentación obligatorios aprobados')
+        required=True, display='Créditos de fundamentación obligatorios aprobados', default=0)
     app_fund_o = IntField(
-        required=True, display='Créditos de fundamentación optativos aprobados')
+        required=True, display='Créditos de fundamentación optativos aprobados', default=0)
     app_disc_m = IntField(
-        required=True, display='Créditos disciplinares obligatorios aprobados')
+        required=True, display='Créditos disciplinares obligatorios aprobados', default=0)
     app_disc_o = IntField(
-        required=True, display='Créditos disciplinares optativos aprobados')
+        required=True, display='Créditos disciplinares optativos aprobados', default=0)
     app_free = IntField(
-        required=True, display='Créditos de libre elección aprobados')
+        required=True, display='Créditos de libre elección aprobados', default=0)
 
     # Remaining credits
     rem_fund_m = IntField(
-        required=True, display='Créditos de fundamentación obligatorios restantes')
+        required=True, display='Créditos de fundamentación obligatorios restantes', default=0)
     rem_fund_o = IntField(
-        required=True, display='Créditos de fundamentación optativos restantes')
+        required=True, display='Créditos de fundamentación optativos restantes', default=0)
     rem_disc_m = IntField(
-        required=True, display='Créditos disciplinares obligatorios restantes')
+        required=True, display='Créditos disciplinares obligatorios restantes', default=0)
     rem_disc_o = IntField(
-        required=True, display='Créditos disciplinares optativos restantes')
+        required=True, display='Créditos disciplinares optativos restantes', default=0)
     rem_free = IntField(
-        required=True, display='Créditos de libre elección restantes')
+        required=True, display='Créditos de libre elección restantes', default=0)
 
     comitee_act = StringField(
-        required=True, display='Número de acta de comité')
+        required=True, display='Número de acta de comité', default='00')
 
     comitee_date = DateField(
-        required=True, display='Fecha de reunión del comité'
+        required=True, display='Fecha de reunión del comité', default=datetime.date.today
     )
 
     # Pre-cm variables
-    request_in_date = BooleanField(display='Solicitud a tiempo')
-    credits_granted = IntField(display='Créditos otorgados')
+    request_in_date = BooleanField(display='Solicitud a tiempo', default=True)
+    credits_granted = IntField(display='Créditos otorgados', default=0)
 
     str_pcm_pre = [
         # Used in pcm and cm:

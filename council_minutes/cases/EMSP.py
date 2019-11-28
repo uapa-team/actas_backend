@@ -3,7 +3,7 @@ from docx.shared import Pt
 from mongoengine import StringField, IntField, FloatField, EmbeddedDocumentListField, BooleanField, DateField
 from ..models import Request, Subject
 from .case_utils import table_subjects, add_analysis_paragraph, num_to_month
-
+import datetime
 
 class EMSP(Request):
 
@@ -11,11 +11,12 @@ class EMSP(Request):
 
     regulation_list = ['002|2011|CFA']  # List of regulations
 
-    percentaje = FloatField(display='Porcentaje de exención de matrícula')
-    is_renovation = BooleanField(display='Es renovación de beca')
+    percentaje = FloatField(display='Porcentaje de exención de matrícula', default=0.0)
+    is_renovation = BooleanField(display='Es renovación de beca', default=False)
     is_best = BooleanField(
-        display='La beca es para el mejor puntaje, sino, es dentro de los primeros 10')
-    date_presentation = DateField(display='Fecha de presentación del examen')
+        display='¿Es el mejor puntaje?', default=False)
+    date_presentation = DateField(display='Fecha de presentación del examen',
+        default=datetime.date.today)
 
     str_cm = [
         'BECA EXCENCIÓN DE DERECHOS ACADÉMICOS del programa {} ({}) por obtener un excelente resu' +

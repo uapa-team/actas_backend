@@ -24,13 +24,14 @@ class EPTU(Request):
     )
 
     target_period = StringField(
-        display='Periodo para el que se realiza la solicitud')
-    points = IntField(display='Cantidad de puntos a eximir')
+        display='Periodo para el que se realiza la solicitud', default='0000-0S')
+    points = IntField(display='Cantidad de puntos a eximir', default=0)
     academic_profile = StringField(
-        default='I', choices=Request.PROFILE_CHOICES, display='Perfil de programa curricular')
+        default=Request.PROFILE_INVE, choices=Request.PROFILE_CHOICES,
+        display='Perfil de programa curricular')
     right_dates = BooleanField(
-        display='Realiza la solicitud en fecha adecuada')
-    periods_in = IntField(display='Periodos de exensión aplicada')
+        display='Realiza la solicitud en fecha adecuada', default=True)
+    periods_in = IntField(display='Periodos de exensión aplicada', default=0)
     cna = StringField(
         choices=CNA_CHOICES, default=CNA_OTRO, display='Motivo de rechazo')
 
