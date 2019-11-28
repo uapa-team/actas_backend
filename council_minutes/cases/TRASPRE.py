@@ -22,7 +22,7 @@ class TRASPRE(TRASPOS):
         name2 = StringField(required=True, display='Nuevo Nombre Asignatura')
         code2 = StringField(required=True, display='Nuevo Código')
         group = StringField(required=True, display='Agrupación')
-        grade = FloatField(min_value=0.0, required=True, display='Nota')
+        grade = StringField(required=True, display='Nota')
         period = StringField(required=True, display='Periodo')
 
     class PendingSubject(Subject):
