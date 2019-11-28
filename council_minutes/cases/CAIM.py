@@ -9,13 +9,16 @@ class CAIM(Request):
 
     full_name = 'Cancelación de asignaturas con carga inferior a la mínima'
 
-    percentaje = FloatField(display='Porcentaje de avance de carrrera')
-    enrollments = IntField(display='Número de matrículas')
-    gpa = FloatField(display='P.A.P.A.')
-    available_credits = IntField(display='Créditos disponibles')
-    remaining_credits = IntField(display='Créditos restantes')
+    percentaje = FloatField(
+        display='Porcentaje de avance de carrrera',
+        min_value=0.0, max_value=100.0, default=0.0)
+    enrollments = IntField(display='Número de matrículas', default=0)
+    gpa = FloatField(display='P.A.P.A.', default=0.0,
+                     min_value=0.0, max_value=5.0)
+    available_credits = IntField(display='Créditos disponibles', default=0)
+    remaining_credits = IntField(display='Créditos restantes', default=0)
     subjects = EmbeddedDocumentListField(
-        Subject, required=True, display='Asignaturas')
+        Subject, display='Asignaturas')
 
     regulation_list = ['008|2008|CSU']  # List of regulations
 

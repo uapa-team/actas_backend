@@ -50,13 +50,13 @@ class RCMO(Request):
     )
 
     calification = StringField(
-        choices=CALIFICATION_CHOICES, display='Calificación Movilidad')
-    institution = StringField(display='Institución origen')
-    subject_code = StringField(display='Código asignatura')
-    subject_name = StringField(display='Nombre asignatura')
-    subject_period = StringField(display='Periodo asignatura')
+        choices=CALIFICATION_CHOICES, display='Calificación Movilidad', default=CALIFICATION_AP)
+    institution = StringField(display='Institución origen', default='')
+    subject_code = StringField(display='Código asignatura', default='')
+    subject_name = StringField(display='Nombre asignatura', default='')
+    subject_period = StringField(display='Periodo asignatura', default='0000-0S')
     subjects = EmbeddedDocumentListField(
-        SubjectMovility, required=True, display='Asignaturas')
+        SubjectMovility, display='Asignaturas')
 
     str_cm = [
         'calificar {} la asignatura {} ({}) en el periodo {}.',

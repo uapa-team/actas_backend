@@ -9,13 +9,13 @@ class DPVP(Request):
 
     full_name = 'Devolución proporcional del valor pagado por concepto de derechos de matrícula'
 
-    percentage = FloatField(required=True, display='Porcentaje devuelto')
+    percentage = FloatField(required=True, display='Porcentaje devuelto', default=0.0)
     cancel = BooleanField(
         required=True, display='¿Cancelación fue aprobada?', default=True)
     council_number = StringField(
         required=True, max_length=2, default='00', display='# Acta de cancelación')
     council_year = StringField(
-        required=True, min_length=4, max_length=4, display='Año del Acta')
+        required=True, min_length=4, max_length=4, display='Año del Acta', default='0000')
 
     regulation_list = ['032|2010|CSU', '1416|2013|RE']
 

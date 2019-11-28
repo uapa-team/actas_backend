@@ -9,10 +9,10 @@ class EBDA(Request):
 
     full_name = 'Beca exensión derechos académicos'
 
-    gpa = FloatField(display='Promedio obtenido el semestre anterior')
+    gpa = FloatField(display='Promedio obtenido el semestre anterior', default=0.0)
     gpa_period = StringField(
-        display='Periodo en el que se obtiene el promedio')
-    target_period = StringField(display='Periodo en el que aplica la beca')
+        display='Periodo en el que se obtiene el promedio', default='0000-0S')
+    target_period = StringField(display='Periodo en el que aplica la beca', default='0000-0S')
 
     regulation_list = ['002|2012|CFA']  # List of regulations
 

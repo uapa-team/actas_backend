@@ -54,6 +54,7 @@ def insert_request(request):
     shell = json.dumps({'_cls': 'Request'})
     subs = [c.__name__ for c in Request.get_subclasses()]
     case = Request.get_subclasses()[subs.index(body['_cls'])]
+    shell = json.dumps({'_cls': case.get_entire_name()})
     new_request = case().from_json(
         case.translate(shell))
     new_request.user = body['user']

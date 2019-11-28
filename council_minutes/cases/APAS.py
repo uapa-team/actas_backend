@@ -3,6 +3,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from mongoengine import StringField, BooleanField, DateField
 from ..models import Request
 from .case_utils import add_analysis_paragraph, string_to_date
+import datetime
 
 
 class APAS(Request):
@@ -19,20 +20,20 @@ class APAS(Request):
     )
 
     date_start = DateField(
-        required=True, display='Fecha de inicio de la pasantía')
+        required=True, display='Fecha de inicio de la pasantía', default=datetime.date.today)
     date_finish = DateField(
-        required=True, display='Fecha de finalización de la pasantía')
+        required=True, display='Fecha de finalización de la pasantía', default=datetime.date.today)
     place = StringField(
-        required=True, display='Lugar: Ciudad, País')
+        required=True, display='Lugar: Ciudad, País', default='')
     format_present = BooleanField(
         required=True, default=False,
         display='¿Presenta el formato de solicitud de movilidad saliente?')
     institut = StringField(
-        required=True, display='Institución donde se va a desarrolar la pasantía')
+        required=True, display='Institución donde se va a desarrolar la pasantía', default='')
     grade_option = StringField(
-        required=True, display='Tipo de tesis/trabajo final', choices=GO_CHOICES)
+        required=True, display='Tipo de tesis/trabajo final', choices=GO_CHOICES, default=GO_TESIS_MAESTRIA)
     internship_period = StringField(
-        required=True, display='Periodo en el que se va a desarrollar la pasantía')
+        required=True, display='Periodo en el que se va a desarrollar la pasantía', default='0000-0S')
     enrolled_thesis = BooleanField(
         required=True, default=False, display='¿Tiene inscrita la asignatura tesis/trabajo final?')
 

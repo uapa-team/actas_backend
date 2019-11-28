@@ -90,30 +90,34 @@ class TRASPOS(Request):
         required=True, default=TT_INTRAFACULTY, choices=TT_CHOICES,
         display='Tipo de traslado')
     admission_period = StringField(
-        required=True, display='Periodo de admisión del estudiante')
+        required=True, display='Periodo de admisión del estudiante', default='')
     same_degree = BooleanField(
         required=True, default=False,
         display='¿Estos planes de estudios conducen al mismo título?')
     transit_program_code = StringField(
         required=True,
-        display='Código del plan de estudios de destino')
+        display='Código del plan de estudios de destino',
+        default='')
     transit_program_name = StringField(
         required=True,
-        display='Nombre del plan de estudios de destino')
+        display='Nombre del plan de estudios de destino',
+        default='')
     transit_program_profile = StringField(
         required=True,
         display='Perfil del plan de estudios de destino',
-        choices=PF_CHOICES)
+        choices=PF_CHOICES, default=PF_INVEST)
     origin_program_code = StringField(
         required=True,
-        display='Código del plan de estudios de origen')
+        display='Código del plan de estudios de origen',
+        default='')
     origin_program_name = StringField(
         required=True,
-        display='Nombre del plan de estudios de origen')
+        display='Nombre del plan de estudios de origen',
+        default='')
     origin_program_profile = StringField(
         required=True,
         display='Perfil del plan de estudios de origen',
-        choices=PF_CHOICES)
+        choices=PF_CHOICES, default=PF_INVEST)
     enrroled = BooleanField(
         required=True, default=True,
         display='¿Se encuentra matriculado en el semestre de presentar la solicitud?')
@@ -124,11 +128,13 @@ class TRASPOS(Request):
         required=True, default=0.0, min_value=0.0, max_value=100.0,
         display='Porcentaje de créditos aprobados en el plan de estudios origen')
     homologated_subjects = EmbeddedDocumentListField(
-        HomologatedSubject, required=True, display='Cuadro de equivalencias y convalidaciones')
+        HomologatedSubject, display='Cuadro de equivalencias y convalidaciones')
     agreement_number = StringField(
-        required=True, display='Número del acuerdo del CF que reglamenta el plan de estudios')
+        required=True, display='Número del acuerdo del CF que reglamenta el plan de estudios',
+        default='')
     agreement_year = IntField(
-        required=True, display='Año del acuerdo del CF que reglamenta el plan de estudios')
+        required=True, display='Año del acuerdo del CF que reglamenta el plan de estudios',
+        default=0)
 
     regulation_list = ['008|2008|CSU', '089|2014|CAC',
                        '155|2014|CSU']  # List of regulations
