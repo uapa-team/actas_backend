@@ -13,19 +13,22 @@ class REINPOS(Request):
     node = StringField(
         display='Perfil', choices=Request.PROFILE_CHOICES, default=Request.PROFILE_INVE)
     papa = FloatField(required=True, min_value=0.0,
-                      max_value=5.0, display='PAPA')
-    first_reing = BooleanField(required=True, display='¿Primer reingreso?')
+                      max_value=5.0, display='PAPA', default=0.0)
+    first_reing = BooleanField(
+        required=True, display='¿Primer reingreso?', default=True)
     reason_of_loss = StringField(
-        required=True, display='Razón pérdida calidad de estudiante')
+        required=True, display='Razón pérdida calidad de estudiante', default='')
     time_limit = BooleanField(
         required=True, default=False, display='Pérdida por tiempo de permanencia')
     remaining_subjects = EmbeddedDocumentListField(
         Subject, required=True, display='Asignaturas Pendientes')
     on_time = BooleanField(required=True, default=True,
                            display='Solicitud a tiempo')
-    reing_period = StringField(required=True, display='Periodo de reingreso')
+    reing_period = StringField(
+        required=True, display='Periodo de reingreso', default='0000-0S')
     grade_option = StringField(
-        required=True, choices=Request.GRADE_OPTION_CHOICES, display='Opción de Grado')
+        required=True, choices=Request.GRADE_OPTION_CHOICES,
+        display='Opción de Grado', default=Request.GRADE_OPTION_TESIS_MAESTRIA)
 
     regulation_list = ['008|2008|CSU', '239|2009|VAC', '012|2014|VAC']
 
@@ -73,10 +76,10 @@ class REINPOS(Request):
             self.reing_period
         ))
         if self.is_affirmative_response_approval_status():
-            paragraph.add_run(self.str_cm[1].format(self.regulations['008|2008|CSU'][0]))
+            paragraph.add_run(self.str_cm[1].format(
+                self.regulations['008|2008|CSU'][0]))
         else:
             paragraph.add_run(self.str_cm[2].format(self.council_decision))
-
 
     def pcm(self, docx):
         add_analysis_paragraph(docx, self.add_analysis())
@@ -91,7 +94,7 @@ class REINPOS(Request):
         paragraph.add_run(self.str_comittee_header + ' ')
         paragraph.add_run(
             self.get_advisor_response_display().upper() + ' ').font.bold = True
-        paragraph.add_run(self.str_pcm[0].format(  
+        paragraph.add_run(self.str_pcm[0].format(
             self.get_academic_program_display(),
             self.reing_period,
             self.regulations['008|2008|CSU'][0]
@@ -100,7 +103,7 @@ class REINPOS(Request):
             self.get_grade_option_display(),
             self.regulations['012|2014|VAC'][0]
         ))
-    
+
     def add_analysis(self):
         analysis = []
 
