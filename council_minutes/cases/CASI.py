@@ -29,14 +29,16 @@ class CASI(Request):
     )
 
     subjects = EmbeddedDocumentListField(
-        Subject, required=True, display='Asignaturas')
-    advance = FloatField(required=True, display='% de Avance')
+        Subject, display='Asignaturas')
+    advance = FloatField(required=True, display='% de Avance', default=0.0)
     enrolled_academic_periods = IntField(
-        required=True, display='# Periodos Matriculados')
-    papa = FloatField(required=True, display='PAPA')
-    available_credits = IntField(required=True, display='Creditos Disponibles')
-    current_credits = IntField(required=True, display='Creditos Inscritos')
-    nrc_answer = StringField(choices=CN_ANSWER_CHOICES, default=CN_ANSWER_OTRO,
+        required=True, display='# Periodos Matriculados', default=0)
+    papa = FloatField(required=True, display='PAPA', default=0.0)
+    available_credits = IntField(
+        required=True, display='Creditos Disponibles', default=0)
+    current_credits = IntField(
+        required=True, display='Creditos Inscritos', default=0)
+    nrc_answer = StringField(choices=CN_ANSWER_CHOICES, default=CN_ANSWER_NO_DILIGENTE,
                              display='Motivo de rechazo')
 
     regulation_list = ['008|2008|CSU']  # List of regulations

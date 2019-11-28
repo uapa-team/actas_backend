@@ -12,14 +12,17 @@ class AAUT(Request):
     regulation_list = ['008|2008|CSU', '070|2009|CAC']  # List of regulations
 
     academic_profile = StringField(
-        default='I', choices=Request.PROFILE_CHOICES, display='Perfil de programa curricular')
+        default=Request.PROFILE_INVE, choices=Request.PROFILE_CHOICES, display='Perfil de programa curricular')
     places_resolution = StringField(
+        default='',
         display='Resolución de cupos para admisión automática.')
     last_academic_program = StringField(
         min_length=4, max_length=4, choices=Request.PLAN_CHOICES,
-        required=True, display='Anterior Programa Académico')
+        required=True, display='Anterior Programa Académico',
+        default=Request.PI_CIVIL)
     admission_academic_period = StringField(max_length=10,
-                                            display='Periodo de ingreso al nuevo programa')
+                                            display='Periodo de ingreso al nuevo programa',
+                                            default="0000-0S")
 
     str_cm = [
         'la admisión automática al programa {} ({}), a partir del periodo académico {}.',

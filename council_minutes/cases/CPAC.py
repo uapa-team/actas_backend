@@ -11,8 +11,10 @@ class CPAC(Request):
     full_name = 'Cancelación periodo académico'
 
     academic_profile = StringField(
-        default='I', choices=Request.PROFILE_CHOICES, display='Perfil de programa curricular en caso de posgrado')
-    is_fortuitous = BooleanField(display='Se considera caso fortuito')
+        default=Request.PROFILE_INVE, choices=Request.PROFILE_CHOICES,
+        display='Perfil de programa curricular en caso de posgrado')
+    is_fortuitous = BooleanField(
+        display='Se considera caso fortuito', default=False)
 
     regulation_list = ['008|2008|CSU']  # List of regulations
 

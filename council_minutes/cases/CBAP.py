@@ -8,7 +8,7 @@ class CBAP(Request):
 
     full_name = 'Créditos excedentes BAPI'
 
-    credits = IntField(required=True, display='Créditos excedentes')
+    credits = IntField(required=True, display='Créditos excedentes', default=0)
 
     str_cm = [
         'trasladar ',
