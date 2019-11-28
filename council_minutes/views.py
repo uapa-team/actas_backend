@@ -40,9 +40,9 @@ def filter_request(request):
         # To make a request check http://docs.mongoengine.org/guide/querying.html#query-operators
         params = json.loads(request.body)
         # pylint: disable=no-member
-        response = Request.objects.filter(
-            **params).order_by('academic_program')
-        return JsonResponse(response, safe=False, encoder=QuerySetEncoder)
+        responses = Request.objects.filter(
+            **params).order_by('-date')
+        return JsonResponse(responses, safe=False, encoder=QuerySetEncoder)
 
     else:
         return HttpResponse('Bad Request', status=400)
