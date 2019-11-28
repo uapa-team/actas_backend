@@ -89,13 +89,13 @@ def update_cm(request, cm_id):
         except mongoengine.DoesNotExist:
             return HttpResponse('Does not exist', status=404)
         body = json.loads(request.body)
-        _cls = body['_cls'].split('.')[-1]
+        _cls = body['_cls']
         subs = [c.__name__ for c in Request.get_subclasses()]
         case = Request.get_subclasses()[subs.index(_cls)]
         obj = case.from_json(case.translate(request.body), True)
-        #obj.id = cm_id
+        obj._cls = case.get_entire_name()
         obj.save()
-        return HttpResponse(obj.to_json(), status=204)
+        return JsonResponse(obj, safe=False, encoder=QuerySetEncoder)
 
 
 @csrf_exempt
@@ -135,6 +135,7 @@ def docx_gen_by_number(request):
         return HttpResponse('No cases with specified number and year', status=401)
     generator.generate(filename)
     return HttpResponse(filename)
+
 
 @csrf_exempt
 def docx_gen_pre_by_number(request):
