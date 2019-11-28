@@ -3,9 +3,10 @@ from docx.shared import Pt
 from mongoengine import StringField, IntField, FloatField, EmbeddedDocumentListField, BooleanField, DateField
 from ..models import Request, Subject
 from .case_utils import table_subjects, add_analysis_paragraph, num_to_month
-
+import datetime
 
 class TGRA(Request):
+
     full_name = 'Trabajo de grado'
 
     TGRA_PASANTIA = 'TP'
@@ -16,7 +17,7 @@ class TGRA(Request):
     )
 
     period_inscription = StringField(
-        display='Periodo de inscripción trabajo de grado')
+        display='Periodo de inscripción trabajo de grado', default='0000-0S')
     type_tgra = StringField(
         choices=TGRA_CHOICES, default=TGRA_PASANTIA, display='Tipo de trabajo de grado')
     title = StringField(default='', display='Título del trabajo de grado')
@@ -24,9 +25,9 @@ class TGRA(Request):
         default='', display='Empresa donde reazlia pasantía')
     professor = StringField(
         default='', display='Profesor director del trabajo')
-    dc_approved = IntField(display='Número de créditos aprobados')
-    commite_cm = IntField(default=1, display='Acta de comité')
-    commite_cm_date = DateField(display='Fecha acta de comité')
+    dc_approved = IntField(display='Número de créditos aprobados', default=0)
+    commite_cm = IntField(default=0, display='Acta de comité')
+    commite_cm_date = DateField(display='Fecha acta de comité', default=datetime.date.today)
 
     regulation_list = ['026|2012|CSU', '040|2017|CSU']  # List of regulations
 

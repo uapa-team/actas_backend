@@ -15,7 +15,7 @@ class IASI(Request):
     full_name = 'Inscripción de Asignaturas'
 
     subjects = EmbeddedDocumentListField(
-        IASISubject, required=True, display='Asignaturas')
+        IASISubject, display='Asignaturas')
 
     str_cm = [
         'inscribir la(s) siguiente(s) asignatura(s) del programa {} ({}), en el periodo academico' +

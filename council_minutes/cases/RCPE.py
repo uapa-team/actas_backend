@@ -33,7 +33,7 @@ class RCPE(Request):
     full_name = 'Registro de calificación del proyecto y examen doctoral'
 
     registers = EmbeddedDocumentListField(
-        Register, required=True, display="Registros")
+        Register, display='Registros')
 
     regulation_list = []
 
