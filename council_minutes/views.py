@@ -55,7 +55,7 @@ def insert_request(request):
     subs = [c.__name__ for c in Request.get_subclasses()]
     case = Request.get_subclasses()[subs.index(body['_cls'])]
     new_request = case().from_json(
-        case.translate(shell.encode('utf-8')))
+        case.translate(shell))
     new_request.user = body['user']
     try:
         response = new_request.save()
@@ -68,10 +68,8 @@ def insert_request(request):
 
 @csrf_exempt
 def docx_gen_by_id(request, cm_id):
-    filename = 'public/acta' + cm_id + '.docx'
-    try:
-        # pylint: disable=no-member
-        request_by_id = Request.objects.get(id=cm_id)
+    filename = 'public/acta' + cm_id + '.docx'.encode('utf-8')
+    request_by_id = Request.objects.get(id=cm_id)
     except mongoengine.DoesNotExist:
         return HttpResponse('Does not exist', status=404)
     generator = CouncilMinuteGenerator()
@@ -90,11 +88,10 @@ def update_cm(request, cm_id):
             return HttpResponse('Does not exist', status=404)
         body = json.loads(request.body)
         body['_id'] = cm_id
-        _cls = body['_cls'] = case.__class__.__name__
-        subs = [c.__name__ for c in Request.get_subclasses()]
-        case = Request.get_subclasses()[subs.index(_cls)]
+        case = case.__class__
+        _cls = body['_cls'] = case.__name__
         obj = case.from_json(case.translate(
-            json.dumps(body).encode('utf-8')), True)
+            json.dumps(body)), True)
         obj._cls = case.get_entire_name()
         obj.save()
         return JsonResponse(obj, safe=False, encoder=QuerySetEncoder)
