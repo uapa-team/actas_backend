@@ -521,7 +521,7 @@ class Request(DynamicDocument):
             except KeyError:
                 pass
         return json.dumps(data_json)
-    
+
     @classmethod
     def get_entire_name(cls):
         parents = cls.mro()
