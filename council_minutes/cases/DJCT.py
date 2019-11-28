@@ -4,7 +4,7 @@ from mongoengine import StringField, DateField, BooleanField
 from mongoengine import EmbeddedDocumentListField
 from ..models import Request, Professor
 from .case_utils import add_analysis_paragraph
-
+import datetime
 
 class DJCT(Request):
 
@@ -13,14 +13,14 @@ class DJCT(Request):
     node = StringField(
         display='Perfil', choices=Request.PROFILE_CHOICES, default=Request.PROFILE_INVE)
     grade_option = StringField(
-        required=True, choices=Request.GRADE_OPTION_CHOICES, display='Opción de grado')
-    advisor = StringField(required=True, display='Director')
+        required=True, choices=Request.GRADE_OPTION_CHOICES, display='Opción de grado',
+        default=Request.GRADE_OPTION_TESIS_MAESTRIA)
+    advisor = StringField(required=True, display='Director', default='')
     title = StringField(
-        requiered=True, display='Título de Tesis/Trabajo Final')
-    date_approval = DateField(required=True, display='Fecha de Aprobación')
-    proposal_jury = BooleanField(required=True, display='¿Jurados Propuestos?')
-    proffesors = EmbeddedDocumentListField(
-        Professor, required=True, display='Docentes')
+        requiered=True, display='Título de Tesis/Trabajo Final', default='')
+    date_approval = DateField(required=True, display='Fecha de Aprobación', default=datetime.date.today)
+    proposal_jury = BooleanField(required=True, display='¿Jurados Propuestos?', default=False)
+    proffesors = EmbeddedDocumentListField(Professor, display='Docentes')
 
     regulation_list = ['040|2017|CFA', '056|2012|CSU']
 

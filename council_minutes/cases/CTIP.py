@@ -16,7 +16,7 @@ class CTIP(Request):
     full_name = 'Cambio de tipología'
 
     subjects_change_tipology = EmbeddedDocumentListField(
-        ChangeTipologySubject, required=True, display='Asignaturas')
+        ChangeTipologySubject, display='Asignaturas')
 
     regulation_list = ['008|2008|CSU']
 
