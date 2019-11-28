@@ -36,4 +36,8 @@ class QuerySetEncoder(DjangoJSONEncoder):
                             break
                 else:
                     data[key] = str(value)
+        try:
+            data['_cls_display'] = obj.full_name
+        except AttributeError:
+            pass
         return data
