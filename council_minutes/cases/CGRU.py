@@ -9,13 +9,13 @@ class CGRU(Request):
 
     full_name = 'Cambio de grupo'
 
-    name = StringField(required=True, display='Nombre Asignatura')
-    code = StringField(required=True, display='Código')
-    group = StringField(required=True, display='Grupo')
-    new_group = StringField(required=True, display='Nuevo Grupo')
+    name = StringField(required=True, display='Nombre Asignatura', default='')
+    code = StringField(required=True, display='Código', default='')
+    group = StringField(required=True, display='Grupo', default='')
+    new_group = StringField(required=True, display='Nuevo Grupo', default='')
     free_places = IntField(required=True, min_value=0,
                            default=0, display='Cupos disponibles')
-    professor = StringField(required=True, display='Profesor')
+    professor = StringField(required=True, display='Profesor', default='')
     department = StringField(required=True, choices=Request.DP_CHOICES,
                              default=Request.DP_EMPTY, display='Departamento')
 

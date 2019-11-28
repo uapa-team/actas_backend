@@ -21,7 +21,7 @@ class REINPOS(Request):
     time_limit = BooleanField(
         required=True, default=False, display='Pérdida por tiempo de permanencia')
     remaining_subjects = EmbeddedDocumentListField(
-        Subject, required=True, display='Asignaturas Pendientes')
+        Subject, display='Asignaturas Pendientes')
     on_time = BooleanField(required=True, default=True,
                            display='Solicitud a tiempo')
     reing_period = StringField(

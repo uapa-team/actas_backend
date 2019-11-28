@@ -10,10 +10,10 @@ class APGD(Request):
 
     class Coadvisor(EmbeddedDocument):
         name_co_advisor = StringField(
-            display='Nombre del codirector', required=True)
+            display='Nombre del codirector', required=True, default='')
         inst_co_advisor = StringField(
             display='Departamento de adscripción del codirector',
-            default='', required=True, choices=Request.DP_CHOICES)
+            default=Request.DP_CIVIL_AGRICOLA, required=True, choices=Request.DP_CHOICES)
         co_advisor_ext = StringField(
             display='Institución externa', default='')
 

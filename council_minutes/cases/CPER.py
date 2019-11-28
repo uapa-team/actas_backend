@@ -7,8 +7,9 @@ from .case_utils import table_subjects, add_analysis_paragraph, num_to_month, ta
 
 class ChangeTipologySubject(Subject):
     new_tipology = StringField(
-        required=True, choices=Subject.TIP_CHOICES, display='Nueva tipología')
-    grade = StringField(display='Nota obtenida')
+        required=True, choices=Subject.TIP_CHOICES,
+        default='', display='Nueva tipología')
+    grade = StringField(display='Nota obtenida', default='')
 
 
 class HomologationSubject(Subject):

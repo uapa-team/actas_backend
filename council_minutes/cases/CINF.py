@@ -14,7 +14,7 @@ class CINF(Request):
     available_creds = IntField(
         required=True, display='Créditos disponibles', min_value=0)
     advance_percentage = FloatField(
-        required=True, display='Porcentaje de avance', min_value=0.0, max_value=100.0)
+        required=True, display='Porcentaje de avance', default=0.0, min_value=0.0, max_value=100.0)
     enrolled_academic_periods = IntField(
         required=True, display='Número de matrículas', min_value=0
     )
