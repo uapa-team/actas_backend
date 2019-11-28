@@ -68,8 +68,10 @@ def insert_request(request):
 
 @csrf_exempt
 def docx_gen_by_id(request, cm_id):
-    filename = 'public/acta' + cm_id + '.docx'.encode('utf-8')
-    request_by_id = Request.objects.get(id=cm_id)
+    # pylint: disable=no-member
+    filename = 'public/acta' + cm_id + '.docx'
+    try:
+        request_by_id = Request.objects.get(id=cm_id)
     except mongoengine.DoesNotExist:
         return HttpResponse('Does not exist', status=404)
     generator = CouncilMinuteGenerator()
