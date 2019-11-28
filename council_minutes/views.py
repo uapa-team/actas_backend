@@ -83,16 +83,18 @@ def docx_gen_by_id(request, cm_id):
 @csrf_exempt
 def update_cm(request, cm_id):
     if request.method == 'PATCH':
+        # pylint: disable=no-member
         try:
-            # pylint: disable=no-member
             case = Request.objects.get(id=cm_id)
         except mongoengine.DoesNotExist:
             return HttpResponse('Does not exist', status=404)
         body = json.loads(request.body)
-        _cls = body['_cls']
+        body['_id'] = cm_id
+        _cls = body['_cls'] = case.__class__.__name__
         subs = [c.__name__ for c in Request.get_subclasses()]
         case = Request.get_subclasses()[subs.index(_cls)]
-        obj = case.from_json(case.translate(request.body), True)
+        obj = case.from_json(case.translate(
+            json.dumps(body).encode('utf-8')), True)
         obj._cls = case.get_entire_name()
         obj.save()
         return JsonResponse(obj, safe=False, encoder=QuerySetEncoder)
