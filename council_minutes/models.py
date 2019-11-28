@@ -498,7 +498,7 @@ class Request(DynamicDocument):
 
     @classmethod
     def translate(cls, data):
-        data_json = json.loads(data.decode('utf-8'))
+        data_json = json.loads(data)
         for key in data_json:
             try:
                 # pylint: disable=no-member
