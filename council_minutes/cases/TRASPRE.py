@@ -7,6 +7,7 @@ from ..models import Request, Subject
 from .case_utils import add_analysis_paragraph, table_general_data, string_to_date
 from .case_utils import table_approvals, table_credits_summary, table_recommend
 from .TRASPOS import TRASPOS
+import datetime
 
 
 class TRASPRE(TRASPOS):
@@ -114,22 +115,22 @@ class TRASPRE(TRASPOS):
         required=True, default=TT_INTRAFACULTY, choices=TT_CHOICES,
         display='Tipo de traslado')
     admission_period = StringField(
-        required=True, display='Periodo de admisión del estudiante')
+        required=True, display='Periodo de admisión del estudiante', default='')
     same_degree = BooleanField(
         required=True, default=False,
         display='¿Estos planes de estudios conducen al mismo título?')
     transit_program_code = StringField(
         required=True,
-        display='Código del plan de estudios de destino')
+        display='Código del plan de estudios de destino', default='')
     transit_program_name = StringField(
         required=True,
-        display='Nombre del plan de estudios de destino')
+        display='Nombre del plan de estudios de destino', default='')
     origin_program_code = StringField(
         required=True,
-        display='Código del plan de estudios de origen')
+        display='Código del plan de estudios de origen', default='')
     origin_program_name = StringField(
         required=True,
-        display='Nombre del plan de estudios de origen')
+        display='Nombre del plan de estudios de origen', default='')
     enrroled = BooleanField(
         required=True, default=True,
         display='¿Se encuentra matriculado en el semestre de presentar la solicitud?')
@@ -158,7 +159,7 @@ class TRASPRE(TRASPOS):
         required=True, default=0, min_value=0,
         display='Cupo de créditos para traslado')
     advisor_meeting_date = DateField(
-        display='Fecha de reunión del comité')
+        display='Fecha de reunión del comité', default=datetime.date.today)
     council_number_advisor = IntField(
         required=True, default=1, min_value=1,
         display='Número del acta del comité')
@@ -181,16 +182,17 @@ class TRASPRE(TRASPOS):
         min_value=0, default=0, required=True,
         display='Créditos exigidos libre elección')
     equivalence = EmbeddedDocumentListField(
-        HomologatedSubject, required=True,
+        HomologatedSubject,
         display="Asignaturas a homologar en el segundo plan de estudios")
     remaining = EmbeddedDocumentListField(
-        PendingSubject, required=True,
+        PendingSubject,
         display="Asignaturas pendientes por cursar en el segundo plan de estudios")
     optative_remaining = EmbeddedDocumentListField(
-        Optative, required=True,
+        Optative,
         display='Agrupaciones de las asignaturas pendientes optativas')
     free_choice_pending = IntField(min_value=0, required=True,
-                                   display='Créditos pendientes de libre elección')
+                                   display='Créditos pendientes de libre elección',
+                                   default=0)
 
     regulation_list = ['008|2008|CSU', '089|2014|CAC']  # List of regulations
 
