@@ -245,7 +245,7 @@ class TRASPRE(TRASPOS):
                  'créditos para traslado es igual o mayor al número de créditos pendientes de ' +
                  'aprobación en el plan de estudios destino (2° plan)?', '* en caso que el ' +
                  'plan destino sea de convocatoria anual el puntaje será con la anterior ' +
-                 'convocatoria.', '3. Resumen general de créditos del segundo plan de estudios:',
+                 'convocatoria.', 'III) Resumen general de créditos del segundo plan de estudios:',
                  '*Sin incluir los créditos correspondientes al cumplimiento del requisito de ' +
                  'suficiencia en idioma extranjero ', 'PLAN DE ESTUDIOS ({})', 'Periodo', 'Código',
                  'Asignatura', 'T*', 'Agrupación', 'C*', 'Nota', '*T: tipología (C/T/B/O/L). ' +
@@ -275,8 +275,8 @@ class TRASPRE(TRASPOS):
             self.str_cm[0].format(
                 self.get_transit_type_display().split(
                     ' ')[1].lower(), self.origin_program_name, self.origin_program_code,
-                self.campus_origin, self.transit_program_name,
-                self.transit_program_code, self.campus_destination,
+                self.get_campus_origin_display(), self.get_academic_program_display(),
+                self.academic_program, self.get_campus_destination_display(),
                 self.get_next_period(self.academic_period)))
         if self.is_affirmative_response_approval_status():
             self.cm_af(paragraph)
@@ -338,9 +338,9 @@ class TRASPRE(TRASPOS):
         aux_str = 'H' if self.availabe_quota_number > 0 else 'No h'
         final_analysis += [aux_str +
                            self.list_analysis[6].format(self.availabe_quota_number)]
-        aux_str = '' if self.available_quota_for_transit else 'no '
-        final_analysis += [self.list_analysis[7].format(
-            aux_str, Request.regulations['089|2014|CAC'][0])]
+        aux_str = 'H' if self.available_quota_for_transit else 'No h'
+        final_analysis += [aux_str + self.list_analysis[7].format(
+            Request.regulations['089|2014|CAC'][0])]
         for extra_a in self.extra_analysis:
             final_analysis += [extra_a]
         add_analysis_paragraph(docx, final_analysis)
@@ -398,8 +398,10 @@ class TRASPRE(TRASPOS):
         table.columns[1].width = 850000
         for cell in table.columns[0].cells:
             cell.width = 4350000
+            cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         for cell in table.columns[1].cells:
             cell.width = 850000
+            cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         creds_study = True
         if self.completion_percentage < 30.0:
             table.cell(0, 0).paragraphs[0].add_run(self.str_table[15])
@@ -408,7 +410,7 @@ class TRASPRE(TRASPOS):
             table.cell(1, 0).paragraphs[0].add_run(self.str_table[16])
             table.cell(1, 1).paragraphs[0].add_run(
                 str(self.last_admitted_score))
-            creds_study = creds_study and self.student_admission_score < self.last_admitted_score
+            creds_study = creds_study and self.student_admission_score > self.last_admitted_score
         else:
             table.cell(0, 0).paragraphs[0].add_run(self.str_table[17])
             table.cell(0, 1).paragraphs[0].add_run(str(self.PAPA))
@@ -421,7 +423,17 @@ class TRASPRE(TRASPOS):
         for i in range(2):
             table.cell(
                 i, 1).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        if creds_study:
+        if not creds_study:
+            paragraph = docx.add_paragraph()
+            paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            paragraph.add_run(' ').font.size = Pt(8)
+            date = self.advisor_meeting_date.strftime('%d-%m-%Y')
+            details = [self.str_cm[3].format(
+                self.get_academic_program_display()), self.advisor_meeting_date.strftime('%d/%m/%Y '),
+                self.council_number_advisor, self.council_year_advisor, self.is_affirmative_response_advisor_response()]
+            table_recommend(docx, details)
+        else:
             paragraph = docx.add_paragraph()
             paragraph.paragraph_format.space_after = Pt(0)
             paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
