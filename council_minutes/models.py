@@ -398,20 +398,20 @@ class Request(DynamicDocument):
     consecutive_minute = IntField(
         min_value=0, default=0, display='Número del Acta')
     year = IntField(
-        min_value=2000, max_value=2100, display='Año del Acta')
+        min_value=2000, max_value=2100, display='Año del Acta', default=datetime.date.today().year)
     date = DateField(default=datetime.date.today, display='Fecha')
     academic_program = StringField(
         min_length=4, max_length=4, choices=PLAN_CHOICES,
-        display='Programa Académico')
+        display='Programa Académico', default=PI_AGRICOLA)
     student_dni_type = StringField(
         min_length=2, choices=DNI_TYPE_CHOICES,
         default=DNI_TYPE_CEDULA_DE_CIUDADANIA, display='Tipo de Documento')
     student_dni = StringField(
-        max_length=22, display='Documento')
+        max_length=22, display='Documento', default='')
     student_name = StringField(
-        max_length=512, display='Nombre del Estudiante')
+        max_length=512, display='Nombre del Estudiante', default='')
     academic_period = StringField(
-        max_length=10, display='Periodo')
+        max_length=10, display='Periodo', default='0000-0S')
     approval_status = StringField(
         min_length=2, max_length=2, choices=AS_CHOICES,
         default=AS_EN_ESPERA, display='Estado de Aprobación')
@@ -424,7 +424,7 @@ class Request(DynamicDocument):
         default='', display='Justificación del Estudiante')
     supports = StringField(default='', display='Soportes')
     extra_analysis = ListField(
-        StringField(), default=[], display='Analisis Extra')
+        StringField(), display='Analisis Extra')
 
     regulations = {
         '008|2008|CSU': ('Acuerdo 008 de 2008 del Consejo Superior Universitario',
