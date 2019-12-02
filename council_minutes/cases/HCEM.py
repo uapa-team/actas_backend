@@ -59,40 +59,14 @@ class HCEM(Request):
     str_cm = [
         '{} la(s) siguiente(s) asignatura(s) cursada(s) en', 'el programa {} de la institución {}',
         'el intercambio académico internacional en la institución', 'el convenio con la Universidad' +
-        'de los Andes']
+        'de los Andes', 'de la siguiente manera:', 'por la siguiente razónes']
 
     def cm(self, docx):
         # pylint: disable=no-member
-        paragraph.add_run(self.str_council_header + ' ')
-        summary = [0, 0]
-        types = {self.HomologatedSubject.HT_CONVALIDACION: 0,
-                 self.HomologatedSubject.HT_EQUIVALENCIA: 0,
-                 self.HomologatedSubject.HT_HOMOLOGACION: 0,
-                 self.HomologatedSubject.HT_ANDES: 0,
-                 self.HomologatedSubject.HT_INTERNACIONAL: 0, }
-        for sbj in self.homologated_subjects:
-            summary[sbj.approved] += 1
-            types[sbj.h_type] += 1
-        total = 0
-        if summary[0] == 0:
-            total += 1
-        if summary[1] == 0:
-            total += 1
-        if types[self.HomologatedSubject.HT_CONVALIDACION] == 0:
-            total += 1
-        if types[self.HomologatedSubject.HT_EQUIVALENCIA] == 0:
-            total += 1
-        if types[self.HomologatedSubject.HT_HOMOLOGACION] == 0:
-            total += 1
-        if types[self.HomologatedSubject.HT_ANDES] == 0:
-            total += 1
-        if types[self.HomologatedSubject.HT_INTERNACIONAL] == 0:
-            total += 1
-        if total == 5:
-            paragraph.add_run(
-                self.get_approval_status_display().upper() + ' ').font.bold = True
-            paragraph.add_run(
-                self.verbs[self.homologated_subjects[0].h_type])
+        paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
+        self.cm_answer()
 
     def cm_answer(self, paragraph):
         raise NotImplementedError('Not yet!')

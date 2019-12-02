@@ -527,7 +527,7 @@ class TRASPRE(Request):
             paragraph.add_run(' ').font.size = Pt(8)
             reproved = 0
             for sbj in self.equivalence:
-                if sbj.grade < 3.0:
+                if float(sbj.grade) < 3.0:
                     reproved += 1
             table = docx.add_table(
                 rows=(len(self.equivalence) + 3 - reproved), cols=9, style='Table Grid')
@@ -601,7 +601,7 @@ class TRASPRE(Request):
             index = 2
             total_creds = 0
             for sbj in self.equivalence:
-                if sbj.grade < 3.0:
+                if float(sbj.grade) < 3.0:
                     continue
                 table.cell(index, 0).paragraphs[0].add_run(sbj.period)
                 table.cell(index, 1).paragraphs[0].add_run(sbj.code)
@@ -713,7 +713,7 @@ class TRASPRE(Request):
                 index = 2
                 total_creds = 0
                 for sbj in self.equivalence:
-                    if sbj.grade >= 3.0:
+                    if float(sbj.grade) >= 3.0:
                         continue
                     table.cell(index, 0).paragraphs[0].add_run(sbj.period)
                     table.cell(index, 1).paragraphs[0].add_run(sbj.code)
