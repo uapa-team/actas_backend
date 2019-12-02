@@ -310,6 +310,14 @@ class TRASPRE(Request):
         else:
             self.cm_ng(paragraph)
 
+    def get_next_period(self, actual_period):
+        year = int(actual_period[0:4])
+        semester = int(actual_period[5])
+        if semester == 1:
+            return str(year) + '-' + str(semester + 1) + 'S'
+        elif semester == 2:
+            return str(year + 1) + '-1S'
+
     def cm_af(self, paragraph):
         paragraph.add_run(self.str_cm[1].format(
             self.academic_period, Request.regulations['008|2008|CSU'][0],
