@@ -200,6 +200,8 @@ class TRASPRE(Request):
               'calidad de estudiante al finalizar el periodo académico {}. (Artículo 39 ' +
               'del {} y {}).', 'debido a que', 'Comité Asesor de {}']
 
+    srt_titles = ['I) Datos Generales', 'II) Información Académica']
+
     list_analysis = ['Viene del plan {} de la sede {}.',
                      'a tenido calidad de estudiante en ese programa previamente ' +
                      '(Parágrafo 1. Artículo 2, {}). Universitas: OK.',

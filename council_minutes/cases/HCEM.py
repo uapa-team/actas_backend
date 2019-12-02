@@ -91,6 +91,8 @@ class HCEM(Request):
         if total == 5:
             paragraph.add_run(
                 self.get_approval_status_display().upper() + ' ').font.bold = True
+            paragraph.add_run(
+                self.verbs[self.homologated_subjects[0].h_type])
 
     def cm_answer(self, paragraph):
         raise NotImplementedError('Not yet!')
