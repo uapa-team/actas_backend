@@ -399,7 +399,8 @@ class Request(DynamicDocument):
         min_value=0, default=0, display='Número del Acta')
     year = IntField(
         min_value=2000, max_value=2100, display='Año del Acta', default=datetime.date.today().year)
-    date = DateField(default=datetime.date.today, display='Fecha')
+    date = DateField(default=datetime.date.today,
+                     display='Fecha de radicación')
     academic_program = StringField(
         min_length=4, max_length=4, choices=PLAN_CHOICES,
         display='Programa Académico', default=PI_AGRICOLA)
@@ -419,7 +420,7 @@ class Request(DynamicDocument):
         min_length=3, max_length=3, choices=ARCR_CHOICES,
         default=ARCR_EN_ESPERA, display='Respuesta del Comité')
     council_decision = StringField(
-        max_length=255, default='', display='Justificación del Consejo')
+        max_length=255, default='justifica debidamente la solicitud', display='Justificación del Consejo')
     student_justification = StringField(
         default='', display='Justificación del Estudiante')
     supports = StringField(default='', display='Soportes')

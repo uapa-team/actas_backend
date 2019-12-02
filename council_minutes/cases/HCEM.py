@@ -9,11 +9,11 @@ class HCEM(Request):
 
     class HomologatedSubject(Subject):
         HT_HOMOLOGACION = 'H'
-        HT_CONVALIDACIÓN = 'C'
+        HT_CONVALIDACION = 'C'
         HT_EQUIVALENCIA = 'E'
         HT_CHOICES = (
             (HT_HOMOLOGACION, 'Homologación'),
-            (HT_CONVALIDACIÓN, 'Convalidación'),
+            (HT_CONVALIDACION, 'Convalidación'),
             (HT_EQUIVALENCIA, 'Equivalencia'),
         )
         old_credits = IntField(default=3, min_value=0, required=True,
@@ -45,13 +45,33 @@ class HCEM(Request):
 
     regulation_list = ['008|2008|CSU']  # List of regulations
 
+    str_cm = [
+        '{} la(s) siguiente(s) asignatura(s) cursada(s) en el programa {}']
+
     def cm(self, docx):
+        # pylint: disable=no-member
         paragraph.add_run(self.str_council_header + ' ')
-        approved = 0
-        types = [0, 0, 0]
+        summary = [0, 0]
+        types = {self.HomologatedSubject.HT_CONVALIDACION: 0,
+                 self.HomologatedSubject.HT_EQUIVALENCIA: 0,
+                 self.HomologatedSubject.HT_HOMOLOGACION: 0}
         for sbj in self.homologated_subjects:
-            if sbj.approved:
-                approved += 1
+            summary[sbj.approved] += 1
+            types[sbj.h_type] += 1
+        total = 0
+        if summary[0] == 0:
+            total += 1
+        if summary[1] == 0:
+            total += 1
+        if types[self.HomologatedSubject.HT_CONVALIDACION] == 0:
+            total += 1
+        if types[self.HomologatedSubject.HT_EQUIVALENCIA] == 0:
+            total += 1
+        if types[self.HomologatedSubject.HT_HOMOLOGACION] == 0:
+            total += 1
+        if total == 3:
+            paragraph.add_run(
+                self.get_approval_status_display().upper() + ' ').font.bold = True
 
     def cm_answer(self, paragraph):
         raise NotImplementedError('Not yet!')
