@@ -1,3 +1,4 @@
+import datetime
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
@@ -5,8 +6,7 @@ from mongoengine import StringField, BooleanField, DateField, IntField
 from mongoengine import EmbeddedDocumentListField, FloatField, EmbeddedDocument
 from ..models import Request, Subject
 from .case_utils import add_analysis_paragraph, table_general_data, string_to_date
-from .case_utils import table_approvals, table_credits_summary, table_recommend
-import datetime
+from .case_utils import table_credits_summary, table_recommend
 
 
 class TRASPRE(Request):
@@ -260,7 +260,8 @@ class TRASPRE(Request):
                  'Optativas', 'La oferta de asignaturas optativas en cada una de las ' +
                  'agrupaciones y componentes del plan de estudios del programa curricular de {}' +
                  ', la encuentra en el Acuerdo No. {} del año {}, expedido por el Consejo de ' +
-                 'la Facultad de Ingeniería.', 'Total créditos que se equivalen/convalidan', 'Bogotá']
+                 'la Facultad de Ingeniería.', 'Total créditos que se equivalen/convalidan',
+                 'Bogotá']
 
     def cm(self, docx):
         paragraph = docx.add_paragraph()
@@ -439,10 +440,11 @@ class TRASPRE(Request):
             paragraph.paragraph_format.space_after = Pt(0)
             paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
             paragraph.add_run(' ').font.size = Pt(8)
-            date = self.advisor_meeting_date.strftime('%d-%m-%Y')
             details = [self.str_cm[3].format(
-                self.get_academic_program_display()), self.advisor_meeting_date.strftime('%d/%m/%Y '),
-                self.council_number_advisor, self.council_year_advisor, self.is_affirmative_response_advisor_response()]
+                self.get_academic_program_display()), self.advisor_meeting_date.strftime(
+                    '%d/%m/%Y '), self.council_number_advisor,
+                       self.council_year_advisor,
+                       self.is_affirmative_response_advisor_response()]
             table_recommend(docx, details)
         else:
             paragraph = docx.add_paragraph()
@@ -493,10 +495,13 @@ class TRASPRE(Request):
             run.font.bold = True
             equivalence_creds = Subject.creds_summary(
                 self.equivalence)
-            pending_creds = [self.exiged_b_ob - equivalence_creds[0], self.exiged_b_op - equivalence_creds[1],
-                             self.exiged_c_ob - equivalence_creds[2], self.exiged_c_op - equivalence_creds[3], self.exiged_l - equivalence_creds[4]]
+            pending_creds = [self.exiged_b_ob - equivalence_creds[0], self.exiged_b_op - \
+                 equivalence_creds[1], self.exiged_c_ob - equivalence_creds[2],
+                             self.exiged_c_op - equivalence_creds[3], self.exiged_l - \
+                 equivalence_creds[4]]
             table_credits_summary(docx, [[self.exiged_b_ob, self.exiged_b_op, self.exiged_c_ob,
-                                          self.exiged_c_op, self.exiged_l], equivalence_creds, pending_creds], 'TRASLADO')
+                                          self.exiged_c_op, self.exiged_l], equivalence_creds,
+                                         pending_creds], 'TRASLADO')
             paragraph = docx.add_paragraph()
             paragraph.paragraph_format.space_after = Pt(0)
             paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
@@ -505,10 +510,11 @@ class TRASPRE(Request):
             paragraph.paragraph_format.space_after = Pt(0)
             paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
             paragraph.add_run(' ').font.size = Pt(8)
-            date = self.advisor_meeting_date.strftime('%d-%m-%Y')
             details = [self.str_cm[3].format(
-                self.get_academic_program_display()), self.advisor_meeting_date.strftime('%d/%m/%Y '),
-                self.council_number_advisor, self.council_year_advisor, self.is_affirmative_response_advisor_response]
+                self.get_academic_program_display()),
+                       self.advisor_meeting_date.strftime('%d/%m/%Y '),
+                       self.council_number_advisor, self.council_year_advisor,
+                       self.is_affirmative_response_advisor_response]
             table_recommend(docx, details)
             paragraph = docx.add_paragraph()
             paragraph.paragraph_format.space_after = Pt(0)
