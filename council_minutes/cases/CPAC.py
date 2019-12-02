@@ -1,5 +1,4 @@
 from docx.shared import Pt
-from num2words import num2words
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from mongoengine import StringField, BooleanField
 from ..models import Request

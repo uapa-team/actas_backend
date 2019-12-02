@@ -1,7 +1,7 @@
-from ..models import Request
 from docx.shared import Pt
 from mongoengine import IntField
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from ..models import Request
 
 
 class CBAP(Request):
@@ -27,9 +27,9 @@ class CBAP(Request):
         self.cm_answer(paragraph)
 
     def cm_answer(self, paragraph):
+        # pylint: disable=no-member
         paragraph.add_run(self.str_council_header + ' ')
         paragraph.add_run(
-            # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True
         paragraph.add_run(self.str_cm[0] + str(self.credits) + self.str_cm[1])
         paragraph.add_run(self.get_academic_program_display())
@@ -48,9 +48,9 @@ class CBAP(Request):
         self.pcm_answer(paragraph)
 
     def pcm_answer(self, paragraph):
+        # pylint: disable=no-member
         paragraph.add_run(self.str_council_header + ' ')
         paragraph.add_run(
-            # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True
         paragraph.add_run(self.str_cm[0] + str(self.credits) + self.str_cm[1])
         paragraph.add_run(self.get_academic_program_display())

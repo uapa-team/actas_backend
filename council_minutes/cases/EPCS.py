@@ -122,6 +122,7 @@ class EPCS(Request):
         ))
 
     def pcm_analysis(self, docx):
+        # pylint: disable=no-member
         analysis_list = []
         analysis_list += [self.str_pcm[0].format(
             self.get_academic_program_display(),

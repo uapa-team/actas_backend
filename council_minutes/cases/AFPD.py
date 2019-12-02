@@ -55,10 +55,10 @@ class AFPD(Request):
         self.pcm_answer(paragraph)
 
     def pcm_answer(self, paragraph):
+        # pylint: disable=no-member
         paragraph.add_run(self.str_answer + ' ').font.bold = True
         paragraph.add_run(self.str_comittee_header + ' ')
         paragraph.add_run(
-            # pylint: disable=no-member
             self.get_advisor_response_display().upper() + ' ').font.bold = True
         paragraph.add_run(self.str_pcm[1].format(
             self.academic_period,
