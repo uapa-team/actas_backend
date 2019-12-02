@@ -50,11 +50,11 @@ class HCEM(Request):
     regulation_list = ['008|2008|CSU']  # List of regulations
 
     verbs = {
-        self.HomologatedSubject.HT_CONVALIDACION: 'convalidar',
-        self.HomologatedSubject.HT_EQUIVALENCIA: 'equivaler',
-        self.HomologatedSubject.HT_HOMOLOGACION: 'homologar',
-        self.HomologatedSubject.HT_ANDES: 'homologar',
-        self.HomologatedSubject.HT_INTERNACIONAL: 'homologar'}
+        HomologatedSubject.HT_CONVALIDACION: 'convalidar',
+        HomologatedSubject.HT_EQUIVALENCIA: 'equivaler',
+        HomologatedSubject.HT_HOMOLOGACION: 'homologar',
+        HomologatedSubject.HT_ANDES: 'homologar',
+        HomologatedSubject.HT_INTERNACIONAL: 'homologar'}
 
     str_cm = [
         '{} la(s) siguiente(s) asignatura(s) cursada(s) en', 'el programa {} de la institución {}',
