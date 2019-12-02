@@ -6,11 +6,10 @@ from mongoengine import EmbeddedDocumentListField, FloatField, EmbeddedDocument
 from ..models import Request, Subject
 from .case_utils import add_analysis_paragraph, table_general_data, string_to_date
 from .case_utils import table_approvals, table_credits_summary, table_recommend
-from .TRASPOS import TRASPOS
 import datetime
 
 
-class TRASPRE(TRASPOS):
+class TRASPRE(Request):
 
     class HomologatedSubject(Subject):
         TIP_CHOICES = (
