@@ -258,7 +258,7 @@ class TRASPRE(Request):
                  'Optativas', 'La oferta de asignaturas optativas en cada una de las ' +
                  'agrupaciones y componentes del plan de estudios del programa curricular de {}' +
                  ', la encuentra en el Acuerdo No. {} del año {}, expedido por el Consejo de ' +
-                 'la Facultad de Ingeniería.', 'Total créditos que se equivalen/convalidan']
+                 'la Facultad de Ingeniería.', 'Total créditos que se equivalen/convalidan', 'Bogotá']
 
     def cm(self, docx):
         paragraph = docx.add_paragraph()
@@ -277,7 +277,7 @@ class TRASPRE(Request):
                 self.get_transit_type_display().split(
                     ' ')[1].lower(), self.origin_program_name, self.origin_program_code,
                 self.get_campus_origin_display(), self.get_academic_program_display(),
-                self.academic_program, self.get_campus_destination_display(),
+                self.academic_program, self.str_table[48],
                 self.get_next_period(self.academic_period)))
         if self.is_affirmative_response_approval_status():
             self.cm_af(paragraph)
@@ -303,7 +303,7 @@ class TRASPRE(Request):
                 self.get_transit_type_display().split(
                     ' ')[1].lower(), self.origin_program_name, self.origin_program_code,
                 self.get_campus_origin_display(), self.get_academic_program_display(),
-                self.academic_program, self.get_campus_destination_display(),
+                self.academic_program, self.str_table[48],
                 self.get_next_period(self.academic_period)))
         if self.is_affirmative_response_approval_status():
             self.cm_af(paragraph)
@@ -360,7 +360,7 @@ class TRASPRE(Request):
                 self.get_campus_origin_display()), self.origin_program_name],
             [self.str_table[3], self.origin_program_code],
             [self.str_table[4].format(
-                self.get_campus_destination_display()), self.get_academic_program_display()],
+                self.str_table[48]), self.get_academic_program_display()],
             [self.str_table[5], self.academic_program],
             [self.str_table[6], string_to_date(str(self.date))],
             [self.str_table[7], 'Sí' if self.same_degree else 'No'],

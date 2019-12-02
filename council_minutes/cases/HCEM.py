@@ -11,10 +11,14 @@ class HCEM(Request):
         HT_HOMOLOGACION = 'H'
         HT_CONVALIDACION = 'C'
         HT_EQUIVALENCIA = 'E'
+        HT_ANDES = 'A'
+        HT_INTERNACIONAL = 'I'
         HT_CHOICES = (
             (HT_HOMOLOGACION, 'Homologación'),
             (HT_CONVALIDACION, 'Convalidación'),
             (HT_EQUIVALENCIA, 'Equivalencia'),
+            (HT_ANDES, 'Homologación conv. Uniandes'),
+            (HT_INTERNACIONAL, 'Homologación conv. internacional'),
         )
         old_credits = IntField(default=3, min_value=0, required=True,
                                display='Créditos de la asignatura en la anterior institución')
@@ -38,15 +42,24 @@ class HCEM(Request):
         required=True, default='Universidad Nacional de Colombia',
         display='Institución donde cursó las asignaturas')
     origin_plan = StringField(
-        required=True, default='',
+        default='',
         display='Plan de estudios donde cursó las asignaturas')
     homologated_subjects = EmbeddedDocumentListField(
         HomologatedSubject, required=True, default=[], display='Asignaturas a homologar')
 
     regulation_list = ['008|2008|CSU']  # List of regulations
 
+    verbs = {
+        self.HomologatedSubject.HT_CONVALIDACION: 'convalidar',
+        self.HomologatedSubject.HT_EQUIVALENCIA: 'equivaler',
+        self.HomologatedSubject.HT_HOMOLOGACION: 'homologar',
+        self.HomologatedSubject.HT_ANDES: 'homologar',
+        self.HomologatedSubject.HT_INTERNACIONAL: 'homologar'}
+
     str_cm = [
-        '{} la(s) siguiente(s) asignatura(s) cursada(s) en el programa {}']
+        '{} la(s) siguiente(s) asignatura(s) cursada(s) en', 'el programa {} de la institución {}',
+        'el intercambio académico internacional en la institución', 'el convenio con la Universidad' +
+        'de los Andes']
 
     def cm(self, docx):
         # pylint: disable=no-member
@@ -54,7 +67,9 @@ class HCEM(Request):
         summary = [0, 0]
         types = {self.HomologatedSubject.HT_CONVALIDACION: 0,
                  self.HomologatedSubject.HT_EQUIVALENCIA: 0,
-                 self.HomologatedSubject.HT_HOMOLOGACION: 0}
+                 self.HomologatedSubject.HT_HOMOLOGACION: 0,
+                 self.HomologatedSubject.HT_ANDES: 0,
+                 self.HomologatedSubject.HT_INTERNACIONAL: 0, }
         for sbj in self.homologated_subjects:
             summary[sbj.approved] += 1
             types[sbj.h_type] += 1
@@ -69,7 +84,11 @@ class HCEM(Request):
             total += 1
         if types[self.HomologatedSubject.HT_HOMOLOGACION] == 0:
             total += 1
-        if total == 3:
+        if types[self.HomologatedSubject.HT_ANDES] == 0:
+            total += 1
+        if types[self.HomologatedSubject.HT_INTERNACIONAL] == 0:
+            total += 1
+        if total == 5:
             paragraph.add_run(
                 self.get_approval_status_display().upper() + ' ').font.bold = True
 
