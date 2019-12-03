@@ -12,7 +12,8 @@ class AAUT(Request):
     regulation_list = ['008|2008|CSU', '070|2009|CAC']  # List of regulations
 
     academic_profile = StringField(
-        default=Request.PROFILE_INVE, choices=Request.PROFILE_CHOICES, display='Perfil de programa curricular')
+        default=Request.PROFILE_INVE, choices=Request.PROFILE_CHOICES,
+        display='Perfil de programa curricular')
     places_resolution = StringField(
         default='',
         display='Resolución de cupos para admisión automática.')

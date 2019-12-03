@@ -1,10 +1,11 @@
+import datetime
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
 from mongoengine import StringField, DateField, BooleanField
 from mongoengine import EmbeddedDocumentListField
 from ..models import Request, Professor
 from .case_utils import add_analysis_paragraph
-import datetime
+
 
 class DJCT(Request):
 
@@ -18,8 +19,10 @@ class DJCT(Request):
     advisor = StringField(required=True, display='Director', default='')
     title = StringField(
         requiered=True, display='Título de Tesis/Trabajo Final', default='')
-    date_approval = DateField(required=True, display='Fecha de Aprobación', default=datetime.date.today)
-    proposal_jury = BooleanField(required=True, display='¿Jurados Propuestos?', default=False)
+    date_approval = DateField(required=True, display='Fecha de Aprobación',
+                              default=datetime.date.today)
+    proposal_jury = BooleanField(
+        required=True, display='¿Jurados Propuestos?', default=False)
     proffesors = EmbeddedDocumentListField(Professor, display='Docentes')
 
     regulation_list = ['040|2017|CFA', '056|2012|CSU']

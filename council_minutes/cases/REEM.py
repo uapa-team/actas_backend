@@ -1,6 +1,6 @@
 from docx.shared import Pt
-from num2words import num2words
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from num2words import num2words
 from mongoengine import IntField, FloatField, ObjectIdField
 from ..models import Request
 from .case_utils import add_analysis_paragraph
@@ -11,7 +11,8 @@ class REEM(Request):
     full_name = 'Reembolso'
 
     credits_refunded = IntField(display='Creditos Disponibles', default=0)
-    percentage = FloatField(display='Porcentaje de créditos a cancelar', default=0.0)
+    percentage = FloatField(
+        display='Porcentaje de créditos a cancelar', default=0.0)
     cancelation_case = ObjectIdField(
         display='Código del caso en el que fue cancelado el periodo')
 

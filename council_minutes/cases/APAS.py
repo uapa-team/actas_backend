@@ -1,9 +1,9 @@
+import datetime
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from mongoengine import StringField, BooleanField, DateField
 from ..models import Request
 from .case_utils import add_analysis_paragraph, string_to_date
-import datetime
 
 
 class APAS(Request):
@@ -31,9 +31,11 @@ class APAS(Request):
     institut = StringField(
         required=True, display='Institución donde se va a desarrolar la pasantía', default='')
     grade_option = StringField(
-        required=True, display='Tipo de tesis/trabajo final', choices=GO_CHOICES, default=GO_TESIS_MAESTRIA)
+        required=True, display='Tipo de tesis/trabajo final', choices=GO_CHOICES,
+        default=GO_TESIS_MAESTRIA)
     internship_period = StringField(
-        required=True, display='Periodo en el que se va a desarrollar la pasantía', default='0000-0S')
+        required=True, display='Periodo en el que se va a desarrollar la pasantía',
+        default='0000-0S')
     enrolled_thesis = BooleanField(
         required=True, default=False, display='¿Tiene inscrita la asignatura tesis/trabajo final?')
 

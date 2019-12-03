@@ -1,7 +1,6 @@
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import StringField, DateField, BooleanField
-from mongoengine import EmbeddedDocumentListField, EmbeddedDocument
+from mongoengine import EmbeddedDocumentListField, StringField
 from ..models import Request, Subject
 from .case_utils import add_analysis_paragraph, table_subjects
 
@@ -23,7 +22,8 @@ class HOID(Request):
                             display='Nivel Requerido')
     certification_type = StringField(
         required=True, choices=CT_CHOICES, display='Tipo de certificación', default=CT_EXAMEN)
-    institution = StringField(required=True, display='Institución/Examen', default='')
+    institution = StringField(
+        required=True, display='Institución/Examen', default='')
     grade_got = StringField(required=True, default='B1',
                             display='Nivel Obtenido')
     subjects = EmbeddedDocumentListField(

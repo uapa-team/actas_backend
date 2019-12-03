@@ -1,5 +1,4 @@
 from docx.shared import Pt
-from num2words import num2words
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from mongoengine import StringField, BooleanField
 from ..models import Request
@@ -15,7 +14,8 @@ class TEPR(Request):
         required=True, display='Programa Académico origen', default=Request.PI_ELECTRICA)
     academic_period_transit = StringField(
         max_length=10, required=True, display='Periodo de tránsito', default='0000-0S')
-    available_places = BooleanField(display='Hay cupos en el plan de estudios', default=False)
+    available_places = BooleanField(
+        display='Hay cupos en el plan de estudios', default=False)
     languaje = BooleanField(
         display='Cumple requisito de idioma en el plan destino', default=True)
     on_time = BooleanField(

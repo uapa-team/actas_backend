@@ -1,9 +1,9 @@
+import datetime
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
 from mongoengine import StringField, DateField
 from ..models import Request
 from .case_utils import add_analysis_paragraph
-import datetime
 
 
 class AFPD(Request):

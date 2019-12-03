@@ -1,10 +1,10 @@
+import datetime
 from docx.shared import Pt
-from num2words import num2words
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from num2words import num2words
 from mongoengine import DateField, StringField, IntField, BooleanField
 from ..models import Request
 from .case_utils import num_to_month, add_analysis_paragraph
-import datetime
 
 
 class EPCS(Request):

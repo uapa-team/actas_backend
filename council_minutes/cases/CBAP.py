@@ -1,6 +1,6 @@
 from docx.shared import Pt
-from mongoengine import IntField
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from mongoengine import IntField
 from ..models import Request
 
 

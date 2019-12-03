@@ -1,18 +1,20 @@
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import StringField, IntField, FloatField, EmbeddedDocumentListField, BooleanField, DateField
-from ..models import Request, Subject
-from .case_utils import table_subjects, add_analysis_paragraph, num_to_month
+from mongoengine import StringField, FloatField
+from ..models import Request
+from .case_utils import add_analysis_paragraph
 
 
 class EBDA(Request):
 
     full_name = 'Beca exensión derechos académicos'
 
-    gpa = FloatField(display='Promedio obtenido el semestre anterior', default=0.0)
+    gpa = FloatField(
+        display='Promedio obtenido el semestre anterior', default=0.0)
     gpa_period = StringField(
         display='Periodo en el que se obtiene el promedio', default='0000-0S')
-    target_period = StringField(display='Periodo en el que aplica la beca', default='0000-0S')
+    target_period = StringField(
+        display='Periodo en el que aplica la beca', default='0000-0S')
 
     regulation_list = ['002|2012|CFA']  # List of regulations
 

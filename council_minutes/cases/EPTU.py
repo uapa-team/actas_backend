@@ -1,9 +1,9 @@
 from docx.shared import Pt
-from num2words import num2words
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from num2words import num2words
 from mongoengine import StringField, IntField, BooleanField
 from ..models import Request
-from .case_utils import string_to_date, add_analysis_paragraph
+from .case_utils import add_analysis_paragraph
 
 
 class EPTU(Request):

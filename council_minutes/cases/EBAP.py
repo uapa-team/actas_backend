@@ -1,9 +1,9 @@
+import datetime
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
 from mongoengine import IntField, DateField
 from ..models import Request
 from .case_utils import add_analysis_paragraph, num_to_month
-import datetime
 
 
 class EBAP(Request):

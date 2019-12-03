@@ -1,6 +1,6 @@
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import StringField, IntField, FloatField, EmbeddedDocumentListField, BooleanField
+from mongoengine import EmbeddedDocumentListField, BooleanField
 from ..models import Request, Subject
 from .case_utils import table_subjects, add_analysis_paragraph
 
@@ -61,6 +61,7 @@ class IASI(Request):
         table_subjects(docx, Subject.subjects_to_array(self.subjects))
 
     def pcm_analysis(self, docx):
+        # pylint: disable=no-member
         analysis_list = []
         for subject in self.subjects:
             analysis_list += [self.str_pcm[0].format(

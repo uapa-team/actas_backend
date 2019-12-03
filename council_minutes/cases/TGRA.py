@@ -1,9 +1,10 @@
+import datetime
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import StringField, IntField, FloatField, EmbeddedDocumentListField, BooleanField, DateField
+from mongoengine import StringField, IntField, DateField
 from ..models import Request, Subject
 from .case_utils import table_subjects, add_analysis_paragraph, num_to_month
-import datetime
+
 
 class TGRA(Request):
 
@@ -27,7 +28,8 @@ class TGRA(Request):
         default='', display='Profesor director del trabajo')
     dc_approved = IntField(display='Número de créditos aprobados', default=0)
     commite_cm = IntField(default=0, display='Acta de comité')
-    commite_cm_date = DateField(display='Fecha acta de comité', default=datetime.date.today)
+    commite_cm_date = DateField(
+        display='Fecha acta de comité', default=datetime.date.today)
 
     regulation_list = ['026|2012|CSU', '040|2017|CSU']  # List of regulations
 
