@@ -1,3 +1,4 @@
+import datetime
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
@@ -5,12 +6,10 @@ from mongoengine import StringField, BooleanField, DateField, IntField
 from mongoengine import EmbeddedDocumentListField, FloatField, EmbeddedDocument
 from ..models import Request, Subject
 from .case_utils import add_analysis_paragraph, table_general_data, string_to_date
-from .case_utils import table_approvals, table_credits_summary, table_recommend
-from .TRASPOS import TRASPOS
-import datetime
+from .case_utils import table_credits_summary, table_recommend
 
 
-class TRASPRE(TRASPOS):
+class TRASPRE(Request):
 
     class HomologatedSubject(Subject):
         TIP_CHOICES = (
@@ -201,6 +200,8 @@ class TRASPRE(TRASPOS):
               'calidad de estudiante al finalizar el periodo académico {}. (Artículo 39 ' +
               'del {} y {}).', 'debido a que', 'Comité Asesor de {}']
 
+    srt_titles = ['I) Datos Generales', 'II) Información Académica']
+
     list_analysis = ['Viene del plan {} de la sede {}.',
                      'a tenido calidad de estudiante en ese programa previamente ' +
                      '(Parágrafo 1. Artículo 2, {}). Universitas: OK.',
@@ -259,7 +260,8 @@ class TRASPRE(TRASPOS):
                  'Optativas', 'La oferta de asignaturas optativas en cada una de las ' +
                  'agrupaciones y componentes del plan de estudios del programa curricular de {}' +
                  ', la encuentra en el Acuerdo No. {} del año {}, expedido por el Consejo de ' +
-                 'la Facultad de Ingeniería.', 'Total créditos que se equivalen/convalidan']
+                 'la Facultad de Ingeniería.', 'Total créditos que se equivalen/convalidan',
+                 'Bogotá']
 
     def cm(self, docx):
         paragraph = docx.add_paragraph()
@@ -278,7 +280,7 @@ class TRASPRE(TRASPOS):
                 self.get_transit_type_display().split(
                     ' ')[1].lower(), self.origin_program_name, self.origin_program_code,
                 self.get_campus_origin_display(), self.get_academic_program_display(),
-                self.academic_program, self.get_campus_destination_display(),
+                self.academic_program, self.str_table[48],
                 self.get_next_period(self.academic_period)))
         if self.is_affirmative_response_approval_status():
             self.cm_af(paragraph)
@@ -304,12 +306,20 @@ class TRASPRE(TRASPOS):
                 self.get_transit_type_display().split(
                     ' ')[1].lower(), self.origin_program_name, self.origin_program_code,
                 self.get_campus_origin_display(), self.get_academic_program_display(),
-                self.academic_program, self.get_campus_destination_display(),
+                self.academic_program, self.str_table[48],
                 self.get_next_period(self.academic_period)))
         if self.is_affirmative_response_approval_status():
             self.cm_af(paragraph)
         else:
             self.cm_ng(paragraph)
+
+    def get_next_period(self, actual_period):
+        year = int(actual_period[0:4])
+        semester = int(actual_period[5])
+        if semester == 1:
+            return str(year) + '-' + str(semester + 1) + 'S'
+        elif semester == 2:
+            return str(year + 1) + '-1S'
 
     def cm_af(self, paragraph):
         paragraph.add_run(self.str_cm[1].format(
@@ -361,7 +371,7 @@ class TRASPRE(TRASPOS):
                 self.get_campus_origin_display()), self.origin_program_name],
             [self.str_table[3], self.origin_program_code],
             [self.str_table[4].format(
-                self.get_campus_destination_display()), self.get_academic_program_display()],
+                self.str_table[48]), self.get_academic_program_display()],
             [self.str_table[5], self.academic_program],
             [self.str_table[6], string_to_date(str(self.date))],
             [self.str_table[7], 'Sí' if self.same_degree else 'No'],
@@ -430,10 +440,11 @@ class TRASPRE(TRASPOS):
             paragraph.paragraph_format.space_after = Pt(0)
             paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
             paragraph.add_run(' ').font.size = Pt(8)
-            date = self.advisor_meeting_date.strftime('%d-%m-%Y')
             details = [self.str_cm[3].format(
-                self.get_academic_program_display()), self.advisor_meeting_date.strftime('%d/%m/%Y '),
-                self.council_number_advisor, self.council_year_advisor, self.is_affirmative_response_advisor_response()]
+                self.get_academic_program_display()), self.advisor_meeting_date.strftime(
+                    '%d/%m/%Y '), self.council_number_advisor,
+                       self.council_year_advisor,
+                       self.is_affirmative_response_advisor_response()]
             table_recommend(docx, details)
         else:
             paragraph = docx.add_paragraph()
@@ -484,10 +495,13 @@ class TRASPRE(TRASPOS):
             run.font.bold = True
             equivalence_creds = Subject.creds_summary(
                 self.equivalence)
-            pending_creds = [self.exiged_b_ob - equivalence_creds[0], self.exiged_b_op - equivalence_creds[1],
-                             self.exiged_c_ob - equivalence_creds[2], self.exiged_c_op - equivalence_creds[3], self.exiged_l - equivalence_creds[4]]
+            pending_creds = [self.exiged_b_ob - equivalence_creds[0], self.exiged_b_op - \
+                 equivalence_creds[1], self.exiged_c_ob - equivalence_creds[2],
+                             self.exiged_c_op - equivalence_creds[3], self.exiged_l - \
+                 equivalence_creds[4]]
             table_credits_summary(docx, [[self.exiged_b_ob, self.exiged_b_op, self.exiged_c_ob,
-                                          self.exiged_c_op, self.exiged_l], equivalence_creds, pending_creds], 'TRASLADO')
+                                          self.exiged_c_op, self.exiged_l], equivalence_creds,
+                                         pending_creds], 'TRASLADO')
             paragraph = docx.add_paragraph()
             paragraph.paragraph_format.space_after = Pt(0)
             paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
@@ -496,10 +510,11 @@ class TRASPRE(TRASPOS):
             paragraph.paragraph_format.space_after = Pt(0)
             paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
             paragraph.add_run(' ').font.size = Pt(8)
-            date = self.advisor_meeting_date.strftime('%d-%m-%Y')
             details = [self.str_cm[3].format(
-                self.get_academic_program_display()), self.advisor_meeting_date.strftime('%d/%m/%Y '),
-                self.council_number_advisor, self.council_year_advisor, self.is_affirmative_response_advisor_response]
+                self.get_academic_program_display()),
+                       self.advisor_meeting_date.strftime('%d/%m/%Y '),
+                       self.council_number_advisor, self.council_year_advisor,
+                       self.is_affirmative_response_advisor_response]
             table_recommend(docx, details)
             paragraph = docx.add_paragraph()
             paragraph.paragraph_format.space_after = Pt(0)
@@ -518,7 +533,7 @@ class TRASPRE(TRASPOS):
             paragraph.add_run(' ').font.size = Pt(8)
             reproved = 0
             for sbj in self.equivalence:
-                if sbj.grade < 3.0:
+                if float(sbj.grade) < 3.0:
                     reproved += 1
             table = docx.add_table(
                 rows=(len(self.equivalence) + 3 - reproved), cols=9, style='Table Grid')
@@ -592,7 +607,7 @@ class TRASPRE(TRASPOS):
             index = 2
             total_creds = 0
             for sbj in self.equivalence:
-                if sbj.grade < 3.0:
+                if float(sbj.grade) < 3.0:
                     continue
                 table.cell(index, 0).paragraphs[0].add_run(sbj.period)
                 table.cell(index, 1).paragraphs[0].add_run(sbj.code)
@@ -704,7 +719,7 @@ class TRASPRE(TRASPOS):
                 index = 2
                 total_creds = 0
                 for sbj in self.equivalence:
-                    if sbj.grade >= 3.0:
+                    if float(sbj.grade) >= 3.0:
                         continue
                     table.cell(index, 0).paragraphs[0].add_run(sbj.period)
                     table.cell(index, 1).paragraphs[0].add_run(sbj.code)

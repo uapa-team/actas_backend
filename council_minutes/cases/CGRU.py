@@ -1,7 +1,7 @@
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
 from mongoengine import StringField, IntField
-from ..models import Request, Subject
+from ..models import Request
 from .case_utils import add_analysis_paragraph
 
 
@@ -61,10 +61,10 @@ class CGRU(Request):
         self.pcm_answer(paragraph)
 
     def pcm_answer(self, paragraph):
+        # pylint: disable=no-member
         paragraph.add_run(self.str_answer + ' ').font.bold = True
         paragraph.add_run(self.str_comittee_header + ' ')
         paragraph.add_run(
-            # pylint: disable=no-member
             self.get_advisor_response_display().upper() + ' ').font.bold = True
         if self.is_affirmative_response_advisor_response():
             modifier = ''

@@ -1,8 +1,8 @@
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import StringField, IntField, FloatField, EmbeddedDocumentListField, BooleanField
-from ..models import Request, Subject
-from .case_utils import table_subjects, add_analysis_paragraph
+from mongoengine import StringField
+from ..models import Request
+from .case_utils import add_analysis_paragraph
 
 
 class AAUT(Request):
@@ -12,7 +12,8 @@ class AAUT(Request):
     regulation_list = ['008|2008|CSU', '070|2009|CAC']  # List of regulations
 
     academic_profile = StringField(
-        default=Request.PROFILE_INVE, choices=Request.PROFILE_CHOICES, display='Perfil de programa curricular')
+        default=Request.PROFILE_INVE, choices=Request.PROFILE_CHOICES,
+        display='Perfil de programa curricular')
     places_resolution = StringField(
         default='',
         display='Resolución de cupos para admisión automática.')

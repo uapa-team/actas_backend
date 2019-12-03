@@ -1,6 +1,6 @@
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import StringField, IntField, FloatField, EmbeddedDocumentListField, BooleanField
+from mongoengine import StringField, EmbeddedDocumentListField
 from ..models import Request, Subject
 from .case_utils import table_change_typology, add_analysis_paragraph
 

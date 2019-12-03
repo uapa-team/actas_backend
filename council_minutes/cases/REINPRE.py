@@ -1,10 +1,14 @@
-from .case_utils import *
-from ..models import Request
-from mongoengine import StringField, IntField, FloatField, BooleanField, DateField
 import datetime
+from docx.shared import Pt
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.enum.table import WD_ALIGN_VERTICAL
+from mongoengine import StringField, IntField, FloatField, BooleanField, DateField
+from .case_utils import string_to_date, table_general_data
+from .case_utils import table_credits_summary, table_recommend, add_analysis_paragraph
+from ..models import Request
+
 
 class REINPRE(Request):
-    # http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34983
     RL_ANSWER_RENOV_MATRICULA = 'RM'
     RL_ANSWER_PAPA = 'PA'
     RL_ANSWER_CUPO_CREDITOS = 'CC'
@@ -28,10 +32,12 @@ class REINPRE(Request):
 
     regulation_list = ['008|2008|CSU', '239|2009|VAC', '012|2014|VAC']
 
-    reing_period = StringField(required=True, display='Periodo de reingreso', default='0000-0S')
+    reing_period = StringField(
+        required=True, display='Periodo de reingreso', default='0000-0S')
     loss_period = StringField(
         required=True, display='Periodo de pérdida de calidad de estudiante', default='0000-0S')
-    first_reing = BooleanField(required=True, display='Primer reingreso', default=True)
+    first_reing = BooleanField(
+        required=True, display='Primer reingreso', default=True)
     admission_period = StringField(
         required=True, display='Periodo de admisión', default='0000-0S')
     periods_since = IntField(
@@ -42,8 +48,10 @@ class REINPRE(Request):
                                  display='Razón pérdida calidad de estudiante')
     credits_minus_remaining = IntField(
         required=True, display='Cupo de créditos menos créditos pendientes')
-    credits_remaining = IntField(required=True, display='Créditos restantes', default=0)
-    credits_english = IntField(required=True, display='Créditos inglés', default=0)
+    credits_remaining = IntField(
+        required=True, display='Créditos restantes', default=0)
+    credits_english = IntField(
+        required=True, display='Créditos inglés', default=0)
     credits_add = IntField(
         required=True, display='Créditos requeridos para inscribir asignaturas', default=0)
 
@@ -238,7 +246,7 @@ class REINPRE(Request):
         table.cell(1, 0).merge(table.cell(1, 1)).paragraphs[0].add_run(
             self.str_pcm_pre_acadinfo[1])
 
-        if(self.first_reing):
+        if self.first_reing:
             table.cell(1, 2).paragraphs[0].add_run('Sí')
         else:
             table.cell(1, 2).paragraphs[0].add_run('No')
@@ -301,7 +309,7 @@ class REINPRE(Request):
         table.cell(12, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
 
         # Optional: Grade needed with N credits to keep student condition.
-        if (self.reason_of_loss == self.RL_ANSWER_CUPO_CREDITOS):
+        if self.reason_of_loss == self.RL_ANSWER_CUPO_CREDITOS:
             table = docx.add_table(rows=5, cols=2)
             for col in table.columns:
                 for cell in col.cells:
@@ -340,14 +348,14 @@ class REINPRE(Request):
         bullet.font.bold = True
         bullet.font.size = Pt(8)
 
-        credits = [[self.exi_fund_m, self.exi_fund_o, self.exi_disc_m,
-                    self.exi_disc_o, self.exi_free],
-                   [self.app_fund_m, self.app_fund_o, self.app_disc_m,
-                    self.app_disc_o, self.app_free],
-                   [self.rem_fund_m, self.rem_fund_o, self.rem_disc_m,
-                    self.rem_disc_o, self.rem_free]]
+        credits_data = [[self.exi_fund_m, self.exi_fund_o, self.exi_disc_m,
+                         self.exi_disc_o, self.exi_free],
+                        [self.app_fund_m, self.app_fund_o, self.app_disc_m,
+                         self.app_disc_o, self.app_free],
+                        [self.rem_fund_m, self.rem_fund_o, self.rem_disc_m,
+                         self.rem_disc_o, self.rem_free]]
         case = 'REINGRESO'
-        table_credits_summary(docx, credits, case)
+        table_credits_summary(docx, credits_data, case)
 
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
@@ -368,7 +376,7 @@ class REINPRE(Request):
         details.append(day + '-' + month + '-' + year)
         details.append(self.comitee_act)
         details.append(str(self.comitee_date)[0:4])
-        if (self.advisor_response == self.ARCR_APROBAR):
+        if self.advisor_response == self.ARCR_APROBAR:
             details.append(True)
         else:
             details.append(False)

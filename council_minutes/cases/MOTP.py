@@ -25,8 +25,8 @@ class MOTP(Request):
         choices=GO_CHOICES, default=GO_TESIS_MAESTRIA)
     general_objetive = StringField(
         required=True, display='Objetivo general', default='')
-    specific_objetives = ListField( StringField(),
-        display='Objetivos específicos')
+    specific_objetives = ListField(StringField(),
+                                   display='Objetivos específicos')
     enrolled_thesis = BooleanField(
         required=True, default=False,
         display='¿Tiene inscrita la asignatura tesis/trabajo final?')
