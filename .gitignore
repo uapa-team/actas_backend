@@ -108,3 +108,7 @@ public/*
 
 # Visual code
 .vscode/
+
+# User DB for DJango
+
+ActasDjangoDB
