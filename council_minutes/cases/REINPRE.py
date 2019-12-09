@@ -47,7 +47,7 @@ class REINPRE(Request):
                                  default=RL_ANSWER_OTRO,
                                  display='Razón pérdida calidad de estudiante')
     credits_minus_remaining = IntField(
-        required=True, display='Cupo de créditos menos créditos pendientes')
+        required=True, display='Cupo de créditos menos créditos pendientes', default=0)
     credits_remaining = IntField(
         required=True, display='Créditos restantes', default=0)
     credits_english = IntField(
@@ -57,16 +57,16 @@ class REINPRE(Request):
 
     min_grade_12c = StringField(
         required=True, display='Promedio semestral mínimo requerido para mantener la ' +
-        'calidad de estudiante con 12 créditos inscritos: ', default=0)
+        'calidad de estudiante con 12 créditos inscritos: ', default='')
     min_grade_15c = StringField(
         required=True, display='Promedio semestral mínimo requerido para mantener la ' +
-        'calidad de estudiante con 15 créditos inscritos: ', default=0)
+        'calidad de estudiante con 15 créditos inscritos: ', default='')
     min_grade_18c = StringField(
         required=True, display='Promedio semestral mínimo requerido para mantener la ' +
-        'calidad de estudiante con 18 créditos inscritos: ', default=0)
+        'calidad de estudiante con 18 créditos inscritos: ', default='')
     min_grade_21c = StringField(
         required=True, display='Promedio semestral mínimo requerido para mantener la ' +
-        'calidad de estudiante con 21 créditos inscritos: ', default=0)
+        'calidad de estudiante con 21 créditos inscritos: ', default='')
 
     # Exiged credits
     exi_fund_m = IntField(
