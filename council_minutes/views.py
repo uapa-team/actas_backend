@@ -24,10 +24,13 @@ from .docx import PreCouncilMinuteGenerator
 from .cases import *
 
 
-def index():
+@api_view(["GET"])
+@permission_classes((AllowAny,))
+def index(request):
     return HttpResponse("Working!")
 
 
+@api_view(["GET"])
 def cases_defined(request):
     if request.method == 'GET':
         response = {
