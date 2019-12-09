@@ -143,8 +143,8 @@ MONGODB_PASS = os.environ.get('ACTAS_DB_PASS')
 
 DATABASES = {
     'default': {
-        'ENGINE'        : 'django.db.backends.sqlite3',
-        'NAME': 'ActasDjangoDB'
+        'ENGINE' : 'django.db.backends.sqlite3',
+        'NAME'   : 'ActasDjangoDB'
     }
 }
 
