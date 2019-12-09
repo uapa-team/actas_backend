@@ -2,6 +2,7 @@ import json
 import datetime
 import mongoengine
 from mongoengine.errors import ValidationError
+from django_auth_ldap.backend import LDAPBackend
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Request, get_fields
@@ -24,6 +25,15 @@ def cases_defined(request):
         }
         return JsonResponse(response)
 
+@csrf_exempt
+def login(request):
+    body = json.loads(request.body)
+    username = body['username']
+    password = body['password']
+
+    user = LDAPBackend().authenticate(request, username=username,password=password)
+
+    return JsonResponse({'status':'ok'}, status=200) if user is not None else JsonResponse({'status':'Not ok'}, status=400)
 
 def info_cases(request, case_id):
     if request.method == 'GET':

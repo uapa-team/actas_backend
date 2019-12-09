@@ -1,5 +1,9 @@
 dateparser==0.7.1
 Django==2.1.7
+django-auth-ldap==2.1.0
+djangorestframework==3.10.3
+django-cors-headers==3.2.0
+djangorestframeworkjwt==1.11.0
 djongo==1.2.32
 mongoengine==0.17.0
 num2words==0.5.10
