@@ -11,7 +11,55 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import ldap
 import mongoengine
+from django_auth_ldap.config import LDAPSearch, LDAPSearchUnion
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "loggers": {"django_auth_ldap": {"level": "DEBUG", "handlers": ["console"]}},
+}
+
+AUTH_LDAP_CONNECTION_OPTIONS = {
+    ldap.OPT_DEBUG_LEVEL: 1,
+    ldap.OPT_REFERRALS: 0,
+}
+
+AUTH_LDAP_SERVER_URI = os.environ.get('LDAP_HOST')
+AUTH_LDAP_USER_SEARCH = LDAPSearchUnion(
+    LDAPSearch("ou=people,o=unal.edu.co", ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
+    LDAPSearch("ou=institucional,o=bogota,o=unal.edu.co", ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
+    LDAPSearch("ou=dependencia,o=bogota,o=unal.edu.co", ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
+    LDAPSearch("ou=Institucional,o=bogota,o=unal.edu.co", ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
+    LDAPSearch("ou=Dependencia,o=bogota,o=unal.edu.co", ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
+)
+AUTH_LDAP_ALWAYS_UPDATE_USER = False
+AUTHENTICATION_BACKENDS = (
+    'django_auth_ldap.backend.LDAPBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+}
+
+# CORS_ORIGIN_WHITELIST = (
+#   'http://localhost:3000',
+# ) To allow only certain front ends
+
+CORS_ORIGIN_ALLOW_ALL = True  #TODO: Allow only certainb front ends
+
+CORS_ALLOW_CREDENTIALS = True
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -39,6 +87,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -48,7 +98,6 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 ROOT_URLCONF = 'actas_backend.urls'
@@ -80,16 +129,25 @@ MONGODB_USER = os.environ.get('ACTAS_DB_USER')
 MONGODB_HOST = os.environ.get('ACTAS_DB_HOST')
 MONGODB_NAME = os.environ.get('ACTAS_DB_NAME')
 MONGODB_PASS = os.environ.get('ACTAS_DB_PASS')
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE'        : 'djongo',
+#         'AUTH_SOURCE'   : MONGODB_AUTH,
+#         'NAME'          : MONGODB_NAME,
+#         'HOST'          : MONGODB_HOST,
+#         'USER'          : MONGODB_USER,
+#         'PASSWORD'      : MONGODB_PASS
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE'        : 'djongo',
-        'AUTH_SOURCE'   : MONGODB_AUTH,
-        'NAME'          : MONGODB_NAME,
-        'HOST'          : MONGODB_HOST,
-        'USER'          : MONGODB_USER,
-        'PASSWORD'      : MONGODB_PASS
+        'ENGINE'        : 'django.db.backends.sqlite3',
+        'NAME': 'ActasDjangoDB'
     }
 }
+
 mongoengine.connect(authentication_source = MONGODB_AUTH, db = MONGODB_NAME, username = MONGODB_USER, password = MONGODB_PASS, host = MONGODB_HOST)
 
 # Password validation
