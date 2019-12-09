@@ -10,13 +10,13 @@ class CINF(Request):
     full_name = 'Autorización carga inferior a la mínima'
 
     papa = FloatField(
-        required=True, display='P.A.P.A.', min_value=0.0, max_value=5)
+        required=True, display='P.A.P.A.', min_value=0.0, max_value=5, default=0.0)
     available_creds = IntField(
-        required=True, display='Créditos disponibles', min_value=0)
+        required=True, display='Créditos disponibles', min_value=0, default=0)
     advance_percentage = FloatField(
         required=True, display='Porcentaje de avance', default=0.0, min_value=0.0, max_value=100.0)
     enrolled_academic_periods = IntField(
-        required=True, display='Número de matrículas', min_value=0
+        required=True, display='Número de matrículas', min_value=0, default=0
     )
 
     regulation_list = ['008|2008|CSU']  # List of regulations
