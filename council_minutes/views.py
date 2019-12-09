@@ -2,7 +2,19 @@ import json
 import datetime
 import mongoengine
 from mongoengine.errors import ValidationError
+from django.contrib.auth import authenticate
 from django_auth_ldap.backend import LDAPBackend
+from rest_framework.authtoken.models import Token
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.status import (
+    HTTP_400_BAD_REQUEST,
+    HTTP_404_NOT_FOUND,
+    HTTP_403_FORBIDDEN,
+    HTTP_200_OK
+)
+from rest_framework.response import Response
+from django.contrib.auth.models import User
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Request, get_fields
@@ -25,15 +37,30 @@ def cases_defined(request):
         }
         return JsonResponse(response)
 
+
 @csrf_exempt
+@api_view(["POST"])
+@permission_classes((AllowAny,))
 def login(request):
     body = json.loads(request.body)
     username = body['username']
     password = body['password']
+    if username is None or password is None:
+        return Response({'error': 'Contraseña o usuario vacío o nulo.'},
+                        status=HTTP_400_BAD_REQUEST)
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        return Response({'error': 'Error en ActasDB, usuario sin permisos en la aplicación.'},
+                        status=HTTP_403_FORBIDDEN)
+    user = LDAPBackend().authenticate(request, username=username, password=password)
+    if not user:
+        return Response({'error': 'Error en LDAP, contraseña o usuario no válido.'},
+                        status=HTTP_404_NOT_FOUND)
+    token, _ = Token.objects.get_or_create(user=user)
+    return Response({'token': token.key},
+                    status=HTTP_200_OK)
 
-    user = LDAPBackend().authenticate(request, username=username,password=password)
-
-    return JsonResponse({'status':'ok'}, status=200) if user is not None else JsonResponse({'status':'Not ok'}, status=400)
 
 def info_cases(request, case_id):
     if request.method == 'GET':

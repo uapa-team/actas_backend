@@ -29,11 +29,16 @@ AUTH_LDAP_CONNECTION_OPTIONS = {
 
 AUTH_LDAP_SERVER_URI = os.environ.get('LDAP_HOST')
 AUTH_LDAP_USER_SEARCH = LDAPSearchUnion(
-    LDAPSearch("ou=people,o=unal.edu.co", ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
-    LDAPSearch("ou=institucional,o=bogota,o=unal.edu.co", ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
-    LDAPSearch("ou=dependencia,o=bogota,o=unal.edu.co", ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
-    LDAPSearch("ou=Institucional,o=bogota,o=unal.edu.co", ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
-    LDAPSearch("ou=Dependencia,o=bogota,o=unal.edu.co", ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
+    LDAPSearch("ou=people,o=unal.edu.co",
+               ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
+    LDAPSearch("ou=institucional,o=bogota,o=unal.edu.co",
+               ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
+    LDAPSearch("ou=dependencia,o=bogota,o=unal.edu.co",
+               ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
+    LDAPSearch("ou=Institucional,o=bogota,o=unal.edu.co",
+               ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
+    LDAPSearch("ou=Dependencia,o=bogota,o=unal.edu.co",
+               ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
 )
 AUTH_LDAP_ALWAYS_UPDATE_USER = False
 AUTHENTICATION_BACKENDS = (
@@ -43,21 +48,18 @@ AUTHENTICATION_BACKENDS = (
 
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated', )
 }
 
 # CORS_ORIGIN_WHITELIST = (
 #   'http://localhost:3000',
 # ) To allow only certain front ends
 
-CORS_ORIGIN_ALLOW_ALL = True  #TODO: Allow only certainb front ends
+CORS_ORIGIN_ALLOW_ALL = True  # TODO: Allow only certainb front ends
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -88,6 +90,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
 ]
 
@@ -143,12 +146,13 @@ MONGODB_PASS = os.environ.get('ACTAS_DB_PASS')
 
 DATABASES = {
     'default': {
-        'ENGINE' : 'django.db.backends.sqlite3',
-        'NAME'   : 'ActasDjangoDB'
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'ActasDjangoDB'
     }
 }
 
-mongoengine.connect(authentication_source = MONGODB_AUTH, db = MONGODB_NAME, username = MONGODB_USER, password = MONGODB_PASS, host = MONGODB_HOST)
+mongoengine.connect(authentication_source=MONGODB_AUTH, db=MONGODB_NAME,
+                    username=MONGODB_USER, password=MONGODB_PASS, host=MONGODB_HOST)
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
