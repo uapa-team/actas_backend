@@ -223,7 +223,7 @@ def docx_gen_with_array(request):
     return HttpResponse(filename)
 
 
-@api_view(["GET"])
+@api_view(["GET", "POST"])
 @csrf_exempt
 def docx_gen_pre_by_id(request, cm_id):
     filename = 'public/preacta' + cm_id + '.docx'
