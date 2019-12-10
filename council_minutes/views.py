@@ -65,6 +65,7 @@ def login(request):
                     status=HTTP_200_OK)
 
 
+@api_view(["GET"])
 def info_cases(request, case_id):
     if request.method == 'GET':
         for type_case in Request.get_subclasses():
@@ -73,6 +74,7 @@ def info_cases(request, case_id):
         return JsonResponse({'response': 'Not found'}, status=404)
 
 
+@api_view(["POST"])
 @csrf_exempt  # Esto va solo para evitar la verificacion de django
 def filter_request(request):
     if request.method == 'POST':
@@ -84,10 +86,8 @@ def filter_request(request):
             **params).order_by('-date')
         return JsonResponse(responses, safe=False, encoder=QuerySetEncoder)
 
-    else:
-        return HttpResponse('Bad Request', status=400)
 
-
+@api_view(["POST"])
 @csrf_exempt  # Esto va solo para evitar la verificacion de django
 def insert_request(request):
     body = json.loads(request.body)
@@ -107,6 +107,7 @@ def insert_request(request):
         return HttpResponse(e.message, status=400)
 
 
+@api_view(["GET"])
 @csrf_exempt
 def docx_gen_by_id(request, cm_id):
     # pylint: disable=no-member
@@ -121,6 +122,7 @@ def docx_gen_by_id(request, cm_id):
     return HttpResponse(filename)
 
 
+@api_view(["PATCH"])
 @csrf_exempt
 def update_cm(request, cm_id):
     if request.method == 'PATCH':
@@ -140,6 +142,7 @@ def update_cm(request, cm_id):
         return JsonResponse(obj, safe=False, encoder=QuerySetEncoder)
 
 
+@api_view(["POST"])
 @csrf_exempt
 def docx_gen_by_date(request):
     try:
@@ -159,6 +162,7 @@ def docx_gen_by_date(request):
     return HttpResponse(filename)
 
 
+@api_view(["POST"])
 @csrf_exempt
 def docx_gen_by_number(request):
     try:
@@ -179,6 +183,7 @@ def docx_gen_by_number(request):
     return HttpResponse(filename)
 
 
+@api_view(["POST"])
 @csrf_exempt
 def docx_gen_pre_by_number(request):
     try:
@@ -199,6 +204,7 @@ def docx_gen_pre_by_number(request):
     return HttpResponse(filename)
 
 
+@api_view(["POST"])
 @csrf_exempt
 def docx_gen_with_array(request):
     try:
@@ -217,6 +223,7 @@ def docx_gen_with_array(request):
     return HttpResponse(filename)
 
 
+@api_view(["GET"])
 @csrf_exempt
 def docx_gen_pre_by_id(request, cm_id):
     filename = 'public/preacta' + cm_id + '.docx'
@@ -231,6 +238,7 @@ def docx_gen_pre_by_id(request, cm_id):
     return HttpResponse(filename)
 
 
+@api_view(["POST"])
 @csrf_exempt
 def docx_gen_pre_by_date(request):
     try:
@@ -250,6 +258,7 @@ def docx_gen_pre_by_date(request):
     return HttpResponse(filename)
 
 
+@api_view(["POST"])
 @csrf_exempt
 def docx_gen_pre_with_array(request):
     try:
