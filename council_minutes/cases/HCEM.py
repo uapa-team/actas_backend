@@ -1,6 +1,6 @@
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from mongoengine import StringField, BooleanField, IntField, EmbeddedDocumentListField
+from mongoengine import StringField, BooleanField, IntField, EmbeddedDocumentListField, EmbeddedDocument
 from ..models import Request, Subject
 from .case_utils import table_approvals, add_analysis_paragraph, table_repprovals
 
@@ -36,6 +36,17 @@ class HCEM(Request):
         h_type = StringField(required=True, default=HT_HOMOLOGACION,
                              choices=HT_CHOICES, display='Tipo de homologación')
 
+    class MobilitySubject(EmbeddedDocument):
+        GD_AP = 'AP'
+        GD_NA = 'NA'
+        HT_CHOICES = (
+            (GD_AP, 'Aprobada'),
+            (GD_NA, 'Reprobada'),
+        )
+        period = StringField(max_length=10, display='Periodo')
+        code = StringField(display='Código de la asignatura')
+        grade = StringField(display='Calificación', default='AP')
+
     full_name = 'Homologación, convalidación o equivalencia'
 
     institution_origin = StringField(
@@ -45,11 +56,18 @@ class HCEM(Request):
         default='',
         display='Plan de estudios donde cursó las asignaturas')
     homologated_subjects = EmbeddedDocumentListField(
-        HomologatedSubject, required=True, default=[], display='Asignaturas a homologar')
-    mobility_subject = StringField(
-        default='', display='Asignatura de movilidad')
+        HomologatedSubject, display='Asignaturas a homologar')
+    mobility_subject = EmbeddedDocumentListField(MobilitySubject,
+                                                 display='Asignaturas de movilidad')
 
     regulation_list = ['008|2008|CSU']  # List of regulations
+
+    homologable_subjects = {
+        '2011183': 'Intercambio Académico Internacional',
+        '2014269': 'Intercambio Académico Internacional Prórroga',
+        '2026630': 'Intercambio académico internacional – II',
+        '2026631': 'Intercambio académico internacional - II Prórroga',
+    }
 
     verbs = {
         HomologatedSubject.HT_CONVALIDACION: 'convalidar',
@@ -61,7 +79,8 @@ class HCEM(Request):
     str_cm = [
         '{} la(s) siguiente(s) asignatura(s) cursada(s) en', 'el programa {} de la institución {}',
         'el intercambio académico internacional en la institución', 'el convenio con la ' +
-        'Universidad de los Andes', 'de la siguiente manera', 'por la siguiente razones']
+        'Universidad de los Andes', 'de la siguiente manera', 'por la siguiente razones',
+        'Calificar', 'la asignatura {} - {}, en el periodo {}']
 
     srt_status = ['NO APRUEBA', 'APRUEBA']
 
@@ -90,7 +109,7 @@ class HCEM(Request):
             counter += 1
         if types[self.HomologatedSubject.HT_INTERNACIONAL] == 0:
             counter += 1
-        if self.mobility_subject == '':
+        if self.mobility_subject == []:
             counter += 1
         return counter
 
@@ -158,6 +177,16 @@ class HCEM(Request):
                             data.append([sbj.period, sbj.name, sbj.old_name, sbj.reason,
                                          sbj.credits, sbj.grade])
                         table_repprovals(docx, data, details)
+        if self.mobility_subject != []:
+            paragraph = docx.add_paragraph()
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.style = 'List Bullet'
+            paragraph.add_run(self.str_cm[6] + ' ')
+            for sbj in self.mobility_subject:
+                paragraph.add_run('{} ({})'.format(
+                    sbj.get_grade_display(), sbj.grade))
+                paragraph.add_run(self.str_cm[7])
 
     def pcm(self, docx):
         raise NotImplementedError('Not yet!')
