@@ -109,5 +109,10 @@ public/*
 # Visual code
 .vscode/
 
+<<<<<<< HEAD
 ##
+=======
+# User DB for DJango
+
+>>>>>>> token_authentication
 ActasDjangoDB

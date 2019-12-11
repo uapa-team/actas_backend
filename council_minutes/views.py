@@ -2,7 +2,19 @@ import json
 import datetime
 import mongoengine
 from mongoengine.errors import ValidationError
+from django.contrib.auth import authenticate
 from django_auth_ldap.backend import LDAPBackend
+from rest_framework.authtoken.models import Token
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.status import (
+    HTTP_400_BAD_REQUEST,
+    HTTP_404_NOT_FOUND,
+    HTTP_403_FORBIDDEN,
+    HTTP_200_OK
+)
+from rest_framework.response import Response
+from django.contrib.auth.models import User
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Request, get_fields
@@ -12,10 +24,13 @@ from .docx import PreCouncilMinuteGenerator
 from .cases import *
 
 
-def index():
+@api_view(["GET"])
+@permission_classes((AllowAny,))
+def index(request):
     return HttpResponse("Working!")
 
 
+@api_view(["GET"])
 def cases_defined(request):
     if request.method == 'GET':
         response = {
@@ -25,16 +40,32 @@ def cases_defined(request):
         }
         return JsonResponse(response)
 
+
 @csrf_exempt
+@api_view(["POST"])
+@permission_classes((AllowAny,))
 def login(request):
     body = json.loads(request.body)
     username = body['username']
     password = body['password']
+    if username is None or password is None:
+        return Response({'error': 'Contraseña o usuario vacío o nulo.'},
+                        status=HTTP_400_BAD_REQUEST)
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        return Response({'error': 'Error en ActasDB, usuario sin permisos en la aplicación.'},
+                        status=HTTP_403_FORBIDDEN)
+    user = LDAPBackend().authenticate(request, username=username, password=password)
+    if not user:
+        return Response({'error': 'Error en LDAP, contraseña o usuario no válido.'},
+                        status=HTTP_404_NOT_FOUND)
+    token, _ = Token.objects.get_or_create(user=user)
+    return Response({'token': token.key},
+                    status=HTTP_200_OK)
 
-    user = LDAPBackend().authenticate(request, username=username,password=password)
 
-    return JsonResponse({'status':'ok'}, status=200) if user is not None else JsonResponse({'status':'Not ok'}, status=400)
-
+@api_view(["GET"])
 def info_cases(request, case_id):
     if request.method == 'GET':
         for type_case in Request.get_subclasses():
@@ -43,6 +74,7 @@ def info_cases(request, case_id):
         return JsonResponse({'response': 'Not found'}, status=404)
 
 
+@api_view(["POST"])
 @csrf_exempt  # Esto va solo para evitar la verificacion de django
 def filter_request(request):
     if request.method == 'POST':
@@ -54,10 +86,8 @@ def filter_request(request):
             **params).order_by('-date')
         return JsonResponse(responses, safe=False, encoder=QuerySetEncoder)
 
-    else:
-        return HttpResponse('Bad Request', status=400)
 
-
+@api_view(["POST"])
 @csrf_exempt  # Esto va solo para evitar la verificacion de django
 def insert_request(request):
     body = json.loads(request.body)
@@ -77,6 +107,7 @@ def insert_request(request):
         return HttpResponse(e.message, status=400)
 
 
+@api_view(["GET", "POST"])
 @csrf_exempt
 def docx_gen_by_id(request, cm_id):
     # pylint: disable=no-member
@@ -91,6 +122,7 @@ def docx_gen_by_id(request, cm_id):
     return HttpResponse(filename)
 
 
+@api_view(["PATCH"])
 @csrf_exempt
 def update_cm(request, cm_id):
     if request.method == 'PATCH':
@@ -110,6 +142,7 @@ def update_cm(request, cm_id):
         return JsonResponse(obj, safe=False, encoder=QuerySetEncoder)
 
 
+@api_view(["GET", "POST"])
 @csrf_exempt
 def docx_gen_by_date(request):
     try:
@@ -129,6 +162,7 @@ def docx_gen_by_date(request):
     return HttpResponse(filename)
 
 
+@api_view(["GET", "POST"])
 @csrf_exempt
 def docx_gen_by_number(request):
     try:
@@ -149,6 +183,7 @@ def docx_gen_by_number(request):
     return HttpResponse(filename)
 
 
+@api_view(["POST"])
 @csrf_exempt
 def docx_gen_pre_by_number(request):
     try:
@@ -169,6 +204,7 @@ def docx_gen_pre_by_number(request):
     return HttpResponse(filename)
 
 
+@api_view(["POST"])
 @csrf_exempt
 def docx_gen_with_array(request):
     try:
@@ -187,6 +223,7 @@ def docx_gen_with_array(request):
     return HttpResponse(filename)
 
 
+@api_view(["GET", "POST"])
 @csrf_exempt
 def docx_gen_pre_by_id(request, cm_id):
     filename = 'public/preacta' + cm_id + '.docx'
@@ -201,6 +238,7 @@ def docx_gen_pre_by_id(request, cm_id):
     return HttpResponse(filename)
 
 
+@api_view(["POST"])
 @csrf_exempt
 def docx_gen_pre_by_date(request):
     try:
@@ -220,6 +258,7 @@ def docx_gen_pre_by_date(request):
     return HttpResponse(filename)
 
 
+@api_view(["POST"])
 @csrf_exempt
 def docx_gen_pre_with_array(request):
     try:
