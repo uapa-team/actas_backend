@@ -107,7 +107,7 @@ def insert_request(request):
         return HttpResponse(e.message, status=400)
 
 
-@api_view(["GET"])
+@api_view(["GET", "POST"])
 @csrf_exempt
 def docx_gen_by_id(request, cm_id):
     # pylint: disable=no-member
@@ -142,7 +142,7 @@ def update_cm(request, cm_id):
         return JsonResponse(obj, safe=False, encoder=QuerySetEncoder)
 
 
-@api_view(["POST"])
+@api_view(["GET", "POST"])
 @csrf_exempt
 def docx_gen_by_date(request):
     try:
@@ -162,7 +162,7 @@ def docx_gen_by_date(request):
     return HttpResponse(filename)
 
 
-@api_view(["POST"])
+@api_view(["GET", "POST"])
 @csrf_exempt
 def docx_gen_by_number(request):
     try:
