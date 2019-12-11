@@ -23,7 +23,7 @@ class PEST(Request):
         SUB_P3: ('2016764', 9)
     }
 
-    institution = StringField(required=True, display='Institución', default='')
+    institution = StringField(required=True, display='Institución/Empresa', default='')
     proffesor = StringField(required=True, display='Profesor', default='')
     ins_person = StringField(required=True, display='Encargado Institucion', default='')
     subject = StringField(required=True, choices=SUBJECT_CHOICES,
