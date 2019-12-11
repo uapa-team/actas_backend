@@ -32,7 +32,7 @@ class PEST(Request):
     another_practice = BooleanField(
         required=True, display='¿Primera practica?', default=False)
     hours = IntField(required=True, min_value=0, display='Horas Semana', default=0)
-    duration = StringField(required=True, display='Duración', default=0)
+    duration = StringField(required=True, display='Duración', default='')
     documentation = BooleanField(
         required=True, display='¿Documentación Completa?', default=True)
 
