@@ -15,13 +15,6 @@ import ldap
 import mongoengine
 from django_auth_ldap.config import LDAPSearch, LDAPSearchUnion
 
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "handlers": {"console": {"class": "logging.StreamHandler"}},
-    "loggers": {"django_auth_ldap": {"level": "DEBUG", "handlers": ["console"]}},
-}
-
 AUTH_LDAP_CONNECTION_OPTIONS = {
     ldap.OPT_DEBUG_LEVEL: 1,
     ldap.OPT_REFERRALS: 0,
