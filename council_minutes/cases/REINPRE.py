@@ -478,6 +478,9 @@ class REINPRE(Request):
 
     def cm_answer(self, paragraph):
         paragraph.add_run(self.str_council_header + ' ')
+        paragraph.add_run(
+            # pylint: disable=no-member
+            self.get_approval_status_display().upper() + ' ').font.bold = True
         aff = self.is_affirmative_response_approval_status()
         self.standard_answer(paragraph, aff)
 
