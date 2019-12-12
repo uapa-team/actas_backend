@@ -21,7 +21,8 @@ class CPTE(Request):
     title = StringField(
         required=True, display='Nuevo título de la tesis/trabajo final', default='')
     grade_option = StringField(
-        required=True, display='Tipo de tesis/trabajo final', choices=GO_CHOICES)
+        required=True, display='Tipo de tesis/trabajo final',
+        choices=GO_CHOICES, default=GO_TESIS_MAESTRIA)
     new_advisor = StringField(
         required=True, display='Nuevo director de tesis/trabajo final', default='')
     old_advisor = StringField(
