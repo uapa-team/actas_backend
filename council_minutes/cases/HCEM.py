@@ -1,6 +1,7 @@
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from mongoengine import StringField, BooleanField, IntField, EmbeddedDocumentListField, EmbeddedDocument
+from mongoengine import (StringField, BooleanField, IntField,
+                         EmbeddedDocumentListField, EmbeddedDocument)
 from ..models import Request, Subject
 from .case_utils import table_approvals, add_analysis_paragraph, table_repprovals
 
@@ -67,6 +68,9 @@ class HCEM(Request):
         '2014269': 'Intercambio Académico Internacional Prórroga',
         '2026630': 'Intercambio académico internacional – II',
         '2026631': 'Intercambio académico internacional - II Prórroga',
+        '2024944': 'Asignatura por convenio con Universidad de los Andes I - POSGRADO',
+        '2011302': 'Asignatura por convenio con Universidad de los Andes I - PREGRADO',
+        '2011302': 'Asignatura por convenio con Universidad de los Andes II - PREGRADO',
     }
 
     verbs = {
@@ -186,7 +190,11 @@ class HCEM(Request):
             for sbj in self.mobility_subject:
                 paragraph.add_run('{} ({})'.format(
                     sbj.get_grade_display(), sbj.grade))
-                paragraph.add_run(self.str_cm[7])
+                try:
+                    paragraph.add_run(self.str_cm[7].format(
+                        sbj.code, self.mobility_subject[sbj.code], sbj.period))
+                except KeyError as e:
+                    print(e)
 
     def pcm(self, docx):
         raise NotImplementedError('Not yet!')
