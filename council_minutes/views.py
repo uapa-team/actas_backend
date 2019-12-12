@@ -88,7 +88,6 @@ def filter_request(request):
 
 
 @api_view(["POST"])
-@permission_classes((AllowAny,))
 @csrf_exempt  # Esto va solo para evitar la verificacion de django
 def insert_request(request):
     body = json.loads(request.body)
