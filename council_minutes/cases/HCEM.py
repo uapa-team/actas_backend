@@ -41,12 +41,13 @@ class HCEM(Request):
         GD_AP = 'AP'
         GD_NA = 'NA'
         HT_CHOICES = (
-            (GD_AP, 'Aprobada'),
-            (GD_NA, 'Reprobada'),
+            (GD_AP, 'aprobada'),
+            (GD_NA, 'reprobada'),
         )
         period = StringField(max_length=10, display='Periodo')
         code = StringField(display='Código de la asignatura')
-        grade = StringField(display='Calificación', default='AP')
+        grade = StringField(display='Calificación',
+                            default='AP', choices=HT_CHOICES)
 
     full_name = 'Homologación, convalidación o equivalencia'
 
@@ -60,6 +61,12 @@ class HCEM(Request):
         HomologatedSubject, display='Asignaturas a homologar')
     mobility_subject = EmbeddedDocumentListField(MobilitySubject,
                                                  display='Asignaturas de movilidad')
+    subject_accomplish_pr = BooleanField(
+        default=True, display='¿Las asignaturas a homologar cumplen con los prerrequisitos?')
+    greatger_than_50 = BooleanField(
+        default=False, display='¿Se homologan/convalidan más del 50% de créditos del plan?')
+    prev_hcem = BooleanField(
+        default=False, display='¿Ha tenido homologaciones/convalidaciones anteriores.?')
 
     regulation_list = ['008|2008|CSU']  # List of regulations
 
@@ -70,7 +77,7 @@ class HCEM(Request):
         '2026631': 'Intercambio académico internacional - II Prórroga',
         '2024944': 'Asignatura por convenio con Universidad de los Andes I - POSGRADO',
         '2011302': 'Asignatura por convenio con Universidad de los Andes I - PREGRADO',
-        '2011302': 'Asignatura por convenio con Universidad de los Andes II - PREGRADO',
+        '2012698': 'Asignatura por convenio con Universidad de los Andes II - PREGRADO',
     }
 
     verbs = {
@@ -84,9 +91,15 @@ class HCEM(Request):
         '{} la(s) siguiente(s) asignatura(s) cursada(s) en', 'el programa {} de la institución {}',
         'el intercambio académico internacional en la institución', 'el convenio con la ' +
         'Universidad de los Andes', 'de la siguiente manera', 'por la siguiente razones',
-        'Calificar', 'la asignatura {} - {}, en el periodo {}']
+        'calificar', 'la asignatura {} - {}, en el periodo {}']
 
-    srt_status = ['NO APRUEBA', 'APRUEBA']
+    list_analysis = ['Solicitud de homologación de {} asignaturas del programa {} de' +
+                     ' la institución {}.', 'Las asignaturas a homologar {}cumplen' +
+                     ' con los prerrequisitos.', '{}e homologan/convalidan más' +
+                     ' del 50% de créditos del plan (Artículo 38, {}).',
+                     '{}a tenido homologaciones/convalidaciones anteriores.']
+
+    srt_status = [['NO APROBAR', 'APROBAR'], ['NO APRUEBA', 'APRUEBA']]
 
     def counter(self):
         summary = [0, 0]
@@ -118,18 +131,18 @@ class HCEM(Request):
         return counter
 
     def cm(self, docx):
-        paragraph = docx.add_paragraph()
-        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        paragraph.paragraph_format.space_after = Pt(0)
         if self.counter() == 6:
+            paragraph = docx.add_paragraph()
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            paragraph.paragraph_format.space_after = Pt(0)
             self.cm_answer(paragraph)
             self.add_single_table(docx)
         else:
-            self.add_composite_hcem(docx)
+            self.add_composite_hcem(docx, True)
 
     def cm_answer(self, paragraph):
         # pylint: disable=no-member
-        paragraph.add_run(self.str_council_header + ' ')
+        paragraph.add_run(self.str_comittee_header + ' ')
         paragraph.add_run(
             self.get_approval_status_display().upper() + ' ').font.bold = True
         paragraph.add_run(self.str_cm[0].format(
@@ -141,8 +154,29 @@ class HCEM(Request):
         else:
             paragraph.add_run(' ' + self.str_cm[5] + ':')
 
-    def add_composite_hcem(self, docx):
+    def add_analysis(self, docx):
+        final_analysis = []
+        final_analysis += [self.list_analysis[0].format(
+            str(len(self.homologated_subjects)), self.origin_plan, self.institution_origin)]
+        aux = '' if self.subject_accomplish_pr else 'no '
+        final_analysis += [self.list_analysis[1].format(aux)]
+        aux = 'S' if self.greatger_than_50 else 'No s'
+        final_analysis += [self.list_analysis[2].format(
+            aux, self.regulations['008|2008|CSU'][0])]
+        aux = 'S' if self.prev_hcem else 'No h'
+        final_analysis += [self.list_analysis[3].format(
+            aux, self.regulations['008|2008|CSU'][0])]
+        for extra_a in self.extra_analysis:
+            final_analysis += [extra_a]
+        add_analysis_paragraph(docx, final_analysis)
+
+    def add_composite_hcem(self, docx, pre):
         # pylint: disable=consider-using-enumerate
+        if not pre:
+            paragraph = docx.add_paragraph()
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.add_run(self.str_answer + ': ').font.bold = True
         types = {self.HomologatedSubject.HT_CONVALIDACION: [[], []],
                  self.HomologatedSubject.HT_EQUIVALENCIA: [[], []],
                  self.HomologatedSubject.HT_HOMOLOGACION: [[], []],
@@ -160,9 +194,12 @@ class HCEM(Request):
                     paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
                     paragraph.paragraph_format.space_after = Pt(0)
                     paragraph.style = 'List Bullet'
-                    paragraph.add_run(self.str_council_header + ' ')
+                    if not pre:
+                        paragraph.add_run(self.str_comittee_header + ' ')
+                    else:
+                        paragraph.add_run(self.str_council_header + ' ')
                     paragraph.add_run(
-                        self.srt_status[j] + ' ').font.bold = True
+                        self.srt_status[pre][j] + ' ').font.bold = True
                     paragraph.add_run(self.str_cm[0].format(
                         self.verbs[types[list(types.keys())[i]][j][0].h_type]))
                     paragraph.add_run(
@@ -182,25 +219,51 @@ class HCEM(Request):
                                          sbj.credits, sbj.grade])
                         table_repprovals(docx, data, details)
         if self.mobility_subject != []:
-            paragraph = docx.add_paragraph()
-            paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-            paragraph.paragraph_format.space_after = Pt(0)
-            paragraph.style = 'List Bullet'
-            paragraph.add_run(self.str_cm[6] + ' ')
             for sbj in self.mobility_subject:
+                paragraph = docx.add_paragraph()
+                paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+                paragraph.paragraph_format.space_after = Pt(0)
+                paragraph.style = 'List Bullet'
+                if not pre:
+                    paragraph.add_run(self.str_comittee_header + ' ')
+                else:
+                    paragraph.add_run(self.str_council_header + ' ')
+                paragraph.add_run(
+                    self.srt_status[pre][1] + ' ').font.bold = True
+                paragraph.add_run(self.str_cm[6] + ' ')
                 paragraph.add_run('{} ({})'.format(
-                    sbj.get_grade_display(), sbj.grade))
+                    sbj.get_grade_display(), sbj.grade) + ' ')
                 try:
                     paragraph.add_run(self.str_cm[7].format(
-                        sbj.code, self.mobility_subject[sbj.code], sbj.period))
+                        sbj.code, self.homologable_subjects[sbj.code], sbj.period) + '.')
                 except KeyError as e:
                     print(e)
 
     def pcm(self, docx):
-        raise NotImplementedError('Not yet!')
+        self.add_analysis(docx)
+        if self.counter() == 6:
+            paragraph = docx.add_paragraph()
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            paragraph.paragraph_format.space_after = Pt(0)
+            self.pcm_answer(paragraph)
+            self.add_single_table(docx)
+        else:
+            self.add_composite_hcem(docx, False)
 
     def pcm_answer(self, paragraph):
-        raise NotImplementedError('Not yet!')
+        # pylint: disable=no-member
+        paragraph.add_run(self.str_answer + ': ').font.bold = True
+        paragraph.add_run(self.str_comittee_header + ' ')
+        paragraph.add_run(
+            self.get_advisor_response_display().upper() + ' ').font.bold = True
+        paragraph.add_run(self.str_cm[0].format(
+            self.verbs[self.homologated_subjects[0].h_type]))
+        paragraph.add_run(
+            ' ' + self.str_cm[1].format(self.origin_plan, self.institution_origin))
+        if self.is_affirmative_response_advisor_response():
+            paragraph.add_run(' ' + self.str_cm[4] + ':')
+        else:
+            paragraph.add_run(' ' + self.str_cm[5] + ':')
 
     def add_single_table(self, docx):
         data = []
