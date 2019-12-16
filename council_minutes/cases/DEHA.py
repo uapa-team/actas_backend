@@ -10,7 +10,7 @@ class DEHA(Request):
 
     full_name = 'Permiso Académico'
 
-    reason_permision = StringField(required=True, display='Razón del permiso académico',
+    reason_permision = StringField(required=True, display='Con l objetivo de ...',
         default='Razón del permiso académico')
     from_date = DateField(
         required=True, display='Fecha de inicio del permiso', default=datetime.date.today)
@@ -18,10 +18,10 @@ class DEHA(Request):
         required=True, display='Fecha de fin del permiso', default=datetime.date.today)
 
     str_cm = [
-        'otorgar permiso académico. Desde la fecha {} de {} del {}, a la fecha {} de {} del {}.',
+        'otorgar permiso académico. Desde la fecha {}, a la fecha {}.',
     ]
 
-    regulation_list = ['070|2019|CSU']  # List of regulations
+    regulation_list = ['070|2012|CSU']  # List of regulations
 
     def cm(self, docx):
         paragraph = docx.add_paragraph()
@@ -36,8 +36,11 @@ class DEHA(Request):
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True
-        paragraph.add_run(self.str_cm[0].format(from_date, to_date) + ' ')
-        paragraph.add_run(reason_permision + ' ')
+        paragraph.add_run(self.str_cm[0].format(
+            self.from_date,
+            self.to_date
+        ) + ' ')
+        paragraph.add_run(self.reason_permision + ' ')
 
     def pcm(self, docx):
         self.pcm_analysis(docx)
@@ -57,5 +60,8 @@ class DEHA(Request):
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_advisor_response_display().upper() + ' ').font.bold = True
-        paragraph.add_run(self.str_cm[0].format(from_date, to_date) + ' ')
-        paragraph.add_run(reason_permision + ' ')
+        paragraph.add_run(self.str_cm[0].format(
+            self.from_date,
+            self.to_date
+        ) + ' ')
+        paragraph.add_run(self.reason_permision + ' ')

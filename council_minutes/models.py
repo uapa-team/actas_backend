@@ -472,6 +472,8 @@ class Request(DynamicDocument):
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=92579'),
         '1416|2013|RE': ('Resolución 1416 de 2013 de Rectoría',
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=60849'),
+        '070|2012|CSU': ('Acuerdo 70 de 2018 del Consejo Superior Universitario',
+                         'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=50105'),
         '155|2014|CSU': ('Acuerdo 155 de 2014 del Consejo Superior Universitario',
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=69337'),
     }
