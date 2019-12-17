@@ -275,3 +275,24 @@ def docx_gen_pre_with_array(request):
         return HttpResponse('Empty list', status=400)
     generator.generate(filename)
     return HttpResponse(filename)
+
+
+@csrf_exempt
+@api_view(["POST"])
+@permission_classes((AllowAny,))
+def insert_many(request):
+    body = json.loads(request.body)
+    subs = [c.__name__ for c in Request.get_subclasses()]
+    errors = []
+    inserted_items = []
+    for item_request in body['items']:
+        item_request['user'] = body['user']
+        case = Request.get_subclasses()[subs.index(item_request['_cls'])]
+        item_request['_cls'] = case.get_entire_name()
+        new_request = case().from_json(case.translate(json.dumps(item_request)))
+        try:
+            inserted_items += [new_request.save()]
+        except ValidationError as e:
+            errors += [e.message]
+    return JsonResponse({'inserted_items': inserted_items, 'errors': errors},
+                        status=HTTP_200_OK, encoder=QuerySetEncoder, safe=False)
