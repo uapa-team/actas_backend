@@ -279,7 +279,6 @@ def docx_gen_pre_with_array(request):
 
 @csrf_exempt
 @api_view(["POST"])
-@permission_classes((AllowAny,))
 def insert_many(request):
     body = json.loads(request.body)
     subs = [c.__name__ for c in Request.get_subclasses()]
