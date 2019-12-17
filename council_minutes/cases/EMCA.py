@@ -19,9 +19,9 @@ class EMCA(Request):
     regulation_list = ['070|2009|CAC']  # List of regulations
 
     str_cm = [' otorgrar exención del pago de {}% del valor de la matrícula para el periodo ' +
-              'académico {}, ', ' ({})']
+              'académico {}, ', ' ({}).']
 
-    str_analysis = ['iene la historia académica activa']
+    str_analysis = ['iene la historia académica activa.']
 
     list_analysis = []
 
