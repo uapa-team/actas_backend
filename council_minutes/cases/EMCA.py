@@ -1,6 +1,6 @@
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from mongoengine import FloatField, StringField
+from mongoengine import FloatField, StringField, BooleanField
 from ..models import Request
 from .case_utils import string_to_date, add_analysis_paragraph
 
@@ -13,11 +13,15 @@ class EMCA(Request):
                             display='Procentaje de exención del valor de la matrícula')
     academic_period_exe = StringField(
         max_length=10, display='Periodo de exención', default='0000-0S')
+    ha_active = BooleanField(
+        default=True, display='¿Tiene la historia académica activa?')
 
     regulation_list = ['070|2009|CAC']  # List of regulations
 
-    str_cm = ['otorgrar exención del pago de {}% del valor de la matrícula para el periodo ' +
-              'académico {}, ', '({})']
+    str_cm = [' otorgrar exención del pago de {}% del valor de la matrícula para el periodo ' +
+              'académico {}, ', ' ({})']
+
+    str_analysis = ['iene la historia académica activa']
 
     list_analysis = []
 
@@ -59,6 +63,8 @@ class EMCA(Request):
 
     def pcm_analysis(self, docx):
         final_analysis = []
+        aux = 'T' if self.ha_active else 'No t'
+        final_analysis += [aux + self.str_analysis[0]]
         for extra_a in self.extra_analysis:
             final_analysis += [extra_a]
         add_analysis_paragraph(docx, final_analysis)
