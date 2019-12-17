@@ -1,0 +1,64 @@
+from docx.shared import Pt
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from mongoengine import FloatField, StringField
+from ..models import Request
+from .case_utils import string_to_date, add_analysis_paragraph
+
+
+class EMCA(Request):
+
+    full_name = 'Excención de matrícula por consideración atípica'
+
+    percentage = FloatField(min_value=0.0, max_value=100.0, required=True,
+                            display='Procentaje de exención del valor de la matrícula')
+    academic_period_exe = StringField(
+        max_length=10, display='Periodo de exención', default='0000-0S')
+
+    regulation_list = ['070|2009|CAC']  # List of regulations
+
+    str_cm = ['otorgrar exención del pago de {}% del valor de la matrícula para el periodo ' +
+              'académico {}, ', '({})']
+
+    list_analysis = []
+
+    def cm(self, docx):
+        paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
+        self.cm_answer(paragraph)
+
+    def cm_answer(self, paragraph):
+        # pylint: disable=no-member
+        paragraph.add_run(self.str_council_header + ' ')
+        paragraph.add_run(
+            self.get_approval_status_display().upper() + ' ').font.bold = True
+        paragraph.add_run(self.str_cm[0].format(
+            self.percentage, self.academic_period_exe))
+        paragraph.add_run(self.council_decision)
+        paragraph.add_run(self.str_cm[1].format(
+            Request.regulations['070|2009|CAC'][0]))
+
+    def pcm(self, docx):
+        self.pcm_analysis(docx)
+        self.pcm_answer(docx)
+
+    def pcm_answer(self, docx):
+            # pylint: disable=no-member
+        paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_answer + ': ').font.bold = True
+        paragraph.add_run(self.str_comittee_header + ' ')
+        paragraph.add_run(
+            self.get_advisor_response_display().upper()).font.bold = True
+        paragraph.add_run(self.str_cm[0].format(
+            self.percentage, self.academic_period_exe))
+        paragraph.add_run(self.council_decision)
+        paragraph.add_run(self.str_cm[1].format(
+            Request.regulations['070|2009|CAC'][0]))
+
+    def pcm_analysis(self, docx):
+        final_analysis = []
+        for extra_a in self.extra_analysis:
+            final_analysis += [extra_a]
+        add_analysis_paragraph(docx, final_analysis)
