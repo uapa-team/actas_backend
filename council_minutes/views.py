@@ -300,7 +300,6 @@ def insert_many(request):
 
 @csrf_exempt
 @api_view(["PATCH"])
-@permission_classes((AllowAny,))
 def edit_many(request):
     # pylint: disable=no-member
     body = json.loads(request.body)
