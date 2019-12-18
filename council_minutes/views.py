@@ -279,6 +279,7 @@ def docx_gen_pre_with_array(request):
 
 @csrf_exempt
 @api_view(["POST"])
+@permission_classes((AllowAny,))
 def insert_many(request):
     body = json.loads(request.body)
     subs = [c.__name__ for c in Request.get_subclasses()]
@@ -294,4 +295,39 @@ def insert_many(request):
         except ValidationError as e:
             errors += [e.message]
     return JsonResponse({'inserted_items': inserted_items, 'errors': errors},
+                        status=HTTP_200_OK, encoder=QuerySetEncoder, safe=False)
+
+
+@csrf_exempt
+@api_view(["PATCH"])
+@permission_classes((AllowAny,))
+def edit_many(request):
+    # pylint: disable=no-member
+    body = json.loads(request.body)
+    subs = [c.__name__ for c in Request.get_subclasses()]
+    errors = []
+    edited_items = []
+    not_found = []
+    for item_request in body['items']:
+        try:
+            Request.objects.get(id=item_request['_id'])
+        except mongoengine.DoesNotExist:
+            not_found += [item_request['_id']]
+            continue
+        item_request['user'] = body['user']
+        item_request['_id'] = item_request['_id']
+        case = Request.get_subclasses()[subs.index(item_request['_cls'])]
+        item_request['_cls'] = case.get_entire_name()
+        new_request = case().from_json(case.translate(
+            json.dumps(item_request)), True)
+        try:
+            edited_items += [new_request.save()]
+        except ValidationError as e:
+            errors += [e.message]
+    if edited_items == []:
+        return JsonResponse({'edited_items': edited_items,
+                             'errors': errors, 'id(s)_not_found': not_found},
+                            status=HTTP_400_BAD_REQUEST, encoder=QuerySetEncoder, safe=False)
+    return JsonResponse({'edited_items': edited_items,
+                         'errors': errors, 'id(s)_not_found': not_found},
                         status=HTTP_200_OK, encoder=QuerySetEncoder, safe=False)
