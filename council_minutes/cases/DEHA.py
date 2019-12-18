@@ -1,54 +1,69 @@
-import datetime
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import StringField, DateField
 from ..models import Request
 from .case_utils import add_analysis_paragraph
 
 
 class DEHA(Request):
 
-    full_name = 'Permiso Académico'
-
-    reason_permision = StringField(required=True, display='Con l objetivo de ...',
-        default='Razón del permiso académico')
-    from_date = DateField(
-        required=True, display='Fecha de inicio del permiso', default=datetime.date.today)
-    to_date = DateField(
-        required=True, display='Fecha de fin del permiso', default=datetime.date.today)
+    full_name = 'Desbloquear historia académica'
 
     str_cm = [
-        'otorgar permiso académico. Desde la fecha {}, a la fecha {}.',
+        'Desbloqueo de la historia académica en el programa {} ({}).',
+        'Restablecimiento de la carga académica de la historia académica del programa {} ({}).'
     ]
 
     regulation_list = ['070|2012|CSU']  # List of regulations
 
     def cm(self, docx):
+        # pylint: disable=no-member
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
-        self.cm_answer(paragraph)
-        paragraph.add_run(' ({}). '.format(
-            self.regulations[self.regulation_list[0]][0]))
-
-    def cm_answer(self, paragraph):
         paragraph.add_run(self.str_council_header + ' ')
         paragraph.add_run(
-            # pylint: disable=no-member
-            self.get_approval_status_display().upper() + ' ').font.bold = True
-        paragraph.add_run(self.str_cm[0].format(
-            self.from_date,
-            self.to_date
-        ) + ' ')
-        paragraph.add_run(self.reason_permision + ' ')
-
-    def pcm(self, docx):
-        self.pcm_analysis(docx)
+            self.get_approval_status_display().upper() + ':').font.bold = True
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
-        paragraph.add_run(self.str_answer + ': ').bold = True
+        paragraph.style = 'List Bullet'
+        self.cm_answer(paragraph)
+        paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.style = 'List Bullet'
+        self.cm_retrieve(paragraph)
+
+    def cm_answer(self, paragraph):
+        # pylint: disable=no-member
+        paragraph.add_run(self.str_cm[0].format(
+            self.get_academic_program_display(),
+            self.academic_program))
+
+    def cm_retrieve(self, paragraph):
+        # pylint: disable=no-member
+        paragraph.add_run(self.str_cm[1].format(
+            self.get_academic_program_display(),
+            self.academic_program))
+
+    def pcm(self, docx):
+        # pylint: disable=no-member
+        paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_comittee_header + ' ')
+        paragraph.add_run(
+            self.get_advisor_response_display().upper() + ':').font.bold = True
+        paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.style = 'List Bullet'
         self.pcm_answer(paragraph)
+        paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.style = 'List Bullet'
+        self.pcm_retrieve(paragraph)
 
     def pcm_analysis(self, docx):
         analysis_list = []
@@ -56,12 +71,7 @@ class DEHA(Request):
         add_analysis_paragraph(docx, analysis_list)
 
     def pcm_answer(self, paragraph):
-        paragraph.add_run(self.str_comittee_header + ' ')
-        paragraph.add_run(
-            # pylint: disable=no-member
-            self.get_advisor_response_display().upper() + ' ').font.bold = True
-        paragraph.add_run(self.str_cm[0].format(
-            self.from_date,
-            self.to_date
-        ) + ' ')
-        paragraph.add_run(self.reason_permision + ' ')
+        self.cm_answer(paragraph)
+
+    def pcm_retrieve(self, paragraph):
+        self.cm_retrieve(paragraph)
