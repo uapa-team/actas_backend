@@ -129,8 +129,6 @@ class Subject(EmbeddedDocument):
         : param subjects: EmbeddedDocumentListField of Subjects to be computed
         """
         data = [0, 0, 0, 0, 0]
-        TIP_FUNDAMENTACION = 'B'
-        TIP_DISCIPLINAR = 'C'
         for sbj in subjects:
             if sbj.tipology == Subject.TIP_PRE_FUND_OBLIGATORIA:
                 data[0] += sbj.credits

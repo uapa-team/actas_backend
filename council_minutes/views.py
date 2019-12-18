@@ -2,7 +2,6 @@ import json
 import datetime
 import mongoengine
 from mongoengine.errors import ValidationError
-from django.contrib.auth import authenticate
 from django_auth_ldap.backend import LDAPBackend
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
@@ -21,7 +20,7 @@ from .models import Request, get_fields
 from .helpers import QuerySetEncoder
 from .docx import CouncilMinuteGenerator
 from .docx import PreCouncilMinuteGenerator
-from .cases import *
+from .cases import *  # pylint: disable=wildcard-import,unused-wildcard-import
 
 
 @api_view(["GET"])
@@ -90,6 +89,7 @@ def filter_request(request):
 @api_view(["POST"])
 @csrf_exempt  # Esto va solo para evitar la verificacion de django
 def insert_request(request):
+    # pylint: disable=protected-access
     body = json.loads(request.body)
     shell = json.dumps({'_cls': 'Request'})
     subs = [c.__name__ for c in Request.get_subclasses()]
@@ -126,7 +126,7 @@ def docx_gen_by_id(request, cm_id):
 @csrf_exempt
 def update_cm(request, cm_id):
     if request.method == 'PATCH':
-        # pylint: disable=no-member
+        # pylint: disable=no-member,protected-access
         try:
             case = Request.objects.get(id=cm_id)
         except mongoengine.DoesNotExist:
