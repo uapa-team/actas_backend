@@ -108,7 +108,6 @@ def insert_request(request):
 
 
 @api_view(["GET", "POST"])
-@permission_classes((AllowAny,))
 @csrf_exempt
 def docx_gen_by_id(request, cm_id):
     # pylint: disable=no-member
@@ -225,7 +224,6 @@ def docx_gen_with_array(request):
 
 
 @api_view(["GET", "POST"])
-@permission_classes((AllowAny,))
 @csrf_exempt
 def docx_gen_pre_by_id(request, cm_id):
     filename = 'public/preacta' + cm_id + '.docx'
