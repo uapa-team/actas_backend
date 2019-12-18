@@ -313,6 +313,9 @@ def edit_many(request):
         except mongoengine.DoesNotExist:
             not_found += [item_request['_id']]
             continue
+        except mongoengine.ValidationError:
+            not_found += [item_request['_id']]
+            continue
         item_request['user'] = body['user']
         item_request['_id'] = item_request['_id']
         case = Request.get_subclasses()[subs.index(item_request['_cls'])]
@@ -320,13 +323,12 @@ def edit_many(request):
         new_request = case().from_json(case.translate(
             json.dumps(item_request)), True)
         try:
-            edited_items += [new_request.save()]
+            new_request.save()
         except ValidationError as e:
             errors += [e.message]
-    if edited_items == []:
-        return JsonResponse({'edited_items': edited_items,
-                             'errors': errors, 'id(s)_not_found': not_found},
-                            status=HTTP_400_BAD_REQUEST, encoder=QuerySetEncoder, safe=False)
+        else:
+            edited_items += [new_request]
     return JsonResponse({'edited_items': edited_items,
                          'errors': errors, 'id(s)_not_found': not_found},
-                        status=HTTP_200_OK, encoder=QuerySetEncoder, safe=False)
+                        status=HTTP_400_BAD_REQUEST if edited_items == [] else HTTP_200_OK,
+                        encoder=QuerySetEncoder, safe=False)
