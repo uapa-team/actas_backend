@@ -332,3 +332,9 @@ def edit_many(request):
                          'errors': errors, 'id(s)_not_found': not_found},
                         status=HTTP_400_BAD_REQUEST if edited_items == [] else HTTP_200_OK,
                         encoder=QuerySetEncoder, safe=False)
+@csrf_exempt
+@api_view(["GET"])
+@permission_classes((AllowAny,))
+def programs_defined(_):
+    programs = sorted([plan[1] for plan in Request.PLAN_CHOICES])
+    return JsonResponse({'programs': programs})
