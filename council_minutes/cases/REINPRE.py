@@ -35,7 +35,7 @@ class REINPRE(Request):
     reing_period = StringField(
         required=True, display='Periodo de reingreso', default='0000-0S')
     loss_period = StringField(
-        required=True, display='Periodo de pérdida de calidad de estudiante', default='0000-0S')
+        required=True, display='Periodo de perdida de calidad de estudiante', default='0000-0S')
     first_reing = BooleanField(
         required=True, display='Primer reingreso', default=True)
     admission_period = StringField(
@@ -417,17 +417,18 @@ class REINPRE(Request):
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
         self.pcm_answer(paragraph)
-        if self.request_in_date:
-            self.cm_pcm_paragraph(docx)
-            self.rein_general_data_table(docx)
-            self.rein_academic_info(docx)
-            self.rein_credits_summary(docx)
+        #if self.request_in_date: To ommit tables when the request isn't in time
+        self.cm_pcm_paragraph(docx)
+        self.rein_general_data_table(docx)
+        self.rein_academic_info(docx)
+        self.rein_credits_summary(docx)
         self.rein_recommends(docx)
 
     def cm(self, docx):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        #if self.request_in_date: To ommit tables when the request isn't in time
         self.cm_answer(paragraph)
         self.rein_general_data_table(docx)
         self.rein_academic_info(docx)

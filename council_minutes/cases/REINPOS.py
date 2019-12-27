@@ -17,7 +17,7 @@ class REINPOS(Request):
     first_reing = BooleanField(
         required=True, display='¿Primer reingreso?', default=True)
     reason_of_loss = StringField(
-        required=True, display='Razón pérdida calidad de estudiante', default='')
+        required=True, display='Razón perdida calidad de estudiante', default='')
     time_limit = BooleanField(
         required=True, default=False, display='Pérdida por tiempo de permanencia')
     remaining_subjects = EmbeddedDocumentListField(

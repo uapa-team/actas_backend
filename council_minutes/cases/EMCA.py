@@ -2,15 +2,15 @@ from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from mongoengine import FloatField, StringField, BooleanField
 from ..models import Request
-from .case_utils import string_to_date, add_analysis_paragraph
+from .case_utils import add_analysis_paragraph
 
 
 class EMCA(Request):
 
-    full_name = 'Excención de matrícula por consideración atípica'
+    full_name = 'Exención de matrícula por consideración atípica'
 
     percentage = FloatField(min_value=0.0, max_value=100.0, required=True,
-                            display='Procentaje de exención del valor de la matrícula')
+                            display='Porcentaje de exención del valor de la matrícula')
     academic_period_exe = StringField(
         max_length=10, display='Periodo de exención', default='0000-0S')
     ha_active = BooleanField(

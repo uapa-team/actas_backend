@@ -4,7 +4,6 @@ from docx.shared import Pt
 from mongoengine import StringField, IntField, DateField
 from ..models import Request, Subject
 from .case_utils import table_subjects, add_analysis_paragraph, num_to_month
-import datetime
 
 class TGRA(Request):
 
@@ -23,7 +22,7 @@ class TGRA(Request):
         choices=TGRA_CHOICES, default=TGRA_PASANTIA, display='Tipo de trabajo de grado')
     title = StringField(default='', display='Título del trabajo de grado')
     organization = StringField(
-        default='', display='Empresa donde reazlia pasantía')
+        default='', display='Empresa donde realiza pasantía')
     professor = StringField(
         default='', display='Profesor director del trabajo')
     dc_approved = IntField(display='Número de créditos aprobados', default=0)

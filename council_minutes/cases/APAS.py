@@ -4,7 +4,6 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from mongoengine import StringField, BooleanField, DateField
 from ..models import Request
 from .case_utils import add_analysis_paragraph, string_to_date
-import datetime
 
 
 class APAS(Request):
@@ -30,7 +29,7 @@ class APAS(Request):
         required=True, default=False,
         display='¿Presenta el formato de solicitud de movilidad saliente?')
     institut = StringField(
-        required=True, display='Institución donde se va a desarrolar la pasantía', default='')
+        required=True, display='Institución donde se va a desarrollar la pasantía', default='')
     grade_option = StringField(
         required=True, display='Tipo de tesis/trabajo final', choices=GO_CHOICES,
         default=GO_TESIS_MAESTRIA)

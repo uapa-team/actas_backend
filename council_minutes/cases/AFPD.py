@@ -4,7 +4,6 @@ from docx.shared import Pt
 from mongoengine import StringField, DateField
 from ..models import Request
 from .case_utils import add_analysis_paragraph
-import datetime
 
 
 class AFPD(Request):
@@ -12,9 +11,9 @@ class AFPD(Request):
     full_name = 'Ampliación de la fecha de pago de derechos académicos'
 
     justification = StringField(
-        required=True, display='Justificación de la decision', default='')
+        required=True, display='Justificación de la decisión', default='')
     limit_date = DateField(
-        required=True, display='Fecha Limite', default=datetime.date.today)
+        required=True, display='Fecha Límite', default=datetime.date.today)
 
     regulation_list = []
 

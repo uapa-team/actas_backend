@@ -35,9 +35,9 @@ class CASI(Request):
         required=True, display='# Periodos Matriculados', default=0)
     papa = FloatField(required=True, display='PAPA', default=0.0)
     available_credits = IntField(
-        required=True, display='Creditos Disponibles', default=0)
+        required=True, display='Créditos Disponibles', default=0)
     current_credits = IntField(
-        required=True, display='Creditos Inscritos', default=0)
+        required=True, display='Créditos Inscritos', default=0)
     nrc_answer = StringField(choices=CN_ANSWER_CHOICES, default=CN_ANSWER_NO_DILIGENTE,
                              display='Motivo de rechazo')
 

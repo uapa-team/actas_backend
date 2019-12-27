@@ -10,7 +10,7 @@ class CAIM(Request):
     full_name = 'Cancelación de asignaturas con carga inferior a la mínima'
 
     percentaje = FloatField(
-        display='Porcentaje de avance de carrrera',
+        display='Porcentaje de avance de carrera',
         min_value=0.0, max_value=100.0, default=0.0)
     enrollments = IntField(display='Número de matrículas', default=0)
     gpa = FloatField(display='P.A.P.A.', default=0.0,

@@ -10,8 +10,8 @@ class PEAC(Request):
 
     full_name = 'Permiso Académico'
 
-    reason_permision = StringField(required=True, display='Con l objetivo de ...',
-                                   default='Razón del permiso académico')
+    reason_permision = StringField(required=True, default='Con el objetivo de ...',
+                                   display='Razón del permiso académico')
     from_date = DateField(
         required=True, display='Fecha de inicio del permiso', default=datetime.date.today)
     to_date = DateField(

@@ -10,7 +10,7 @@ class REEM(Request):
 
     full_name = 'Reembolso'
 
-    credits_refunded = IntField(display='Creditos Disponibles', default=0)
+    credits_refunded = IntField(display='Créditos Disponibles', default=0)
     percentage = FloatField(
         display='Porcentaje de créditos a cancelar', default=0.0)
     cancelation_case = ObjectIdField(

@@ -73,7 +73,7 @@ class APGD(Request):
         display='Institución externa', default='')
     co_advisor_list = EmbeddedDocumentListField(
         Coadvisor, display='Codirector(es)')
-    grade_proyect = StringField(required=True, display='Calificación de la prupuesta/proyecto',
+    grade_proyect = StringField(required=True, display='Calificación de la propuesta/proyecto',
                                 choices=CP_CHOICES)
 
     regulation_list = ['040|2017|CFA', '056|2012|CSU']  # List of regulations

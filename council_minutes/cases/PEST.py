@@ -25,7 +25,7 @@ class PEST(Request):
 
     institution = StringField(required=True, display='Institución/Empresa', default='')
     proffesor = StringField(required=True, display='Profesor', default='')
-    ins_person = StringField(required=True, display='Encargado Institucion', default='')
+    ins_person = StringField(required=True, display='Encargado Institución', default='')
     subject = StringField(required=True, choices=SUBJECT_CHOICES,
                           default=SUB_P1, display='Asignatura')
     advance = FloatField(required=True, min_value=0, display='Avance SIA', default=0.0)

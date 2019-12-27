@@ -31,7 +31,7 @@ class EPTU(Request):
         display='Perfil de programa curricular')
     right_dates = BooleanField(
         display='Realiza la solicitud en fecha adecuada', default=True)
-    periods_in = IntField(display='Periodos de exensión aplicada', default=0)
+    periods_in = IntField(display='Periodos de exención aplicada', default=0)
     cna = StringField(
         choices=CNA_CHOICES, default=CNA_OTRO, display='Motivo de rechazo')
 

@@ -7,7 +7,7 @@ from .case_utils import add_analysis_paragraph
 
 class EBDA(Request):
 
-    full_name = 'Beca exensión derechos académicos'
+    full_name = 'Beca exención derechos académicos'
 
     gpa = FloatField(
         display='Promedio obtenido el semestre anterior', default=0.0)
