@@ -7,7 +7,7 @@ from .case_utils import add_analysis_paragraph
 
 class PEST(Request):
 
-    full_name = 'Práctica estudiantil'
+    full_name = 'Inscripción práctica estudiantil'
 
     SUB_P1 = 'P1'
     SUB_P2 = 'P2'

@@ -8,7 +8,7 @@ from .case_utils import add_analysis_paragraph, string_to_date
 
 class APAS(Request):
 
-    full_name = 'Aprobación de pasantía en el exterior'
+    full_name = 'Aprobación de pasantía'
 
     GO_TRABAJO_FINAL_MAESTRIA = 'TFM'
     GO_TESIS_MAESTRIA = 'TSM'

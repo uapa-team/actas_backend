@@ -8,7 +8,7 @@ from .case_utils import add_analysis_paragraph
 
 class AFPD(Request):
 
-    full_name = 'Ampliación de la fecha de pago de derechos académicos'
+    full_name = 'Ampliación de la fecha de pago de recibo de matrícula'
 
     justification = StringField(
         required=True, display='Justificación de la decisión', default='')

@@ -7,7 +7,7 @@ from .case_utils import table_subjects, add_analysis_paragraph, num_to_month
 
 class TGRA(Request):
 
-    full_name = 'Trabajo de grado'
+    full_name = 'Inscripción trabajo de grado'
 
     TGRA_PASANTIA = 'TP'
     TGRA_TRABAJO = 'TT'

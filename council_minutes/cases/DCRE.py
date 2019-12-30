@@ -7,7 +7,7 @@ from .case_utils import add_analysis_paragraph, table_subjects
 
 class DCRE(Request):
 
-    full_name = 'Devolución de Créditos'
+    full_name = 'Reintegro de Créditos'
 
     subjects = EmbeddedDocumentListField(Subject, display='Asignaturas')
 

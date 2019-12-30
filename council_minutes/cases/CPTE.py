@@ -7,7 +7,8 @@ from .case_utils import add_analysis_paragraph
 
 class CPTE(Request):
 
-    full_name = 'Cambio de proyecto de tesis o trabajo final'
+    full_name = 'Cambio de proyecto de tesis de maestría/doctorado o ' + \
+        'propuesta de trabajo final de maestría'
 
     GO_TRABAJO_FINAL_MAESTRIA = 'TFM'
     GO_TESIS_MAESTRIA = 'TSM'
