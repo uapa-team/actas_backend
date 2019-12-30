@@ -39,7 +39,7 @@ class PEST(Request):
     regulation_list = ['008|2008|CSU', '102|2013|CSU', '016|2011|CAC']
 
     str_cm = [
-        'inscribir la asignatura {} ({}) con carga de {} créditos, ',
+        'inscribir la asignatura {} ({}) de {} créditos, ',
         'en el periodo {}, a desarrollar en la empresa {}, a cargo del docente ' +
         '{} por parte de la Universidad Nacional de Colombia y {} por parte de la entidad ' +
         '(Artículo 15 {}).',

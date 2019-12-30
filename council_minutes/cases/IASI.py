@@ -19,7 +19,7 @@ class IASI(Request):
         IASISubject, display='Asignaturas')
 
     str_cm = [
-        'inscribir la(s) siguiente(s) asignatura(s) del programa {} ({}), en el periodo academico' +
+        'inscribir la(s) siguiente(s) asignatura(s) del programa {} ({}), en el periodo académico' +
         ' {}, debido a que {}realiza adecuadamente su solicitud.',
     ]
 
