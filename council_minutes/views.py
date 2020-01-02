@@ -183,7 +183,7 @@ def docx_gen_by_number(request):
     return HttpResponse(filename)
 
 
-@api_view(["POST"])
+@api_view(["GET", "POST"])
 @csrf_exempt
 def docx_gen_pre_by_number(request):
     try:
@@ -204,7 +204,7 @@ def docx_gen_pre_by_number(request):
     return HttpResponse(filename)
 
 
-@api_view(["POST"])
+@api_view(["GET", "POST"])
 @csrf_exempt
 def docx_gen_with_array(request):
     try:
