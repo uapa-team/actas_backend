@@ -238,7 +238,7 @@ def docx_gen_pre_by_id(request, cm_id):
     return HttpResponse(filename)
 
 
-@api_view(["POST"])
+@api_view(["GET", "POST"])
 @csrf_exempt
 def docx_gen_pre_by_date(request):
     try:
