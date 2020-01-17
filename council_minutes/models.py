@@ -82,20 +82,20 @@ class Subject(EmbeddedDocument):
     TIP_DOC_ELEGIBLE = 'DU'
 
     TIP_CHOICES = (
-        (TIP_PRE_FUND_OBLIGATORIA, 'Fundamentación Obligatoria'),
-        (TIP_PRE_FUND_OPTATIVA, 'Fundamentación Optativa'),
-        (TIP_PRE_DISC_OBLIGATORIA, 'Disciplinar Obligatoria'),
-        (TIP_PRE_DISC_OPTATIVA, 'Disciplinar Optativa'),
-        (TIP_PRE_TRAB_GRADO, 'Trabajo de Grado Pregrado'),
-        (TIP_PRE_LIBRE_ELECCION, 'Libre Elección'),
-        (TIP_PRE_NIVELACION, 'Nivelación'),
-        (TIP_MOF_OBLIGATORIA, 'Obligatoria Maestría'),
-        (TIP_MOF_ACTIV_ACADEMICA, 'Actividad Académica Maestría'),
-        (TIP_MOF_TRAB_GRADO, 'Tesis o Trabajo Final de Maestría'),
-        (TIP_MOF_ELEGIBLE, 'Elegible Maestría'),
-        (TIP_DOC_ACTIV_ACADEMICA, 'Actividad Académica Doctorado'),
-        (TIP_DOC_TESIS, 'Tesis de Doctorado'),
-        (TIP_DOC_ELEGIBLE, 'Elegible Doctorado'),
+        (TIP_PRE_FUND_OBLIGATORIA, 'Fundamentación Obligatoria (B)'),
+        (TIP_PRE_FUND_OPTATIVA, 'Fundamentación Optativa (O)'),
+        (TIP_PRE_DISC_OBLIGATORIA, 'Disciplinar Obligatoria (C)'),
+        (TIP_PRE_DISC_OPTATIVA, 'Disciplinar Optativa (T)'),
+        (TIP_PRE_TRAB_GRADO, 'Trabajo de Grado Pregrado (P)'),
+        (TIP_PRE_LIBRE_ELECCION, 'Libre Elección (L)'),
+        (TIP_PRE_NIVELACION, 'Nivelación (E)'),
+        (TIP_MOF_OBLIGATORIA, 'Obligatoria Maestría (O)'),
+        (TIP_MOF_ACTIV_ACADEMICA, 'Actividad Académica Maestría (C)'),
+        (TIP_MOF_TRAB_GRADO, 'Tesis o Trabajo Final de Maestría (P)'),
+        (TIP_MOF_ELEGIBLE, 'Elegible Maestría (L)'),
+        (TIP_DOC_ACTIV_ACADEMICA, 'Actividad Académica Doctorado (F)'),
+        (TIP_DOC_TESIS, 'Tesis de Doctorado (S)'),
+        (TIP_DOC_ELEGIBLE, 'Elegible Doctorado (U)'),
     )
 
     name = StringField(required=True, display='Nombre Asignatura')

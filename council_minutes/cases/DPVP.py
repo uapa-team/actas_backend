@@ -20,7 +20,7 @@ class DPVP(Request):
     regulation_list = ['032|2010|CSU', '1416|2013|RE']
 
     str_cm = [
-        'la devolución proporcional del {:0.2f}% del valor pagado por concepto de ' +
+        'devolución proporcional del {:0.2f} % del valor pagado por concepto de ' +
         'derechos de matricula del periodo {}, teniendo en cuenta la fecha de ' +
         'presentación de la solicitud y que {}le fue aprobada la cancelación ' +
         'de periodo en Acta {} de {} de Consejo de Facultad.'

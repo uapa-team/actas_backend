@@ -17,7 +17,8 @@ class APGD(Request):
         co_advisor_ext = StringField(
             display='Institución externa', default='')
 
-    full_name = 'Aprobación de propuesta de proyecto y designación de director'
+    full_name = 'Aprobación de propuesta de trabajo final de maestría/doctorado' + \
+        ' o de proyecto de tesis de maestría y designación de director y co-director'
 
     GO_TRABAJO_FINAL_MAESTRIA = 'TFM'
     GO_TESIS_MAESTRIA = 'TSM'

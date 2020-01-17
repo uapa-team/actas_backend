@@ -7,13 +7,13 @@ from .case_utils import table_change_typology, add_analysis_paragraph
 
 class ChangeTipologySubject(Subject):
     new_tipology = StringField(
-        required=True, choices=Subject.TIP_CHOICES, display='Nueva tipología')
+        required=True, choices=Subject.TIP_CHOICES, display='Nuevo componente')
     grade = StringField(display='Nota obtenida')
 
 
 class CTIP(Request):
 
-    full_name = 'Cambio de tipología'
+    full_name = 'Cambio de componente'
 
     subjects_change_tipology = EmbeddedDocumentListField(
         ChangeTipologySubject, display='Asignaturas')

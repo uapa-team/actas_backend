@@ -7,7 +7,7 @@ from .case_utils import add_analysis_paragraph
 
 class ADIC(Request):
 
-    full_name = 'Adición de codirector'
+    full_name = 'Designación de codirector'
 
     node = StringField(required=True, choices=Request.PROFILE_CHOICES,
                        default=Request.PROFILE_INVE, display='Perfil')

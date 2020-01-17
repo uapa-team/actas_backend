@@ -26,7 +26,7 @@ class AAUT(Request):
                                             default="0000-0S")
 
     str_cm = [
-        'la admisión automática al programa {} ({}), a partir del periodo académico {}.',
+        'admisión automática al programa {} ({}), a partir del periodo académico {}.',
         'Debido a que {}justifica debidamente la solicitud.'
     ]
 

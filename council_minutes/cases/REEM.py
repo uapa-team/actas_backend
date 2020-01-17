@@ -22,10 +22,10 @@ class REEM(Request):
     )
 
     str_cm = [
-        'la devolución proporcional del {} por ciento ({}%) del valor pagado por concepto de der ' +
-        'echos de matrícula del periodo {}.',
-        'Teniendo en cuenta la fecha de presentación de la solicitud y que le fue aprobada la ca' +
-        'ncelación de periodo en el caso {} del Acta {} de {} del Consejo de Facultad.'
+        'devolución proporcional del {} por ciento ({} %) del valor pagado por concepto de ' +
+        'derechos de matrícula del periodo {}.',
+        'Teniendo en cuenta la fecha de presentación de la solicitud y que le fue aprobada la ' +
+        'cancelación de periodo en el Acta {} de {} del Consejo de Facultad.'
     ]
 
     str_pcm = [
@@ -55,7 +55,6 @@ class REEM(Request):
         )
         paragraph.add_run(
             self.str_cm[1].format(
-                cancelation_case.id,
                 cancelation_case.consecutive_minute,
                 str(cancelation_case.date)[0:4])
         )

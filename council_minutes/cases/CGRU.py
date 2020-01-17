@@ -22,7 +22,7 @@ class CGRU(Request):
     regulation_list = ['008|2008|CSU']
 
     str_cm = [
-        'el cambio de grupo de la asignatura {} ({}) al grupo {} en el periodo {}, ' +
+        'cambio de grupo de la asignatura {} ({}) al grupo {} en el periodo {}, ' +
         'debido a que {}.',
         'justifica debidamente la solicitud'
     ]

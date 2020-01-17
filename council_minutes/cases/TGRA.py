@@ -7,7 +7,7 @@ from .case_utils import table_subjects, add_analysis_paragraph, num_to_month
 
 class TGRA(Request):
 
-    full_name = 'Trabajo de grado'
+    full_name = 'Inscripción trabajo de grado'
 
     TGRA_PASANTIA = 'TP'
     TGRA_TRABAJO = 'TT'
@@ -34,7 +34,7 @@ class TGRA(Request):
 
     str_cm = [
         'inscribir la(s) siguiente(s) asignatura(s) en el periodo académico {}, en modalidad {}, ' +
-        'bajo la dirección del profesor {}, debido a que {}realiza correctamente la sulicitud.'
+        'bajo la dirección del profesor {}, debido a que {}realiza correctamente la solicitud.'
     ]
 
     str_pcm = [

@@ -7,7 +7,7 @@ from .case_utils import add_analysis_paragraph
 
 class EBDA(Request):
 
-    full_name = 'Beca exención derechos académicos'
+    full_name = 'Beca exención de derechos académicos'
 
     gpa = FloatField(
         display='Promedio obtenido el semestre anterior', default=0.0)
@@ -26,7 +26,7 @@ class EBDA(Request):
         'dio académico ponderado más alto del semestre en las asignaturas cursadas durante el per' +
         'iodo académico inmediatamente anterior.',
         ' la BECA EXENCIÓN DE DERECHOS ACADÉMICOS en el programa de {} ({}) en el periodo {} y ot' +
-        'orgar la exención del 100% de derechos académicos por obtener el promedio académico pond' +
+        'orgar la exención del 100 % de derechos académicos por obtener el promedio académico pond' +
         'erado más alto del semestre en las asignaturas cursadas durante el periodo académico inm' +
         'ediatamente anterior.'
     ]

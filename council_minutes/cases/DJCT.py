@@ -5,11 +5,11 @@ from mongoengine import StringField, DateField, BooleanField
 from mongoengine import EmbeddedDocumentListField
 from ..models import Request, Professor
 from .case_utils import add_analysis_paragraph
-import datetime
 
 class DJCT(Request):
 
-    full_name = 'Designación de jurados calificadores de Tesis/Trabajo Final'
+    full_name = 'Designación de jurados calificadores de tesis de maestría/doctorado ' + \
+        'o evaluadores de trabajo final de maestría'
 
     node = StringField(
         display='Perfil', choices=Request.PROFILE_CHOICES, default=Request.PROFILE_INVE)
