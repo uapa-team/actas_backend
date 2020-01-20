@@ -100,14 +100,14 @@ class CouncilMinuteGenerator():
                 run.font.size = Pt(12)
                 list_level_3 = 0
             if actual_case != request.full_name:
-                list_level_3 = list_level_3 + 1
                 actual_case = request.full_name
                 para = self.document.add_paragraph(style='Heading 2')
                 run = para.add_run(request.full_name.upper())
                 run.font.bold = True
                 run.font.size = Pt(12)
             para = self.document.add_paragraph(style='Heading 3')
-            run = para.add_run('{}.{}.{} {} \t DNI. {}'.format(
+            list_level_3 = list_level_3 + 1
+            run = para.add_run('{}.{}.{} {}\tDNI. {}'.format(
                 list_level_1, list_level_2, list_level_3, request.student_name,
                 request.student_dni))
             run.font.bold = True
@@ -229,13 +229,13 @@ class PreCouncilMinuteGenerator():
                 run.font.size = Pt(12)
                 list_level_3 = 0
             if actual_case != request.full_name:
-                list_level_3 = list_level_3 + 1
                 actual_case = request.full_name
                 para = self.document.add_paragraph(style='Heading 2')
                 run = para.add_run(request.full_name.upper())
                 run.font.bold = True
                 run.font.size = Pt(12)
             para = self.document.add_paragraph(style='Heading 3')
+            list_level_3 = list_level_3 + 1
             run = para.add_run('{}.{}.{} {} \t DNI. {}'.format(
                 list_level_1, list_level_2, list_level_3, request.student_name,
                 request.student_dni))
