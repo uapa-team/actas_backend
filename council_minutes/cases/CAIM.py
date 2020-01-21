@@ -38,7 +38,8 @@ class CAIM(Request):
     ]
 
     def cm(self, docx):
-        if self.is_affirmative_response_approval_status():
+        if self.is_affirmative_response_approval_status() or self.approval_status in [
+                Request.AS_EN_ESPERA, Request.AS_EN_TRAMITE]:
             self.cm_ap(docx)
         else:
             self.cm_na(docx)
@@ -86,7 +87,7 @@ class CAIM(Request):
 
     def pcm(self, docx):
         self.pcm_analysis(docx)
-        if self.is_affirmative_response_advisor_response():
+        if self.is_affirmative_response_advisor_response() or self.advisor_response == Request.ARCR_EN_ESPERA:
             self.pcm_ap(docx)
         else:
             self.pcm_na(docx)

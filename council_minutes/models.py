@@ -117,7 +117,7 @@ class Subject(EmbeddedDocument):
                 subject.code,
                 subject.name,
                 subject.group,
-                subject.get_tipology_display(),
+                subject.tipology[-1],
                 str(subject.credits)
             ])
         return data
