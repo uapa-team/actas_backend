@@ -38,8 +38,7 @@ class CAIM(Request):
     ]
 
     def cm(self, docx):
-        if self.is_affirmative_response_approval_status() or self.approval_status in [
-                Request.AS_EN_ESPERA, Request.AS_EN_TRAMITE]:
+        if self.is_affirmative_response_approval_status():
             self.cm_ap(docx)
         else:
             self.cm_na(docx)
@@ -77,6 +76,7 @@ class CAIM(Request):
         paragraph.add_run(self.str_cm[2].format('no ') + ' ')
         paragraph.add_run(self.str_cm[3].format(
             Request.regulations[self.regulation_list[0]][0]))
+        table_subjects(docx, Subject.subjects_to_array(self.subjects))
 
     def cm_answer(self, paragraph):
         paragraph.add_run(
@@ -87,7 +87,7 @@ class CAIM(Request):
 
     def pcm(self, docx):
         self.pcm_analysis(docx)
-        if self.is_affirmative_response_advisor_response() or self.advisor_response == Request.ARCR_EN_ESPERA:
+        if self.is_affirmative_response_advisor_response():
             self.pcm_ap(docx)
         else:
             self.pcm_na(docx)
@@ -125,6 +125,7 @@ class CAIM(Request):
         paragraph.add_run(self.str_cm[2].format('no ') + ' ')
         paragraph.add_run(self.str_cm[3].format(
             Request.regulations[self.regulation_list[0]][0]))
+        table_subjects(docx, Subject.subjects_to_array(self.subjects))
 
     def pcm_answer(self, paragraph):
         paragraph.add_run(
