@@ -331,9 +331,88 @@ def edit_many(request):
                          'errors': errors, 'id(s)_not_found': not_found},
                         status=HTTP_400_BAD_REQUEST if edited_items == [] else HTTP_200_OK,
                         encoder=QuerySetEncoder, safe=False)
+
+
 @csrf_exempt
 @api_view(["GET"])
 @permission_classes((AllowAny,))
 def programs_defined(_):
     programs = sorted([plan[1] for plan in Request.PLAN_CHOICES])
     return JsonResponse({'programs': programs})
+
+
+@csrf_exempt
+@api_view(["GET"])
+@permission_classes((AllowAny,))
+def allow_generate(request):
+    username = json.loads(request.body)['username']
+    if username == 'acica_fibog':
+        return JsonResponse({'allowed_to_generate': [
+            {'ALL': 'Generar todas las solicitudes estudiantiles'},
+            {'ARC_CIAG': 'Generar las solicitudes del Área Curricular de' +
+             ' Ingeniería Civil y Agrícola'},
+            {'PRE_CIVI': 'Generar las solicitudes del pregrado en Ingeniería Civil'},
+            {'PRE_AGRI': 'Generar las solicitudes del pregrado en Ingeniería Agrícola'},
+            {'POS_ARCA': 'Generar las solicitudes de posgrados pertenecientes' +
+             ' al Área curricular de Ingeniería Civil y Agrícola'},
+        ]},
+            status=HTTP_200_OK,
+            safe=False)
+    elif username == 'acimm_fibog':
+        return JsonResponse({'allowed_to_generate': [
+            {'ALL': 'Generar todas las solicitudes estudiantiles'},
+            {'ARC_MEME': 'Generar las solicitudes del Área Curricular de' +
+             ' Ingeniería Mecánica y Mecatrónica'},
+            {'PRE_MECA': 'Generar las solicitudes del pregrado en Ingeniería Mecánica'},
+            {'PRE_METR': 'Generar las solicitudes del pregrado en Ingeniería Mecatrónica'},
+            {'POS_ARMM': 'Generar las solicitudes de posgrados pertenecientes' +
+             ' al Área curricular de Ingeniería Mecánica y Mecatrónica'},
+        ]},
+            status=HTTP_200_OK,
+            safe=False)
+    elif username == 'aciee_fibog':
+        return JsonResponse({'allowed_to_generate': [
+            {'ALL': 'Generar todas las solicitudes estudiantiles'},
+            {'ARC_ELEL': 'Generar las solicitudes del Área Curricular de' +
+             ' Ingeniería Eléctrica y Electrónica'},
+            {'PRE_ELCT': 'Generar las solicitudes del pregrado en Ingeniería Eléctrica'},
+            {'PRE_ETRN': 'Generar las solicitudes del pregrado en Ingeniería Electrónica'},
+            {'POS_AREE': 'Generar las solicitudes de posgrados pertenecientes' +
+             ' al Área curricular de Ingeniería Eléctrica y Electrónica'},
+        ]},
+            status=HTTP_200_OK,
+            safe=False)
+    elif username == 'aciqa_fibog':
+        return JsonResponse({'allowed_to_generate': [
+            {'ALL': 'Generar todas las solicitudes estudiantiles'},
+            {'ARC_QIAM': 'Generar las solicitudes del Área Curricular de' +
+             ' Ingeniería Química y Ambiental'},
+            {'PRE_QUIM': 'Generar las solicitudes del pregrado en Ingeniería Química'},
+            {'POS_ARQA': 'Generar las solicitudes de posgrados pertenecientes' +
+             ' al Área curricular de Ingeniería Química y Ambiental'},
+        ]},
+            status=HTTP_200_OK,
+            safe=False)
+    elif username == 'acisi_fibog':
+        return JsonResponse({'allowed_to_generate': [
+            {'ALL': 'Generar todas las solicitudes estudiantiles'},
+            {'ARC_SIIN': 'Generar las solicitudes del Área Curricular de' +
+             ' Ingeniería de Sistemas e Industrial'},
+            {'PRE_SIST': 'Generar las solicitudes del pregrado en Ingeniería de Sistemas y Computación'},
+            {'PRE_INDU': 'Generar las solicitudes del pregrado en Ingeniería Industrial'},
+            {'POS_ARSI': 'Generar las solicitudes de posgrados pertenecientes' +
+             ' al Área curricular de Ingeniería de Sistemas e Industrial'},
+        ]},
+            status=HTTP_200_OK,
+            safe=False)
+    else:
+        return JsonResponse({'error': 'username without choices'},
+                            status=HTTP_400_BAD_REQUEST,
+                            safe=False)
+
+
+@csrf_exempt
+@api_view(["GET"])
+@permission_classes((AllowAny,))
+def generate_spec(_):
+    return JsonResponse({'': ''})

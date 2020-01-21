@@ -23,6 +23,8 @@ urlpatterns = [
     path('generate_pre', views.docx_gen_pre_by_date, name='docx_gen'),
     path('generate_pre_arr', views.docx_gen_pre_with_array, name='docx_gen_pre_arr'),
     path('insert_many', views.insert_many, name='insert_many'),
-    path('edit_many', views.edit_many, name='edit_many')
+    path('edit_many', views.edit_many, name='edit_many'),
+    path('allow_generate', views.allow_generate, name='allow_generate'),
+    path('generate_spec', views.generate_spec, name='generate_spec')
 
 ] + static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)
