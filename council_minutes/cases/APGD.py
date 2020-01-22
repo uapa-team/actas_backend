@@ -46,7 +46,8 @@ class APGD(Request):
     )
 
     grade_option = StringField(
-        required=True, display='Tipo de tesis/trabajo final', choices=GO_CHOICES)
+        required=True, display='Tipo de tesis/trabajo final',
+        choices=GO_CHOICES, default=GO_TESIS_MAESTRIA)
     enrolled_proyect = BooleanField(
         required=True, default=False, display='¿Tiene inscrita la asignatura ' +
         '(proyecto de tesis)/(propuesta de trabajo final de maestría)?')
@@ -57,11 +58,11 @@ class APGD(Request):
     cd_delivered = BooleanField(
         required=True, default=False, display='¿Entregó CD?')
     general_objetive = StringField(
-        required=True, display='Objetivo general')
+        required=True, display='Objetivo general', default='')
     specific_objetives = ListField(
         display='Objetivos específicos')
     title = StringField(
-        required=True, display='Título de la tesis/trabajo final')
+        required=True, display='Título de la tesis/trabajo final', default='')
     ownership_ig = StringField(
         required=True, choices=IG_CHOICES, default=IG_UNDEFINED,
         display='¿El proyecto hace parte de un grupo de investigación?')
@@ -69,13 +70,13 @@ class APGD(Request):
         display='Director de tesis/trabajo final', default='', required=True)
     advisor_inst = StringField(
         display='Departamento de adscripción del director',
-        required=True, choices=Request.DP_CHOICES)
+        required=True, choices=Request.DP_CHOICES, default=Request.DP_EMPTY)
     advisor_ext = StringField(
         display='Institución externa', default='')
     co_advisor_list = EmbeddedDocumentListField(
         Coadvisor, display='Codirector(es)')
     grade_proyect = StringField(required=True, display='Calificación de la propuesta/proyecto',
-                                choices=CP_CHOICES)
+                                choices=CP_CHOICES, DEFAULT=CP_APROBADA)
 
     regulation_list = ['040|2017|CFA', '056|2012|CSU']  # List of regulations
 
