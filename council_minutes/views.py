@@ -63,7 +63,7 @@ def info_cases(request):
 @api_view(["GET", "PATCH", "POST"])
 def case(request):
     if request.method == 'GET':
-        responses = Request.get_cases_by_query(request.GET.dict())
+        responses = Request.get_cases_by_query(querydict_to_dict(request.GET))
         return JsonResponse(responses, safe=False, encoder=QuerySetEncoder)
     if request.method == 'POST':
         body = json.loads(request.body)
@@ -114,163 +114,27 @@ def case(request):
                             encoder=QuerySetEncoder, safe=False)
 
 
-@api_view(["GET"])
-def get_docx_genid(request):
-    caseid = request.GET.get('caseid')
-    pre = request.GET.get('pre') == 'true'
-    generator = UnifiedWritter()
-    try:
-        generator.generate_case_example_by_id(caseid, pre)
-    except KeyError:
-        return HttpResponse('Not found :c', status=404)
-    return HttpResponse(generator.filename)
+def querydict_to_dict(query_dict):
+    data = {}
+    for key in query_dict.keys():
+        v = query_dict.getlist(key)
+        if len(v) == 1:
+            v = v[0]
+        data[key] = v
+    return data
 
 
 @api_view(["GET"])
-def get_docx_gencode(request, bycode):
-    caseid = request.GET.get('caseid')
-    pre = request.GET.get('pre') == 'true'
-    if bycode == '':
-        raise NotImplementedError
-    elif bycode == '':
-        raise NotImplementedError
-    else:
-        raise NotImplementedError
+def get_docx_genquerie(request):
 
     generator = UnifiedWritter()
-    try:
-        generator.generate_case_example_by_id(caseid, pre)
-    except KeyError:
-        return HttpResponse('Not found :c', status=404)
-    return HttpResponse(generator.filename)
-
-
-@api_view(["GET", "POST"])
-def docx_gen_by_date(request):
-    try:
-        body = json.loads(request.body)
-        start_date = body['cm']['start_date']
-        end_date = body['cm']['end_date']
-    except json.decoder.JSONDecodeError:
-        return HttpResponse("Bad Request", status=400)
-    filename = 'public/acta' + \
-        start_date.split(':')[0] + '_' + end_date.split(':')[0] + '.docx'
-    generator = CouncilMinuteGenerator()
-    try:
-        generator.add_cases_from_date(start_date, end_date)
-    except IndexError:
-        return HttpResponse('No cases in date range specified', status=401)
-    generator.generate(filename)
-    return HttpResponse(filename)
-
-
-@api_view(["GET", "POST"])
-def docx_gen_by_number(request):
-    try:
-        body = json.loads(request.body)
-        consecutive_minute = body['consecutive_minute']
-        year = body['year']
-    except json.decoder.JSONDecodeError:
-        return HttpResponse("Bad Request", status=400)
-    filename = 'public/acta' + \
-        year + '_' + consecutive_minute + '.docx'
-    generator = CouncilMinuteGenerator()
-    try:
-        generator.add_case_from_year_and_council_number(
-            consecutive_minute, year)
-    except IndexError:
-        return HttpResponse('No cases with specified number and year', status=401)
-    generator.generate(filename)
-    return HttpResponse(filename)
-
-
-@api_view(["GET", "POST"])
-def docx_gen_pre_by_number(request):
-    try:
-        body = json.loads(request.body)
-        consecutive_minute = body['consecutive_minute']
-        year = body['year']
-    except json.decoder.JSONDecodeError:
-        return HttpResponse("Bad Request", status=400)
-    filename = 'public/preacta' + \
-        year + '_' + consecutive_minute + '.docx'
-    generator = PreCouncilMinuteGenerator()
-    try:
-        generator.add_case_from_year_and_council_number(
-            consecutive_minute, year)
-    except IndexError:
-        return HttpResponse('No cases with specified number and year', status=401)
-    generator.generate(filename)
-    return HttpResponse(filename)
-
-
-@api_view(["GET", "POST"])
-def docx_gen_with_array(request):
-    try:
-        body = json.loads(request.body)
-        array = body['array']
-    except json.decoder.JSONDecodeError:
-        return HttpResponse("Bad Request", status=400)
-    filename = 'public/acta' + \
-        str(datetime.date.today()) + '.docx'
-    generator = CouncilMinuteGenerator()
-    try:
-        generator.add_cases_from_array(array)
-    except IndexError:
-        return HttpResponse('Empty list', status=400)
-    generator.generate(filename)
-    return HttpResponse(filename)
-
-
-@api_view(["GET", "POST"])
-def docx_gen_pre_by_id(request, cm_id):
-    filename = 'public/preacta' + cm_id + '.docx'
-    try:
-        # pylint: disable=no-member
-        request_by_id = Request.objects.get(id=cm_id)
-    except mongoengine.DoesNotExist:
-        return HttpResponse('Does not exist', status=404)
-    generator = PreCouncilMinuteGenerator()
-    generator.add_case_from_request(request_by_id)
-    generator.generate(filename)
-    return HttpResponse(filename)
-
-
-@api_view(["GET", "POST"])
-def docx_gen_pre_by_date(request):
-    try:
-        body = json.loads(request.body)
-        start_date = body['cm']['start_date']
-        end_date = body['cm']['end_date']
-    except json.decoder.JSONDecodeError:
-        return HttpResponse("Bad Request", status=400)
-    filename = 'public/preacta' + \
-        start_date.split(':')[0] + '_' + end_date.split(':')[0] + '.docx'
-    generator = PreCouncilMinuteGenerator()
-    try:
-        generator.add_cases_from_date(start_date, end_date)
-    except IndexError:
-        return HttpResponse('No cases in date range specified', status=401)
-    generator.generate(filename)
-    return HttpResponse(filename)
-
-
-@api_view(["POST"])
-def docx_gen_pre_with_array(request):
-    try:
-        body = json.loads(request.body)
-        array = body['array']
-    except json.decoder.JSONDecodeError:
-        return HttpResponse("Bad Request", status=400)
-    filename = 'public/preacta' + \
-        str(datetime.date.today()) + '.docx'
-    generator = PreCouncilMinuteGenerator()
-    try:
-        generator.add_cases_from_array(array)
-    except IndexError:
-        return HttpResponse('Empty list', status=400)
-    generator.generate(filename)
-    return HttpResponse(filename)
+    generator.filename = 'public/' + \
+        str(request.user) + str(datetime.date.today()) + '.docx'
+    query_dict = querydict_to_dict(request.GET)
+    precm = query_dict['pre'] == 'true'
+    del query_dict['pre']
+    generator.generate_document_by_querie(query_dict, precm)
+    return JsonResponse({'url': generator.filename}, status=HTTP_200_OK)
 
 
 @api_view(["GET"])
@@ -339,9 +203,3 @@ def allow_generate(request):
         return JsonResponse({'error': 'username without choices'},
                             status=HTTP_400_BAD_REQUEST,
                             safe=False)
-
-
-@api_view(["GET"])
-@permission_classes((AllowAny,))
-def generate_spec(_):
-    return JsonResponse({'': ''})

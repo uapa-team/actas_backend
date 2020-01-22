@@ -159,6 +159,8 @@ class Request(DynamicDocument):
     AS_SE_INHIBE = 'SI'
     AS_CONSEJO_RECOMIENDA = 'FR'
     AS_CONSEJO_NO_RECOMIENDA = 'FN'
+    AS_ANULADA = 'AN'
+    AS_RENUNCIA = 'RN'
     AS_CHOICES = (
         (AS_APLAZA, 'Aplaza'),
         (AS_APRUEBA, 'Aprueba'),
@@ -168,6 +170,8 @@ class Request(DynamicDocument):
         (AS_SE_INHIBE, 'Se Inhibe'),
         (AS_CONSEJO_RECOMIENDA, 'Consejo Recomienda'),
         (AS_CONSEJO_NO_RECOMIENDA, 'Consejo No Recomienda'),
+        (AS_ANULADA, 'Anular'),
+        (AS_RENUNCIA, 'Desistir'),
     )
     # ARCR Advisor Response - Committee Recommends
     ARCR_APROBAR = 'CAP'
@@ -505,7 +509,17 @@ class Request(DynamicDocument):
             raise ValueError(e.message)
 
     def get_cases_by_query(query):
-        return Request.objects(**query).filter()  # Here quit apprubal statuss
+        # Here quit apprubal statuss
+        return Request.objects(**query).filter(approval_status__nin=[Request.AS_ANULADA, Request.AS_RENUNCIA])
+
+    def get_cases_final_approval_status(query):
+        return Request.objects(**query).filter(
+            approval_status__in=[
+                Request.AS_APRUEBA,
+                Request.AS_NO_APRUEBA,
+                Request.AS_CONSEJO_RECOMIENDA,
+                Request.AS_CONSEJO_NO_RECOMIENDA],
+            approval_status__nin=[Request.AS_ANULADA, Request.AS_RENUNCIA])
 
     def get_case_by_id(caseid):
         try:

@@ -23,7 +23,8 @@ class UnifiedWritter():
         self.case_count = 0
 
     def generate_case_example_by_id(self, caseid, pre):
-        case = self.__get_case_by_id(caseid)
+        case = Request.get_case_by_id(caseid)
+        print(case)
         if case is None:
             raise KeyError
         if pre:
@@ -34,14 +35,82 @@ class UnifiedWritter():
             self.__write_case_cm(case)
         self.__generate()
 
+    def generate_document_by_querie(self, query, precm):
+        cases = Request.get_cases_final_approval_status(query).order_by(
+            'academic_program', '_cls')
+        casespre = [
+            case for case in cases if case.is_pre()]
+        casespos = [
+            case for case in cases if not case.is_pre()]
+        self.__write_case_collection(casespre, True, precm)
+        self.__write_case_collection(casespos, False, precm)
+        self.__generate()
+
     def __write_case_cm(self, case):
         case.cm(self.document)
 
     def __write_case_pcm(self, case):
         case.pcm(self.document)
 
-    def __get_case_by_id(self, caseid):
-        return Request.objects.get(id=caseid)
+    def __write_document_header(self, precm):
+        run = self.document.add_paragraph(style='Heading 1').add_run(
+            '{}. ASUNTOS ESTUDIANTILES DE {}'.format(
+                9 if precm else 10,
+                'PREGRADO' if precm else 'POSGRADO'))
+        run.font.bold = True
+        run.font.size = Pt(12)
+
+    def __write_case_type_header(self, case_type_name):
+        run = self.document.add_paragraph(
+            style='Heading 2').add_run(case_type_name.upper())
+        run.font.bold = True
+        run.font.size = Pt(12)
+
+    def __write_academic_program_header(self, academic_program):
+        run = self.document.add_paragraph(
+            style='Heading 2').add_run(academic_program)
+        run.font.bold = True
+        run.font.size = Pt(12)
+
+    def __write_case_collection(self, cases, pre, cm):
+        list_level_1 = 9 if pre else 10
+        list_level_2 = 0
+        list_level_3 = 0
+        actual_case = 'dummy'
+        actual_academic_program = 'dummy'
+        for request in cases:
+            if actual_academic_program != request.academic_program:
+                list_level_2 = list_level_2 + 1
+                actual_academic_program = request.academic_program
+                self.__write_academic_program_header(
+                    '{}.{} {}'.format(
+                        list_level_1,
+                        list_level_2,
+                        request.get_academic_program_display().upper()))
+                list_level_3 = 0
+            if actual_case != request.full_name:
+                actual_case = request.full_name
+                self.__write_case_type_header(request.full_name)
+            para = self.document.add_paragraph(style='Heading 3')
+            list_level_3 = list_level_3 + 1
+            run = para.add_run('{}.{}.{} {}\tDNI. {}'.format(
+                list_level_1, list_level_2, list_level_3, request.student_name,
+                request.student_dni))
+            run.font.bold = True
+            run.font.size = Pt(12)
+            try:
+                request.cm(self.document)
+            except NotImplementedError:
+                self.document.add_paragraph()
+                self.document.add_paragraph(
+                    'Not Implemented case {}'.format(request.full_name))
+                self.document.add_paragraph()
+            except Exception as err:  # pylint: disable=broad-except
+                self.document.add_paragraph()
+                self.document.add_paragraph(
+                    'Error en el acta {}'.format(request.id))
+                self.document.add_paragraph('Trace: {}'.format(err))
+                self.document.add_paragraph()
 
     def add_case_from_request(self, request):
         request.cm(self.document)
@@ -77,7 +146,6 @@ class UnifiedWritter():
         case_list = Request.objects.filter(id__in=array)
         request_from_array_ordered = case_list.order_by(
             'academic_program', '_cls')
-
         requests_pre = [
             request for request in request_from_array_ordered if request.is_pre()]
         requests_pos = [
@@ -100,55 +168,6 @@ class UnifiedWritter():
             request for request in request_by_date_ordered if not request.is_pre()]
         self.__add_cases_from_date_pre_pos(requests_pre, 'PREGRADO')
         self.__add_cases_from_date_pre_pos(requests_pos, 'POSGRADO')
-
-    def __add_cases_from_date_pre_pos(self, requests, pre_pos):
-        actual_academic_program = requests[0].academic_program
-        para = self.document.add_paragraph(style='Heading 1')
-        list_level_1 = 9 if pre_pos == 'PREGRADO' else 10
-        list_level_2 = 0
-        list_level_3 = 0
-        run = para.add_run(
-            '{}. ASUNTOS ESTUDIANTILES DE {}'.format(list_level_1, pre_pos))
-        run.font.bold = True
-        run.font.size = Pt(12)
-        actual_academic_program = 'dummy'
-        actual_case = 'dummy'
-        for request in requests:
-            if actual_academic_program != request.academic_program:
-                list_level_2 = list_level_2 + 1
-                actual_academic_program = request.academic_program
-                para = self.document.add_paragraph(style='Heading 2')
-                run = para.add_run('{}.{} {}'.format(
-                    list_level_1, list_level_2, request.get_academic_program_display().upper()))
-                run.font.bold = True
-                run.font.size = Pt(12)
-                list_level_3 = 0
-            if actual_case != request.full_name:
-                actual_case = request.full_name
-                para = self.document.add_paragraph(style='Heading 2')
-                run = para.add_run(request.full_name.upper())
-                run.font.bold = True
-                run.font.size = Pt(12)
-            para = self.document.add_paragraph(style='Heading 3')
-            list_level_3 = list_level_3 + 1
-            run = para.add_run('{}.{}.{} {}\tDNI. {}'.format(
-                list_level_1, list_level_2, list_level_3, request.student_name,
-                request.student_dni))
-            run.font.bold = True
-            run.font.size = Pt(12)
-            try:
-                request.cm(self.document)
-            except NotImplementedError:
-                self.document.add_paragraph()
-                self.document.add_paragraph(
-                    'Not Implemented case {}'.format(request.full_name))
-                self.document.add_paragraph()
-            except Exception as err:  # pylint: disable=broad-except
-                self.document.add_paragraph()
-                self.document.add_paragraph(
-                    'Error en el acta {}'.format(request.id))
-                self.document.add_paragraph('Trace: {}'.format(err))
-                self.document.add_paragraph()
 
     def __generate(self):
         self.document.save(self.filename)
