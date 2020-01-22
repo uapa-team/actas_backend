@@ -80,7 +80,7 @@ def filter_request(request):
         # Generic Query for Request modelstart_date.split(':')[0] + '_' + end_date.split(':')[0]
         # To make a request check http://docs.mongoengine.org/guide/querying.html#query-operators
         params = json.loads(request.body)
-        params['approval_status_nin'] = [Request.AS_ANULADA, Request.AS_RENUNCIA]
+        params['approval_status__nin'] = [Request.AS_ANULADA, Request.AS_RENUNCIA]
         # pylint: disable=no-member
         responses = Request.objects.filter(
             **params).order_by('-date')
