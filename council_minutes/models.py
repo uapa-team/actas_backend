@@ -158,6 +158,8 @@ class Request(DynamicDocument):
     AS_SE_INHIBE = 'SI'
     AS_CONSEJO_RECOMIENDA = 'FR'
     AS_CONSEJO_NO_RECOMIENDA = 'FN'
+    AS_ANULADA = 'AN'
+    AS_RENUNCIA = 'RN'
     AS_CHOICES = (
         (AS_APLAZA, 'Aplaza'),
         (AS_APRUEBA, 'Aprueba'),
@@ -167,6 +169,8 @@ class Request(DynamicDocument):
         (AS_SE_INHIBE, 'Se Inhibe'),
         (AS_CONSEJO_RECOMIENDA, 'Consejo Recomienda'),
         (AS_CONSEJO_NO_RECOMIENDA, 'Consejo No Recomienda'),
+        (AS_ANULADA, 'Anular'),
+        (AS_RENUNCIA, 'Desistir'),
     )
     # ARCR Advisor Response - Committee Recommends
     ARCR_APROBAR = 'CAP'
