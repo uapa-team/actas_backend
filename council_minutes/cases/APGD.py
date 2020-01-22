@@ -59,7 +59,7 @@ class APGD(Request):
     general_objetive = StringField(
         required=True, display='Objetivo general')
     specific_objetives = ListField(
-        display='Objetivos específicos', default=[], required=True)
+        display='Objetivos específicos')
     title = StringField(
         required=True, display='Título de la tesis/trabajo final')
     ownership_ig = StringField(
