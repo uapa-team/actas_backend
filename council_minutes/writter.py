@@ -12,7 +12,7 @@ class UnifiedWritter():
 
     def __init__(self):
         self.document = Document()
-        self.filename = ''
+        self.filename = 'public/'
         for style in self.document.styles:
             try:
                 self.document.styles[style.name].font.name = 'Ancizar Sans'
@@ -24,14 +24,13 @@ class UnifiedWritter():
 
     def generate_case_example_by_id(self, caseid, pre):
         case = self.__get_case_by_id(caseid)
-        self.filename = caseid + '.docx'
         if case is None:
             raise KeyError
         if pre:
-            self.filename = 'pcm' + self.filename
+            self.filename += 'pcm' + caseid + '.docx'
             self.__write_case_pcm(case)
         else:
-            self.filename = 'cm' + self.filename
+            self.filename += 'cm' + caseid + '.docx'
             self.__write_case_cm(case)
         self.__generate()
 
@@ -152,4 +151,4 @@ class UnifiedWritter():
                 self.document.add_paragraph()
 
     def __generate(self):
-        self.document.save('public/'+self.filename)
+        self.document.save(self.filename)
