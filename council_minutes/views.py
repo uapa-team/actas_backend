@@ -4,8 +4,7 @@ from django.contrib.auth.models import User
 from django_auth_ldap.backend import LDAPBackend
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny  # pylint: disable=wildcard-import,unused-wildcard-import
-from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 from rest_framework.status import *
 from django.http import JsonResponse
 from .models import Request, get_fields
@@ -17,7 +16,7 @@ from .cases import *  # pylint: disable=wildcard-import,unused-wildcard-import
 @api_view(["GET"])
 @permission_classes((AllowAny,))
 def check(request):
-    return Response({"Ok?": "Ok!"}, status=HTTP_200_OK)
+    return JsonResponse({"Ok?": "Ok!"}, status=HTTP_200_OK)
 
 
 @api_view(["POST"])
@@ -27,75 +26,92 @@ def login(request):
     username = body['username']
     password = body['password']
     if username is None or password is None:
-        return Response({'error': 'Contraseña o usuario vacío o nulo.'},
-                        status=HTTP_400_BAD_REQUEST)
+        return JsonResponse({'error': 'Contraseña o usuario vacío o nulo.'},
+                            status=HTTP_400_BAD_REQUEST)
     try:
         user = User.objects.get(username=username)
     except User.DoesNotExist:
-        return Response({'error': 'Error en ActasDB, usuario sin permisos en la aplicación.'},
-                        status=HTTP_403_FORBIDDEN)
+        return JsonResponse({'error': 'Error en ActasDB, usuario sin permisos en la aplicación.'},
+                            status=HTTP_403_FORBIDDEN)
     user = LDAPBackend().authenticate(request, username=username, password=password)
     if not user:
-        return Response({'error': 'Error en LDAP, contraseña o usuario no válido.'},
-                        status=HTTP_404_NOT_FOUND)
+        return JsonResponse({'error': 'Error en LDAP, contraseña o usuario no válido.'},
+                            status=HTTP_404_NOT_FOUND)
     token, _ = Token.objects.get_or_create(user=user)
-    return Response({'token': token.key},
-                    status=HTTP_200_OK)
+    return JsonResponse({'token': token.key},
+                        status=HTTP_200_OK)
 
 
 @api_view(["GET"])
 @permission_classes((AllowAny,))
 def programs_defined(_):
-    return Response(Request.get_programs(), status=HTTP_200_OK)
+    return JsonResponse(Request.get_programs(), status=HTTP_200_OK)
 
 
 @api_view(["GET"])
-def cases_defined(request):
-    return Response(Request.get_cases(), status=HTTP_200_OK)
-
-
-@api_view(["POST"])
-def insert_request(request):
-    body = json.loads(request.body)
-    body['user'] = str(request.user)
-    shell = json.dumps({'_cls': 'Request'})
-    subs = [c.__name__ for c in Request.get_subclasses()]
-    try:
-        case = Request.get_subclasses()[subs.index(body['_cls'])]
-    except ValueError as e:
-        return Response('ValueError _cls {} Not Found'.format(body['_cls']), status=HTTP_404_NOT_FOUND)
-    shell = json.dumps({'_cls': case.get_entire_name()})
-    new_request = case().from_json(
-        case.translate(shell))
-    new_request.user = body['user']
-    try:
-        response = new_request.save()
-        response._cls = case.get_entire_name()
-        response.save()
-        return Response({'id': str(response.id)}, status=HTTP_200_OK)
-    except ValidationError as e:
-        return Response(e.message, status=HTTP_400_BAD_REQUEST)
-
-
-@api_view(["GET"])
-def info_cases(request, case_id):
-    if request.method == 'GET':
+def info_cases(request):
+    print(request.GET.get('cls'))
+    if request.GET.get('cls') == '' or request.GET.get('cls') is None:
+        return JsonResponse(Request.get_cases(), status=HTTP_200_OK)
+    else:
         for type_case in Request.get_subclasses():
-            if type_case.__name__ == case_id:
-                return Response(get_fields(type_case()))
-        return Response({'response': 'Not found'}, status=HTTP_404_NOT_FOUND)
+            if type_case.__name__ == request.GET.get('cls'):
+                return JsonResponse(get_fields(type_case()))
+        return JsonResponse({'response': 'Not found'}, status=HTTP_404_NOT_FOUND)
 
 
-@api_view(["POST"])
-def filter_request(request):
-    if request.method == 'POST':
-        # Generic Query for Request modelstart_date.split(':')[0] + '_' + end_date.split(':')[0]
-        # To make a request check http://docs.mongoengine.org/guide/querying.html#query-operators
-        params = json.loads(request.body)
-        # pylint: disable=no-member
-        responses = Request.objects.filter(
-            **params).order_by('-date')
+@api_view(["GET", "PATCH", "POST"])
+def case(request):
+    if request.method == 'GET':
+        responses = Request.get_cases_by_query(request.GET.dict())
         return JsonResponse(responses, safe=False, encoder=QuerySetEncoder)
+    if request.method == 'POST':
+        body = json.loads(request.body)
+        subs = [c.__name__ for c in Request.get_subclasses()]
+        errors = []
+        inserted_items = []
+        for item_request in body['items']:
+            item_request['user'] = str(request.user)
+            case = Request.get_subclasses()[subs.index(item_request['_cls'])]
+            item_request['_cls'] = case.get_entire_name()
+            new_request = case().from_json(case.translate(json.dumps(item_request)))
+            try:
+                inserted_items += [new_request.save()]
+            except ValidationError as e:
+                errors += [e.message]
+        return JsonResponse({'inserted_items': inserted_items, 'errors': errors},
+                            status=HTTP_200_OK, encoder=QuerySetEncoder, safe=False)
+    if request.method == 'PATCH':
+        body = json.loads(request.body)
+        subs = [c.__name__ for c in Request.get_subclasses()]
+        errors = []
+        edited_items = []
+        not_found = []
+        for item_request in body['items']:
+            try:
+                Request.get_case_by_id(item_request['_id'])
+            except ValueError:
+                not_found += [item_request['_id']]
+                continue
+            except KeyError:
+                not_found += [item_request['_id']]
+                continue
+            item_request['user'] = request.user
+            item_request['_id'] = item_request['_id']
+            case = Request.get_subclasses()[subs.index(item_request['_cls'])]
+            item_request['_cls'] = case.get_entire_name()
+            new_request = case().from_json(case.translate(
+                json.dumps(item_request)), True)
+            try:
+                new_request.save()
+            except ValidationError as e:
+                errors += [e.message]
+            else:
+                edited_items += [new_request]
+        return JsonResponse({'edited_items': edited_items,
+                             'errors': errors, 'not_found': not_found},
+                            status=HTTP_400_BAD_REQUEST if edited_items == [] else HTTP_200_OK,
+                            encoder=QuerySetEncoder, safe=False)
 
 
 @api_view(["GET"])
@@ -127,25 +143,6 @@ def get_docx_gencode(request, bycode):
     except KeyError:
         return HttpResponse('Not found :c', status=404)
     return HttpResponse(generator.filename)
-
-
-@api_view(["PATCH"])
-def update_cm(request, cm_id):
-    if request.method == 'PATCH':
-        # pylint: disable=no-member,protected-access
-        try:
-            case = Request.objects.get(id=cm_id)
-        except mongoengine.DoesNotExist:
-            return HttpResponse('Does not exist', status=404)
-        body = json.loads(request.body)
-        body['_id'] = cm_id
-        case = case.__class__
-        _cls = body['_cls'] = case.__name__
-        obj = case.from_json(case.translate(
-            json.dumps(body)), True)
-        obj._cls = case.get_entire_name()
-        obj.save()
-        return JsonResponse(obj, safe=False, encoder=QuerySetEncoder)
 
 
 @api_view(["GET", "POST"])
@@ -274,60 +271,6 @@ def docx_gen_pre_with_array(request):
         return HttpResponse('Empty list', status=400)
     generator.generate(filename)
     return HttpResponse(filename)
-
-
-@api_view(["POST"])
-def insert_many(request):
-    body = json.loads(request.body)
-    subs = [c.__name__ for c in Request.get_subclasses()]
-    errors = []
-    inserted_items = []
-    for item_request in body['items']:
-        item_request['user'] = body['user']
-        case = Request.get_subclasses()[subs.index(item_request['_cls'])]
-        item_request['_cls'] = case.get_entire_name()
-        new_request = case().from_json(case.translate(json.dumps(item_request)))
-        try:
-            inserted_items += [new_request.save()]
-        except ValidationError as e:
-            errors += [e.message]
-    return JsonResponse({'inserted_items': inserted_items, 'errors': errors},
-                        status=HTTP_200_OK, encoder=QuerySetEncoder, safe=False)
-
-
-@api_view(["PATCH"])
-def edit_many(request):
-    # pylint: disable=no-member
-    body = json.loads(request.body)
-    subs = [c.__name__ for c in Request.get_subclasses()]
-    errors = []
-    edited_items = []
-    not_found = []
-    for item_request in body['items']:
-        try:
-            Request.objects.get(id=item_request['_id'])
-        except mongoengine.DoesNotExist:
-            not_found += [item_request['_id']]
-            continue
-        except mongoengine.ValidationError:
-            not_found += [item_request['_id']]
-            continue
-        item_request['user'] = body['user']
-        item_request['_id'] = item_request['_id']
-        case = Request.get_subclasses()[subs.index(item_request['_cls'])]
-        item_request['_cls'] = case.get_entire_name()
-        new_request = case().from_json(case.translate(
-            json.dumps(item_request)), True)
-        try:
-            new_request.save()
-        except ValidationError as e:
-            errors += [e.message]
-        else:
-            edited_items += [new_request]
-    return JsonResponse({'edited_items': edited_items,
-                         'errors': errors, 'id(s)_not_found': not_found},
-                        status=HTTP_400_BAD_REQUEST if edited_items == [] else HTTP_200_OK,
-                        encoder=QuerySetEncoder, safe=False)
 
 
 @api_view(["GET"])

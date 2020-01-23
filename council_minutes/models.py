@@ -1,8 +1,9 @@
 import datetime
 import json
-from mongoengine.fields import BaseField
 from mongoengine import DynamicDocument, EmbeddedDocument, DateField, StringField
 from mongoengine import ListField, IntField, EmbeddedDocumentField, EmbeddedDocumentListField
+from mongoengine.errors import ValidationError, DoesNotExist
+from mongoengine.fields import BaseField
 
 
 def get_fields(obj):
@@ -497,14 +498,29 @@ class Request(DynamicDocument):
                                          self.PI_INDUSTRIAL, self.PI_ELECTRICA, self.PI_MECATRONICA,
                                          self.PI_MECATRONICA, self.PI_ELECTRONICA, self.PI_QUIMICA)
 
-    @classmethod
-    def get_programs(_):
+    def safe_save(self):
+        try:
+            self.save()
+        except ValidationError as e:
+            raise ValueError(e.message)
+
+    def get_cases_by_query(query):
+        return Request.objects(**query).filter()  # Here quit apprubal statuss
+
+    def get_case_by_id(caseid):
+        try:
+            return Request.objects.get(id=caseid)
+        except ValidationError as e:
+            raise ValueError(e.message)
+        except DoesNotExist as e:
+            raise KeyError('ID {} does not exist')
+
+    def get_programs():
         return {
             'programs': sorted([plan[1] for plan in Request.PLAN_CHOICES])
         }
 
-    @classmethod
-    def get_cases(_):
+    def get_cases():
         return {
             'cases': [
                 {'code': type_case.__name__, 'name': type_case.full_name}
