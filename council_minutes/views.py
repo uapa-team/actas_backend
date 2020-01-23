@@ -416,3 +416,21 @@ def allow_generate(request):
 @permission_classes((AllowAny,))
 def generate_spec(_):
     return JsonResponse({'': ''})
+
+
+@csrf_exempt
+@api_view(["PATCH"])
+def change_case_type(request):
+    # pylint: disable=no-member
+    id_request = json.loads(request.body)['id']
+    new_type = json.loads(request.body)['new_case']
+    try:
+        this_request = Request.objects.get(id=id_request)
+        new_request =
+        print('a')
+    except mongoengine.DoesNotExist:
+        return JsonResponse({'error': 'id not found'})
+    except mongoengine.ValidationError:
+        return JsonResponse({'error': 'id not found'})
+
+    return JsonResponse({'': ''})
