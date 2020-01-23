@@ -18,8 +18,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Request, get_fields
 from .helpers import QuerySetEncoder
-from .docx import CouncilMinuteGenerator
-from .docx import PreCouncilMinuteGenerator
+from .docx import UnifiedWritter
 from .cases import *  # pylint: disable=wildcard-import,unused-wildcard-import
 
 
@@ -107,19 +106,17 @@ def insert_request(request):
         return HttpResponse(e.message, status=400)
 
 
-@api_view(["GET", "POST"])
+@api_view(["GET"])
 @csrf_exempt
-def docx_gen_by_id(request, cm_id):
-    # pylint: disable=no-member
-    filename = 'public/acta' + cm_id + '.docx'
+def get_docx_gen_by_id(request):
+    caseid = request.GET.get('caseid')
+    pre = request.GET.get('pre') == 'true'
+    generator = UnifiedWritter()
     try:
-        request_by_id = Request.objects.get(id=cm_id)
-    except mongoengine.DoesNotExist:
-        return HttpResponse('Does not exist', status=404)
-    generator = CouncilMinuteGenerator()
-    generator.add_case_from_request(request_by_id)
-    generator.generate(filename)
-    return HttpResponse(filename)
+        generator.generate_case_example_by_id(caseid, pre)
+    except KeyError:
+        return HttpResponse('Not found :c', status=404)
+    return HttpResponse(generator.filename)
 
 
 @api_view(["PATCH"])
