@@ -18,7 +18,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Request, get_fields
 from .helpers import QuerySetEncoder
-from .docx import UnifiedWritter
+from .writter import UnifiedWritter
 from .cases import *  # pylint: disable=wildcard-import,unused-wildcard-import
 
 
@@ -108,9 +108,29 @@ def insert_request(request):
 
 @api_view(["GET"])
 @csrf_exempt
-def get_docx_gen_by_id(request):
+def get_docx_genid(request):
     caseid = request.GET.get('caseid')
     pre = request.GET.get('pre') == 'true'
+    generator = UnifiedWritter()
+    try:
+        generator.generate_case_example_by_id(caseid, pre)
+    except KeyError:
+        return HttpResponse('Not found :c', status=404)
+    return HttpResponse(generator.filename)
+
+
+@api_view(["GET"])
+@csrf_exempt
+def get_docx_gencode(request, bycode):
+    caseid = request.GET.get('caseid')
+    pre = request.GET.get('pre') == 'true'
+    if bycode == '':
+        raise NotImplementedError
+    elif bycode == '':
+        raise NotImplementedError
+    else:
+        raise NotImplementedError
+
     generator = UnifiedWritter()
     try:
         generator.generate_case_example_by_id(caseid, pre)
