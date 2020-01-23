@@ -1,21 +1,12 @@
 import json
 import datetime
-import mongoengine
-from mongoengine.errors import ValidationError
+from django.contrib.auth.models import User
 from django_auth_ldap.backend import LDAPBackend
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
-from rest_framework.status import (
-    HTTP_400_BAD_REQUEST,
-    HTTP_404_NOT_FOUND,
-    HTTP_403_FORBIDDEN,
-    HTTP_200_OK
-)
+from rest_framework.permissions import AllowAny  # pylint: disable=wildcard-import,unused-wildcard-import
 from rest_framework.response import Response
-from django.contrib.auth.models import User
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+from rest_framework.status import *
 from .models import Request, get_fields
 from .helpers import QuerySetEncoder
 from .writter import UnifiedWritter
@@ -362,8 +353,7 @@ def programs_defined(_):
 @api_view(["GET"])
 @permission_classes((AllowAny,))
 def allow_generate(request):
-    username = json.loads(request.body)['username']
-    if username == 'acica_fibog':
+    if request.user == 'acica_fibog':
         return JsonResponse({'allowed_to_generate': [
             {'ALL': 'Generar todas las solicitudes estudiantiles'},
             {'ARC_CIAG': 'Generar las solicitudes del Área Curricular de' +
@@ -375,7 +365,7 @@ def allow_generate(request):
         ]},
             status=HTTP_200_OK,
             safe=False)
-    elif username == 'acimm_fibog':
+    elif request.user == 'acimm_fibog':
         return JsonResponse({'allowed_to_generate': [
             {'ALL': 'Generar todas las solicitudes estudiantiles'},
             {'ARC_MEME': 'Generar las solicitudes del Área Curricular de' +
@@ -387,7 +377,7 @@ def allow_generate(request):
         ]},
             status=HTTP_200_OK,
             safe=False)
-    elif username == 'aciee_fibog':
+    elif request.user == 'aciee_fibog':
         return JsonResponse({'allowed_to_generate': [
             {'ALL': 'Generar todas las solicitudes estudiantiles'},
             {'ARC_ELEL': 'Generar las solicitudes del Área Curricular de' +
@@ -399,7 +389,7 @@ def allow_generate(request):
         ]},
             status=HTTP_200_OK,
             safe=False)
-    elif username == 'aciqa_fibog':
+    elif request.user == 'aciqa_fibog':
         return JsonResponse({'allowed_to_generate': [
             {'ALL': 'Generar todas las solicitudes estudiantiles'},
             {'ARC_QIAM': 'Generar las solicitudes del Área Curricular de' +
@@ -410,7 +400,7 @@ def allow_generate(request):
         ]},
             status=HTTP_200_OK,
             safe=False)
-    elif username == 'acisi_fibog':
+    elif request.user == 'acisi_fibog':
         return JsonResponse({'allowed_to_generate': [
             {'ALL': 'Generar todas las solicitudes estudiantiles'},
             {'ARC_SIIN': 'Generar las solicitudes del Área Curricular de' +
