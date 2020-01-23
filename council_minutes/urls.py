@@ -10,8 +10,8 @@ urlpatterns = [
 
     path('programs', views.programs_defined, name='Programs defined'),
     path('cases', views.cases_defined, name='Cases defined'),
-
     path('insert', views.insert_request, name='insert_request'),
+
     path('read', views.filter_request, name='Filter request'),
     path('cases/<case_id>', views.info_cases, name='cases_defined_attributes'),
     path('generate/byid', views.get_docx_genid, name='Docx generation by id'),

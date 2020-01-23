@@ -54,6 +54,29 @@ def cases_defined(request):
     return Response(Request.get_cases(), status=HTTP_200_OK)
 
 
+@api_view(["POST"])
+def insert_request(request):
+    body = json.loads(request.body)
+    body['user'] = str(request.user)
+    shell = json.dumps({'_cls': 'Request'})
+    subs = [c.__name__ for c in Request.get_subclasses()]
+    try:
+        case = Request.get_subclasses()[subs.index(body['_cls'])]
+    except ValueError as e:
+        return Response('ValueError _cls {} Not Found'.format(body['_cls']), status=HTTP_404_NOT_FOUND)
+    shell = json.dumps({'_cls': case.get_entire_name()})
+    new_request = case().from_json(
+        case.translate(shell))
+    new_request.user = body['user']
+    try:
+        response = new_request.save()
+        response._cls = case.get_entire_name()
+        response.save()
+        return Response({'id': str(response.id)}, status=HTTP_200_OK)
+    except ValidationError as e:
+        return Response(e.message, status=HTTP_400_BAD_REQUEST)
+
+
 @api_view(["GET"])
 def info_cases(request, case_id):
     if request.method == 'GET':
@@ -73,26 +96,6 @@ def filter_request(request):
         responses = Request.objects.filter(
             **params).order_by('-date')
         return JsonResponse(responses, safe=False, encoder=QuerySetEncoder)
-
-
-@api_view(["POST"])
-def insert_request(request):
-    body = json.loads(request.body)
-    body['user'] = str(request.user)
-    shell = json.dumps({'_cls': 'Request'})
-    subs = [c.__name__ for c in Request.get_subclasses()]
-    case = Request.get_subclasses()[subs.index(body['_cls'])]
-    shell = json.dumps({'_cls': case.get_entire_name()})
-    new_request = case().from_json(
-        case.translate(shell))
-    new_request.user = body['user']
-    try:
-        response = new_request.save()
-        response._cls = case.get_entire_name()
-        response.save()
-        return JsonResponse({'id': str(response.id)}, safe=False)
-    except ValidationError as e:
-        return HttpResponse(e.message, status=400)
 
 
 @api_view(["GET"])
