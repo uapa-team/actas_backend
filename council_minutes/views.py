@@ -16,7 +16,7 @@ from .cases import *  # pylint: disable=wildcard-import,unused-wildcard-import
 @api_view(["GET"])
 @permission_classes((AllowAny,))
 def index(request):
-    return HttpResponse("Working!")
+    return Response({"Ok?": "Ok!"}, status=HTTP_200_OK)
 
 
 @api_view(["GET"])
@@ -30,7 +30,6 @@ def cases_defined(request):
         return JsonResponse(response)
 
 
-@csrf_exempt
 @api_view(["POST"])
 @permission_classes((AllowAny,))
 def login(request):
@@ -64,7 +63,6 @@ def info_cases(request, case_id):
 
 
 @api_view(["POST"])
-@csrf_exempt  # Esto va solo para evitar la verificacion de django
 def filter_request(request):
     if request.method == 'POST':
         # Generic Query for Request modelstart_date.split(':')[0] + '_' + end_date.split(':')[0]
@@ -77,7 +75,6 @@ def filter_request(request):
 
 
 @api_view(["POST"])
-@csrf_exempt  # Esto va solo para evitar la verificacion de django
 def insert_request(request):
     # pylint: disable=protected-access
     body = json.loads(request.body)
@@ -98,7 +95,6 @@ def insert_request(request):
 
 
 @api_view(["GET"])
-@csrf_exempt
 def get_docx_genid(request):
     caseid = request.GET.get('caseid')
     pre = request.GET.get('pre') == 'true'
@@ -111,7 +107,6 @@ def get_docx_genid(request):
 
 
 @api_view(["GET"])
-@csrf_exempt
 def get_docx_gencode(request, bycode):
     caseid = request.GET.get('caseid')
     pre = request.GET.get('pre') == 'true'
@@ -131,7 +126,6 @@ def get_docx_gencode(request, bycode):
 
 
 @api_view(["PATCH"])
-@csrf_exempt
 def update_cm(request, cm_id):
     if request.method == 'PATCH':
         # pylint: disable=no-member,protected-access
@@ -151,7 +145,6 @@ def update_cm(request, cm_id):
 
 
 @api_view(["GET", "POST"])
-@csrf_exempt
 def docx_gen_by_date(request):
     try:
         body = json.loads(request.body)
@@ -171,7 +164,6 @@ def docx_gen_by_date(request):
 
 
 @api_view(["GET", "POST"])
-@csrf_exempt
 def docx_gen_by_number(request):
     try:
         body = json.loads(request.body)
@@ -192,7 +184,6 @@ def docx_gen_by_number(request):
 
 
 @api_view(["GET", "POST"])
-@csrf_exempt
 def docx_gen_pre_by_number(request):
     try:
         body = json.loads(request.body)
@@ -213,7 +204,6 @@ def docx_gen_pre_by_number(request):
 
 
 @api_view(["GET", "POST"])
-@csrf_exempt
 def docx_gen_with_array(request):
     try:
         body = json.loads(request.body)
@@ -232,7 +222,6 @@ def docx_gen_with_array(request):
 
 
 @api_view(["GET", "POST"])
-@csrf_exempt
 def docx_gen_pre_by_id(request, cm_id):
     filename = 'public/preacta' + cm_id + '.docx'
     try:
@@ -247,7 +236,6 @@ def docx_gen_pre_by_id(request, cm_id):
 
 
 @api_view(["GET", "POST"])
-@csrf_exempt
 def docx_gen_pre_by_date(request):
     try:
         body = json.loads(request.body)
@@ -267,7 +255,6 @@ def docx_gen_pre_by_date(request):
 
 
 @api_view(["POST"])
-@csrf_exempt
 def docx_gen_pre_with_array(request):
     try:
         body = json.loads(request.body)
@@ -285,7 +272,6 @@ def docx_gen_pre_with_array(request):
     return HttpResponse(filename)
 
 
-@csrf_exempt
 @api_view(["POST"])
 def insert_many(request):
     body = json.loads(request.body)
@@ -305,7 +291,6 @@ def insert_many(request):
                         status=HTTP_200_OK, encoder=QuerySetEncoder, safe=False)
 
 
-@csrf_exempt
 @api_view(["PATCH"])
 def edit_many(request):
     # pylint: disable=no-member
@@ -341,7 +326,6 @@ def edit_many(request):
                         encoder=QuerySetEncoder, safe=False)
 
 
-@csrf_exempt
 @api_view(["GET"])
 @permission_classes((AllowAny,))
 def programs_defined(_):
@@ -349,7 +333,6 @@ def programs_defined(_):
     return JsonResponse({'programs': programs})
 
 
-@csrf_exempt
 @api_view(["GET"])
 @permission_classes((AllowAny,))
 def allow_generate(request):
@@ -418,7 +401,6 @@ def allow_generate(request):
                             safe=False)
 
 
-@csrf_exempt
 @api_view(["GET"])
 @permission_classes((AllowAny,))
 def generate_spec(_):
