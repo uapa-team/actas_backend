@@ -498,6 +498,20 @@ class Request(DynamicDocument):
                                          self.PI_MECATRONICA, self.PI_ELECTRONICA, self.PI_QUIMICA)
 
     @classmethod
+    def get_programs(_):
+        return {
+            'programs': sorted([plan[1] for plan in Request.PLAN_CHOICES])
+        }
+
+    @classmethod
+    def get_cases(_):
+        return {
+            'cases': [
+                {'code': type_case.__name__, 'name': type_case.full_name}
+                for type_case in Request.get_subclasses()]
+        }
+
+    @classmethod
     def translate(cls, data):
         data_json = json.loads(data)
         for key in data_json:

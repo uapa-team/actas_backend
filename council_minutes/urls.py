@@ -4,13 +4,15 @@ from django.conf.urls.static import static
 from . import views
 
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('cases', views.cases_defined, name='cases_defined'),
-    path('programs', views.programs_defined, name='programs_defined'),
+    path('', views.check, name='Checker REST API'),
 
-    path('login', views.login, name='login'),
-    path('read', views.filter_request, name='filter_request'),
+    path('login', views.login, name='Get token on REST API'),
+
+    path('programs', views.programs_defined, name='Programs defined'),
+    path('cases', views.cases_defined, name='Cases defined'),
+
     path('insert', views.insert_request, name='insert_request'),
+    path('read', views.filter_request, name='Filter request'),
     path('cases/<case_id>', views.info_cases, name='cases_defined_attributes'),
     path('generate/byid', views.get_docx_genid, name='Docx generation by id'),
     path('generate/<slug:bycode>', views.get_docx_gencode,

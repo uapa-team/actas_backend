@@ -7,6 +7,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny  # pylint: disable=wildcard-import,unused-wildcard-import
 from rest_framework.response import Response
 from rest_framework.status import *
+from django.http import JsonResponse
 from .models import Request, get_fields
 from .helpers import QuerySetEncoder
 from .writter import UnifiedWritter
@@ -15,19 +16,8 @@ from .cases import *  # pylint: disable=wildcard-import,unused-wildcard-import
 
 @api_view(["GET"])
 @permission_classes((AllowAny,))
-def index(request):
+def check(request):
     return Response({"Ok?": "Ok!"}, status=HTTP_200_OK)
-
-
-@api_view(["GET"])
-def cases_defined(request):
-    if request.method == 'GET':
-        response = {
-            'cases': [
-                {'code': type_case.__name__, 'name': type_case.full_name}
-                for type_case in Request.get_subclasses()]
-        }
-        return JsonResponse(response)
 
 
 @api_view(["POST"])
@@ -54,12 +44,23 @@ def login(request):
 
 
 @api_view(["GET"])
+@permission_classes((AllowAny,))
+def programs_defined(_):
+    return Response(Request.get_programs(), status=HTTP_200_OK)
+
+
+@api_view(["GET"])
+def cases_defined(request):
+    return Response(Request.get_cases(), status=HTTP_200_OK)
+
+
+@api_view(["GET"])
 def info_cases(request, case_id):
     if request.method == 'GET':
         for type_case in Request.get_subclasses():
             if type_case.__name__ == case_id:
-                return JsonResponse(get_fields(type_case()))
-        return JsonResponse({'response': 'Not found'}, status=404)
+                return Response(get_fields(type_case()))
+        return Response({'response': 'Not found'}, status=HTTP_404_NOT_FOUND)
 
 
 @api_view(["POST"])
@@ -76,8 +77,8 @@ def filter_request(request):
 
 @api_view(["POST"])
 def insert_request(request):
-    # pylint: disable=protected-access
     body = json.loads(request.body)
+    body['user'] = str(request.user)
     shell = json.dumps({'_cls': 'Request'})
     subs = [c.__name__ for c in Request.get_subclasses()]
     case = Request.get_subclasses()[subs.index(body['_cls'])]
@@ -324,13 +325,6 @@ def edit_many(request):
                          'errors': errors, 'id(s)_not_found': not_found},
                         status=HTTP_400_BAD_REQUEST if edited_items == [] else HTTP_200_OK,
                         encoder=QuerySetEncoder, safe=False)
-
-
-@api_view(["GET"])
-@permission_classes((AllowAny,))
-def programs_defined(_):
-    programs = sorted([plan[1] for plan in Request.PLAN_CHOICES])
-    return JsonResponse({'programs': programs})
 
 
 @api_view(["GET"])
