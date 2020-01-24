@@ -426,11 +426,19 @@ def change_case_type(request):
     new_type = json.loads(request.body)['new_case']
     try:
         this_request = Request.objects.get(id=id_request)
-        new_request =
-        print('a')
     except mongoengine.DoesNotExist:
         return JsonResponse({'error': 'id not found'})
     except mongoengine.ValidationError:
         return JsonResponse({'error': 'id not found'})
-
+    subs = [c.__name__ for c in Request.get_subclasses()]
+    case = Request.get_subclasses()[subs.index(new_type)]
+    shell = json.dumps({'_cls': case.get_entire_name()})
+    new_request = case().from_json(
+        case.translate(shell))
+    new_request.user = this_request.user
+    try:
+        response = new_request.save()
+    except ValidationError as e:
+        return HttpResponse(e.message, status=400)
+    print('a')
     return JsonResponse({'': ''})
