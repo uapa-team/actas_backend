@@ -10,7 +10,7 @@ class EMCA(Request):
     full_name = 'Exención de matrícula por consideración atípica'
 
     percentage = FloatField(min_value=0.0, max_value=100.0, required=True,
-                            display='Porcentaje de exención del valor de la matrícula')
+                            display='Porcentaje de exención del valor de la matrícula', default=0.0)
     academic_period_exe = StringField(
         max_length=10, display='Periodo de exención', default='0000-0S')
     ha_active = BooleanField(

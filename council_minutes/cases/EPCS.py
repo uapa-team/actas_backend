@@ -51,7 +51,7 @@ class EPCS(Request):
     bacheilor_program = StringField(
         choices=Request.PLAN_CHOICES, display='Programa de pregrado', default=Request.PI_AGRICOLA)
     headquarters = StringField(
-        choices=HEAD_CHOICES, display='Sede donde culminó sus estudios de pregrado', default='')
+        choices=HEAD_CHOICES, display='Sede donde culminó sus estudios de pregrado', default=HC_BOGOTA)
 
     # List of regulations
     regulation_list = ['014|2008|CAC']
