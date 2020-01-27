@@ -7,6 +7,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.status import *
 from django.http import JsonResponse
+from mongoengine.errors import ValidationError
 from .models import Request, get_fields
 from .helpers import QuerySetEncoder
 from .writter import UnifiedWritter
@@ -88,16 +89,12 @@ def case(request):
         not_found = []
         for item_request in body['items']:
             try:
-                Request.get_case_by_id(item_request['_id'])
-            except ValueError:
+                req = Request.get_case_by_id(item_request['_id'])
+            except (ValueError, KeyError):
                 not_found += [item_request['_id']]
                 continue
-            except KeyError:
-                not_found += [item_request['_id']]
-                continue
-            item_request['user'] = request.user
-            item_request['_id'] = item_request['_id']
-            case = Request.get_subclasses()[subs.index(item_request['_cls'])]
+            item_request['user'] = request.user.username
+            case = req.__class__
             item_request['_cls'] = case.get_entire_name()
             new_request = case().from_json(case.translate(
                 json.dumps(item_request)), True)
@@ -125,13 +122,16 @@ def querydict_to_dict(query_dict):
 
 @api_view(["GET"])
 def get_docx_genquerie(request):
+    query_dict = querydict_to_dict(request.GET)
+    try:
+        precm = query_dict['pre'] == 'true'
+        del query_dict['pre']
+    except KeyError:
+        return JsonResponse({'error': "'pre' Key not provided"}, status=HTTP_400_BAD_REQUEST)
 
     generator = UnifiedWritter()
     generator.filename = 'public/' + \
         str(request.user) + str(datetime.date.today()) + '.docx'
-    query_dict = querydict_to_dict(request.GET)
-    precm = query_dict['pre'] == 'true'
-    del query_dict['pre']
     generator.generate_document_by_querie(query_dict, precm)
     return JsonResponse({'url': generator.filename}, status=HTTP_200_OK)
 
@@ -148,7 +148,7 @@ def allow_generate(request):
     if username == 'acica_fibog':
         options['allowed_to_generate'].extend([
             {'ARC_CIAG': {
-                'display': 'Generar las solicitudes del Área Curricular de ngeniería Civil y Agrícola',
+                'display': 'Generar las solicitudes del Área Curricular de Ingeniería Civil y Agrícola',
                 'filter': 'academic_program__in=2541&academic_program__in=2542&academic_program__in=2886&academic_program__in=2696&academic_program__in=2699&academic_program__in=2700&academic_program__in=2701&academic_program__in=2705&academic_program__in=2706&academic_program__in=2887'}
             },
             {'PRE_CIVI': {

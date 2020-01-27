@@ -36,7 +36,7 @@ class UnifiedWritter():
         self.__generate()
 
     def generate_document_by_querie(self, query, precm):
-        cases = Request.get_cases_final_approval_status(query).order_by(
+        cases = Request.get_cases_by_query(query).order_by(
             'academic_program', '_cls')
         casespre = [
             case for case in cases if case.is_pre()]
@@ -72,7 +72,7 @@ class UnifiedWritter():
         run.font.bold = True
         run.font.size = Pt(12)
 
-    def __write_case_collection(self, cases, pre, cm):
+    def __write_case_collection(self, cases, pre, pcm):
         list_level_1 = 9 if pre else 10
         list_level_2 = 0
         list_level_3 = 0
@@ -99,7 +99,10 @@ class UnifiedWritter():
             run.font.bold = True
             run.font.size = Pt(12)
             try:
-                request.cm(self.document)
+                if pcm:
+                    request.pcm(self.document)
+                else:
+                    request.cm(self.document)
             except NotImplementedError:
                 self.document.add_paragraph()
                 self.document.add_paragraph(

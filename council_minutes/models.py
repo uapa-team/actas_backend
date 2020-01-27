@@ -512,15 +512,6 @@ class Request(DynamicDocument):
         # Here quit apprubal statuss
         return Request.objects(**query).filter(approval_status__nin=[Request.AS_ANULADA, Request.AS_RENUNCIA])
 
-    def get_cases_final_approval_status(query):
-        return Request.objects(**query).filter(
-            approval_status__in=[
-                Request.AS_APRUEBA,
-                Request.AS_NO_APRUEBA,
-                Request.AS_CONSEJO_RECOMIENDA,
-                Request.AS_CONSEJO_NO_RECOMIENDA],
-            approval_status__nin=[Request.AS_ANULADA, Request.AS_RENUNCIA])
-
     def get_case_by_id(caseid):
         try:
             return Request.objects.get(id=caseid)
