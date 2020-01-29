@@ -15,7 +15,7 @@ urlpatterns = [
     path('generate/<cm_id>', views.docx_gen_by_id, name='docx_gen'),
     path('generate_pre/<cm_id>', views.docx_gen_pre_by_id, name='docx_gen'),
     path('update/<cm_id>', views.update_cm, name='update_request'),
-    path('generate', views.docx_gen_by_date, name='docx_gen'),
+    # path('generate', views.docx_gen_by_date, name='docx_gen'),
     path('generate_council', views.docx_gen_by_number, name='docx_gen_by_number'),
     path('generate_pre_council', views.docx_gen_pre_by_number,
          name='docx_gen_pre_by_number'),
@@ -25,6 +25,8 @@ urlpatterns = [
     path('insert_many', views.insert_many, name='insert_many'),
     path('edit_many', views.edit_many, name='edit_many'),
     path('allow_generate', views.allow_generate, name='allow_generate'),
-    path('generate_spec', views.generate_spec, name='generate_spec')
+    path('generate', views.get_docx_genquerie,
+         name='Docx generation by case query'),
+
 
 ] + static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)

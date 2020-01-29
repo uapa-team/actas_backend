@@ -16,6 +16,7 @@ from rest_framework.response import Response
 from django.contrib.auth.models import User
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from .writter import UnifiedWritter
 from .models import Request, get_fields
 from .helpers import QuerySetEncoder
 from .docx import CouncilMinuteGenerator
@@ -80,7 +81,8 @@ def filter_request(request):
         # Generic Query for Request modelstart_date.split(':')[0] + '_' + end_date.split(':')[0]
         # To make a request check http://docs.mongoengine.org/guide/querying.html#query-operators
         params = json.loads(request.body)
-        params['approval_status__nin'] = [Request.AS_ANULADA, Request.AS_RENUNCIA]
+        params['approval_status__nin'] = [
+            Request.AS_ANULADA, Request.AS_RENUNCIA]
         # pylint: disable=no-member
         responses = Request.objects.filter(
             **params).order_by('-date')
@@ -342,78 +344,127 @@ def programs_defined(_):
     return JsonResponse({'programs': programs})
 
 
-@csrf_exempt
+def querydict_to_dict(query_dict):
+    data = {}
+    for key in query_dict.keys():
+        v = query_dict.getlist(key)
+        if len(v) == 1:
+            v = v[0]
+        data[key] = v
+    return data
+
+
 @api_view(["GET"])
-@permission_classes((AllowAny,))
+def get_docx_genquerie(request):
+    query_dict = querydict_to_dict(request.GET)
+    try:
+        precm = query_dict['pre'] == 'true'
+        del query_dict['pre']
+    except KeyError:
+        return JsonResponse({'error': "'pre' Key not provided"}, status=HTTP_400_BAD_REQUEST)
+
+    generator = UnifiedWritter()
+    generator.filename = 'public/' + \
+        str(request.user) + str(datetime.date.today()) + '.docx'
+    generator.generate_document_by_querie(query_dict, precm)
+    return JsonResponse({'url': generator.filename}, status=HTTP_200_OK)
+
+
+@api_view(["GET"])
 def allow_generate(request):
-    username = json.loads(request.body)['username']
+    username = request.user.username
+    username = 'acica_fibog'
+    options = {'allowed_to_generate': [
+        {'ALL': {
+            'display': 'Generar todas las solicitudes estudiantiles',
+            'filter': ''}
+         }]}
+
     if username == 'acica_fibog':
-        return JsonResponse({'allowed_to_generate': [
-            {'ALL': 'Generar todas las solicitudes estudiantiles'},
-            {'ARC_CIAG': 'Generar las solicitudes del Área Curricular de' +
-             ' Ingeniería Civil y Agrícola'},
-            {'PRE_CIVI': 'Generar las solicitudes del pregrado en Ingeniería Civil'},
-            {'PRE_AGRI': 'Generar las solicitudes del pregrado en Ingeniería Agrícola'},
-            {'POS_ARCA': 'Generar las solicitudes de posgrados pertenecientes' +
-             ' al Área curricular de Ingeniería Civil y Agrícola'},
-        ]},
-            status=HTTP_200_OK,
-            safe=False)
+        options['allowed_to_generate'].extend([
+            {'ARC_CIAG': {
+                'display': 'Generar las solicitudes del Área Curricular de Ingeniería Civil y Agrícola',
+                'filter': 'academic_program__in=2541&academic_program__in=2542&academic_program__in=2886&academic_program__in=2696&academic_program__in=2699&academic_program__in=2700&academic_program__in=2701&academic_program__in=2705&academic_program__in=2706&academic_program__in=2887'}
+             },
+            {'PRE_CIVI': {
+                'display': 'Generar las solicitudes del pregrado en Ingeniería Civil',
+                'filter': 'academic_program__eq=2542'}
+             },
+            {'PRE_AGRI': {
+                'display': 'Generar las solicitudes del pregrado en Ingeniería Agrícola',
+                'filter': 'academic_program__eq=2541'}
+             },
+            {'POS_ARCA': {
+                'display': 'Generar las solicitudes de posgrados pertenecientes al Área curricular de Ingeniería Civil y Agrícola',
+                'filter': 'academic_program__in=2886&academic_program__in=2696&academic_program__in=2699&academic_program__in=2700&academic_program__in=2701&academic_program__in=2705&academic_program__in=2706&academic_program__in=2887'}}
+        ])
     elif username == 'acimm_fibog':
-        return JsonResponse({'allowed_to_generate': [
-            {'ALL': 'Generar todas las solicitudes estudiantiles'},
-            {'ARC_MEME': 'Generar las solicitudes del Área Curricular de' +
-             ' Ingeniería Mecánica y Mecatrónica'},
-            {'PRE_MECA': 'Generar las solicitudes del pregrado en Ingeniería Mecánica'},
-            {'PRE_METR': 'Generar las solicitudes del pregrado en Ingeniería Mecatrónica'},
-            {'POS_ARMM': 'Generar las solicitudes de posgrados pertenecientes' +
-             ' al Área curricular de Ingeniería Mecánica y Mecatrónica'},
-        ]},
-            status=HTTP_200_OK,
-            safe=False)
+        options['allowed_to_generate'].extend([
+            {'ARC_MEME': {
+                'display': 'Generar las solicitudes del Área Curricular de Ingeniería Mecánica y Mecatrónica',
+                'filter': 'academic_program__in=2547&academic_program__in=2548&academic_program__in=2710&academic_program__in=2709&academic_program__in=2839&academic_program__in=2682'}
+             },
+            {'PRE_MECA': {
+                'display': 'Generar las solicitudes del pregrado en Ingeniería Mecánica',
+                'filter': 'academic_program__eq=2547'}
+             },
+            {'PRE_METR': {
+                'display': 'Generar las solicitudes del pregrado en Ingeniería Mecatrónica',
+                'filter': 'academic_program__eq=2548'}
+             },
+            {'POS_ARMM': {
+                'display': 'Generar las solicitudes de posgrados pertenecientes al Área curricular de Ingeniería Mecánica y Mecatrónica',
+                'filter': 'academic_program__in=2710&academic_program__in=2709&academic_program__in=2839&academic_program__in=2682'}}
+        ])
     elif username == 'aciee_fibog':
-        return JsonResponse({'allowed_to_generate': [
-            {'ALL': 'Generar todas las solicitudes estudiantiles'},
-            {'ARC_ELEL': 'Generar las solicitudes del Área Curricular de' +
-             ' Ingeniería Eléctrica y Electrónica'},
-            {'PRE_ELCT': 'Generar las solicitudes del pregrado en Ingeniería Eléctrica'},
-            {'PRE_ETRN': 'Generar las solicitudes del pregrado en Ingeniería Electrónica'},
-            {'POS_AREE': 'Generar las solicitudes de posgrados pertenecientes' +
-             ' al Área curricular de Ingeniería Eléctrica y Electrónica'},
-        ]},
-            status=HTTP_200_OK,
-            safe=False)
+        options['allowed_to_generate'].extend([
+            {'ARC_ELEL': {
+                'display': 'Generar las solicitudes del Área Curricular de Ingeniería Eléctrica y Electrónica',
+                'filter': 'academic_program__in=2544&academic_program__in=2545&academic_program__in=2691&academic_program__in=2698&academic_program__in=2703&academic_program__in=2865&academic_program__in=2685'}
+             },
+            {'PRE_ELCT': {
+                'display': 'Generar las solicitudes del pregrado en Ingeniería Eléctrica',
+                'filter': 'academic_program__eq=2544'}
+             },
+            {'PRE_ETRN': {
+                'display': 'Generar las solicitudes del pregrado en Ingeniería Electrónica',
+                'filter': 'academic_program__eq=2545'}
+             },
+            {'POS_AREE': {
+                'display': 'Generar las solicitudes de posgrados pertenecientes al Área curricular de Ingeniería Eléctrica y Electrónica',
+                'filter': 'academic_program__in=2691&academic_program__in=2698&academic_program__in=2703&academic_program__in=2865&academic_program__in=2685'}}
+        ])
     elif username == 'aciqa_fibog':
-        return JsonResponse({'allowed_to_generate': [
-            {'ALL': 'Generar todas las solicitudes estudiantiles'},
-            {'ARC_QIAM': 'Generar las solicitudes del Área Curricular de' +
-             ' Ingeniería Química y Ambiental'},
-            {'PRE_QUIM': 'Generar las solicitudes del pregrado en Ingeniería Química'},
-            {'POS_ARQA': 'Generar las solicitudes de posgrados pertenecientes' +
-             ' al Área curricular de Ingeniería Química y Ambiental'},
-        ]},
-            status=HTTP_200_OK,
-            safe=False)
+        options['allowed_to_generate'].extend([
+            {'ARC_QIAM': {
+                'display': 'Generar las solicitudes del Área Curricular de Ingeniería Química y Ambiental',
+                'filter': 'academic_program__in=2549&academic_program__in=2704&academic_program__in=2562&academic_program__in=2686'}
+             },
+            {'PRE_QUIM': {
+                'display': 'Generar las solicitudes del pregrado en Ingeniería Química',
+                'filter': 'academic_program__eq=2549'}
+             },
+            {'POS_ARQA': {
+                'display': 'Generar las solicitudes de posgrados pertenecientes al Área curricular de Ingeniería Química y Ambiental',
+                'filter': 'academic_program__in=2704&academic_program__in=2562&academic_program__in=2686'}}
+        ])
     elif username == 'acisi_fibog':
-        return JsonResponse({'allowed_to_generate': [
-            {'ALL': 'Generar todas las solicitudes estudiantiles'},
-            {'ARC_SIIN': 'Generar las solicitudes del Área Curricular de' +
-             ' Ingeniería de Sistemas e Industrial'},
-            {'PRE_SIST': 'Generar las solicitudes del pregrado en Ingeniería de Sistemas y Computación'},
-            {'PRE_INDU': 'Generar las solicitudes del pregrado en Ingeniería Industrial'},
-            {'POS_ARSI': 'Generar las solicitudes de posgrados pertenecientes' +
-             ' al Área curricular de Ingeniería de Sistemas e Industrial'},
-        ]},
-            status=HTTP_200_OK,
-            safe=False)
-    else:
-        return JsonResponse({'error': 'username without choices'},
-                            status=HTTP_400_BAD_REQUEST,
-                            safe=False)
+        options['allowed_to_generate'].extend([
+            {'ARC_SIIN': {
+                'display': 'Generar las solicitudes del Área Curricular de Ingeniería de Sistemas e Industrial',
+                'filter': 'academic_program__in=2879&academic_program__in=2546&academic_program__in=2896&academic_program__in=2708&academic_program__in=2882&academic_program__in=2702&academic_program__in=2707&academic_program__in=2684&academic_program__in=2838'}
+             },
+            {'PRE_SIST': {
+                'display': 'Generar las solicitudes del pregrado en Ingeniería de Sistemas',
+                'filter': 'academic_program__eq=2879'}
+             },
+            {'PRE_INDU': {
+                'display': 'Generar las solicitudes del pregrado en Ingeniería Industrial',
+                'filter': 'academic_program__eq=2546'}
+             },
+            {'POS_ARSI': {
+                'display': 'Generar las solicitudes de posgrados pertenecientes al Área curricular de Ingeniería de Sistemas e Industrial',
+                'filter': 'academic_program__in=2896&academic_program__in=2708&academic_program__in=2882&academic_program__in=2702&academic_program__in=2707&academic_program__in=2684&academic_program__in=2838'}}
+        ])
 
-
-@csrf_exempt
-@api_view(["GET"])
-@permission_classes((AllowAny,))
-def generate_spec(_):
-    return JsonResponse({'': ''})
+    return JsonResponse(options, status=HTTP_200_OK, safe=False)

@@ -501,6 +501,10 @@ class Request(DynamicDocument):
                                          self.PI_INDUSTRIAL, self.PI_ELECTRICA, self.PI_MECATRONICA,
                                          self.PI_MECATRONICA, self.PI_ELECTRONICA, self.PI_QUIMICA)
 
+    def get_cases_by_query(query):
+        # Here quit apprubal statuss
+        return Request.objects(**query).filter(approval_status__nin=[Request.AS_ANULADA, Request.AS_RENUNCIA])
+
     @classmethod
     def translate(cls, data):
         data_json = json.loads(data)
