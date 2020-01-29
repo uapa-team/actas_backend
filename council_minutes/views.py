@@ -461,7 +461,6 @@ def allow_generate(request):
             'display': 'Generar las solicitudes de posgrados pertenecientes al Área curricular de Ingeniería de Sistemas e Industrial',
             'filter': 'academic_program__in=2896&academic_program__in=2708&academic_program__in=2882&academic_program__in=2702&academic_program__in=2707&academic_program__in=2684&academic_program__in=2838'
         }
-    print(options)
     return JsonResponse(options, status=HTTP_200_OK, safe=False)
 
 
