@@ -373,7 +373,6 @@ def get_docx_genquerie(request):
 @api_view(["GET"])
 def allow_generate(request):
     username = request.user.username
-    username = 'acica_fibog'
     options = {'allowed_to_generate': [
         {'ALL': {
             'display': 'Generar todas las solicitudes estudiantiles',
@@ -388,11 +387,11 @@ def allow_generate(request):
              },
             {'PRE_CIVI': {
                 'display': 'Generar las solicitudes del pregrado en Ingeniería Civil',
-                'filter': 'academic_program__eq=2542'}
+                'filter': 'academic_program=2542'}
              },
             {'PRE_AGRI': {
                 'display': 'Generar las solicitudes del pregrado en Ingeniería Agrícola',
-                'filter': 'academic_program__eq=2541'}
+                'filter': 'academic_program=2541'}
              },
             {'POS_ARCA': {
                 'display': 'Generar las solicitudes de posgrados pertenecientes al Área curricular de Ingeniería Civil y Agrícola',
@@ -406,11 +405,11 @@ def allow_generate(request):
              },
             {'PRE_MECA': {
                 'display': 'Generar las solicitudes del pregrado en Ingeniería Mecánica',
-                'filter': 'academic_program__eq=2547'}
+                'filter': 'academic_program=2547'}
              },
             {'PRE_METR': {
                 'display': 'Generar las solicitudes del pregrado en Ingeniería Mecatrónica',
-                'filter': 'academic_program__eq=2548'}
+                'filter': 'academic_program=2548'}
              },
             {'POS_ARMM': {
                 'display': 'Generar las solicitudes de posgrados pertenecientes al Área curricular de Ingeniería Mecánica y Mecatrónica',
@@ -424,11 +423,11 @@ def allow_generate(request):
              },
             {'PRE_ELCT': {
                 'display': 'Generar las solicitudes del pregrado en Ingeniería Eléctrica',
-                'filter': 'academic_program__eq=2544'}
+                'filter': 'academic_program=2544'}
              },
             {'PRE_ETRN': {
                 'display': 'Generar las solicitudes del pregrado en Ingeniería Electrónica',
-                'filter': 'academic_program__eq=2545'}
+                'filter': 'academic_program=2545'}
              },
             {'POS_AREE': {
                 'display': 'Generar las solicitudes de posgrados pertenecientes al Área curricular de Ingeniería Eléctrica y Electrónica',
@@ -442,7 +441,7 @@ def allow_generate(request):
              },
             {'PRE_QUIM': {
                 'display': 'Generar las solicitudes del pregrado en Ingeniería Química',
-                'filter': 'academic_program__eq=2549'}
+                'filter': 'academic_program=2549'}
              },
             {'POS_ARQA': {
                 'display': 'Generar las solicitudes de posgrados pertenecientes al Área curricular de Ingeniería Química y Ambiental',
@@ -456,11 +455,11 @@ def allow_generate(request):
              },
             {'PRE_SIST': {
                 'display': 'Generar las solicitudes del pregrado en Ingeniería de Sistemas',
-                'filter': 'academic_program__eq=2879'}
+                'filter': 'academic_program=2879'}
              },
             {'PRE_INDU': {
                 'display': 'Generar las solicitudes del pregrado en Ingeniería Industrial',
-                'filter': 'academic_program__eq=2546'}
+                'filter': 'academic_program=2546'}
              },
             {'POS_ARSI': {
                 'display': 'Generar las solicitudes de posgrados pertenecientes al Área curricular de Ingeniería de Sistemas e Industrial',
