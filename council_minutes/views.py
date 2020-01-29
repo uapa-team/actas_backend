@@ -437,8 +437,23 @@ def change_case_type(request):
         case.translate(shell))
     new_request.user = this_request.user
     try:
-        response = new_request.save()
+        new_request.save()
+    except ValidationError as e:
+        new_request.delete()
+        return HttpResponse(e.message, status=400)
+    for k in this_request._fields:
+        if k in ['_cls', 'id']:
+            continue
+        if k in new_request._fields:
+            new_request[k] = this_request[k]
+    try:
+        new_request.save()
+    except ValidationError as e:
+        new_request.delete()
+        return HttpResponse(e.message, status=400)
+    try:
+        this_request.delete()
+        new_request.save()
     except ValidationError as e:
         return HttpResponse(e.message, status=400)
-    print('a')
-    return JsonResponse({'': ''})
+    return JsonResponse({'Oki :3': 'All changes were applied correctly', 'id': str(new_request.id)})
