@@ -22,10 +22,10 @@ class UnifiedWritter():
     def generate_document_by_querie(self, query, precm):
         cases = Request.get_cases_by_query(query).order_by(
             'academic_program', '_cls')
-        casespre = [
-            case for case in cases if case.is_pre()]
-        casespos = [
-            case for case in cases if not case.is_pre()]
+        cases = [case for case in cases if
+                 ((precm and case.in_pcm) or (not precm and case.in_cm))]
+        casespre = [case for case in cases if case.is_pre()]
+        casespos = [case for case in cases if not case.is_pre()]
         self.__write_case_collection(casespre, True, precm)
         self.__write_case_collection(casespos, False, precm)
         self.__generate()
