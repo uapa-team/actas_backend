@@ -150,6 +150,20 @@ class Request(DynamicDocument):
 
     full_name = 'Petición sin tipo'
 
+    decision_makers = (
+        'Consejo de Facultad',
+        'Comité Asesor',
+        'Director de Tesis',
+        'Comité de Matricula',
+        'Consejo de Sede',
+        'Consejo Superior Universitario',
+    )
+    decision_maker = decision_makers[0]
+
+    #Request is in cm, pcm (or not)
+    in_cm = True
+    in_pcm = True
+
     # AS Approval Status
     AS_APLAZA = 'AL'
     AS_APRUEBA = 'AP'
