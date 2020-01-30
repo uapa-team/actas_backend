@@ -8,6 +8,7 @@ from .case_utils import add_analysis_paragraph
 class MOTP(Request):
 
     full_name = 'Cambio de objetivos de tesis o trabajo final'
+    decision_maker = Request.decision_makers[1]
 
     GO_TRABAJO_FINAL_MAESTRIA = 'TFM'
     GO_TESIS_MAESTRIA = 'TSM'

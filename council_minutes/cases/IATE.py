@@ -8,6 +8,9 @@ from .case_utils import add_analysis_paragraph
 class IATE(Request):
 
     full_name = 'Informe de avance de tesis'
+    decision_maker = Request.decision_makers[2]
+    in_cm = False
+    in_pcm = False
 
     subject = StringField(
         required=True, choices=Request.GRADE_OPTION_CHOICES, display='Nombre Asignatura',
