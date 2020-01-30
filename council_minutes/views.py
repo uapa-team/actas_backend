@@ -469,3 +469,44 @@ def allow_generate(request):
 @permission_classes((AllowAny,))
 def generate_spec(_):
     return JsonResponse({'': ''})
+
+
+@csrf_exempt
+@api_view(["PATCH"])
+def change_case_type(request):
+    # pylint: disable=no-member
+    id_request = json.loads(request.body)['id']
+    new_type = json.loads(request.body)['new_case']
+    try:
+        this_request = Request.objects.get(id=id_request)
+    except mongoengine.DoesNotExist:
+        return JsonResponse({'error': 'id not found'})
+    except mongoengine.ValidationError:
+        return JsonResponse({'error': 'id not found'})
+    subs = [c.__name__ for c in Request.get_subclasses()]
+    case = Request.get_subclasses()[subs.index(new_type)]
+    shell = json.dumps({'_cls': case.get_entire_name()})
+    new_request = case().from_json(
+        case.translate(shell))
+    new_request.user = this_request.user
+    try:
+        new_request.save()
+    except ValidationError as e:
+        new_request.delete()
+        return HttpResponse(e.message, status=400)
+    for k in this_request._fields:
+        if k in ['_cls', 'id']:
+            continue
+        if k in new_request._fields:
+            new_request[k] = this_request[k]
+    try:
+        new_request.save()
+    except ValidationError as e:
+        new_request.delete()
+        return HttpResponse(e.message, status=400)
+    try:
+        this_request.delete()
+        new_request.save()
+    except ValidationError as e:
+        return HttpResponse(e.message, status=400)
+    return JsonResponse({'Oki :3': 'All changes were applied correctly', 'id': str(new_request.id)})

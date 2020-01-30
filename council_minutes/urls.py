@@ -27,6 +27,7 @@ urlpatterns = [
     path('allow_generate', views.allow_generate, name='allow_generate'),
     path('generate', views.get_docx_genquerie,
          name='Docx generation by case query'),
-
+    path('generate_spec', views.generate_spec, name='generate_spec'),
+    path('change_case_type', views.change_case_type, name='change_case_type'),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)
