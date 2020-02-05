@@ -3,7 +3,6 @@ import dateparser
 from docx import Document
 from docx.shared import RGBColor
 from docx.shared import Pt
-from docx.enum.style import WD_STYLE_TYPE
 from .models import Request
 from .cases.case_utils import header
 
@@ -13,6 +12,11 @@ class UnifiedWritter():
     def __init__(self):
         self.document = Document()
         self.filename = 'public/'
+        hyperlink_style = self.document.styles.add_style(
+            'List Hyperlink', docx.enum.style.WD_STYLE_TYPE.PARAGRAPH)
+        hyperlink_style.base_style = self.document.styles['List Bullet']
+        hyperlink_style.font.color.rgb = RGBColor(0x00, 0x00, 0xFF)
+        hyperlink_style.font.underline = True
         for style in self.document.styles:
             try:
                 self.document.styles[style.name].font.name = 'Ancizar Sans'
@@ -50,6 +54,7 @@ class UnifiedWritter():
         case.cm(self.document)
 
     def __write_case_pcm(self, case):
+        header(case, self.document)
         case.pcm(self.document)
 
     def __write_document_header(self, precm):
@@ -100,9 +105,9 @@ class UnifiedWritter():
             run.font.size = Pt(12)
             try:
                 if pcm:
-                    request.pcm(self.document)
+                    self.__write_case_pcm(request)
                 else:
-                    request.cm(self.document)
+                    self.__write_case_cm(request)
             except NotImplementedError:
                 self.document.add_paragraph()
                 self.document.add_paragraph(

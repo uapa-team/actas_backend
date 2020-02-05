@@ -498,7 +498,7 @@ class Request(DynamicDocument):
     def is_pre(self):
         return self.academic_program in (self.PI_AGRICOLA, self.PI_CIVIL,
                                          self.PI_DE_SISTEMAS_Y_COMPUTACION,
-                                         self.PI_INDUSTRIAL, self.PI_ELECTRICA, self.PI_MECATRONICA,
+                                         self.PI_INDUSTRIAL, self.PI_ELECTRICA, self.PI_MECANICA,
                                          self.PI_MECATRONICA, self.PI_ELECTRONICA, self.PI_QUIMICA)
 
     def get_cases_by_query(query):
