@@ -12,11 +12,6 @@ class UnifiedWritter():
     def __init__(self):
         self.document = Document()
         self.filename = 'public/'
-        hyperlink_style = self.document.styles.add_style(
-            'List Hyperlink', enum.style.WD_STYLE_TYPE.PARAGRAPH)
-        hyperlink_style.base_style = self.document.styles['List Bullet']
-        hyperlink_style.font.color.rgb = RGBColor(0x00, 0x00, 0xFF)
-        hyperlink_style.font.underline = True
         for style in self.document.styles:
             try:
                 self.document.styles[style.name].font.name = 'Ancizar Sans'
@@ -24,6 +19,11 @@ class UnifiedWritter():
                     0x00, 0x00, 0x00)
             except:  # pylint: disable=bare-except
                 pass
+        hyperlink_style = self.document.styles.add_style(
+            'List Hyperlink', enum.style.WD_STYLE_TYPE.PARAGRAPH)
+        hyperlink_style.base_style = self.document.styles['List Bullet']
+        hyperlink_style.font.color.rgb = RGBColor(0x00, 0x00, 0xFF)
+        hyperlink_style.font.underline = True
         self.case_count = 0
 
     def generate_case_example_by_id(self, caseid, pre):
@@ -107,7 +107,7 @@ class UnifiedWritter():
                 if pcm:
                     self.__write_case_pcm(request)
                 else:
-                    self.__write_case_pcm(request)
+                    self.__write_case_cm(request)
             except NotImplementedError:
                 self.document.add_paragraph()
                 self.document.add_paragraph(
