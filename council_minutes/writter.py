@@ -1,6 +1,6 @@
 
 import dateparser
-from docx import Document
+from docx import Document, enum
 from docx.shared import RGBColor
 from docx.shared import Pt
 from .models import Request
@@ -13,7 +13,7 @@ class UnifiedWritter():
         self.document = Document()
         self.filename = 'public/'
         hyperlink_style = self.document.styles.add_style(
-            'List Hyperlink', docx.enum.style.WD_STYLE_TYPE.PARAGRAPH)
+            'List Hyperlink', enum.style.WD_STYLE_TYPE.PARAGRAPH)
         hyperlink_style.base_style = self.document.styles['List Bullet']
         hyperlink_style.font.color.rgb = RGBColor(0x00, 0x00, 0xFF)
         hyperlink_style.font.underline = True
@@ -107,7 +107,7 @@ class UnifiedWritter():
                 if pcm:
                     self.__write_case_pcm(request)
                 else:
-                    self.__write_case_cm(request)
+                    self.__write_case_pcm(request)
             except NotImplementedError:
                 self.document.add_paragraph()
                 self.document.add_paragraph(
