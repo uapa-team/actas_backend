@@ -444,7 +444,7 @@ def allow_generate(request):
             'display': 'Generar las solicitudes de posgrados pertenecientes al Área curricular de Ingeniería Química y Ambiental',
             'filter': 'academic_program__in=2704&academic_program__in=2562&academic_program__in=2686'
         }
-    elif username == 'acisi_fibog':
+    elif username == 'acisi_fibog' or username == 'daescobarp':
         options['ARC_SIIN'] = {
             'display': 'Generar las solicitudes del Área Curricular de Ingeniería de Sistemas e Industrial',
             'filter': 'academic_program__in=2879&academic_program__in=2546&academic_program__in=2896&academic_program__in=2708&academic_program__in=2882&academic_program__in=2702&academic_program__in=2707&academic_program__in=2684&academic_program__in=2838'
