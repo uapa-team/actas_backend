@@ -1,3 +1,4 @@
+# pylint: disable=wildcard-import,unused-wildcard-import
 import json
 import datetime
 from django.contrib.auth.models import User
@@ -8,10 +9,10 @@ from rest_framework.permissions import AllowAny
 from rest_framework.status import *
 from django.http import JsonResponse
 from mongoengine.errors import ValidationError
-from .models import Request, get_fields
-from .helpers import QuerySetEncoder
+from .models import Request
+from .helpers import QuerySetEncoder, get_fields
 from .writter import UnifiedWritter
-from .cases import *  # pylint: disable=wildcard-import,unused-wildcard-import
+from .cases import *
 
 
 @api_view(["GET"])
@@ -23,6 +24,7 @@ def check(request):
 @api_view(["POST"])
 @permission_classes((AllowAny,))
 def login(request):
+    # pylint: disable=no-member
     body = json.loads(request.body)
     username = body['username']
     password = body['password']
@@ -56,7 +58,7 @@ def info_cases(request):
     else:
         for type_case in Request.get_subclasses():
             if type_case.__name__ == request.GET.get('cls'):
-                return JsonResponse(get_fields(type_case()))
+                return JsonResponse(get_fields(type_case))
         return JsonResponse({'response': 'Not found'}, status=HTTP_404_NOT_FOUND)
 
 
@@ -227,5 +229,4 @@ def allow_generate(request):
             'display': 'Generar las solicitudes de posgrados pertenecientes al Área curricular de Ingeniería de Sistemas e Industrial',
             'filter': 'academic_program__in=2896&academic_program__in=2708&academic_program__in=2882&academic_program__in=2702&academic_program__in=2707&academic_program__in=2684&academic_program__in=2838'
         }
-    print(options)
     return JsonResponse(options, status=HTTP_200_OK, safe=False)

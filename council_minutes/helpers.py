@@ -6,6 +6,7 @@ from mongoengine.fields import BaseField
 
 class QuerySetEncoder(DjangoJSONEncoder):
 
+    # pylint: disable=method-hidden
     def default(self, obj):
         json_obj = {}
         json_obj['cases'] = []
@@ -42,3 +43,63 @@ class QuerySetEncoder(DjangoJSONEncoder):
         except AttributeError:
             pass
         return data
+
+def get_fields(_cls):
+    schema = {
+        'full_name': _cls.full_name,
+        'decision_maker': _cls.decision_maker
+        }
+    schema.update(get_schema(_cls))
+    return schema
+
+def get_schema(_cls):
+    schema = {}
+    fields = _cls._fields
+    #Only if nedded
+    obj = _cls()
+    for name, field in fields.items():
+        if 'display' in field.__dict__:
+            schema[name] = {
+                'type': clear_name(field),
+                'display': field.display,
+                }
+
+            #Default can be a function, part of choices list or just a value
+            if callable(field.default):
+                schema[name]['default'] = field.default()
+            elif field.choices:
+                k = 'get_{}_display'.format(name)
+                schema[name]['default'] = obj.__dict__[k]()
+            else:
+                schema[name]['default'] = field.default
+
+            if field.choices:
+                schema[name]['choices'] = [option[1]
+                                          for option in field.choices]
+
+            if schema[name]['type'] == 'Table':
+                schema[name]['fields'] = get_schema(
+                    field.field.document_type_obj)
+    return schema
+
+def clear_name(_cls):
+    name = _cls.__class__.__name__
+    if name == 'StringField':
+        return 'String'
+    elif name == 'DateField':
+        return 'Date'
+    elif name == 'IntField':
+        return 'Integer'
+    elif name == 'FloatField':
+        return 'Float'
+    elif name == 'BooleanField':
+        return 'Boolean'
+    elif name == 'ListField':
+        type = clear_name(_cls.field)
+        return 'List:{}'.format(type)
+    elif name == 'EmbeddedDocumentField':
+        return 'Object'
+    elif name == 'EmbeddedDocumentListField':
+        return 'Table'
+    else:
+        return name

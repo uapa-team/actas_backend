@@ -5,64 +5,6 @@ from mongoengine import ListField, IntField, EmbeddedDocumentField, EmbeddedDocu
 from mongoengine.errors import ValidationError, DoesNotExist
 from mongoengine.fields import BaseField
 
-
-def get_fields(obj):
-    fields = {}
-    _dir = obj.__class__.__dict__
-    if 'full_name' in _dir:
-        fields['full_name'] = obj.full_name
-    for key, value in _dir.items():
-        if isinstance(value, BaseField):
-            fields[key] = {'type': clear_name(value.__class__)}
-            if 'display' in value.__dict__:
-                fields[key]['display'] = value.display
-                if value.default:
-                    if callable(value.default):
-                        fields[key]['default'] = value.default()
-                    elif value.choices:
-                        k = 'get_{}_display'.format(key)
-                        fields[key]['default'] = obj.__dict__[k]()
-                    else:
-                        fields[key]['default'] = value.default
-            if value.choices:
-                fields[key]['choices'] = [option[1]
-                                          for option in value.choices]
-            if isinstance(value, ListField):
-                fields[key]['list'] = {
-                    'type': clear_name(value.field.__class__)}
-                if isinstance(value.field, EmbeddedDocumentField):
-                    fields[key]['list']['fields'] = get_fields(
-                        value.field.document_type_obj())
-    super_cls = obj.__class__.mro()[1]
-    if super_cls not in (DynamicDocument, EmbeddedDocument):
-        super_fields = get_fields(super_cls())
-        super_fields.update(fields)
-        fields = super_fields
-    return fields
-
-
-def clear_name(_class):
-    name = _class.__name__
-    if name == 'StringField':
-        return 'String'
-    elif name == 'DateField':
-        return 'Date'
-    elif name == 'ListField':
-        return 'List'
-    elif name == 'IntField':
-        return 'Integer'
-    elif name == 'FloatField':
-        return 'Float'
-    elif name == 'BooleanField':
-        return 'Boolean'
-    elif name == 'EmbeddedDocumentField':
-        return 'Object'
-    elif name == 'EmbeddedDocumentListField':
-        return 'List'
-    else:
-        return name
-
-
 class Subject(EmbeddedDocument):
 
     meta = {'allow_inheritance': True}
@@ -522,23 +464,28 @@ class Request(DynamicDocument):
         except ValidationError as e:
             raise ValueError(e.message)
 
+    @staticmethod
     def get_cases_by_query(query):
-        # Here quit apprubal statuss
+        # pylint: disable=no-member
         return Request.objects(**query).filter(approval_status__nin=[Request.AS_ANULADA, Request.AS_RENUNCIA])
 
+    @staticmethod
     def get_case_by_id(caseid):
         try:
+            # pylint: disable=no-member
             return Request.objects.get(id=caseid)
         except ValidationError as e:
             raise ValueError(e.message)
         except DoesNotExist as e:
             raise KeyError('ID {} does not exist')
 
+    @staticmethod
     def get_programs():
         return {
             'programs': sorted([plan[1] for plan in Request.PLAN_CHOICES])
         }
 
+    @staticmethod
     def get_cases():
         return {
             'cases': [
