@@ -9,6 +9,7 @@ from .case_utils import string_to_date, add_analysis_paragraph
 class EREP(Request):
 
     full_name = 'Expedición de recibo de matrícula'
+    decision_maker = Request.decision_makers[3]
 
     ah_active = BooleanField(
         required=True, display='¿Tiene activa la historia académica?', default=False)

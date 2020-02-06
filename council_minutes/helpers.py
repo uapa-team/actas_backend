@@ -8,12 +8,13 @@ class QuerySetEncoder(DjangoJSONEncoder):
 
     def default(self, obj):
         json_obj = {}
+        json_obj['cases'] = []
         if isinstance(obj, QuerySet):
             for element in obj:
-                json_obj[str(element.id)] = QuerySetEncoder.encode_object(
-                    element)
+                json_obj['cases'].append(
+                    QuerySetEncoder.encode_object(element))
         else:
-            json_obj = QuerySetEncoder.encode_object(obj)
+            json_obj['cases'].append(QuerySetEncoder.encode_object(obj))
 
         return json_obj
 
