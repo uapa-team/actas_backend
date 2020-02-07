@@ -59,7 +59,7 @@ class APGD(Request):
         required=True, default=False, display='¿Entregó CD?')
     general_objetive = StringField(
         required=True, display='Objetivo general', default='')
-    specific_objetives = ListField(
+    specific_objetives = ListField(StringField(),
         display='Objetivos específicos')
     title = StringField(
         required=True, display='Título de la tesis/trabajo final', default='')
