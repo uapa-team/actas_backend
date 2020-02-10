@@ -35,7 +35,7 @@ class APAS(Request):
         default=GO_TESIS_MAESTRIA)
     internship_period = StringField(
         required=True, display='Periodo en el que se va a desarrollar la pasantía',
-        default='0000-0S')
+        choices=Request.PERIOD_CHOICES, default=Request.PERIOD_DEFAULT)
     enrolled_thesis = BooleanField(
         required=True, default=False, display='¿Tiene inscrita la asignatura tesis/trabajo final?')
 
