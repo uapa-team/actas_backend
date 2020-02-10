@@ -353,7 +353,7 @@ class Request(DynamicDocument):
     )
 
     PERIOD_CHOICES = get_period_choices()
-    PERIOD_DEFAULT = PERIOD_CHOICES[0][0]
+    PERIOD_DEFAULT = PERIOD_CHOICES[0][0] if datetime.date.today().month <= 6 else PERIOD_CHOICES[1][0]
 
     _cls = StringField(required=True)
     date_stamp = DateField(default=datetime.date.today)
