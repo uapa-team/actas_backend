@@ -353,7 +353,7 @@ class Request(DynamicDocument):
     )
 
     PERIOD_CHOICES = get_period_choices()
-    PERIOD_DEFAULT = PERIOD_CHOICES[-3][0]
+    PERIOD_DEFAULT = PERIOD_CHOICES[3][0]
 
     _cls = StringField(required=True)
     date_stamp = DateField(default=datetime.date.today)

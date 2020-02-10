@@ -106,7 +106,7 @@ def clear_name(_cls):
         return name
 
 def get_period_choices():
-    templates = ('{}-1S', '{}-2S', '{}-1I')
+    templates = ('{}-1I', '{}-2S', '{}-1S')
     choices = []
     for year in range(2007, datetime.date.today().year + 1):
         values = []
