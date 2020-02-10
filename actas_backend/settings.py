@@ -14,6 +14,7 @@ import os
 import ldap
 import mongoengine
 from django_auth_ldap.config import LDAPSearch, LDAPSearchUnion
+from corsheaders.defaults import default_headers
 
 AUTH_LDAP_CONNECTION_OPTIONS = {
     ldap.OPT_DEBUG_LEVEL: 1,
@@ -55,6 +56,12 @@ REST_FRAMEWORK = {
 CORS_ORIGIN_ALLOW_ALL = True  # TODO: Allow only certainb front ends
 
 CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_HEADERS = default_headers + (
+    'Access-Control-Allow-Origin',
+)
+
+CORS_EXPOSE_HEADERS = ['Access-Control-Allow-Origin']
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
