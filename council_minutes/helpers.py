@@ -114,4 +114,4 @@ def get_period_choices():
             st = template.format(year)
             values.append((st, st))
         choices.extend(values)
-    return tuple(choices)
+    return tuple(reversed(choices))
