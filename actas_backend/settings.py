@@ -53,7 +53,8 @@ REST_FRAMEWORK = {
 #   'http://localhost:3000',
 # ) To allow only certain front ends
 
-CORS_ORIGIN_ALLOW_ALL = True  # TODO: Allow only certainb front ends
+# TODO: Allow only certainb front ends #DONE: Done in develop
+CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -81,7 +82,6 @@ ALLOWED_HOSTS = [os.environ.get('ACTAS_HOST'), '127.0.0.1']
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:4200',
 ]
-
 
 
 # Application definition
