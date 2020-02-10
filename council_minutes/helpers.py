@@ -1,3 +1,4 @@
+import datetime
 from django.core.serializers.json import DjangoJSONEncoder
 from mongoengine.base.datastructures import BaseList, EmbeddedDocumentList
 from mongoengine.queryset import QuerySet
@@ -103,3 +104,14 @@ def clear_name(_cls):
         return 'Table'
     else:
         return name
+
+def get_period_choices():
+    templates = ('{}-1S', '{}-2S', '{}-1I')
+    choices = []
+    for year in range(2007, datetime.date.today().year + 1):
+        values = []
+        for template in templates:
+            st = template.format(year)
+            values.append((st, st))
+        choices.extend(values)
+    return tuple(choices)

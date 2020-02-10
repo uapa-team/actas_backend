@@ -4,6 +4,7 @@ from mongoengine import DynamicDocument, EmbeddedDocument, DateField, StringFiel
 from mongoengine import ListField, IntField, EmbeddedDocumentField, EmbeddedDocumentListField
 from mongoengine.errors import ValidationError, DoesNotExist
 from mongoengine.fields import BaseField
+from.helpers import get_period_choices
 
 class Subject(EmbeddedDocument):
 
@@ -351,6 +352,9 @@ class Request(DynamicDocument):
         (GRADE_OPTION_TESIS_DOCTORADO, 'Tesis de Doctorado')
     )
 
+    PERIOD_CHOICES = get_period_choices()
+    PERIOD_DEFAULT = PERIOD_CHOICES[-3][0]
+
     _cls = StringField(required=True)
     date_stamp = DateField(default=datetime.date.today)
     user = StringField(max_length=255, required=True)
@@ -371,7 +375,7 @@ class Request(DynamicDocument):
     student_name = StringField(
         max_length=512, display='Nombre del Estudiante', default='')
     academic_period = StringField(
-        max_length=10, display='Periodo', default='0000-0S')
+        max_length=10, display='Periodo', choices=PERIOD_CHOICES, default=PERIOD_DEFAULT)
     approval_status = StringField(
         min_length=2, max_length=2, choices=AS_CHOICES,
         default=AS_EN_ESPERA, display='Estado de Aprobación')
