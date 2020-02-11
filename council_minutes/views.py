@@ -7,9 +7,10 @@ from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.status import *
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 from mongoengine.errors import ValidationError
-from .models import Request
+from .models import Request, Person
 from .helpers import QuerySetEncoder, get_fields, get_period_choices
 from .writter import UnifiedWritter
 from .cases import *
@@ -138,6 +139,25 @@ def get_docx_genquerie(request):
         str(request.user) + str(datetime.date.today()) + '.docx'
     generator.generate_document_by_querie(query_dict, precm)
     return JsonResponse({'url': generator.filename}, status=HTTP_200_OK)
+
+@api_view(["GET"])
+def autofill(request):
+    # pylint: disable=no-member
+    body = json.loads(request.body)
+    try:
+        if body['field'] == 'name':
+            try:
+                student = Person.objects.filter(student_dni=body['student_dni'])[0]
+            except IndexError:
+                return JsonResponse({'error':'dni not found'}, status=HTTP_404_NOT_FOUND)
+            else:
+                return JsonResponse({'student_dni': student.student_dni,
+                'student_dni_type': student.student_dni_type,
+                'student_name': student.student_name}, status=HTTP_200_OK)
+        elif body['field'] == 'subject':
+            return JsonResponse({}, safe=False, status=HTTP_200_OK)
+    except ValueError:
+        return JsonResponse({'error':'field "field" no encontrado'}, safe=False, status=HTTP_400_BAD_REQUEST)
 
 
 @api_view(["GET"])

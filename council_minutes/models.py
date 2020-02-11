@@ -548,3 +548,14 @@ class Professor(EmbeddedDocument):
         display='Departamento', choices=Request.DP_CHOICES, default=Request.DP_EMPTY)
     institution = StringField(display='Institución')
     country = StringField(display='Nombre')
+
+
+class Person(DynamicDocument):
+    student_dni_type = StringField(
+        min_length=2, choices=Request.DNI_TYPE_CHOICES,
+        default=Request.DNI_TYPE_CEDULA_DE_CIUDADANIA, display='Tipo de Documento')
+    student_dni = StringField(
+        max_length=22, display='Documento', default='')
+    student_name = StringField(
+        max_length=512, display='Nombre del Estudiante', default='')
+        

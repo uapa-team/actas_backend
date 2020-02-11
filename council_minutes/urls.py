@@ -15,5 +15,6 @@ urlpatterns = [
     path('allow_generate', views.allow_generate, name='allow_generate'),
     path('generate', views.get_docx_genquerie,
          name='Docx generation by case query'),
+    path('autofill', views.autofill, name='autofill')
 
 ] + static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)
