@@ -17,7 +17,8 @@ class TGRA(Request):
     )
 
     period_inscription = StringField(
-        display='Periodo de inscripción trabajo de grado', default='0000-0S')
+        display='Periodo de inscripción trabajo de grado', 
+        choices=Request.PERIOD_CHOICES, default=Request.PERIOD_DEFAULT)
     type_tgra = StringField(
         choices=TGRA_CHOICES, default=TGRA_PASANTIA, display='Tipo de trabajo de grado')
     title = StringField(default='', display='Título del trabajo de grado')

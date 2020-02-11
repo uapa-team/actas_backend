@@ -10,7 +10,7 @@ from rest_framework.status import *
 from django.http import JsonResponse
 from mongoengine.errors import ValidationError
 from .models import Request
-from .helpers import QuerySetEncoder, get_fields
+from .helpers import QuerySetEncoder, get_fields, get_period_choices
 from .writter import UnifiedWritter
 from .cases import *
 
@@ -47,8 +47,10 @@ def login(request):
 
 @api_view(["GET"])
 @permission_classes((AllowAny,))
-def programs_defined(_):
-    return JsonResponse(Request.get_programs(), status=HTTP_200_OK)
+def details(_):
+    programs = Request.get_programs()
+    programs.update({'periods': [period[0] for period in get_period_choices()]})
+    return JsonResponse(programs, status=HTTP_200_OK, safe=False)
 
 
 @api_view(["GET"])

@@ -8,7 +8,7 @@ urlpatterns = [
 
     path('login', views.login, name='Get token on REST API'),
 
-    path('programs', views.programs_defined, name='Programs defined'),
+    path('details', views.details, name='Details'),
     path('infocase', views.info_cases, name='Info about cases'),
     path('case', views.case, name='Case object manipulation'),
 

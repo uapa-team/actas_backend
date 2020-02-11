@@ -23,7 +23,8 @@ class AAUT(Request):
         default=Request.PI_CIVIL)
     admission_academic_period = StringField(max_length=10,
                                             display='Periodo de ingreso al nuevo programa',
-                                            default="0000-0S")
+                                            choices=Request.PERIOD_CHOICES,
+                                            default=Request.PERIOD_DEFAULT)
 
     str_cm = [
         'admisión automática al programa {} ({}), a partir del periodo académico {}.',

@@ -12,9 +12,13 @@ class EBDA(Request):
     gpa = FloatField(
         display='Promedio obtenido el semestre anterior', default=0.0)
     gpa_period = StringField(
-        display='Periodo en el que se obtiene el promedio', default='0000-0S')
+        display='Periodo en el que se obtiene el promedio',
+        choices=Request.PERIOD_CHOICES,
+        default=Request.PERIOD_DEFAULT)
     target_period = StringField(
-        display='Periodo en el que aplica la beca', default='0000-0S')
+        display='Periodo en el que aplica la beca',
+        choices=Request.PERIOD_CHOICES,
+        default=Request.PERIOD_DEFAULT)
 
     regulation_list = ['002|2012|CFA']  # List of regulations
 
