@@ -21,6 +21,8 @@ AUTH_LDAP_CONNECTION_OPTIONS = {
     ldap.OPT_REFERRALS: 0,
 }
 
+ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, os.getcwd()+"/certificate.pem")
+
 AUTH_LDAP_SERVER_URI = os.environ.get('LDAP_HOST')
 AUTH_LDAP_USER_SEARCH = LDAPSearchUnion(
     LDAPSearch("ou=people,o=unal.edu.co",
