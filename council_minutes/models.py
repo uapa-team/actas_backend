@@ -558,4 +558,10 @@ class Person(DynamicDocument):
         max_length=22, display='Documento', default='')
     student_name = StringField(
         max_length=512, display='Nombre del Estudiante', default='')
+
+class SubjectAutofill(DynamicDocument):
+    subject_code = StringField(
+        min_length=2, display='Código de la Asignatura')
+    subject_name = StringField(
+        max_length=512, display='Nombre de la Asignatura', default='')
         

@@ -10,7 +10,7 @@ from rest_framework.status import *
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 from mongoengine.errors import ValidationError
-from .models import Request, Person
+from .models import Request, Person, SubjectAutofill
 from .helpers import QuerySetEncoder, get_fields, get_period_choices
 from .writter import UnifiedWritter
 from .cases import *
@@ -144,18 +144,30 @@ def get_docx_genquerie(request):
 def autofill(request):
     # pylint: disable=no-member
     body = json.loads(request.body)
+    if 'field' not in body:
+        return JsonResponse({'error':'"field" key is not in body'}, status=HTTP_400_BAD_REQUEST)
     try:
         if body['field'] == 'name':
+            if 'student_dni' not in body:
+                return JsonResponse({'error':'"student_dni" key is not in body'}, status=HTTP_400_BAD_REQUEST)
             try:
                 student = Person.objects.filter(student_dni=body['student_dni'])[0]
             except IndexError:
-                return JsonResponse({'error':'dni not found'}, status=HTTP_404_NOT_FOUND)
+                return JsonResponse({'error':'dni not found'}, status=HTTP_204_NO_CONTENT)
             else:
                 return JsonResponse({'student_dni': student.student_dni,
                 'student_dni_type': student.student_dni_type,
                 'student_name': student.student_name}, status=HTTP_200_OK)
         elif body['field'] == 'subject':
-            return JsonResponse({}, safe=False, status=HTTP_200_OK)
+            if 'subject_code' not in body:
+                return JsonResponse({'error':'"subject_code" key is not in body'}, status=HTTP_400_BAD_REQUEST)
+            try:
+                subject = SubjectAutofill.objects.filter(subject_code=body['subject_code'])[0]
+            except IndexError:
+                return JsonResponse({'error':'subject code not found'}, status=HTTP_204_NO_CONTENT)
+            else:
+                return JsonResponse({'subject_code': subject.subject_code,
+                'subject_name': subject.subject_name}, status=HTTP_200_OK)
     except ValueError:
         return JsonResponse({'error':'field "field" no encontrado'}, safe=False, status=HTTP_400_BAD_REQUEST)
 
