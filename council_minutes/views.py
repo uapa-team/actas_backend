@@ -140,7 +140,7 @@ def get_docx_genquerie(request):
     generator.generate_document_by_querie(query_dict, precm)
     return JsonResponse({'url': generator.filename}, status=HTTP_200_OK)
 
-@api_view(["GET"])
+@api_view(["POST"])
 def autofill(request):
     # pylint: disable=no-member
     body = json.loads(request.body)
