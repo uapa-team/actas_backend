@@ -561,7 +561,7 @@ class Person(DynamicDocument):
 
 class SubjectAutofill(DynamicDocument):
     subject_code = StringField(
-        min_length=2, display='Código de la Asignatura')
+        display='Código de la Asignatura')
     subject_name = StringField(
         max_length=512, display='Nombre de la Asignatura', default='')
         
