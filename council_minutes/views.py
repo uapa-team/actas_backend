@@ -81,11 +81,11 @@ def case(request):
             item_request['_cls'] = case.get_entire_name()
             new_request = case().from_json(case.translate(json.dumps(item_request)))
             try:
-                inserted_items += [new_request.save()]
+                inserted_items += [str(new_request.save().id)]
             except ValidationError as e:
                 errors += [e.message]
         return JsonResponse({'inserted_items': inserted_items, 'errors': errors},
-                            status=HTTP_200_OK, encoder=QuerySetEncoder, safe=False)
+                            status=HTTP_200_OK, safe=False)
     if request.method == 'PATCH':
         body = json.loads(request.body)
         subs = [c.__name__ for c in Request.get_subclasses()]
