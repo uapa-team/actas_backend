@@ -43,8 +43,7 @@ def login(request):
         return JsonResponse({'error': 'Error en LDAP, contraseña o usuario no válido.'},
                             status=HTTP_404_NOT_FOUND)
     token, _ = Token.objects.get_or_create(user=user)
-    groups = [g.name for g in user.groups.all()]
-    return JsonResponse({'token': token.key, 'groups': groups},
+    return JsonResponse({'token': token.key, 'group': user.groups.first().name},
                         status=HTTP_200_OK)
 
 @api_view(["GET"])
