@@ -1,11 +1,12 @@
 # pylint: disable=wildcard-import,unused-wildcard-import
 import json
 import datetime
+from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django_auth_ldap.backend import LDAPBackend
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.status import *
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
@@ -45,6 +46,12 @@ def login(request):
     return JsonResponse({'token': token.key},
                         status=HTTP_200_OK)
 
+@api_view(["GET"])
+@permission_classes((IsAuthenticated,))
+def api_logout(request):
+    request.user.auth_token.delete()
+    logout(request)
+    return JsonResponse({'successful': 'Logout Success'}, status=HTTP_200_OK)
 
 @api_view(["GET"])
 @permission_classes((AllowAny,))
