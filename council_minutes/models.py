@@ -359,7 +359,9 @@ class Request(DynamicDocument):
     date_stamp = DateField(default=datetime.date.today)
     user = StringField(max_length=255, required=True)
     consecutive_minute = IntField(
-        min_value=0, default=0, display='Número del Acta')
+        min_value=0, default=0, display='Número del Acta de Consejo de Facultad')
+    consecutive_minute_ac = IntField(
+        min_value=0, default=0, display='Número del Acta de Comité Asesor') #ac stands for advisory committe
     year = IntField(
         min_value=2000, max_value=2100, display='Año del Acta', default=datetime.date.today().year)
     date = DateField(default=datetime.date.today,
