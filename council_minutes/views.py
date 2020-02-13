@@ -1,11 +1,12 @@
 # pylint: disable=wildcard-import,unused-wildcard-import
 import json
 import datetime
+from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django_auth_ldap.backend import LDAPBackend
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.status import *
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
@@ -42,9 +43,16 @@ def login(request):
         return JsonResponse({'error': 'Error en LDAP, contraseña o usuario no válido.'},
                             status=HTTP_404_NOT_FOUND)
     token, _ = Token.objects.get_or_create(user=user)
-    return JsonResponse({'token': token.key},
+    groups = [g.name for g in user.groups.all()]
+    return JsonResponse({'token': token.key, 'groups': groups},
                         status=HTTP_200_OK)
 
+@api_view(["GET"])
+@permission_classes((IsAuthenticated,))
+def api_logout(request):
+    request.user.auth_token.delete()
+    logout(request)
+    return JsonResponse({'successful': 'Logout Success'}, status=HTTP_200_OK)
 
 @api_view(["GET"])
 @permission_classes((AllowAny,))
@@ -140,7 +148,7 @@ def get_docx_genquerie(request):
     generator.generate_document_by_querie(query_dict, precm)
     return JsonResponse({'url': generator.filename}, status=HTTP_200_OK)
 
-@api_view(["GET"])
+@api_view(["POST"])
 def autofill(request):
     # pylint: disable=no-member
     body = json.loads(request.body)

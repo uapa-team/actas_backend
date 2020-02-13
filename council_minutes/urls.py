@@ -7,6 +7,7 @@ urlpatterns = [
     path('', views.check, name='Checker REST API'),
 
     path('login', views.login, name='Get token on REST API'),
+    path('logout', views.api_logout, name='Destroy token on REST API'),
 
     path('details', views.details, name='Details'),
     path('infocase', views.info_cases, name='Info about cases'),
