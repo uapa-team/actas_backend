@@ -1,6 +1,6 @@
 import datetime
 import json
-from mongoengine import DynamicDocument, EmbeddedDocument, DateField, StringField
+from mongoengine import DynamicDocument, EmbeddedDocument, DateField, StringField, BooleanField
 from mongoengine import ListField, IntField, EmbeddedDocumentField, EmbeddedDocumentListField
 from mongoengine.errors import ValidationError, DoesNotExist
 from mongoengine.fields import BaseField
@@ -364,6 +364,7 @@ class Request(DynamicDocument):
         min_value=0, default=0, display='Número del Acta de Comité Asesor') #ac stands for advisory committe
     year = IntField(
         min_value=2000, max_value=2100, display='Año del Acta', default=datetime.date.today().year)
+    to_legal = BooleanField(default=False, display='Sugerir remitir caso a legataria')
     date = DateField(default=datetime.date.today,
                      display='Fecha de radicación')
     academic_program = StringField(
