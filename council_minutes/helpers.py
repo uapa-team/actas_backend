@@ -41,6 +41,7 @@ class QuerySetEncoder(DjangoJSONEncoder):
                     data[key] = str(value)
         try:
             data['_cls_display'] = obj.full_name
+            data['decision_maker'] = obj.decision_maker
         except AttributeError:
             pass
         return data
