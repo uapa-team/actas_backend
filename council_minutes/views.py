@@ -101,9 +101,9 @@ def case(request):
         not_found = []
         for item_request in body['items']:
             try:
-                req = Request.get_case_by_id(item_request['_id'])
+                req = Request.get_case_by_id(item_request['id'])
             except (ValueError, KeyError):
-                not_found += [item_request['_id']]
+                not_found += [item_request['id']]
                 continue
             item_request['user'] = request.user.username
             case = req.__class__
