@@ -1,7 +1,7 @@
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
 from mongoengine import StringField, IntField
-from ..models import Request, Subject
+from ..models import Request
 from .case_utils import add_analysis_paragraph
 
 
@@ -9,20 +9,20 @@ class CGRU(Request):
 
     full_name = 'Cambio de grupo'
 
-    name = StringField(required=True, display='Nombre Asignatura')
-    code = StringField(required=True, display='Código')
-    group = StringField(required=True, display='Grupo')
-    new_group = StringField(required=True, display='Nuevo Grupo')
+    name = StringField(required=True, display='Nombre Asignatura', default='')
+    code = StringField(required=True, display='Código', default='')
+    group = StringField(required=True, display='Grupo', default='')
+    new_group = StringField(required=True, display='Nuevo Grupo', default='')
     free_places = IntField(required=True, min_value=0,
                            default=0, display='Cupos disponibles')
-    professor = StringField(required=True, display='Profesor')
+    professor = StringField(required=True, display='Profesor', default='')
     department = StringField(required=True, choices=Request.DP_CHOICES,
                              default=Request.DP_EMPTY, display='Departamento')
 
     regulation_list = ['008|2008|CSU']
 
     str_cm = [
-        'el cambio de grupo de la asignatura {} ({}) al grupo {} en el periodo {}, ' +
+        'cambio de grupo de la asignatura {} ({}) al grupo {} en el periodo {}, ' +
         'debido a que {}.',
         'justifica debidamente la solicitud'
     ]
@@ -61,10 +61,10 @@ class CGRU(Request):
         self.pcm_answer(paragraph)
 
     def pcm_answer(self, paragraph):
+        # pylint: disable=no-member
         paragraph.add_run(self.str_answer + ' ').font.bold = True
         paragraph.add_run(self.str_comittee_header + ' ')
         paragraph.add_run(
-            # pylint: disable=no-member
             self.get_advisor_response_display().upper() + ' ').font.bold = True
         if self.is_affirmative_response_advisor_response():
             modifier = ''

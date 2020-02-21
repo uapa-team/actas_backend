@@ -33,7 +33,7 @@ class RCPE(Request):
     full_name = 'Registro de calificación del proyecto y examen doctoral'
 
     registers = EmbeddedDocumentListField(
-        Register, required=True, display="Registros")
+        Register, display='Registros')
 
     regulation_list = []
 
@@ -78,6 +78,7 @@ class RCPE(Request):
             self.get_advisor_response_display().upper() + ':').font.bold = True
 
     def add_registers(self, docx):
+        # pylint: disable=no-member, protected-access
         for register in self.registers:
             paragraph = docx.add_paragraph()
             paragraph.style = 'List Bullet 2'

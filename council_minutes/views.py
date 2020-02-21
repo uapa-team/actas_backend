@@ -1,201 +1,262 @@
+# pylint: disable=wildcard-import,unused-wildcard-import
 import json
 import datetime
-import mongoengine
+from django.contrib.auth import logout
+from django.contrib.auth.models import User
+from django_auth_ldap.backend import LDAPBackend
+from rest_framework.authtoken.models import Token
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.status import *
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import JsonResponse
 from mongoengine.errors import ValidationError
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from .models import Request, get_fields
-from .helpers import QuerySetEncoder
-from .docx import CouncilMinuteGenerator
-from .docx import PreCouncilMinuteGenerator
+from .models import Request, Person, SubjectAutofill
+from .helpers import QuerySetEncoder, get_fields, get_period_choices, get_queries_by_groups
+from .writter import UnifiedWritter
 from .cases import *
 
 
-def index():
-    return HttpResponse("Working!")
+@api_view(["GET"])
+@permission_classes((AllowAny,))
+def check(request):
+    return JsonResponse({"Ok?": "Ok!"}, status=HTTP_200_OK)
 
 
-def cases_defined(request):
-    if request.method == 'GET':
-        response = {
-            'cases': [
-                {'code': type_case.__name__, 'name': type_case.full_name}
-                for type_case in Request.__subclasses__()]
-        }
-        return JsonResponse(response)
-
-
-def info_cases(request, case_id):
-    if request.method == 'GET':
-        for type_case in Request.__subclasses__():
-            if type_case.__name__ == case_id:
-                return JsonResponse(get_fields(type_case()))
-        return JsonResponse({'response': 'Not found'}, status=404)
-
-
-@csrf_exempt  # Esto va solo para evitar la verificacion de django
-def filter_request(request):
-    if request.method == 'POST':
-        # Generic Query for Request model
-        # To make a request check http://docs.mongoengine.org/guide/querying.html#query-operators
-        params = json.loads(request.body)
-        response = Request.objects.filter(**params).order_by('academic_program')
-        return JsonResponse(response, safe=False, encoder=QuerySetEncoder)
-
-    else:
-        return HttpResponse('Bad Request', status=400)
-
-
-@csrf_exempt  # Esto va solo para evitar la verificacion de django
-def insert_request(request):
+@api_view(["POST"])
+@permission_classes((AllowAny,))
+def login(request):
+    # pylint: disable=no-member
     body = json.loads(request.body)
-    _cls = body['_cls'].split('.')[-1]
-    subs = [c.__name__ for c in Request.__subclasses__()]
-    case = Request.__subclasses__()[subs.index(_cls)]
-    new_request = case().from_json(case.translate(request.body))
+    username = body['username']
+    password = body['password']
+    if username is None or password is None:
+        return JsonResponse({'error': 'Contraseña o usuario vacío o nulo.'},
+                            status=HTTP_400_BAD_REQUEST)
     try:
-        new_request.save()
-        return HttpResponse(request.body, status=201)
-    except ValidationError as e:
-        print(e)
-        return HttpResponse(e.message, status=400)
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'Error en ActasDB, usuario sin permisos en la aplicación.'},
+                            status=HTTP_403_FORBIDDEN)
+    user = LDAPBackend().authenticate(request, username=username, password=password)
+    if not user:
+        return JsonResponse({'error': 'Error en LDAP, contraseña o usuario no válido.'},
+                            status=HTTP_404_NOT_FOUND)
+    token, _ = Token.objects.get_or_create(user=user)
+    return JsonResponse({'token': token.key, 'group': user.groups.first().name},
+                        status=HTTP_200_OK)
+
+@api_view(["GET"])
+@permission_classes((IsAuthenticated,))
+def api_logout(request):
+    request.user.auth_token.delete()
+    logout(request)
+    return JsonResponse({'successful': 'Logout Success'}, status=HTTP_200_OK)
+
+@api_view(["GET"])
+@permission_classes((AllowAny,))
+def details(_):
+    programs = Request.get_programs()
+    programs.update({'periods': [period[0] for period in get_period_choices()]})
+    return JsonResponse(programs, status=HTTP_200_OK, safe=False)
 
 
-@csrf_exempt
-def docx_gen_by_id(request, cm_id):
-    filename = 'public/acta' + cm_id + '.docx'
-    try:
-        request_by_id = Request.objects.get(id=cm_id)
-    except mongoengine.DoesNotExist:
-        return HttpResponse('Does not exist', status=404)
-    generator = CouncilMinuteGenerator()
-    generator.add_case_from_request(request_by_id)
-    generator.generate(filename)
-    return HttpResponse(filename)
+@api_view(["GET"])
+def info_cases(request):
+    if request.GET.get('cls') == '' or request.GET.get('cls') is None:
+        return JsonResponse(Request.get_cases(), status=HTTP_200_OK)
+    else:
+        for type_case in Request.get_subclasses():
+            if type_case.__name__ == request.GET.get('cls'):
+                return JsonResponse(get_fields(type_case))
+        return JsonResponse({'response': 'Not found'}, status=HTTP_404_NOT_FOUND)
 
 
-@csrf_exempt
-def update_cm(request, cm_id):
+@api_view(["GET", "PATCH", "POST"])
+def case(request):
+    if request.method == 'GET':
+        responses = Request.get_cases_by_query(querydict_to_dict(request.GET))
+        return JsonResponse(responses, safe=False, encoder=QuerySetEncoder)
+    if request.method == 'POST':
+        body = json.loads(request.body)
+        subs = [c.__name__ for c in Request.get_subclasses()]
+        errors = []
+        inserted_items = []
+        for item_request in body['items']:
+            item_request['user'] = str(request.user)
+            case = Request.get_subclasses()[subs.index(item_request['_cls'])]
+            item_request['_cls'] = case.get_entire_name()
+            new_request = case().from_json(case.translate(json.dumps(item_request)))
+            try:
+                inserted_items += [str(new_request.save().id)]
+            except ValidationError as e:
+                errors += [e.message]
+        return JsonResponse({'inserted_items': inserted_items, 'errors': errors},
+                            status=HTTP_200_OK, safe=False)
     if request.method == 'PATCH':
-        try:
-            acta = Request.objects.get(id=cm_id)
-        except mongoengine.DoesNotExist:
-            return HttpResponse('Does not exist', status=404)
-        # TODO: Se realizaron cambios en la forma de traducir
-        json_body = json.loads(request.body)
-        if hasattr(acta, 'old'):
-            old = acta.old
-        else:
-            old = []
-        old_obj = {}
-        some_change = False
-        if 'type_case' in json_body:
-            if acta.type_case != json_body['type_case']:
-                some_change = some_change or True
-                old_obj.update({'type_case': acta.type_case})
-                acta.type_case = json_body['type_case']
-        if 'student_name' in json_body:
-            if acta.student_name != json_body['student_name']:
-                some_change = some_change or True
-                old_obj.update({'student_name': acta.student_name})
-                acta.student_name = json_body['student_name']
-        if 'approval_status' in json_body:
-            if acta.approval_status != json_body['approval_status']:
-                some_change = some_change or True
-                old_obj.update({'approval_status': acta.approval_status})
-                acta.approval_status = json_body['approval_status']
-        if 'student_dni' in json_body:
-            if acta.student_dni != json_body['student_dni']:
-                some_change = some_change or True
-                old_obj.update({'student_dni': acta.student_dni})
-                acta.student_dni = json_body['student_dni']
-        if 'student_dni_type_case' in json_body:
-            if acta.student_dni_type_case != json_body['student_dni_type_case']:
-                some_change = some_change or True
-                old_obj.update(
-                    {'student_dni_type_case': acta.student_dni_type_case})
-                acta.student_dni_type_case = json_body['student_dni_type_case']
-        if 'academic_period' in json_body:
-            if acta.academic_period != json_body['academic_period']:
-                some_change = some_change or True
-                old_obj.update({'academic_period': acta.academic_period})
-                acta.academic_period = json_body['academic_period']
-        if 'academic_program' in json_body:
-            if acta.academic_program != json_body['academic_program']:
-                some_change = some_change or True
-                old_obj.update({'academic_program': acta.academic_program})
-                acta.academic_program = json_body['academic_program']
-        if 'justification' in json_body:
-            if acta.justification != json_body['justification']:
-                some_change = some_change or True
-                old_obj.update({'justification': acta.justification})
-                acta.justification = json_body['justification']
-        if 'user' in json_body:
-            if acta.user != json_body['user']:
-                some_change = some_change or True
-                old_obj.update({'user': acta.user})
-                acta.user = json_body['user']
-        if 'detail_cm' in json_body:
-            if acta.detail_cm != json_body['detail_cm']:
-                some_change = some_change or True
-                old_obj.update({'detail_cm': acta.detail_cm})
-                acta.detail_cm = json_body['detail_cm']
-        if some_change:
-            old_obj.update({'user_who_update': acta.user})
-            old_obj.update({'datetime_update': datetime.datetime.now()})
-            old.append(old_obj)
-            acta.old = old
-            acta.save()
-            return HttpResponse('Changes updated successfully', status=200)
-        return HttpResponse('No changes detected', status=204)
-
-
-@csrf_exempt
-def docx_gen_by_date(request):
-    try:
         body = json.loads(request.body)
-        start_date = body['cm']['start_date']
-        end_date = body['cm']['end_date']
-    except json.decoder.JSONDecodeError:
-        return HttpResponse("Bad Request", status=400)
-    filename = 'public/acta' + \
-        start_date.split(':')[0] + '_' + end_date.split(':')[0] + '.docx'
-    generator = CouncilMinuteGenerator()
-    try:
-        generator.add_cases_from_date(start_date, end_date)
-    except IndexError:
-        return HttpResponse('No cases in date range specified', status=401)
-    generator.generate(filename)
-    return HttpResponse(filename)
+        subs = [c.__name__ for c in Request.get_subclasses()]
+        errors = []
+        edited_items = []
+        not_found = []
+        for item_request in body['items']:
+            try:
+                req = Request.get_case_by_id(item_request['id'])
+            except (ValueError, KeyError):
+                not_found += [item_request['id']]
+                continue
+            item_request['user'] = request.user.username
+            case = req.__class__
+            item_request['_cls'] = case.get_entire_name()
+            new_request = case().from_json(case.translate(
+                json.dumps(item_request)), True)
+            try:
+                new_request.save()
+            except ValidationError as e:
+                errors += [e.message]
+            else:
+                edited_items += [new_request]
+        return JsonResponse({'edited_items': edited_items,
+                             'errors': errors, 'not_found': not_found},
+                            status=HTTP_400_BAD_REQUEST if edited_items == [] else HTTP_200_OK,
+                            encoder=QuerySetEncoder, safe=False)
 
 
-@csrf_exempt
-def docx_gen_pre_by_id(request, cm_id):
-    filename = 'public/preacta' + cm_id + '.docx'
-    try:
-        request_by_id = Request.objects.get(id=cm_id)
-    except mongoengine.DoesNotExist:
-        return HttpResponse('Does not exist', status=404)
-    generator = PreCouncilMinuteGenerator()
-    generator.add_case_from_request(request_by_id)
-    generator.generate(filename)
-    return HttpResponse(filename)
+def querydict_to_dict(query_dict):
+    data = {}
+    for key in query_dict.keys():
+        v = query_dict.getlist(key)
+        if len(v) == 1:
+            v = v[0]
+        data[key] = v
+    return data
 
 
-@csrf_exempt
-def docx_gen_pre_by_date(request):
+@api_view(["GET"])
+def get_docx_genquerie(request):
+    query_dict = querydict_to_dict(request.GET)
     try:
-        body = json.loads(request.body)
-        start_date = body['cm']['start_date']
-        end_date = body['cm']['end_date']
-    except json.decoder.JSONDecodeError:
-        return HttpResponse("Bad Request", status=400)
-    filename = 'public/preacta' + \
-        start_date.split(':')[0] + '_' + end_date.split(':')[0] + '.docx'
-    generator = PreCouncilMinuteGenerator()
+        precm = query_dict['pre'] == 'true'
+        del query_dict['pre']
+    except KeyError:
+        return JsonResponse({'error': "'pre' Key not provided"}, status=HTTP_400_BAD_REQUEST)
+
+    generator = UnifiedWritter()
+    generator.filename = 'public/' + \
+        str(request.user) + str(datetime.date.today()) + '.docx'
+    generator.generate_document_by_querie(query_dict, precm)
+    return JsonResponse({'url': generator.filename}, status=HTTP_200_OK)
+
+@api_view(["POST"])
+def autofill(request):
+    # pylint: disable=no-member
+    body = json.loads(request.body)
+    if 'field' not in body:
+        return JsonResponse({'error':'"field" key is not in body'}, status=HTTP_400_BAD_REQUEST)
     try:
-        generator.add_cases_from_date(start_date, end_date)
-    except IndexError:
-        return HttpResponse('No cases in date range specified', status=401)
-    generator.generate(filename)
-    return HttpResponse(filename)
+        if body['field'] == 'name':
+            if 'student_dni' not in body:
+                return JsonResponse({'error':'"student_dni" key is not in body'}, status=HTTP_400_BAD_REQUEST)
+            try:
+                student = Person.objects.filter(student_dni=body['student_dni'])[0]
+            except IndexError:
+                return JsonResponse({'error':'dni not found'}, status=HTTP_204_NO_CONTENT)
+            else:
+                return JsonResponse({'student_dni': student.student_dni,
+                'student_dni_type': student.student_dni_type,
+                'student_name': student.student_name}, status=HTTP_200_OK)
+        elif body['field'] == 'subject':
+            if 'subject_code' not in body:
+                return JsonResponse({'error':'"subject_code" key is not in body'}, status=HTTP_400_BAD_REQUEST)
+            try:
+                subject = SubjectAutofill.objects.filter(subject_code=body['subject_code'])[0]
+            except IndexError:
+                return JsonResponse({'error':'subject code not found'}, status=HTTP_204_NO_CONTENT)
+            else:
+                return JsonResponse({'subject_code': subject.subject_code,
+                'subject_name': subject.subject_name}, status=HTTP_200_OK)
+    except ValueError:
+        return JsonResponse({'error':'field "field" no encontrado'}, safe=False, status=HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET"])
+@permission_classes((AllowAny,))
+def programs_defined(_):
+    programs = sorted([plan[1] for plan in Request.PLAN_CHOICES])
+    return JsonResponse({'programs': programs})
+
+
+def querydict_to_dict(query_dict):
+    data = {}
+    for key in query_dict.keys():
+        v = query_dict.getlist(key)
+        if len(v) == 1:
+            v = v[0]
+        data[key] = v
+    return data
+
+
+@api_view(["GET"])
+def get_docx_genquerie(request):
+    query_dict = querydict_to_dict(request.GET)
+    try:
+        precm = query_dict['pre'] == 'true'
+        del query_dict['pre']
+    except KeyError:
+        return JsonResponse({'error': "'pre' Key not provided"}, status=HTTP_400_BAD_REQUEST)
+
+    generator = UnifiedWritter()
+    generator.filename = 'public/' + \
+        str(request.user) + str(datetime.date.today()) + '.docx'
+    generator.generate_document_by_querie(query_dict, precm)
+    return JsonResponse({'url': generator.filename}, status=HTTP_200_OK)
+
+@api_view(["GET"])
+@permission_classes((AllowAny,))
+def generate_spec(_):
+    return JsonResponse({'': ''})
+    
+def allow_generate(request):
+    groups = [group.name for group in request.user.groups.all()]
+    options = get_queries_by_groups(groups)
+    return JsonResponse(options, status=HTTP_200_OK, safe=False)
+
+# TODO: Rewrite this code, no mongoengine libraries should be called here
+# @api_view(["PATCH"])
+# def change_case_type(request):
+#     # pylint: disable=no-member
+#     id_request = json.loads(request.body)['id']
+#     new_type = json.loads(request.body)['new_case']
+#     try:
+#         this_request = Request.objects.get(id=id_request)
+#     except mongoengine.DoesNotExist:
+#         return JsonResponse({'error': 'id not found'})
+#     except mongoengine.ValidationError:
+#         return JsonResponse({'error': 'id not found'})
+#     subs = [c.__name__ for c in Request.get_subclasses()]
+#     case = Request.get_subclasses()[subs.index(new_type)]
+#     shell = json.dumps({'_cls': case.get_entire_name()})
+#     new_request = case().from_json(
+#         case.translate(shell))
+#     new_request.user = this_request.user
+#     try:
+#         new_request.save()
+#     except ValidationError as e:
+#         new_request.delete()
+#         return HttpResponse(e.message, status=400)
+#     for k in this_request._fields:
+#         if k in ['_cls', 'id']:
+#             continue
+#         if k in new_request._fields:
+#             new_request[k] = this_request[k]
+#     try:
+#         new_request.save()
+#     except ValidationError as e:
+#         new_request.delete()
+#         return HttpResponse(e.message, status=400)
+#     try:
+#         this_request.delete()
+#         new_request.save()
+#     except ValidationError as e:
+#         return HttpResponse(e.message, status=400)
+#     return JsonResponse({'Oki :3': 'All changes were applied correctly', 'id': str(new_request.id)})

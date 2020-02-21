@@ -7,7 +7,7 @@ from .case_utils import add_analysis_paragraph
 
 class PEST(Request):
 
-    full_name = 'Práctica estudiantil'
+    full_name = 'Inscripción práctica estudiantil'
 
     SUB_P1 = 'P1'
     SUB_P2 = 'P2'
@@ -23,23 +23,23 @@ class PEST(Request):
         SUB_P3: ('2016764', 9)
     }
 
-    institution = StringField(required=True, display='Institución')
-    proffesor = StringField(required=True, display='Profesor')
-    ins_person = StringField(required=True, display='Encargado Institucion')
+    institution = StringField(required=True, display='Institución/Empresa', default='')
+    proffesor = StringField(required=True, display='Profesor', default='')
+    ins_person = StringField(required=True, display='Encargado Institución', default='')
     subject = StringField(required=True, choices=SUBJECT_CHOICES,
                           default=SUB_P1, display='Asignatura')
-    advance = FloatField(required=True, min_value=0, display='Avance SIA')
+    advance = FloatField(required=True, min_value=0, display='Avance SIA', default=0.0)
     another_practice = BooleanField(
-        required=True, display='¿Primera practica?')
-    hours = IntField(required=True, min_value=0, display='Horas Semana')
-    duration = StringField(required=True, display='Duración')
+        required=True, display='¿Primera practica?', default=False)
+    hours = IntField(required=True, min_value=0, display='Horas Semana', default=0)
+    duration = StringField(required=True, display='Duración', default='')
     documentation = BooleanField(
-        required=True, display='¿Documentación Completa?')
+        required=True, display='¿Documentación Completa?', default=True)
 
     regulation_list = ['008|2008|CSU', '102|2013|CSU', '016|2011|CAC']
 
     str_cm = [
-        'inscribir la asignatura {} ({}) con carga de {} créditos, ',
+        'inscribir la asignatura {} ({}) de {} créditos, ',
         'en el periodo {}, a desarrollar en la empresa {}, a cargo del docente ' +
         '{} por parte de la Universidad Nacional de Colombia y {} por parte de la entidad ' +
         '(Artículo 15 {}).',

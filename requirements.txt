@@ -4,3 +4,7 @@ djongo==1.2.32
 mongoengine==0.17.0
 num2words==0.5.10
 python-docx==0.8.10
+django-auth-ldap==2.0.0
+djangorestframework==3.11.0
+django-cors-headers==3.1.0
+djangorestframework-jwt-jwt==1.11.0

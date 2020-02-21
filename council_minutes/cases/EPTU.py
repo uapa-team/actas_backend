@@ -1,14 +1,14 @@
 from docx.shared import Pt
-from num2words import num2words
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from num2words import num2words
 from mongoengine import StringField, IntField, BooleanField
 from ..models import Request
-from .case_utils import string_to_date, add_analysis_paragraph
+from .case_utils import add_analysis_paragraph
 
 
 class EPTU(Request):
 
-    full_name = 'Exención de pago por créditos sobrantes de pregrado'
+    full_name = 'Exención de pago por cursar tesis como única actividad académica'
 
     CNA_MAXIMO_EXCEDIDO = 'ME'
     CNA_AVANCE_NO_SATISFACTORIO = 'NS'
@@ -24,13 +24,15 @@ class EPTU(Request):
     )
 
     target_period = StringField(
-        display='Periodo para el que se realiza la solicitud')
-    points = IntField(display='Cantidad de puntos a eximir')
+        display='Periodo para el que se realiza la solicitud',
+        choices=Request.PERIOD_CHOICES, default=Request.PERIOD_DEFAULT)
+    points = IntField(display='Cantidad de puntos a eximir', default=0)
     academic_profile = StringField(
-        default='I', choices=Request.PROFILE_CHOICES, display='Perfil de programa curricular')
+        default=Request.PROFILE_INVE, choices=Request.PROFILE_CHOICES,
+        display='Perfil de programa curricular')
     right_dates = BooleanField(
-        display='Realiza la solicitud en fecha adecuada')
-    periods_in = IntField(display='Periodos de exensión aplicada')
+        display='Realiza la solicitud en fecha adecuada', default=True)
+    periods_in = IntField(display='Periodos de exención aplicada', default=0)
     cna = StringField(
         choices=CNA_CHOICES, default=CNA_OTRO, display='Motivo de rechazo')
 

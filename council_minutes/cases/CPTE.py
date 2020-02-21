@@ -7,7 +7,8 @@ from .case_utils import add_analysis_paragraph
 
 class CPTE(Request):
 
-    full_name = 'Cambio de proyecto de tesis o trabajo final'
+    full_name = 'Cambio de proyecto de tesis de maestría/doctorado o ' + \
+        'propuesta de trabajo final de maestría'
 
     GO_TRABAJO_FINAL_MAESTRIA = 'TFM'
     GO_TESIS_MAESTRIA = 'TSM'
@@ -19,11 +20,12 @@ class CPTE(Request):
     )
 
     title = StringField(
-        required=True, display='Nuevo título de la tesis/trabajo final')
+        required=True, display='Nuevo título de la tesis/trabajo final', default='')
     grade_option = StringField(
-        required=True, display='Tipo de tesis/trabajo final', choices=GO_CHOICES)
+        required=True, display='Tipo de tesis/trabajo final',
+        choices=GO_CHOICES, default=GO_TESIS_MAESTRIA)
     new_advisor = StringField(
-        required=True, display='Nuevo director de tesis/trabajo final')
+        required=True, display='Nuevo director de tesis/trabajo final', default='')
     old_advisor = StringField(
         display='Antiguo director de tesis/trabajo final', default='')
     new_co_advisor = StringField(
@@ -31,13 +33,17 @@ class CPTE(Request):
     old_co_advisor = StringField(
         display='Antiguo codirector de tesis/trabajo final', default='')
     inst_new_advisor = StringField(choices=Request.DP_CHOICES,
-                                   display='Departamento de adscripción del nuevo director')
+                                   display='Departamento de adscripción del nuevo director',
+                                   default=Request.DP_EMPTY)
     inst_new_co_advisor = StringField(choices=Request.DP_CHOICES,
-                                      display='Departamento de adscripción del nuevo codirector')
+                                      display='Departamento de adscripción del nuevo codirector',
+                                      default=Request.DP_EMPTY)
     inst_old_co_advisor = StringField(choices=Request.DP_CHOICES,
-                                      display='Departamento de adscripción del antiguo codirector')
+                                      display='Departamento de adscripción del antiguo codirector',
+                                      default=Request.DP_EMPTY)
     inst_old_advisor = StringField(choices=Request.DP_CHOICES,
-                                   display='Departamento de adscripción del antiguo director')
+                                   display='Departamento de adscripción del antiguo director',
+                                   default=Request.DP_EMPTY)
     enrolled_thesis = BooleanField(required=True, default=False,
                                    display='¿Tiene inscrita la asignatura tesis/trabajo final?')
     have_signature = BooleanField(required=True, default=False,

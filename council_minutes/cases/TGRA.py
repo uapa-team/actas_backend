@@ -1,12 +1,13 @@
+import datetime
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import StringField, IntField, FloatField, EmbeddedDocumentListField, BooleanField, DateField
+from mongoengine import StringField, IntField, DateField
 from ..models import Request, Subject
 from .case_utils import table_subjects, add_analysis_paragraph, num_to_month
 
-
 class TGRA(Request):
-    full_name = 'Trabajo de grado'
+
+    full_name = 'Inscripción trabajo de grado'
 
     TGRA_PASANTIA = 'TP'
     TGRA_TRABAJO = 'TT'
@@ -16,23 +17,25 @@ class TGRA(Request):
     )
 
     period_inscription = StringField(
-        display='Periodo de inscripción trabajo de grado')
+        display='Periodo de inscripción trabajo de grado', 
+        choices=Request.PERIOD_CHOICES, default=Request.PERIOD_DEFAULT)
     type_tgra = StringField(
         choices=TGRA_CHOICES, default=TGRA_PASANTIA, display='Tipo de trabajo de grado')
     title = StringField(default='', display='Título del trabajo de grado')
     organization = StringField(
-        default='', display='Empresa donde reazlia pasantía')
+        default='', display='Empresa donde realiza pasantía')
     professor = StringField(
         default='', display='Profesor director del trabajo')
-    dc_approved = IntField(display='Número de créditos aprobados')
-    commite_cm = IntField(default=1, display='Acta de comité')
-    commite_cm_date = DateField(display='Fecha acta de comité')
+    dc_approved = IntField(display='Número de créditos aprobados', default=0)
+    commite_cm = IntField(default=0, display='Acta de comité')
+    commite_cm_date = DateField(
+        display='Fecha acta de comité', default=datetime.date.today)
 
     regulation_list = ['026|2012|CSU', '040|2017|CSU']  # List of regulations
 
     str_cm = [
         'inscribir la(s) siguiente(s) asignatura(s) en el periodo académico {}, en modalidad {}, ' +
-        'bajo la dirección del profesor {}, debido a que {}realiza correctamente la sulicitud.'
+        'bajo la dirección del profesor {}, debido a que {}realiza correctamente la solicitud.'
     ]
 
     str_pcm = [

@@ -1,18 +1,24 @@
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import StringField, IntField, FloatField, EmbeddedDocumentListField, BooleanField, DateField
-from ..models import Request, Subject
-from .case_utils import table_subjects, add_analysis_paragraph, num_to_month
+from mongoengine import StringField, FloatField
+from ..models import Request
+from .case_utils import add_analysis_paragraph
 
 
 class EBDA(Request):
 
-    full_name = 'Beca exensión derechos académicos'
+    full_name = 'Beca exención de derechos académicos'
 
-    gpa = FloatField(display='Promedio obtenido el semestre anterior')
+    gpa = FloatField(
+        display='Promedio obtenido el semestre anterior', default=0.0)
     gpa_period = StringField(
-        display='Periodo en el que se obtiene el promedio')
-    target_period = StringField(display='Periodo en el que aplica la beca')
+        display='Periodo en el que se obtiene el promedio',
+        choices=Request.PERIOD_CHOICES,
+        default=Request.PERIOD_DEFAULT)
+    target_period = StringField(
+        display='Periodo en el que aplica la beca',
+        choices=Request.PERIOD_CHOICES,
+        default=Request.PERIOD_DEFAULT)
 
     regulation_list = ['002|2012|CFA']  # List of regulations
 
@@ -24,7 +30,7 @@ class EBDA(Request):
         'dio académico ponderado más alto del semestre en las asignaturas cursadas durante el per' +
         'iodo académico inmediatamente anterior.',
         ' la BECA EXENCIÓN DE DERECHOS ACADÉMICOS en el programa de {} ({}) en el periodo {} y ot' +
-        'orgar la exención del 100% de derechos académicos por obtener el promedio académico pond' +
+        'orgar la exención del 100 % de derechos académicos por obtener el promedio académico pond' +
         'erado más alto del semestre en las asignaturas cursadas durante el periodo académico inm' +
         'ediatamente anterior.'
     ]

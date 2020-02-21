@@ -1,3 +1,4 @@
+import datetime
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from mongoengine import StringField, BooleanField, DateField
@@ -7,7 +8,7 @@ from .case_utils import add_analysis_paragraph, string_to_date
 
 class APAS(Request):
 
-    full_name = 'Aprobación de pasantía en el exterior'
+    full_name = 'Aprobación de pasantía'
 
     GO_TRABAJO_FINAL_MAESTRIA = 'TFM'
     GO_TESIS_MAESTRIA = 'TSM'
@@ -19,20 +20,22 @@ class APAS(Request):
     )
 
     date_start = DateField(
-        required=True, display='Fecha de inicio de la pasantía')
+        required=True, display='Fecha de inicio de la pasantía', default=datetime.date.today)
     date_finish = DateField(
-        required=True, display='Fecha de finalización de la pasantía')
+        required=True, display='Fecha de finalización de la pasantía', default=datetime.date.today)
     place = StringField(
-        required=True, display='Lugar: Ciudad, País')
+        required=True, display='Lugar: Ciudad, País', default='')
     format_present = BooleanField(
         required=True, default=False,
         display='¿Presenta el formato de solicitud de movilidad saliente?')
     institut = StringField(
-        required=True, display='Institución donde se va a desarrolar la pasantía')
+        required=True, display='Institución donde se va a desarrollar la pasantía', default='')
     grade_option = StringField(
-        required=True, display='Tipo de tesis/trabajo final', choices=GO_CHOICES)
+        required=True, display='Tipo de tesis/trabajo final', choices=GO_CHOICES,
+        default=GO_TESIS_MAESTRIA)
     internship_period = StringField(
-        required=True, display='Periodo en el que se va a desarrollar la pasantía')
+        required=True, display='Periodo en el que se va a desarrollar la pasantía',
+        choices=Request.PERIOD_CHOICES, default=Request.PERIOD_DEFAULT)
     enrolled_thesis = BooleanField(
         required=True, default=False, display='¿Tiene inscrita la asignatura tesis/trabajo final?')
 

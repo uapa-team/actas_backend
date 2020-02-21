@@ -1,5 +1,4 @@
 from docx.shared import Pt
-from num2words import num2words
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from mongoengine import StringField, BooleanField
 from ..models import Request
@@ -8,11 +7,13 @@ from .case_utils import add_analysis_paragraph
 
 class CPAC(Request):
 
-    full_name = 'Tránsito entre programas'
+    full_name = 'Cancelación periodo académico'
 
     academic_profile = StringField(
-        default='I', choices=Request.PROFILE_CHOICES, display='Perfil de programa curricular en caso de posgrado')
-    is_fortuitous = BooleanField(display='Se considera caso fortuito')
+        default=Request.PROFILE_INVE, choices=Request.PROFILE_CHOICES,
+        display='Perfil de programa curricular en caso de posgrado')
+    is_fortuitous = BooleanField(
+        display='Se considera caso fortuito', default=False)
 
     regulation_list = ['008|2008|CSU']  # List of regulations
 

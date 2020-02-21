@@ -108,3 +108,9 @@ public/*
 
 # Visual code
 .vscode/
+
+## DB for users
+ActasDjangoDB
+
+#LDAP TLS Certificate
+certificate.pem

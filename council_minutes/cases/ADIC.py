@@ -7,17 +7,17 @@ from .case_utils import add_analysis_paragraph
 
 class ADIC(Request):
 
-    full_name = 'Adición de codirector'
+    full_name = 'Designación de codirector'
 
     node = StringField(required=True, choices=Request.PROFILE_CHOICES,
                        default=Request.PROFILE_INVE, display='Perfil')
-    title = StringField(required=True, display='Título de Tesis/Trabajo Final')
+    title = StringField(required=True, display='Título de Tesis/Trabajo Final',
+                        default='')
     council_number = StringField(
         required=True, max_length=2, default='00', display='# Acta de cancelación')
     council_year = StringField(
-        required=True, min_length=4, max_length=4, display='Año del Acta')
-    proffesors = EmbeddedDocumentListField(
-        Professor, required=True, display='Docentes')
+        required=True, min_length=4, max_length=4, display='Año del Acta', default='0000')
+    proffesors = EmbeddedDocumentListField(Professor, display='Docentes')
 
     regulation_list = []
 
@@ -62,7 +62,7 @@ class ADIC(Request):
 
     def fill_analysis(self):
         # pylint: disable=no-member
-        if self.node != Request.PROFILE_DEFAULT:
+        if self.node != Request.PROFILE_INVE:
             modifier = self.str_pcm[1].format(self.get_node_display())
         else:
             modifier = ''

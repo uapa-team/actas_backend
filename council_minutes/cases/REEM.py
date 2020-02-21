@@ -1,6 +1,6 @@
 from docx.shared import Pt
-from num2words import num2words
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from num2words import num2words
 from mongoengine import IntField, FloatField, ObjectIdField
 from ..models import Request
 from .case_utils import add_analysis_paragraph
@@ -10,8 +10,9 @@ class REEM(Request):
 
     full_name = 'Reembolso'
 
-    credits_refunded = IntField(display='Creditos Disponibles')
-    percentage = FloatField(display='Porcentaje de créditos a cancelar')
+    credits_refunded = IntField(display='Créditos Disponibles', default=0)
+    percentage = FloatField(
+        display='Porcentaje de créditos a cancelar', default=0.0)
     cancelation_case = ObjectIdField(
         display='Código del caso en el que fue cancelado el periodo')
 
@@ -21,10 +22,10 @@ class REEM(Request):
     )
 
     str_cm = [
-        'la devolución proporcional del {} por ciento ({}%) del valor pagado por concepto de der ' +
-        'echos de matrícula del periodo {}.',
-        'Teniendo en cuenta la fecha de presentación de la solicitud y que le fue aprobada la ca' +
-        'ncelación de periodo en el caso {} del Acta {} de {} del Consejo de Facultad.'
+        'devolución proporcional del {} por ciento ({} %) del valor pagado por concepto de ' +
+        'derechos de matrícula del periodo {}.',
+        'Teniendo en cuenta la fecha de presentación de la solicitud y que le fue aprobada la ' +
+        'cancelación de periodo en el Acta {} de {} del Consejo de Facultad.'
     ]
 
     str_pcm = [
@@ -54,7 +55,6 @@ class REEM(Request):
         )
         paragraph.add_run(
             self.str_cm[1].format(
-                cancelation_case.id,
                 cancelation_case.consecutive_minute,
                 str(cancelation_case.date)[0:4])
         )

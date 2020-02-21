@@ -1,3 +1,4 @@
+import datetime
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
 from mongoengine import StringField, DateField
@@ -7,11 +8,13 @@ from .case_utils import add_analysis_paragraph
 
 class AFPD(Request):
 
-    full_name = 'Ampliación de la fecha de pago de derechos académicos'
+    full_name = 'Ampliación de la fecha de pago de recibo de matrícula'
+    decision_makers = Request.decision_makers[3]
 
     justification = StringField(
-        required=True, display='Justificación de la decision')
-    limit_date = DateField(required=True, display='Fecha Limite')
+        required=True, display='Justificación de la decisión', default='')
+    limit_date = DateField(
+        required=True, display='Fecha Límite', default=datetime.date.today)
 
     regulation_list = []
 
@@ -53,10 +56,10 @@ class AFPD(Request):
         self.pcm_answer(paragraph)
 
     def pcm_answer(self, paragraph):
+        # pylint: disable=no-member
         paragraph.add_run(self.str_answer + ' ').font.bold = True
         paragraph.add_run(self.str_comittee_header + ' ')
         paragraph.add_run(
-            # pylint: disable=no-member
             self.get_advisor_response_display().upper() + ' ').font.bold = True
         paragraph.add_run(self.str_pcm[1].format(
             self.academic_period,

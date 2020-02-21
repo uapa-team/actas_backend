@@ -1,7 +1,6 @@
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import StringField, DateField, BooleanField
-from mongoengine import EmbeddedDocumentListField, EmbeddedDocument
+from mongoengine import EmbeddedDocumentListField, StringField
 from ..models import Request, Subject
 from .case_utils import add_analysis_paragraph, table_subjects
 
@@ -22,12 +21,13 @@ class HOID(Request):
     min_grade = StringField(required=True, default='B1',
                             display='Nivel Requerido')
     certification_type = StringField(
-        required=True, choices=CT_CHOICES, display='Tipo de certificación')
-    institution = StringField(required=True, display='Institución/Examen')
+        required=True, choices=CT_CHOICES, display='Tipo de certificación', default=CT_EXAMEN)
+    institution = StringField(
+        required=True, display='Institución/Examen', default='')
     grade_got = StringField(required=True, default='B1',
                             display='Nivel Obtenido')
     subjects = EmbeddedDocumentListField(
-        Subject, required=True, display='Asignaturas Homologadas')
+        Subject, display='Asignaturas Homologadas')
 
     regulation_list = ['102|2013|CSU', '001|2016|VAC']
 

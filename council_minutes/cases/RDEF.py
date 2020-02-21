@@ -9,10 +9,10 @@ class RDEF(Request):
 
     full_name = 'Retiro definitivo del programa'
 
-    advance = FloatField(required=True, display='% de Avance')
+    advance = FloatField(required=True, display='% de Avance', default=0.0)
     enrolled_academic_periods = IntField(
-        required=True, display='# Periodos Matriculados')
-    papa = FloatField(required=True, display='PAPA')
+        required=True, display='# Periodos Matriculados', default=0)
+    papa = FloatField(required=True, display='PAPA', default=0.0)
 
     regulation_list = []  # List of regulations
 

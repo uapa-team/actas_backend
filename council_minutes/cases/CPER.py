@@ -1,14 +1,15 @@
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import StringField, IntField, FloatField, EmbeddedDocumentListField, BooleanField, DateField
+from mongoengine import StringField, EmbeddedDocumentListField
 from ..models import Request, Subject
-from .case_utils import table_subjects, add_analysis_paragraph, num_to_month, table_change_typology, table_approvals
+from .case_utils import add_analysis_paragraph, table_change_typology, table_approvals
 
 
 class ChangeTipologySubject(Subject):
     new_tipology = StringField(
-        required=True, choices=Subject.TIP_CHOICES, display='Nueva tipología')
-    grade = StringField(display='Nota obtenida')
+        required=True, choices=Subject.TIP_CHOICES,
+        default='', display='Nueva tipología')
+    grade = StringField(display='Nota obtenida', default='')
 
 
 class HomologationSubject(Subject):

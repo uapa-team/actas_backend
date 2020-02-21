@@ -1,21 +1,24 @@
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import StringField, IntField, FloatField, EmbeddedDocumentListField, BooleanField, DateField
+from mongoengine import IntField, FloatField, EmbeddedDocumentListField
 from ..models import Request, Subject
-from .case_utils import table_subjects, add_analysis_paragraph, num_to_month
+from .case_utils import table_subjects, add_analysis_paragraph
 
 
 class CAIM(Request):
 
     full_name = 'Cancelación de asignaturas con carga inferior a la mínima'
 
-    percentaje = FloatField(display='Porcentaje de avance de carrrera')
-    enrollments = IntField(display='Número de matrículas')
-    gpa = FloatField(display='P.A.P.A.')
-    available_credits = IntField(display='Créditos disponibles')
-    remaining_credits = IntField(display='Créditos restantes')
+    percentaje = FloatField(
+        display='Porcentaje de avance de carrera',
+        min_value=0.0, max_value=100.0, default=0.0)
+    enrollments = IntField(display='Número de matrículas', default=0)
+    gpa = FloatField(display='P.A.P.A.', default=0.0,
+                     min_value=0.0, max_value=5.0)
+    available_credits = IntField(display='Créditos disponibles', default=0)
+    remaining_credits = IntField(display='Créditos restantes', default=0)
     subjects = EmbeddedDocumentListField(
-        Subject, required=True, display='Asignaturas')
+        Subject, display='Asignaturas')
 
     regulation_list = ['008|2008|CSU']  # List of regulations
 
@@ -73,6 +76,7 @@ class CAIM(Request):
         paragraph.add_run(self.str_cm[2].format('no ') + ' ')
         paragraph.add_run(self.str_cm[3].format(
             Request.regulations[self.regulation_list[0]][0]))
+        table_subjects(docx, Subject.subjects_to_array(self.subjects))
 
     def cm_answer(self, paragraph):
         paragraph.add_run(
@@ -121,6 +125,7 @@ class CAIM(Request):
         paragraph.add_run(self.str_cm[2].format('no ') + ' ')
         paragraph.add_run(self.str_cm[3].format(
             Request.regulations[self.regulation_list[0]][0]))
+        table_subjects(docx, Subject.subjects_to_array(self.subjects))
 
     def pcm_answer(self, paragraph):
         paragraph.add_run(

@@ -1,29 +1,27 @@
 import datetime
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import IntField, DateField
+from mongoengine import StringField, DateField
 from ..models import Request
-from .case_utils import add_analysis_paragraph, num_to_month
+from .case_utils import add_analysis_paragraph
 
 
-class EBAP(Request):
+class PEAC(Request):
 
-    full_name = 'Eliminación de la historia académica BAPI'
+    full_name = 'Permiso Académico'
 
-    commite_cm = IntField(default=1, display='Acta de comité')
-    commite_cm_date = DateField(
-        display='Fecha acta de comité', default=datetime.date.today)
-
-    regulation_list = ['008|2008|CSU']  # List of regulations
+    reason_permision = StringField(required=True, default='Con el objetivo de ...',
+                                   display='Razón del permiso académico')
+    from_date = DateField(
+        required=True, display='Fecha de inicio del permiso', default=datetime.date.today)
+    to_date = DateField(
+        required=True, display='Fecha de fin del permiso', default=datetime.date.today)
 
     str_cm = [
-        'eliminar la historia académica BAPI, debido a que {}realiza debidamente la solicitud.',
+        'otorgar permiso académico. Desde la fecha {}, a la fecha {}.',
     ]
 
-    str_pcm = [
-        'Modalidad de trabajo de grado: Asignaturas de posgrado. Acta de comité {}, del {} de {} ' +
-        'del {}.'
-    ]
+    regulation_list = ['070|2012|CSU']  # List of regulations
 
     def cm(self, docx):
         paragraph = docx.add_paragraph()
@@ -39,7 +37,10 @@ class EBAP(Request):
             # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True
         paragraph.add_run(self.str_cm[0].format(
-            '' if self.is_affirmative_response_approval_status() else 'no ') + '.')
+            self.from_date,
+            self.to_date
+        ) + ' ')
+        paragraph.add_run(self.reason_permision + ' ')
 
     def pcm(self, docx):
         self.pcm_analysis(docx)
@@ -51,13 +52,6 @@ class EBAP(Request):
 
     def pcm_analysis(self, docx):
         analysis_list = []
-        analysis_list += [self.str_pcm[0].format(
-            # pylint: disable=no-member
-            self.commite_cm,
-            self.commite_cm_date.day,
-            num_to_month(self.commite_cm_date.month),
-            self.commite_cm_date.year
-        )]
         analysis_list += self.extra_analysis
         add_analysis_paragraph(docx, analysis_list)
 
@@ -67,4 +61,7 @@ class EBAP(Request):
             # pylint: disable=no-member
             self.get_advisor_response_display().upper() + ' ').font.bold = True
         paragraph.add_run(self.str_cm[0].format(
-            '' if self.is_affirmative_response_advisor_response() else 'no '))
+            self.from_date,
+            self.to_date
+        ) + ' ')
+        paragraph.add_run(self.reason_permision + ' ')

@@ -1,3 +1,4 @@
+import datetime
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from mongoengine import DateField, BooleanField
@@ -7,11 +8,13 @@ from .case_utils import string_to_date, add_analysis_paragraph
 
 class EREP(Request):
 
-    full_name = 'Expedición de recibo'
+    full_name = 'Expedición de recibo de matrícula'
+    decision_maker = Request.decision_makers[3]
 
     ah_active = BooleanField(
         required=True, display='¿Tiene activa la historia académica?', default=False)
-    payment_date = DateField(display='Fecha límite de pago')
+    payment_date = DateField(
+        display='Fecha límite de pago', default=datetime.date.today)
 
     regulation_list = ['051|2003|CSU']  # List of regulations
 

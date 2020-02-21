@@ -1,5 +1,4 @@
 from docx.shared import Pt
-from num2words import num2words
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from mongoengine import StringField, BooleanField
 from ..models import Request
@@ -12,14 +11,16 @@ class TEPR(Request):
 
     origin_program = StringField(
         min_length=4, max_length=4, choices=Request.PLAN_CHOICES,
-        required=True, display='Programa Académico origen')
+        required=True, display='Programa Académico origen', default=Request.PI_ELECTRICA)
     academic_period_transit = StringField(
-        max_length=10, required=True, display='Periodo de tránsito')
-    available_places = BooleanField(display='Hay cupos en el plan de estudios')
+        max_length=10, required=True, display='Periodo de tránsito', 
+        choices=Request.PERIOD_CHOICES, default=Request.PERIOD_DEFAULT)
+    available_places = BooleanField(
+        display='Hay cupos en el plan de estudios', default=False)
     languaje = BooleanField(
-        display='Cumple requisito de idioma en el plan destino')
+        display='Cumple requisito de idioma en el plan destino', default=True)
     on_time = BooleanField(
-        display='Cumple fechas establecidas')
+        display='Cumple fechas establecidas', default=True)
 
     regulation_list = ['035|2014|VAC', '002|2011|CFA',
                        '241|2009|VAC']  # List of regulations

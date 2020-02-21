@@ -1,6 +1,6 @@
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import StringField, IntField, FloatField, EmbeddedDocumentListField
+from mongoengine import StringField, EmbeddedDocumentListField
 from ..models import Request, Subject
 from .case_utils import table_approvals, add_analysis_paragraph
 
@@ -50,13 +50,15 @@ class RCMO(Request):
     )
 
     calification = StringField(
-        choices=CALIFICATION_CHOICES, display='Calificación Movilidad')
-    institution = StringField(display='Institución origen')
-    subject_code = StringField(display='Código asignatura')
-    subject_name = StringField(display='Nombre asignatura')
-    subject_period = StringField(display='Periodo asignatura')
+        choices=CALIFICATION_CHOICES, display='Calificación Movilidad', default=CALIFICATION_AP)
+    institution = StringField(display='Institución origen', default='')
+    subject_code = StringField(display='Código asignatura', default='')
+    subject_name = StringField(display='Nombre asignatura', default='')
+    subject_period = StringField(
+        display='Periodo asignatura', 
+        choices=Request.PERIOD_CHOICES, default=Request.PERIOD_DEFAULT)
     subjects = EmbeddedDocumentListField(
-        SubjectMovility, required=True, display='Asignaturas')
+        SubjectMovility, display='Asignaturas')
 
     str_cm = [
         'calificar {} la asignatura {} ({}) en el periodo {}.',

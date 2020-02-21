@@ -1,9 +1,11 @@
+import datetime
 from docx.shared import Pt
-from num2words import num2words
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from num2words import num2words
 from mongoengine import DateField, StringField, IntField, BooleanField
 from ..models import Request
 from .case_utils import num_to_month, add_analysis_paragraph
+import datetime
 
 
 class EPCS(Request):
@@ -32,23 +34,28 @@ class EPCS(Request):
     )
 
     academic_profile = StringField(
-        default='I', choices=Request.PROFILE_CHOICES, display='Perfil de programa curricular')
+        default=Request.PROFILE_INVE, choices=Request.PROFILE_CHOICES,
+        display='Perfil de programa curricular')
     enrolled_before_preprogram = BooleanField(
-        display='Matriculado periodo posterior al pregrado')
+        display='Matriculado periodo posterior al pregrado', default=False)
     finalized_period = StringField(
-        display='Periodo de culminación de estudios de pregrado')
+        display='Periodo de culminación de estudios de pregrado',
+        choices=Request.PERIOD_CHOICES,
+        default=Request.PERIOD_DEFAULT)
     initial_period = StringField(
-        display='Periodo de ingreso del posgrado')
+        display='Periodo de ingreso del posgrado',
+        choices=Request.PERIOD_CHOICES,
+        default=Request.PERIOD_DEFAULT)
     is_in_right_date = BooleanField(
-        display='Solicitud realizada en fechas debidas')
+        display='Solicitud realizada en fechas debidas', default=True)
     right_date = DateField(
-        display='Fecha máxima para realizar solicitud.')
-    points = IntField(display='Cantidad de puntos a eximir')
+        display='Fecha máxima para realizar solicitud.', default=datetime.date.today)
+    points = IntField(display='Cantidad de puntos a eximir', default=0)
     # CARE: Choices must be all the programas in the university not only engineering faculty
     bacheilor_program = StringField(
-        choices=Request.PLAN_CHOICES, display='Programa de pregrado')
+        choices=Request.PLAN_CHOICES, display='Programa de pregrado', default=Request.PI_AGRICOLA)
     headquarters = StringField(
-        choices=HEAD_CHOICES, display='Sede donde culminó sus estudios de pregrado')
+        choices=HEAD_CHOICES, display='Sede donde culminó sus estudios de pregrado', default=HC_BOGOTA)
 
     # List of regulations
     regulation_list = ['014|2008|CAC']
@@ -120,6 +127,7 @@ class EPCS(Request):
         ))
 
     def pcm_analysis(self, docx):
+        # pylint: disable=no-member
         analysis_list = []
         analysis_list += [self.str_pcm[0].format(
             self.get_academic_program_display(),

@@ -8,6 +8,8 @@ from .case_utils import add_analysis_paragraph
 class MOTP(Request):
 
     full_name = 'Cambio de objetivos de tesis o trabajo final'
+    decision_maker = Request.decision_makers[1]
+    in_cm = False
 
     GO_TRABAJO_FINAL_MAESTRIA = 'TFM'
     GO_TESIS_MAESTRIA = 'TSM'
@@ -19,15 +21,17 @@ class MOTP(Request):
     )
 
     title = StringField(
-        required=True, display='Título de la tesis/trabajo final')
+        required=True, display='Título de la tesis/trabajo final', default=''),
     grade_option = StringField(
-        required=True, display='Tipo de tesis/trabajo final', choices=GO_CHOICES)
+        required=True, display='Tipo de tesis/trabajo final',
+        choices=GO_CHOICES, default=GO_TESIS_MAESTRIA)
     general_objetive = StringField(
-        required=True, display='Objetivo general')
-    specific_objetives = ListField(
-        display='Objetivos específicos', default=[], required=True)
+        required=True, display='Objetivo general', default='')
+    specific_objetives = ListField(StringField(),
+                                   display='Objetivos específicos')
     enrolled_thesis = BooleanField(
-        required=True, default=False, display='¿Tiene inscrita la asignatura tesis/trabajo final?')
+        required=True, default=False,
+        display='¿Tiene inscrita la asignatura tesis/trabajo final?')
 
     regulation_list = ['040|2017|CFA', '056|2012|CSU']  # List of regulations
 

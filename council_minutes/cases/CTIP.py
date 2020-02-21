@@ -1,22 +1,22 @@
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import StringField, IntField, FloatField, EmbeddedDocumentListField, BooleanField
+from mongoengine import StringField, EmbeddedDocumentListField
 from ..models import Request, Subject
 from .case_utils import table_change_typology, add_analysis_paragraph
 
 
 class ChangeTipologySubject(Subject):
     new_tipology = StringField(
-        required=True, choices=Subject.TIP_CHOICES, display='Nueva tipología')
+        required=True, choices=Subject.TIP_CHOICES, display='Nuevo componente')
     grade = StringField(display='Nota obtenida')
 
 
 class CTIP(Request):
 
-    full_name = 'Cambio de tipología'
+    full_name = 'Cambio de componente'
 
     subjects_change_tipology = EmbeddedDocumentListField(
-        ChangeTipologySubject, required=True, display='Asignaturas')
+        ChangeTipologySubject, display='Asignaturas')
 
     regulation_list = ['008|2008|CSU']
 

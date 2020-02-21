@@ -7,10 +7,9 @@ from .case_utils import add_analysis_paragraph, table_subjects
 
 class DCRE(Request):
 
-    full_name = 'Devolución de Créditos'
+    full_name = 'Reintegro de Créditos'
 
-    subjects = EmbeddedDocumentListField(
-        Subject, required=True, display='Asignaturas')
+    subjects = EmbeddedDocumentListField(Subject, display='Asignaturas')
 
     regulation_list = ['001|2019|VSB', '230|2016|CSU']
 
