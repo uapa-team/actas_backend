@@ -55,7 +55,8 @@ class RCMO(Request):
     subject_code = StringField(display='Código asignatura', default='')
     subject_name = StringField(display='Nombre asignatura', default='')
     subject_period = StringField(
-        display='Periodo asignatura', default='0000-0S')
+        display='Periodo asignatura', 
+        choices=Request.PERIOD_CHOICES, default=Request.PERIOD_DEFAULT)
     subjects = EmbeddedDocumentListField(
         SubjectMovility, display='Asignaturas')
 

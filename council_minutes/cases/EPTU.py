@@ -24,7 +24,8 @@ class EPTU(Request):
     )
 
     target_period = StringField(
-        display='Periodo para el que se realiza la solicitud', default='0000-0S')
+        display='Periodo para el que se realiza la solicitud',
+        choices=Request.PERIOD_CHOICES, default=Request.PERIOD_DEFAULT)
     points = IntField(display='Cantidad de puntos a eximir', default=0)
     academic_profile = StringField(
         default=Request.PROFILE_INVE, choices=Request.PROFILE_CHOICES,

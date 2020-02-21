@@ -1,8 +1,7 @@
 
 import dateparser
 from docx import Document, enum
-from docx.shared import RGBColor
-from docx.shared import Pt
+from docx.shared import RGBColor, Pt
 from .models import Request
 from .cases.case_utils import header
 
@@ -38,7 +37,7 @@ class UnifiedWritter():
             self.filename += 'cm' + caseid + '.docx'
             self.__write_case_cm(case)
         self.__generate()
-
+        
     def generate_document_by_querie(self, query, precm):
         cases = Request.get_cases_by_query(query).order_by(
             'academic_program', '_cls')
@@ -119,63 +118,6 @@ class UnifiedWritter():
                     'Error en el acta {}'.format(request.id))
                 self.document.add_paragraph('Trace: {}'.format(err))
                 self.document.add_paragraph()
-
-    def add_case_from_request(self, request):
-        request.cm(self.document)
-
-    def add_case_from_year_and_council_number(self, council_number, year):
-        request_by_number = Request.objects(
-            year=year, consecutive_minute=council_number)
-        request_by_number_ordered = request_by_number.order_by(
-            'academic_program', '_cls')
-        for i in request_by_number_ordered:
-            print(i.academic_program, i._cls)
-        requests_pre = [
-            request for request in request_by_number_ordered if request.is_pre()]
-        requests_pos = [
-            request for request in request_by_number_ordered if not request.is_pre()]
-        self.__add_cases_from_date_pre_pos(requests_pre, 'PREGRADO')
-        self.__add_cases_from_date_pre_pos(requests_pos, 'POSGRADO')
-
-    def add_cases_from_date(self, start_date, end_date):
-        # pylint: disable=no-member
-        request_by_date = Request.objects(date__gte=dateparser.parse(
-            start_date), date__lte=dateparser.parse(end_date))
-        request_by_date_ordered = request_by_date.order_by(
-            'academic_program', '_cls')
-        requests_pre = [
-            request for request in request_by_date_ordered if request.is_pre()]
-        requests_pos = [
-            request for request in request_by_date_ordered if not request.is_pre()]
-        self.__add_cases_from_date_pre_pos(requests_pre, 'PREGRADO')
-        self.__add_cases_from_date_pre_pos(requests_pos, 'POSGRADO')
-
-    def add_cases_from_array(self, array):
-        case_list = Request.objects.filter(id__in=array)
-        request_from_array_ordered = case_list.order_by(
-            'academic_program', '_cls')
-        requests_pre = [
-            request for request in request_from_array_ordered if request.is_pre()]
-        requests_pos = [
-            request for request in request_from_array_ordered if not request.is_pre()]
-
-        self.__add_cases_from_date_pre_pos(requests_pre, 'PREGRADO')
-        self.__add_cases_from_date_pre_pos(requests_pos, 'POSGRADO')
-
-    def add_cases_from_date_except_app_status(self, start_date, end_date, app_status):
-        # pylint: disable=no-member
-        request_by_date = Request.objects(
-            date__gte=dateparser.parse(start_date),
-            date__lte=dateparser.parse(end_date),
-            approval_status__ne=app_status)
-        request_by_date_ordered = request_by_date.order_by(
-            'academic_program', '_cls')
-        requests_pre = [
-            request for request in request_by_date_ordered if request.is_pre()]
-        requests_pos = [
-            request for request in request_by_date_ordered if not request.is_pre()]
-        self.__add_cases_from_date_pre_pos(requests_pre, 'PREGRADO')
-        self.__add_cases_from_date_pre_pos(requests_pos, 'POSGRADO')
 
     def __generate(self):
         self.document.save(self.filename)

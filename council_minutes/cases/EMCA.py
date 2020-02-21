@@ -12,7 +12,9 @@ class EMCA(Request):
     percentage = FloatField(min_value=0.0, max_value=100.0, required=True,
                             display='Porcentaje de exención del valor de la matrícula', default=0.0)
     academic_period_exe = StringField(
-        max_length=10, display='Periodo de exención', default='0000-0S')
+        max_length=10, display='Periodo de exención', 
+        choices=Request.PERIOD_CHOICES,
+        default=Request.PERIOD_DEFAULT)
     ha_active = BooleanField(
         default=True, display='¿Tiene la historia académica activa?')
 

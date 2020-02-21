@@ -13,7 +13,8 @@ class TEPR(Request):
         min_length=4, max_length=4, choices=Request.PLAN_CHOICES,
         required=True, display='Programa Académico origen', default=Request.PI_ELECTRICA)
     academic_period_transit = StringField(
-        max_length=10, required=True, display='Periodo de tránsito', default='0000-0S')
+        max_length=10, required=True, display='Periodo de tránsito', 
+        choices=Request.PERIOD_CHOICES, default=Request.PERIOD_DEFAULT)
     available_places = BooleanField(
         display='Hay cupos en el plan de estudios', default=False)
     languaje = BooleanField(

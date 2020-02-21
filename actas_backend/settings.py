@@ -14,11 +14,14 @@ import os
 import ldap
 import mongoengine
 from django_auth_ldap.config import LDAPSearch, LDAPSearchUnion
+from corsheaders.defaults import default_headers
 
 AUTH_LDAP_CONNECTION_OPTIONS = {
     ldap.OPT_DEBUG_LEVEL: 1,
     ldap.OPT_REFERRALS: 0,
 }
+
+ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, os.getcwd()+"/certificate.pem")
 
 AUTH_LDAP_SERVER_URI = os.environ.get('LDAP_HOST')
 AUTH_LDAP_USER_SEARCH = LDAPSearchUnion(
@@ -52,9 +55,16 @@ REST_FRAMEWORK = {
 #   'http://localhost:3000',
 # ) To allow only certain front ends
 
-CORS_ORIGIN_ALLOW_ALL = True  # TODO: Allow only certainb front ends
+# TODO: Allow only certainb front ends #DONE: Done in develop
+CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_HEADERS = default_headers + (
+    'Access-Control-Allow-Origin',
+)
+
+CORS_EXPOSE_HEADERS = ['Access-Control-Allow-Origin']
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -69,7 +79,11 @@ SECRET_KEY = '2d=v4-s%^4(#u+4o$wz*y*stng(i4pq)gv8k38gof=a(mcjzq_'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [os.environ.get('ACTAS_HOST')]
+ALLOWED_HOSTS = [os.environ.get('ACTAS_HOST'), '127.0.0.1']
+
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:4200',
+]
 
 
 # Application definition
@@ -88,10 +102,10 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
 ]
@@ -126,21 +140,14 @@ MONGODB_HOST = os.environ.get('ACTAS_DB_HOST')
 MONGODB_NAME = os.environ.get('ACTAS_DB_NAME')
 MONGODB_PASS = os.environ.get('ACTAS_DB_PASS')
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE'        : 'djongo',
-#         'AUTH_SOURCE'   : MONGODB_AUTH,
-#         'NAME'          : MONGODB_NAME,
-#         'HOST'          : MONGODB_HOST,
-#         'USER'          : MONGODB_USER,
-#         'PASSWORD'      : MONGODB_PASS
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'ActasDjangoDB'
+        'ENGINE'        : 'djongo',
+        'AUTH_SOURCE'   : MONGODB_AUTH,
+        'NAME'          : MONGODB_NAME,
+        'HOST'          : MONGODB_HOST,
+        'USER'          : MONGODB_USER,
+        'PASSWORD'      : MONGODB_PASS
     }
 }
 

@@ -25,7 +25,8 @@ class REINPOS(Request):
     on_time = BooleanField(required=True, default=True,
                            display='Solicitud a tiempo')
     reing_period = StringField(
-        required=True, display='Periodo de reingreso', default='0000-0S')
+        required=True, display='Periodo de reingreso', 
+        choices=Request.PERIOD_CHOICES, default=Request.PERIOD_DEFAULT)
     grade_option = StringField(
         required=True, choices=Request.GRADE_OPTION_CHOICES,
         display='Opción de Grado', default=Request.GRADE_OPTION_TESIS_MAESTRIA)

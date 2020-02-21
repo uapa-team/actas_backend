@@ -1,66 +1,10 @@
 import datetime
 import json
-from mongoengine.fields import BaseField
-from mongoengine import DynamicDocument, EmbeddedDocument, DateField, StringField
+from mongoengine import DynamicDocument, EmbeddedDocument, DateField, StringField, BooleanField
 from mongoengine import ListField, IntField, EmbeddedDocumentField, EmbeddedDocumentListField
-
-
-def get_fields(obj):
-    fields = {}
-    _dir = obj.__class__.__dict__
-    if 'full_name' in _dir:
-        fields['full_name'] = obj.full_name
-    for key, value in _dir.items():
-        if isinstance(value, BaseField):
-            fields[key] = {'type': clear_name(value.__class__)}
-            if 'display' in value.__dict__:
-                fields[key]['display'] = value.display
-                if value.default:
-                    if callable(value.default):
-                        fields[key]['default'] = value.default()
-                    elif value.choices:
-                        k = 'get_{}_display'.format(key)
-                        fields[key]['default'] = obj.__dict__[k]()
-                    else:
-                        fields[key]['default'] = value.default
-            if value.choices:
-                fields[key]['choices'] = [option[1]
-                                          for option in value.choices]
-            if isinstance(value, ListField):
-                fields[key]['list'] = {
-                    'type': clear_name(value.field.__class__)}
-                if isinstance(value.field, EmbeddedDocumentField):
-                    fields[key]['list']['fields'] = get_fields(
-                        value.field.document_type_obj())
-    super_cls = obj.__class__.mro()[1]
-    if super_cls not in (DynamicDocument, EmbeddedDocument):
-        super_fields = get_fields(super_cls())
-        super_fields.update(fields)
-        fields = super_fields
-    return fields
-
-
-def clear_name(_class):
-    name = _class.__name__
-    if name == 'StringField':
-        return 'String'
-    elif name == 'DateField':
-        return 'Date'
-    elif name == 'ListField':
-        return 'List'
-    elif name == 'IntField':
-        return 'Integer'
-    elif name == 'FloatField':
-        return 'Float'
-    elif name == 'BooleanField':
-        return 'Boolean'
-    elif name == 'EmbeddedDocumentField':
-        return 'Object'
-    elif name == 'EmbeddedDocumentListField':
-        return 'List'
-    else:
-        return name
-
+from mongoengine.errors import ValidationError, DoesNotExist
+from mongoengine.fields import BaseField
+from.helpers import get_period_choices
 
 class Subject(EmbeddedDocument):
 
@@ -148,6 +92,20 @@ class Request(DynamicDocument):
     meta = {'allow_inheritance': True}
 
     full_name = 'Petición sin tipo'
+
+    decision_makers = (
+        'Consejo de Facultad',
+        'Comité Asesor',
+        'Director de Tesis',
+        'Comité de Matricula',
+        'Consejo de Sede',
+        'Consejo Superior Universitario',
+    )
+    decision_maker = decision_makers[0]
+
+    #Request is in cm, pcm (or not)
+    in_cm = True
+    in_pcm = True
 
     # AS Approval Status
     AS_APLAZA = 'AL'
@@ -394,13 +352,19 @@ class Request(DynamicDocument):
         (GRADE_OPTION_TESIS_DOCTORADO, 'Tesis de Doctorado')
     )
 
+    PERIOD_CHOICES = get_period_choices()
+    PERIOD_DEFAULT = PERIOD_CHOICES[0][0] if datetime.date.today().month <= 6 else PERIOD_CHOICES[1][0]
+
     _cls = StringField(required=True)
     date_stamp = DateField(default=datetime.date.today)
     user = StringField(max_length=255, required=True)
     consecutive_minute = IntField(
-        min_value=0, default=0, display='Número del Acta')
+        min_value=0, default=0, display='Número del Acta de Consejo de Facultad')
+    consecutive_minute_ac = IntField(
+        min_value=0, default=0, display='Número del Acta de Comité Asesor') #ac stands for advisory committe
     year = IntField(
         min_value=2000, max_value=2100, display='Año del Acta', default=datetime.date.today().year)
+    to_legal = BooleanField(default=False, display='Sugerir remitir caso a legataria')
     date = DateField(default=datetime.date.today,
                      display='Fecha de radicación')
     academic_program = StringField(
@@ -414,7 +378,7 @@ class Request(DynamicDocument):
     student_name = StringField(
         max_length=512, display='Nombre del Estudiante', default='')
     academic_period = StringField(
-        max_length=10, display='Periodo', default='0000-0S')
+        max_length=10, display='Periodo', choices=PERIOD_CHOICES, default=PERIOD_DEFAULT)
     approval_status = StringField(
         min_length=2, max_length=2, choices=AS_CHOICES,
         default=AS_EN_ESPERA, display='Estado de Aprobación')
@@ -501,9 +465,40 @@ class Request(DynamicDocument):
                                          self.PI_INDUSTRIAL, self.PI_ELECTRICA, self.PI_MECANICA,
                                          self.PI_MECATRONICA, self.PI_ELECTRONICA, self.PI_QUIMICA)
 
+    def safe_save(self):
+        try:
+            self.save()
+        except ValidationError as e:
+            raise ValueError(e.message)
+
+    @staticmethod
     def get_cases_by_query(query):
-        # Here quit apprubal statuss
+        # pylint: disable=no-member
         return Request.objects(**query).filter(approval_status__nin=[Request.AS_ANULADA, Request.AS_RENUNCIA])
+
+    @staticmethod
+    def get_case_by_id(caseid):
+        try:
+            # pylint: disable=no-member
+            return Request.objects.get(id=caseid)
+        except ValidationError as e:
+            raise ValueError(e.message)
+        except DoesNotExist as e:
+            raise KeyError('ID {} does not exist')
+
+    @staticmethod
+    def get_programs():
+        return {
+            'programs': sorted([plan[1] for plan in Request.PLAN_CHOICES])
+        }
+
+    @staticmethod
+    def get_cases():
+        return {
+            'cases': [
+                {'code': type_case.__name__, 'name': type_case.full_name}
+                for type_case in Request.get_subclasses()]
+        }
 
     @classmethod
     def translate(cls, data):
@@ -555,4 +550,21 @@ class Professor(EmbeddedDocument):
     department = StringField(
         display='Departamento', choices=Request.DP_CHOICES, default=Request.DP_EMPTY)
     institution = StringField(display='Institución')
-    country = StringField(display='Nombre')
+    country = StringField(display='País')
+
+
+class Person(DynamicDocument):
+    student_dni_type = StringField(
+        min_length=2, choices=Request.DNI_TYPE_CHOICES,
+        default=Request.DNI_TYPE_CEDULA_DE_CIUDADANIA, display='Tipo de Documento')
+    student_dni = StringField(
+        max_length=22, display='Documento', default='')
+    student_name = StringField(
+        max_length=512, display='Nombre del Estudiante', default='')
+
+class SubjectAutofill(DynamicDocument):
+    subject_code = StringField(
+        display='Código de la Asignatura')
+    subject_name = StringField(
+        max_length=512, display='Nombre de la Asignatura', default='')
+        

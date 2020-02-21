@@ -33,13 +33,16 @@ class REINPRE(Request):
     regulation_list = ['008|2008|CSU', '239|2009|VAC', '012|2014|VAC']
 
     reing_period = StringField(
-        required=True, display='Periodo de reingreso', default='0000-0S')
+        required=True, display='Periodo de reingreso',
+        choices=Request.PERIOD_CHOICES, default=Request.PERIOD_DEFAULT)
     loss_period = StringField(
-        required=True, display='Periodo de perdida de calidad de estudiante', default='0000-0S')
+        required=True, display='Periodo de perdida de calidad de estudiante', 
+        choices=Request.PERIOD_CHOICES, default=Request.PERIOD_DEFAULT)
     first_reing = BooleanField(
         required=True, display='Primer reingreso', default=True)
     admission_period = StringField(
-        required=True, display='Periodo de admisión', default='0000-0S')
+        required=True, display='Periodo de admisión',
+        choices=Request.PERIOD_CHOICES, default=Request.PERIOD_DEFAULT)
     periods_since = IntField(
         required=True, display='periodos desde pérdida de calidad de estudiante', default=0)
     papa = FloatField(required=True, display='PAPA', default=0.0)

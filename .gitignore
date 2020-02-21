@@ -111,3 +111,6 @@ public/*
 
 ## DB for users
 ActasDjangoDB
+
+#LDAP TLS Certificate
+certificate.pem

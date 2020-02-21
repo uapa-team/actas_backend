@@ -39,9 +39,13 @@ class EPCS(Request):
     enrolled_before_preprogram = BooleanField(
         display='Matriculado periodo posterior al pregrado', default=False)
     finalized_period = StringField(
-        display='Periodo de culminación de estudios de pregrado', default='0000-0S')
+        display='Periodo de culminación de estudios de pregrado',
+        choices=Request.PERIOD_CHOICES,
+        default=Request.PERIOD_DEFAULT)
     initial_period = StringField(
-        display='Periodo de ingreso del posgrado', default='0000-0S')
+        display='Periodo de ingreso del posgrado',
+        choices=Request.PERIOD_CHOICES,
+        default=Request.PERIOD_DEFAULT)
     is_in_right_date = BooleanField(
         display='Solicitud realizada en fechas debidas', default=True)
     right_date = DateField(
