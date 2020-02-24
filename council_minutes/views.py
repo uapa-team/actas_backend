@@ -46,6 +46,7 @@ def login(request):
     return JsonResponse({'token': token.key, 'group': user.groups.first().name},
                         status=HTTP_200_OK)
 
+
 @api_view(["GET"])
 @permission_classes((IsAuthenticated,))
 def api_logout(request):
@@ -53,11 +54,13 @@ def api_logout(request):
     logout(request)
     return JsonResponse({'successful': 'Logout Success'}, status=HTTP_200_OK)
 
+
 @api_view(["GET"])
 @permission_classes((AllowAny,))
 def details(_):
     programs = Request.get_programs()
-    programs.update({'periods': [period[0] for period in get_period_choices()]})
+    programs.update({'periods': [period[0]
+                                 for period in get_period_choices()]})
     return JsonResponse(programs, status=HTTP_200_OK, safe=False)
 
 
@@ -147,36 +150,39 @@ def get_docx_genquerie(request):
     generator.generate_document_by_querie(query_dict, precm)
     return JsonResponse({'url': generator.filename}, status=HTTP_200_OK)
 
+
 @api_view(["POST"])
 def autofill(request):
     # pylint: disable=no-member
     body = json.loads(request.body)
     if 'field' not in body:
-        return JsonResponse({'error':'"field" key is not in body'}, status=HTTP_400_BAD_REQUEST)
+        return JsonResponse({'error': '"field" key is not in body'}, status=HTTP_400_BAD_REQUEST)
     try:
         if body['field'] == 'name':
             if 'student_dni' not in body:
-                return JsonResponse({'error':'"student_dni" key is not in body'}, status=HTTP_400_BAD_REQUEST)
+                return JsonResponse({'error': '"student_dni" key is not in body'}, status=HTTP_400_BAD_REQUEST)
             try:
-                student = Person.objects.filter(student_dni=body['student_dni'])[0]
+                student = Person.objects.filter(
+                    student_dni=body['student_dni'])[0]
             except IndexError:
-                return JsonResponse({'error':'dni not found'}, status=HTTP_204_NO_CONTENT)
+                return JsonResponse({'error': 'dni not found'}, status=HTTP_204_NO_CONTENT)
             else:
                 return JsonResponse({'student_dni': student.student_dni,
-                'student_dni_type': student.student_dni_type,
-                'student_name': student.student_name}, status=HTTP_200_OK)
+                                     'student_dni_type': student.student_dni_type,
+                                     'student_name': student.student_name}, status=HTTP_200_OK)
         elif body['field'] == 'subject':
             if 'subject_code' not in body:
-                return JsonResponse({'error':'"subject_code" key is not in body'}, status=HTTP_400_BAD_REQUEST)
+                return JsonResponse({'error': '"subject_code" key is not in body'}, status=HTTP_400_BAD_REQUEST)
             try:
-                subject = SubjectAutofill.objects.filter(subject_code=body['subject_code'])[0]
+                subject = SubjectAutofill.objects.filter(
+                    subject_code=body['subject_code'])[0]
             except IndexError:
-                return JsonResponse({'error':'subject code not found'}, status=HTTP_204_NO_CONTENT)
+                return JsonResponse({'error': 'subject code not found'}, status=HTTP_204_NO_CONTENT)
             else:
                 return JsonResponse({'subject_code': subject.subject_code,
-                'subject_name': subject.subject_name}, status=HTTP_200_OK)
+                                     'subject_name': subject.subject_name}, status=HTTP_200_OK)
     except ValueError:
-        return JsonResponse({'error':'field "field" no encontrado'}, safe=False, status=HTTP_400_BAD_REQUEST)
+        return JsonResponse({'error': 'field "field" no encontrado'}, safe=False, status=HTTP_400_BAD_REQUEST)
 
 
 @api_view(["GET"])
@@ -211,11 +217,14 @@ def get_docx_genquerie(request):
     generator.generate_document_by_querie(query_dict, precm)
     return JsonResponse({'url': generator.filename}, status=HTTP_200_OK)
 
+
 @api_view(["GET"])
 @permission_classes((AllowAny,))
 def generate_spec(_):
     return JsonResponse({'': ''})
-    
+
+
+@api_view(["GET"])
 def allow_generate(request):
     groups = [group.name for group in request.user.groups.all()]
     options = get_queries_by_groups(groups)
