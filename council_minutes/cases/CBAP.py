@@ -56,7 +56,7 @@ class CBAP(Request):
             self.get_advisor_response_display().upper() + ' ').font.bold = True
         paragraph.add_run(self.str_cm[0] + str(self.credits) + self.str_cm[1])
         paragraph.add_run(self.get_academic_program_display())
-        if self.approval_status != Request.ARCR_APROBAR:
+        if self.advisor_response != Request.ARCR_APROBAR:
             paragraph.add_run(self.str_cm[2] + self.council_decision)
             return
         paragraph.add_run(self.str_cm[3])
