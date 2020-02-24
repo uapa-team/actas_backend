@@ -10,6 +10,8 @@ class CBAP(Request):
 
     credits = IntField(required=True, display='Créditos excedentes', default=0)
 
+    regulation_list = []
+
     str_cm = [
         'trasladar ',
         ' crédito(s) aprobado(s) en ',
