@@ -51,9 +51,9 @@ class CBAP(Request):
 
     def pcm_answer(self, paragraph):
         # pylint: disable=no-member
-        paragraph.add_run(self.str_council_header + ' ')
+        paragraph.add_run(self.str_comittee_header + ' ')
         paragraph.add_run(
-            self.get_approval_status_display().upper() + ' ').font.bold = True
+            self.get_advisor_response_display().upper() + ' ').font.bold = True
         paragraph.add_run(self.str_cm[0] + str(self.credits) + self.str_cm[1])
         paragraph.add_run(self.get_academic_program_display())
         if self.approval_status != 'CAP':
