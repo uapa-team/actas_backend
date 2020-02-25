@@ -24,8 +24,6 @@ class DNCT(Request):
 
     proffesors_thesis = EmbeddedDocumentListField(
         Professor, display='Docentes jurados evaluadores del proyecto de tesis')
-    proffesors_exam = EmbeddedDocumentListField(
-        Professor, display='Docentes jurados evaluadores del examen doctoral')
 
     regulation_list = ['056|2012|CSU', '040|2017|CFA']
 
@@ -78,9 +76,9 @@ class DNCT(Request):
         
     def add_proffesor(self, professor):
         answer = ''
-        answer = answer + professor.name
-        answer = answer + ' del departamento ' + professor.get_department_display()
-        answer = answer + ' de la institución ' + professor.institution
+        answer = answer + str(professor.name)
+        answer = answer + ' del departamento ' + str(professor.get_department_display())
+        answer = answer + ' de la institución ' + str(professor.institution)
         return answer
 
     def pcm_answer_handler(self, docx):
@@ -102,7 +100,7 @@ class DNCT(Request):
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(self.str_pcm[5].format(
             self.get_academic_program_display(), 
-            self.add_proffesors(self.proffesors_exam)
+            self.add_proffesors(self.proffesors_thesis)
         ))
         paragraph.style = 'List Bullet'
 

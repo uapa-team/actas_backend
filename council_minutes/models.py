@@ -348,8 +348,7 @@ class Request(DynamicDocument):
     GRADE_OPTION_TESIS_DOCTORADO = 'TSD'
     GRADE_OPTION_CHOICES = (
         (GRADE_OPTION_TRABAJO_FINAL_MAESTRIA, 'Trabajo Final de Maestría'),
-        (GRADE_OPTION_TESIS_MAESTRIA, 'Tesis de Maestría'),
-        (GRADE_OPTION_TESIS_DOCTORADO, 'Tesis de Doctorado')
+        (GRADE_OPTION_TESIS_MAESTRIA, 'Tesis de Maestría')
     )
 
     PERIOD_CHOICES = get_period_choices()
