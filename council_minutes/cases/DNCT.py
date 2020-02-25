@@ -18,9 +18,14 @@ class DNCT(Request):
         default='Copia digital de proyecto de tesis, solicitud de nombramiento de jurados.', display='Soportes')
 
     has_thesis_project = BooleanField(
-        default=False, display='Tiene inscrita la asignatura Proyecto de Tesis de Doctorado (2020357)')
+        default=False, display='Tiene inscrita la asignatura Proyecto de Tesis de Doctorado')
     thesis_name = StringField(
         default='', display='Título de la tesis')
+
+    code_exam = StringField(
+        default='', display='Código de asignatura Examen de calificación doctoral')
+    code_thesis = StringField(
+        default='', display='Código de asignatura Tesis de doctorado')
 
     proffesors_thesis = EmbeddedDocumentListField(
         Professor, display='Docentes jurados evaluadores del proyecto de tesis')
@@ -30,7 +35,7 @@ class DNCT(Request):
     str_cm = []
 
     str_pcm = [
-        'El estudiante {}tiene inscrita la asignatura Proyecto de tesis de Doctorado (2020357).',
+        'El estudiante {}tiene inscrita la asignatura Proyecto de tesis de Doctorado ({}).',
         'Versión electrónica en formato pdf (Artículo 35).',
         'El documento Proyecto de Tesis de Doctorado será evaluado por un grupo ' +
         'de evaluadores conformado por mínimo tres integrantes, designados por el ' +
@@ -110,7 +115,7 @@ class DNCT(Request):
 
     def pcm_analysis_phd(self):
         return [
-            self.str_pcm[0].format('' if self.has_thesis_project else 'no '),
+            self.str_pcm[0].format('' if self.has_thesis_project else 'no ', self.code_thesis),
             self.str_pcm[1],
             self.str_pcm[2],
             self.str_pcm[3]
