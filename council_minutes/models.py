@@ -546,9 +546,9 @@ class Request(DynamicDocument):
 
 class Professor(EmbeddedDocument):
 
-    name = StringField(required=True, display='Nombre')
+    name = StringField(required=True, default='Nombre profesor', display='Nombre')
     department = StringField(
-        display='Departamento', choices=Request.DP_CHOICES, default=Request.DP_EMPTY)
+        display='Departamento', choices=Request.DP_CHOICES, default=Request.DP_EXTERNO_FACULTAD)
     institution = StringField(display='Institución')
     country = StringField(display='País')
 

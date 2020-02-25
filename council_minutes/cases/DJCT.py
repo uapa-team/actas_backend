@@ -8,7 +8,7 @@ from .case_utils import add_analysis_paragraph
 
 class DJCT(Request):
 
-    full_name = 'Designación de jurados calificadores de tesis de maestría/doctorado ' + \
+    full_name = 'Designación de jurados calificadores de tesis de maestría ' + \
         'o evaluadores de trabajo final de maestría'
 
     node = StringField(
