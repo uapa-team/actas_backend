@@ -94,8 +94,10 @@ def case(request):
                 inserted_items += [str(new_request.save().id)]
             except ValidationError as e:
                 errors += [e.message]
-        return JsonResponse({'inserted_items': inserted_items, 'errors': errors},
-                            status=HTTP_200_OK, safe=False)
+        return JsonResponse(
+            {'inserted_items': inserted_items, 'errors': errors},
+            status=(HTTP_200_OK if len(inserted_items) != 0 else HTTP_400_BAD_REQUEST),
+            safe=False)
     if request.method == 'PATCH':
         body = json.loads(request.body)
         subs = [c.__name__ for c in Request.get_subclasses()]
