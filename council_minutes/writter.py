@@ -1,9 +1,10 @@
 
 import dateparser
-from docx import Document, enum
+from docx import Document
 from docx.shared import RGBColor, Pt
 from .models import Request
 from .cases.case_utils import header
+from docx.enum.style import WD_STYLE_TYPE
 
 
 class UnifiedWritter():
@@ -11,18 +12,21 @@ class UnifiedWritter():
     def __init__(self):
         self.document = Document()
         self.filename = 'public/'
-        for style in self.document.styles:
-            try:
+        styles = self.document.styles
+        h2a = styles.add_style('Heading 2 Ancizar', WD_STYLE_TYPE.PARAGRAPH)
+        h2a.base_style = styles['Heading 2']
+        h2a = styles.add_style('Heading 3 Ancizar', WD_STYLE_TYPE.PARAGRAPH)
+        h2a.base_style = styles['Heading 3']
+        hls = styles.add_style('List Hyperlink', WD_STYLE_TYPE.PARAGRAPH)
+        hls.base_style = self.document.styles['List Bullet']
+        for style in styles:
+            if style.name != 'No List':
                 self.document.styles[style.name].font.name = 'Ancizar Sans'
+                self.document.styles[style.name].font.size = Pt(11)
                 self.document.styles[style.name].font.color.rgb = RGBColor(
                     0x00, 0x00, 0x00)
-            except:  # pylint: disable=bare-except
-                pass
-        hyperlink_style = self.document.styles.add_style(
-            'List Hyperlink', enum.style.WD_STYLE_TYPE.PARAGRAPH)
-        hyperlink_style.base_style = self.document.styles['List Bullet']
-        hyperlink_style.font.color.rgb = RGBColor(0x00, 0x00, 0xFF)
-        hyperlink_style.font.underline = True
+        hls.font.color.rgb = RGBColor(0x00, 0x00, 0xFF)
+        hls.font.underline = True
         self.case_count = 0
 
     def generate_case_example_by_id(self, caseid, pre):
@@ -37,7 +41,7 @@ class UnifiedWritter():
             self.filename += 'cm' + caseid + '.docx'
             self.__write_case_cm(case)
         self.__generate()
-        
+
     def generate_document_by_querie(self, query, precm):
         cases = Request.get_cases_by_query(query).order_by(
             'academic_program', '_cls')
@@ -62,19 +66,19 @@ class UnifiedWritter():
                 9 if precm else 10,
                 'PREGRADO' if precm else 'POSGRADO'))
         run.font.bold = True
-        run.font.size = Pt(12)
+        run.font.size = Pt(11)
 
     def __write_case_type_header(self, case_type_name):
         run = self.document.add_paragraph(
-            style='Heading 2').add_run(case_type_name.upper())
+            style='Heading 2 Ancizar').add_run(case_type_name.upper())
         run.font.bold = True
-        run.font.size = Pt(12)
+        run.font.size = Pt(11)
 
     def __write_academic_program_header(self, academic_program):
         run = self.document.add_paragraph(
-            style='Heading 2').add_run(academic_program)
+            style='Heading 2 Ancizar').add_run(academic_program)
         run.font.bold = True
-        run.font.size = Pt(12)
+        run.font.size = Pt(11)
 
     def __write_case_collection(self, cases, pre, pcm):
         list_level_1 = 9 if pre else 10
@@ -95,13 +99,13 @@ class UnifiedWritter():
             if actual_case != request.full_name:
                 actual_case = request.full_name
                 self.__write_case_type_header(request.full_name)
-            para = self.document.add_paragraph(style='Heading 3')
+            para = self.document.add_paragraph(style='Heading 3 Ancizar')
             list_level_3 = list_level_3 + 1
             run = para.add_run('{}.{}.{} {}\tDNI. {}'.format(
                 list_level_1, list_level_2, list_level_3, request.student_name,
                 request.student_dni))
             run.font.bold = True
-            run.font.size = Pt(12)
+            run.font.size = Pt(11)
             try:
                 if pcm:
                     self.__write_case_pcm(request)
