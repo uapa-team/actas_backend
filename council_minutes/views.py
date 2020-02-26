@@ -193,39 +193,6 @@ def programs_defined(_):
     programs = sorted([plan[1] for plan in Request.PLAN_CHOICES])
     return JsonResponse({'programs': programs})
 
-
-def querydict_to_dict(query_dict):
-    data = {}
-    for key in query_dict.keys():
-        v = query_dict.getlist(key)
-        if len(v) == 1:
-            v = v[0]
-        data[key] = v
-    return data
-
-
-@api_view(["GET"])
-def get_docx_genquerie(request):
-    query_dict = querydict_to_dict(request.GET)
-    try:
-        precm = query_dict['pre'] == 'true'
-        del query_dict['pre']
-    except KeyError:
-        return JsonResponse({'error': "'pre' Key not provided"}, status=HTTP_400_BAD_REQUEST)
-
-    generator = UnifiedWritter()
-    generator.filename = 'public/' + \
-        str(request.user) + str(datetime.date.today()) + '.docx'
-    generator.generate_document_by_querie(query_dict, precm)
-    return JsonResponse({'url': generator.filename}, status=HTTP_200_OK)
-
-
-@api_view(["GET"])
-@permission_classes((AllowAny,))
-def generate_spec(_):
-    return JsonResponse({'': ''})
-
-
 @api_view(["GET"])
 def allow_generate(request):
     groups = [group.name for group in request.user.groups.all()]
