@@ -1,8 +1,8 @@
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
 from mongoengine import StringField, IntField, FloatField, BooleanField
-from ..models import Request
-from .case_utils import add_analysis_paragraph
+from ..models import Request, Subject
+from .case_utils import add_analysis_paragraph, table_subjects
 
 
 class PEST(Request):
@@ -28,6 +28,7 @@ class PEST(Request):
     ins_person = StringField(required=True, display='Encargado Institución', default='')
     subject = StringField(required=True, choices=SUBJECT_CHOICES,
                           default=SUB_P1, display='Asignatura')
+    group = StringField(required=True, display='Grupo', default='0')
     advance = FloatField(required=True, min_value=0, display='Avance SIA', default=0.0)
     another_practice = BooleanField(
         required=True, display='¿Primera practica?', default=False)
@@ -39,8 +40,8 @@ class PEST(Request):
     regulation_list = ['008|2008|CSU', '102|2013|CSU', '016|2011|CAC']
 
     str_cm = [
-        'inscribir la asignatura {} ({}) de {} créditos, ',
-        'en el periodo {}, a desarrollar en la empresa {}, a cargo del docente ' +
+        'inscribir la siguiente asignatura ',
+        'en el periodo académico {}, a desarrollar en la empresa {}, a cargo del docente ' +
         '{} por parte de la Universidad Nacional de Colombia y {} por parte de la entidad ' +
         '(Artículo 15 {}).',
         'debido a que {} ({}).'
@@ -69,6 +70,7 @@ class PEST(Request):
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
         self.cm_answer(paragraph)
+        self.add_table(docx)
 
     def cm_answer(self, paragraph):
         # pylint: disable=no-member
@@ -84,6 +86,7 @@ class PEST(Request):
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
         self.pcm_answer(paragraph)
+        self.add_table(docx)
 
     def pcm_answer(self, paragraph):
         paragraph.add_run(self.str_answer + ' ').font.bold = True
@@ -97,8 +100,7 @@ class PEST(Request):
     def add_text(self, paragraph, affirmative):
         code, _credits = self.SUBJECT_INFO[self.subject]
         # pylint: disable=no-member
-        paragraph.add_run(self.str_cm[0].format(
-            self.get_subject_display(), code, _credits))
+        paragraph.add_run(self.str_cm[0])
 
         if affirmative:
             paragraph.add_run(self.str_cm[1].format(
@@ -111,6 +113,12 @@ class PEST(Request):
                 self.council_decision,
                 self.regulations[self.regulation_list[1]][0]
             ))
+    
+    def add_table(self, docx):
+        code, _credits = self.SUBJECT_INFO[self.subject]
+        table_subjects(docx, [[
+            code, self.get_subject_display(), self.group, 'L', str(_credits)
+        ]])
 
     def add_analysis(self):
         analysis = []
