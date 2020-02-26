@@ -2,6 +2,7 @@ from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from mongoengine import IntField
 from ..models import Request
+from .case_utils import add_analysis_paragraph
 
 
 class CBAP(Request):
@@ -42,8 +43,20 @@ class CBAP(Request):
         paragraph.add_run(
             self.str_cm[4] + self.regulations['026|2012|CSU'][0] + ').')
 
+    def pcm_analysis(self, docx):
+        # pylint: disable=no-member
+        analysis_list = []
+        analysis_list += self.extra_analysis
+        add_analysis_paragraph(docx, analysis_list)
+
     # PCM for CBAP not found. Using the same of cm.
     def pcm(self, docx):
+        self.pcm_analysis(docx)
+        paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.space_after = Pt(0)
+        paragraph = docx.add_paragraph()
+        paragraph.add_run(self.str_answer + ': ').bold = True
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
