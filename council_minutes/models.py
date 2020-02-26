@@ -2,6 +2,7 @@ import datetime
 import json
 from mongoengine import DynamicDocument, EmbeddedDocument, DateField, StringField, BooleanField
 from mongoengine import ListField, IntField, EmbeddedDocumentField, EmbeddedDocumentListField
+from mongoengine import LazyReferenceField, DictField
 from mongoengine.errors import ValidationError, DoesNotExist
 from mongoengine.fields import BaseField
 from.helpers import get_period_choices
@@ -567,3 +568,9 @@ class SubjectAutofill(DynamicDocument):
     subject_name = StringField(
         max_length=512, display='Nombre de la Asignatura', default='')
         
+class RequestChanges(DynamicDocument):
+    request_id = LazyReferenceField(Request, required=True)
+    user = StringField(required=True)
+    date_stamp = DateField(default=datetime.date.today)
+    field_name = StringField(required=True)
+    changes = DictField(required=True)
