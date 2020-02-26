@@ -24,6 +24,7 @@ class PEST(Request):
     }
 
     institution = StringField(required=True, display='Institución/Empresa', default='')
+    is_intern = BooleanField(required=True, display='¿Es práctica interna?', default=False)
     proffesor = StringField(required=True, display='Profesor', default='')
     ins_person = StringField(required=True, display='Encargado Institución', default='')
     subject = StringField(required=True, choices=SUBJECT_CHOICES,
@@ -42,8 +43,8 @@ class PEST(Request):
     str_cm = [
         'inscribir la siguiente asignatura ',
         'en el periodo académico {}, a desarrollar en la empresa {}, a cargo del docente ' +
-        '{} por parte de la Universidad Nacional de Colombia y {} por parte de la entidad ' +
-        '(Artículo 15 {}).',
+        '{} por parte de la Universidad Nacional de Colombia',
+        ' y {} por parte de la entidad',
         'debido a que {} ({}).'
     ]
 
@@ -104,12 +105,13 @@ class PEST(Request):
 
         if affirmative:
             paragraph.add_run(self.str_cm[1].format(
-                self.academic_period, self.institution,
-                self.proffesor, self.ins_person,
-                self.regulations[self.regulation_list[0]][0]
+                self.academic_period, self.institution, self.proffesor
             ))
+            if not self.is_intern:
+                paragraph.add_run(self.str_cm[2].format(self.ins_person))
+            paragraph.add_run('.')
         else:
-            paragraph.add_run(self.str_cm[2].format(
+            paragraph.add_run(self.str_cm[3].format(
                 self.council_decision,
                 self.regulations[self.regulation_list[1]][0]
             ))
