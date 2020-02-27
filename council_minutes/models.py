@@ -2,7 +2,7 @@ import datetime
 import json
 from mongoengine import DynamicDocument, EmbeddedDocument, DateField, StringField, BooleanField
 from mongoengine import ListField, IntField, EmbeddedDocumentField, EmbeddedDocumentListField
-from mongoengine import LazyReferenceField, DictField
+from mongoengine import LazyReferenceField, DictField, DateTimeField
 from mongoengine.errors import ValidationError, DoesNotExist
 from mongoengine.fields import BaseField
 from.helpers import get_period_choices
@@ -356,7 +356,7 @@ class Request(DynamicDocument):
     PERIOD_DEFAULT = PERIOD_CHOICES[0][0] if datetime.date.today().month <= 6 else PERIOD_CHOICES[1][0]
 
     _cls = StringField(required=True)
-    date_stamp = DateField(default=datetime.date.today)
+    date_stamp = DateTimeField(default=datetime.datetime.now)
     user = StringField(max_length=255, required=True)
     consecutive_minute = IntField(
         min_value=0, default=0, display='Número del Acta de Consejo de Facultad')
@@ -571,6 +571,5 @@ class SubjectAutofill(DynamicDocument):
 class RequestChanges(DynamicDocument):
     request_id = LazyReferenceField(Request, required=True)
     user = StringField(required=True)
-    date_stamp = DateField(default=datetime.date.today)
-    field_name = StringField(required=True)
+    date_stamp = DateTimeField(default=datetime.datetime.now)
     changes = DictField(required=True)
