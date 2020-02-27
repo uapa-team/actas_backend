@@ -194,6 +194,18 @@ def allow_generate(request):
     options = get_queries_by_groups(groups)
     return JsonResponse(options, status=HTTP_200_OK, safe=False)
 
+@api_view(["PATCH"])
+def mark_received(request):
+    try:
+        id = request.GET['id']
+        req = Request.get_case_by_id(id)
+        if req.received_date is None:
+            req.received_date = datetime.datetime.now
+            req.save()
+        return JsonResponse(req, QuerySetEncoder, status=HTTP_200_OK, safe=False)
+    except KeyError:
+        return JsonResponse({'response': 'Not found'}, status=HTTP_404_NOT_FOUND, safe=False)
+
 # TODO: Rewrite this code, no mongoengine libraries should be called here
 # @api_view(["PATCH"])
 # def change_case_type(request):
