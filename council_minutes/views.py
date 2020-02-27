@@ -14,6 +14,7 @@ from mongoengine.errors import ValidationError
 from .models import Request, Person, SubjectAutofill
 from .helpers import QuerySetEncoder, get_fields, get_period_choices, get_queries_by_groups
 from .writter import UnifiedWritter
+from .updater import update_request
 from .cases import *
 
 
@@ -100,27 +101,21 @@ def case(request):
             safe=False)
     if request.method == 'PATCH':
         body = json.loads(request.body)
-        subs = [c.__name__ for c in Request.get_subclasses()]
         errors = []
         edited_items = []
         not_found = []
         for item_request in body['items']:
             try:
-                req = Request.get_case_by_id(item_request['id'])
+                Request.get_case_by_id(item_request['id'])
             except (ValueError, KeyError):
                 not_found += [item_request['id']]
                 continue
             item_request['user'] = request.user.username
-            case = req.__class__
-            item_request['_cls'] = case.get_entire_name()
-            new_request = case().from_json(case.translate(
-                json.dumps(item_request)), True)
-            try:
-                new_request.save()
-            except ValidationError as e:
-                errors += [e.message]
+            result = update_request(item_request)
+            if 'error' in result:
+                errors += [result['error']]
             else:
-                edited_items += [new_request]
+                edited_items += [result]
         return JsonResponse({'edited_items': edited_items,
                              'errors': errors, 'not_found': not_found},
                             status=HTTP_400_BAD_REQUEST if edited_items == [] else HTTP_200_OK,
