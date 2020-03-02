@@ -365,7 +365,7 @@ class Request(DynamicDocument):
     year = IntField(
         min_value=2000, max_value=2100, display='Año del Acta', default=datetime.date.today().year)
     to_legal = BooleanField(default=False, display='Sugerir remitir caso a legataria')
-    date = DateField(default=datetime.date.today,
+    date = DateTimeField(default=datetime.date.today,
                      display='Fecha de radicación')
     academic_program = StringField(
         min_length=4, max_length=4, choices=PLAN_CHOICES,
