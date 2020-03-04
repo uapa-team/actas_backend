@@ -76,8 +76,11 @@ def get_schema(_cls):
                 schema[name]['default'] = field.default
 
             if field.choices:
+                print(_cls.__name__)
                 schema[name]['choices'] = [option[1]
                                           for option in field.choices]
+                print(name)
+                print(schema[name]['choices'])
 
             if schema[name]['type'] == 'Table':
                 schema[name]['fields'] = get_schema(
@@ -89,6 +92,8 @@ def clear_name(_cls):
     if name == 'StringField':
         return 'String'
     elif name == 'DateField':
+        return 'Date'
+    elif name == 'DateTimeField':
         return 'Date'
     elif name == 'IntField':
         return 'Integer'

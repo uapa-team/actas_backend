@@ -122,7 +122,8 @@ def header(request, docx_):
     para.add_run('Justificación:\t\t{}\n'.format(
         request.student_justification))
     para.add_run('Soportes:\t\t{}\n'.format(request.supports))
-    para.add_run('Fecha radicación:\t{}\n'.format(request.date))
+    month = num_to_month(request.date.strftime('%m'))
+    para.add_run('Fecha radicación:\t{}\n'.format(request.date.strftime("%d{}%Y".format(month))))
     para.add_run('Normatividad:')
     para.paragraph_format.space_after = Pt(0)
     for regulation in request.regulation_list:
