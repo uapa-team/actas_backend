@@ -42,13 +42,15 @@ class IASI(Request):
             paragraph = docx.add_paragraph()
             paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
             paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.add_run(self.str_council_header + ' ')
             self.cm_answer_approved(paragraph)
-            table_subjects(docx, Subject.subjects_to_array(snotapproved))
+            table_subjects(docx, Subject.subjects_to_array(sapproved))
         if len(snotapproved) > 0:
             paragraph = docx.add_paragraph()
             paragraph = docx.add_paragraph()
             paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
             paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.add_run(self.str_council_header + ' ')
             self.cm_answer_not_approved(paragraph)
             table_subjects(docx, Subject.subjects_to_array(snotapproved))
 
@@ -66,7 +68,6 @@ class IASI(Request):
         paragraph.add_run('({}).'.format(self.regulations['008|2008|CSU'][0]))
 
     def cm_answer_approved(self, paragraph):
-        paragraph.add_run(self.str_council_header + ' ')
         paragraph.add_run(
             # pylint: disable=no-member
             'APRUEBA ').font.bold = True
@@ -79,7 +80,6 @@ class IASI(Request):
         paragraph.add_run('({}).'.format(self.regulations['008|2008|CSU'][0]))
 
     def cm_answer_not_approved(self, paragraph):
-        paragraph.add_run(self.str_council_header + ' ')
         paragraph.add_run(
             # pylint: disable=no-member
             'NO APRUEBA ').font.bold = True

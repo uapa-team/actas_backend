@@ -82,12 +82,12 @@ class EPCS(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
         paragraph.add_run(self.str_cm[1].format(
             Request.regulations[self.regulation_list[0]][0]))
 
     def cm_answer(self, paragraph):
-        paragraph.add_run(self.str_council_header + ' ')
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True

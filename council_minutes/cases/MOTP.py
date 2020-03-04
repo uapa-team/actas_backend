@@ -50,11 +50,11 @@ class MOTP(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
         self.cm_ob(docx)
 
     def cm_answer(self, paragraph):
-        paragraph.add_run(self.str_council_header + ' ')
         # pylint: disable=no-member
         paragraph.add_run(
             self.get_approval_status_display().upper() + ' ').font.bold = True
@@ -68,15 +68,15 @@ class MOTP(Request):
 
     def pcm(self, docx):
         self.pcm_analysis(docx)
-        self.pcm_answer(docx)
-        self.cm_ob(docx)
-
-    def pcm_answer(self, docx):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(self.str_answer + ': ').font.bold = True
         paragraph.add_run(self.str_comittee_header + ' ')
+        self.pcm_answer(paragraph)
+        self.cm_ob(docx)
+
+    def pcm_answer(self, paragraph):
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_advisor_response_display().upper()).font.bold = True

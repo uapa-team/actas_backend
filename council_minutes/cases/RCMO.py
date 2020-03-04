@@ -120,6 +120,7 @@ class RCMO(Request):
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(self.str_answer + ': ').bold = True
+        paragraph.add_run(self.str_comittee_header + ' ')
         self.pcm_answer(paragraph)
 
     def pcm_analysis(self, docx):
@@ -146,10 +147,9 @@ class RCMO(Request):
         add_analysis_paragraph(docx, analysis_list)
 
     def pcm_answer(self, paragraph):
-        paragraph.add_run(self.str_comittee_header)
         paragraph.add_run(
             # pylint: disable=no-member
-            ' ' + self.get_advisor_response_display().upper()).font.bold = True
+            self.get_advisor_response_display().upper()).font.bold = True
         paragraph.add_run(' ')
         paragraph.add_run(self.str_pcm[2].format(
             # pylint: disable=no-member

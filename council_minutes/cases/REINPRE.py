@@ -419,6 +419,8 @@ class REINPRE(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_answer + ':\n').font.bold = True
+        paragraph.add_run(self.str_comittee_header + ' ')
         self.pcm_answer(paragraph)
         #if self.request_in_date: To ommit tables when the request isn't in time
         self.cm_pcm_paragraph(docx)
@@ -432,6 +434,7 @@ class REINPRE(Request):
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
         #if self.request_in_date: To ommit tables when the request isn't in time
+        paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
         self.rein_general_data_table(docx)
         self.rein_academic_info(docx)
@@ -439,8 +442,6 @@ class REINPRE(Request):
         self.rein_recommends(docx)
 
     def pcm_answer(self, paragraph):
-        paragraph.add_run(self.str_answer + ':\n').font.bold = True
-        paragraph.add_run(self.str_comittee_header + ' ')
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True
@@ -481,7 +482,6 @@ class REINPRE(Request):
             self.get_academic_program_display() + '.')
 
     def cm_answer(self, paragraph):
-        paragraph.add_run(self.str_council_header + ' ')
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True
