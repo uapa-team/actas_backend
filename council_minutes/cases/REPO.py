@@ -15,9 +15,6 @@ class REPO(Request):
 
     regulation_list = []
 
-    RTA_RATIFICAR = 'RATIFICAR'
-    RTA_REPONER = 'REPONER'
-
     AS_EN_ESPERA = 'EE'
     AS_RATIFICA = 'RT'
     AS_REPONE = 'RP'
@@ -25,8 +22,8 @@ class REPO(Request):
     AS_RENUNCIA = 'RN'
     AS_CHOICES = (
         (AS_EN_ESPERA, 'En espera'),
-        (AS_RATIFICA, 'Ratificar'),
-        (AS_REPONE, 'Reponer'),
+        (AS_RATIFICA, 'Ratifica'),
+        (AS_REPONE, 'Repone'),
         (AS_ANULADA, 'Anular'),
         (AS_RENUNCIA, 'Desistir'),
     )
@@ -49,7 +46,10 @@ class REPO(Request):
         min_length=3, max_length=3, choices=ARCR_CHOICES,
         default=AS_EN_ESPERA, display='Respuesta del Comité')
 
-    str_cm = []
+    str_cm = [
+        'en atención al recurso de reposición',
+        'decisión del Acta {} de {} en consecuencia, '
+    ]
 
     str_pcm = [
         'en atención al recurso de reposición',
@@ -68,10 +68,17 @@ class REPO(Request):
         paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
 
+        target = self.get_modified_target(pre=False)
+        target.resource_answer(docx)
+
     def cm_answer(self, paragraph):
+        target = Request.get_case_by_id(self.reference_id)
+
+        paragraph.add_run(self.str_cm[0] + ' ')
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True
+        paragraph.add_run(self.str_cm[1].format(target.consecutive_minute, target.year))
 
     def pcm(self, docx):
         self.pcm_analysis(docx)

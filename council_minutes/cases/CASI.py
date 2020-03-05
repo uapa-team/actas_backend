@@ -188,6 +188,6 @@ class CASI(Request):
 
     def resource_answer(self, docx):
         last_paragraph = docx.paragraphs[-1]
-        self.pcm_answer(last_paragraph)
+        self.cm_answer(last_paragraph)
         table_subjects(docx, Subject.subjects_to_array(self.subjects))
         
