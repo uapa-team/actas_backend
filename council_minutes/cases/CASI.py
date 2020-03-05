@@ -175,3 +175,19 @@ class CASI(Request):
             raise AssertionError(
                 self.assertionerror['CHOICES'].format('NRC_answer'))
         paragraph.add_run(' ({}).'.format(self.regulations['008|2008|CSU'][0]))
+
+    def resource_analysis(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+        table_subjects(docx, Subject.subjects_to_array(self.subjects))
+    
+    def resource_pre_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+        table_subjects(docx, Subject.subjects_to_array(self.subjects))
+
+    def resource_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+        table_subjects(docx, Subject.subjects_to_array(self.subjects))
+        

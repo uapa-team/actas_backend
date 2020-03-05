@@ -82,6 +82,9 @@ class REPO(Request):
         paragraph.add_run(self.str_comittee_header + ' ')
         self.pcm_answer(paragraph)
 
+        target = self.get_modified_target(pre=True)
+        target.resource_pre_answer(docx)
+
     def pcm_answer(self, paragraph):
         target = Request.get_case_by_id(self.reference_id)
 
@@ -90,14 +93,6 @@ class REPO(Request):
             # pylint: disable=no-member
             ' ' + self.get_advisor_response_display().upper() + ' ').font.bold = True
         paragraph.add_run(self.str_pcm[1].format(target.consecutive_minute, target.year))
-
-        if self.advisor_response == self.ARCR_REPONE:
-            if target.advisor_response == Request.ARCR_APROBAR:
-                target.advisor_response = Request.ARCR_NO_APROBAR
-            elif target.advisor_response == Request.ARCR_NO_APROBAR:
-                target.advisor_response = Request.ARCR_APROBAR
-
-        target.pcm_answer(paragraph)
 
     def pcm_analysis(self, docx):
         analysis_list = []
@@ -109,7 +104,22 @@ class REPO(Request):
 
         text = self.str_analysis[1].format(target.consecutive_minute, target.year)
         analysis_list.append(text)
-        add_analysis_paragraph(docx, analysis_list + self.extra_analysis)
+        add_analysis_paragraph(docx, analysis_list)
+        target.resource_analysis(docx)
+        add_analysis_paragraph(docx, self.extra_analysis, False)
 
-        para = docx.paragraphs[-1-len(self.extra_analysis)]
-        target.pcm_answer(para)
+    def get_modified_target(self, pre=False):
+        target = Request.get_case_by_id(self.reference_id)
+        if pre:
+            if self.advisor_response == self.ARCR_REPONE:
+                if target.advisor_response == Request.ARCR_APROBAR:
+                    target.advisor_response = Request.ARCR_NO_APROBAR
+                elif target.advisor_response == Request.ARCR_NO_APROBAR:
+                    target.advisor_response = Request.ARCR_APROBAR
+        else:
+            if self.council_decision == self.AS_REPONE:
+                if target.council_decision == Request.AS_APRUEBA:
+                    target.council_decision = Request.AS_NO_APRUEBA
+                elif target.council_decision == Request.AS_NO_APRUEBA:
+                    target.council_decision = Request.AS_APRUEBA
+        return target
