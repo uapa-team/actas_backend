@@ -190,4 +190,3 @@ class CASI(Request):
         last_paragraph = docx.paragraphs[-1]
         self.cm_answer(last_paragraph)
         table_subjects(docx, Subject.subjects_to_array(self.subjects))
-        

@@ -95,3 +95,15 @@ class ADIC(Request):
             end = ', ' if i + 1 < len(self.proffesors) else '.'
             paragraph.add_run(
                 '{} - {}{}'.format(self.proffesors[i].name, mod, end))
+
+    def resource_analysis(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+    
+    def resource_pre_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+
+    def resource_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.cm_answer(last_paragraph)
