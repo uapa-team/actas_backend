@@ -31,7 +31,6 @@ class UnifiedWritter():
 
     def generate_case_example_by_id(self, caseid, pre):
         case = Request.get_case_by_id(caseid)
-        print(case)
         if case is None:
             raise KeyError
         if pre:

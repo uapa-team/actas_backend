@@ -78,7 +78,6 @@ class TestCases(TestCase):
         document = Document()
         for unique_id in self.unique_ids:
             request = Request.objects.get(id=unique_id)
-            print(unique_id)
             request.cm(document)
 
     def test_cases_can_create_pcm(self):
@@ -86,5 +85,4 @@ class TestCases(TestCase):
         document = Document()
         for unique_id in self.unique_ids:
             request = Request.objects.get(id=unique_id)
-            print(unique_id)
             request.pcm(document)
