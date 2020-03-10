@@ -188,7 +188,7 @@ class HCEM(Request):
                    self.academic_program, self.str_cm[1].format(
                        self.origin_plan, self.institution_origin)]
         for i in range(len(types)):
-            for j in range(len(types[list(types.keys())[i]])):
+            for j in range(len(types[list(types.keys())[i]]) - 1, -1, -1):
                 if len(types[list(types.keys())[i]][j]) != 0:
                     paragraph = docx.add_paragraph()
                     paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
@@ -277,7 +277,7 @@ class HCEM(Request):
     def resource_analysis(self, docx):
         last_paragraph = docx.paragraphs[-1]
         self.pcm_answer(last_paragraph)
-    
+
     def resource_pre_answer(self, docx):
         last_paragraph = docx.paragraphs[-1]
         self.pcm_answer(last_paragraph)
