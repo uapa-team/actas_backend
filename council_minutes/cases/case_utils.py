@@ -455,6 +455,24 @@ def table_approvals(docx_, subjects, details):
     table.cell(2, 7).paragraphs[0].add_run('Nota').font.bold = True
     table.cell(2, 7).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
     count = 3
+    summary_subjects_right = {}
+    summary_subjects_left = {}
+    to_check_again = []
+    for sbj in subjects:
+        if sbj[6] in summary_subjects_right:
+            summary_subjects_right[sbj[6]] += [sbj]
+        else:
+            if sbj[6] == '':
+                to_check_again += [sbj]
+            else:
+                summary_subjects_right.update({sbj[6]: [sbj]})
+        if sbj[6] in summary_subjects_right:
+            summary_subjects_right[sbj[6]] += [sbj]
+        else:
+            if sbj[6] == '':
+                to_check_again += [sbj]
+            else:
+                summary_subjects_right.update({sbj[6]: [sbj]})
     for subject in subjects:
         table.cell(count, 0).paragraphs[0].add_run(subject[0])
         table.cell(count, 0).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
