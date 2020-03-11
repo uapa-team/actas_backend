@@ -124,7 +124,8 @@ def header(request, docx_):
         request.student_justification))
     para.add_run('Soportes:\t\t{}\n'.format(request.supports))
     month = num_to_month(request.date.strftime('%m'))
-    para.add_run('Fecha radicación:\t{}\n'.format(request.date.strftime("%d{}%Y".format(month))))
+    para.add_run('Fecha radicación:\t{}\n'.format(
+        request.date.strftime("%d{}%Y".format(month))))
     para.add_run('Normatividad:')
     para.paragraph_format.space_after = Pt(0)
     for regulation in request.regulation_list:
@@ -392,7 +393,7 @@ def table_approvals(docx_, subjects, details):
     asign_number = len(subjects)
     tipology_number = len(tipology)
     table = docx_.add_table(
-        rows=(4+asign_number+tipology_number), cols=8, style='Table Grid')
+        rows=(3+asign_number), cols=8, style='Table Grid')
     table.style.font.size = Pt(8)
     table.alignment = WD_ALIGN_PARAGRAPH.CENTER
     table.columns[0].width = 500000
@@ -475,26 +476,36 @@ def table_approvals(docx_, subjects, details):
         table.cell(count, 7).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         count += 1
     total_homologated = 0
+    table = docx_.add_table(
+        rows=(tipology_number+1), cols=8, style='Table Grid')
+    table.style.font.size = Pt(8)
+    table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    table.columns[0].width = 500000
+    table.columns[1].width = 550000
+    table.columns[2].width = 1350000
+    table.columns[3].width = 300000
+    table.columns[4].width = 300000
+    table.columns[5].width = 400000
+    table.columns[6].width = 1400000
+    table.columns[7].width = 400000
+    count = 0
     for tip in tipology:
         text = 'Créditos homologados ' + str(tip)
-        table.cell(count, 0).merge(table.cell(
-            count, 5)).paragraphs[0].add_run(text)
-        table.cell(count, 0).merge(table.cell(count, 5)
-                                   ).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(count, 6).merge(table.cell(count, 7)
-                                   ).paragraphs[0].add_run(str(tipology[tip]))
-        table.cell(count, 6).merge(table.cell(count, 7)
-                                   ).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(count, 2).paragraphs[0].add_run(text)
+        table.cell(
+            count, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(count, 3).paragraphs[0].add_run(str(tipology[tip]))
+        table.cell(
+            count, 6).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         total_homologated += int(tipology[tip])
         count += 1
-    table.cell(count, 0).merge(table.cell(count, 5)).paragraphs[0].add_run(
+    table.cell(count, 2).paragraphs[0].add_run(
         'Total créditos que se homologan')
-    table.cell(count, 0).merge(table.cell(count, 5)
-                               ).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-    table.cell(count, 6).merge(table.cell(count, 7)
-                               ).paragraphs[0].add_run(str(total_homologated))
-    table.cell(count, 6).merge(table.cell(count, 7)
-                               ).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+    table.cell(count, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+    table.cell(count, 3).paragraphs[0].add_run(str(total_homologated))
+    table.cell(count, 3).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+    table.cell(0, 0).merge(table.cell(count, 1))
+    table.cell(0, 4).merge(table.cell(count, 7))
 
 
 def table_repprovals(docx_, subjects, details):
