@@ -394,7 +394,6 @@ def table_approvals(docx_, subjects, details):
     tipology_number = len(tipology)
     table = docx_.add_table(
         rows=(3+asign_number), cols=8, style='Table Grid')
-    table.style.font.size = Pt(8)
     table.alignment = WD_ALIGN_PARAGRAPH.CENTER
     table.columns[0].width = 500000
     table.columns[1].width = 550000
@@ -424,16 +423,19 @@ def table_approvals(docx_, subjects, details):
     cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
     cellp.add_run('{}\t\t\tDNI.{}'.format(
         details[0], details[1])).font.bold = True
+    cellp.runs[0].font.size = Pt(8)
     cellp = table.cell(1, 0).merge(table.cell(1, 5)).paragraphs[0]
     cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
     cellp.add_run('Asignaturas a homologar en el plan de estudios de {} ({})'.format(
         get_academic_program(details[2]), details[2])).font.bold = True
+    cellp.runs[0].font.size = Pt(8)
     table.cell(1, 0).merge(table.cell(1, 5)
                            ).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
     cellp = table.cell(1, 6).merge(table.cell(1, 7)).paragraphs[0]
     cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
     cellp.add_run('Asignaturas cursadas en {}'.format(
         details[3])).font.bold = True
+    cellp.runs[0].font.size = Pt(8)
     for i in range(2, asign_number + 3):
         for j in range(8):
             table.cell(
@@ -454,49 +456,126 @@ def table_approvals(docx_, subjects, details):
     table.cell(2, 6).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
     table.cell(2, 7).paragraphs[0].add_run('Nota').font.bold = True
     table.cell(2, 7).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-    count = 3
+    for i in range(8):
+        table.cell(2, i).paragraphs[0].runs[0].font.size = Pt(8)
+    subjects.sort(key=lambda s: (s[0], s[2]))
     summary_subjects_right = {}
     summary_subjects_left = {}
-    to_check_again = []
     for sbj in subjects:
         if sbj[6] in summary_subjects_right:
             summary_subjects_right[sbj[6]] += [sbj]
         else:
             if sbj[6] == '':
-                to_check_again += [sbj]
+                summary_subjects_right[list(
+                    summary_subjects_right.keys())[-1]] += [sbj]
             else:
                 summary_subjects_right.update({sbj[6]: [sbj]})
-        if sbj[6] in summary_subjects_right:
-            summary_subjects_right[sbj[6]] += [sbj]
+        if sbj[1] in summary_subjects_left:
+            summary_subjects_left[sbj[1]] += [sbj]
         else:
-            if sbj[6] == '':
-                to_check_again += [sbj]
+            if sbj[1] == '':
+                summary_subjects_left[list(
+                    summary_subjects_left.keys())[-1]] += [sbj]
             else:
-                summary_subjects_right.update({sbj[6]: [sbj]})
-    for subject in subjects:
-        table.cell(count, 0).paragraphs[0].add_run(subject[0])
-        table.cell(count, 0).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-        table.cell(count, 1).paragraphs[0].add_run(subject[1])
-        table.cell(count, 1).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-        table.cell(count, 2).paragraphs[0].add_run(
-            subject[2])
-        table.cell(count, 2).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-        table.cell(count, 3).paragraphs[0].add_run(str(subject[3]))
-        table.cell(count, 3).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-        table.cell(count, 4).paragraphs[0].add_run(subject[4])
-        table.cell(count, 4).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-        table.cell(count, 5).paragraphs[0].add_run(subject[5])
-        table.cell(count, 5).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-        table.cell(count, 6).paragraphs[0].add_run(
-            subject[6])
-        table.cell(count, 6).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-        table.cell(count, 7).paragraphs[0].add_run(subject[7])
-        table.cell(count, 7).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-        count += 1
+                summary_subjects_left.update({sbj[1]: [sbj]})
+        index = 3
+    if len(summary_subjects_right) > len(summary_subjects_left):
+        for item in summary_subjects_left:
+            for k in range(5):
+                mg_c = table.cell(index, k).merge(table.cell(
+                    index + len(summary_subjects_left[item]) - 1, k)).paragraphs[0]
+                table.cell(index, k).merge(table.cell(
+                    index + len(summary_subjects_left[
+                        item]) - 1, k)).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                mg_c.add_run(
+                    summary_subjects_left[item][0][k]).font.size = Pt(8)
+            index += len(summary_subjects_left[item])
+        count = 3
+        for subject in subjects:
+            table.cell(count, 5).paragraphs[0].add_run(
+                subject[5]).font.size = Pt(8)
+            table.cell(count, 5).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 6).paragraphs[0].add_run(
+                subject[6]).font.size = Pt(8)
+            table.cell(count, 6).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 7).paragraphs[0].add_run(
+                subject[7]).font.size = Pt(8)
+            table.cell(count, 7).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            count += 1
+    elif len(summary_subjects_right) < len(summary_subjects_left):
+        if len(summary_subjects_right) == 1:
+            for k in (6, 7):
+                mg_c = table.cell(index, k).merge(table.cell(
+                    index + len(subjects) - 1, k)).paragraphs[0]
+                table.cell(index, k).merge(table.cell(
+                    index + len(subjects) - 1, k)).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                mg_c.add_run(summary_subjects_right[list(
+                    summary_subjects_right.keys())[-1]][0][k]).font.size = Pt(8)
+            index += len(subjects)
+        else:
+            for item in summary_subjects_right:
+                for k in (6, 7):
+                    mg_c = table.cell(index, k).merge(table.cell(
+                        index + len(summary_subjects_right[item]) - 1, k)).paragraphs[0]
+                    table.cell(index, k).merge(table.cell(
+                        index + len(
+                            summary_subjects_right[
+                                item]) - 1, k)).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                mg_c.add_run(
+                    summary_subjects_right[item][0][k]).font.size = Pt(8)
+                index += len(summary_subjects_right[item])
+        count = 3
+        for subject in subjects:
+            table.cell(count, 0).paragraphs[0].add_run(
+                subject[0]).font.size = Pt(8)
+            table.cell(count, 0).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 1).paragraphs[0].add_run(
+                subject[1]).font.size = Pt(8)
+            table.cell(count, 1).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 2).paragraphs[0].add_run(
+                subject[2]).font.size = Pt(8)
+            table.cell(count, 2).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 3).paragraphs[0].add_run(
+                str(subject[3])).font.size = Pt(8)
+            table.cell(count, 3).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 4).paragraphs[0].add_run(
+                subject[4]).font.size = Pt(8)
+            table.cell(count, 4).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 5).paragraphs[0].add_run(
+                subject[5]).font.size = Pt(8)
+            table.cell(count, 5).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            count += 1
+    else:
+        count = 3
+        for subject in subjects:
+            table.cell(count, 0).paragraphs[0].add_run(
+                subject[0]).font.size = Pt(8)
+            table.cell(count, 0).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 1).paragraphs[0].add_run(
+                subject[1]).font.size = Pt(8)
+            table.cell(count, 1).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 2).paragraphs[0].add_run(
+                subject[2]).font.size = Pt(8)
+            table.cell(count, 2).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 3).paragraphs[0].add_run(
+                str(subject[3])).font.size = Pt(8)
+            table.cell(count, 3).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 4).paragraphs[0].add_run(
+                subject[4]).font.size = Pt(8)
+            table.cell(count, 4).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 5).paragraphs[0].add_run(
+                subject[5]).font.size = Pt(8)
+            table.cell(count, 5).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 6).paragraphs[0].add_run(
+                subject[6]).font.size = Pt(8)
+            table.cell(count, 6).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 7).paragraphs[0].add_run(
+                subject[7]).font.size = Pt(8)
+            table.cell(count, 7).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            count += 1
     total_homologated = 0
     table = docx_.add_table(
         rows=(tipology_number+1), cols=8, style='Table Grid')
-    table.style.font.size = Pt(8)
     table.alignment = WD_ALIGN_PARAGRAPH.CENTER
     table.columns[0].width = 500000
     table.columns[1].width = 550000
@@ -506,21 +585,41 @@ def table_approvals(docx_, subjects, details):
     table.columns[5].width = 400000
     table.columns[6].width = 1400000
     table.columns[7].width = 400000
+    for cell in table.columns[0].cells:
+        cell.width = 500000
+    for cell in table.columns[1].cells:
+        cell.width = 550000
+    for cell in table.columns[2].cells:
+        cell.width = 1350000
+    for cell in table.columns[3].cells:
+        cell.width = 300000
+    for cell in table.columns[4].cells:
+        cell.width = 300000
+    for cell in table.columns[5].cells:
+        cell.width = 400000
+    for cell in table.columns[6].cells:
+        cell.width = 1400000
+    for cell in table.columns[7].cells:
+        cell.width = 400000
     count = 0
     for tip in tipology:
         text = 'Créditos homologados ' + str(tip)
-        table.cell(count, 2).paragraphs[0].add_run(text)
+        table.cell(count, 2).paragraphs[0].add_run(text).font.size = Pt(8)
         table.cell(
             count, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(count, 3).paragraphs[0].add_run(str(tipology[tip]))
+        table.cell(count, 3).paragraphs[0].add_run(
+            str(tipology[tip])).font.size = Pt(8)
+        table.cell(
+            count, 3).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(
             count, 6).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         total_homologated += int(tipology[tip])
         count += 1
     table.cell(count, 2).paragraphs[0].add_run(
-        'Total créditos que se homologan')
+        'Total créditos que se homologan').font.size = Pt(8)
     table.cell(count, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-    table.cell(count, 3).paragraphs[0].add_run(str(total_homologated))
+    table.cell(count, 3).paragraphs[0].add_run(
+        str(total_homologated)).font.size = Pt(8)
     table.cell(count, 3).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
     table.cell(0, 0).merge(table.cell(count, 1))
     table.cell(0, 4).merge(table.cell(count, 7))
