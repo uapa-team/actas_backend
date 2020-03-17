@@ -7,6 +7,7 @@ from mongoengine.errors import ValidationError, DoesNotExist
 from mongoengine.fields import BaseField
 from.helpers import get_period_choices
 
+
 class Subject(EmbeddedDocument):
 
     meta = {'allow_inheritance': True}
@@ -104,7 +105,7 @@ class Request(DynamicDocument):
     )
     decision_maker = decision_makers[0]
 
-    #Request is in cm, pcm (or not)
+    # Request is in cm, pcm (or not)
     in_cm = True
     in_pcm = True
 
@@ -353,7 +354,8 @@ class Request(DynamicDocument):
     )
 
     PERIOD_CHOICES = get_period_choices()
-    PERIOD_DEFAULT = PERIOD_CHOICES[0][0] if datetime.date.today().month <= 6 else PERIOD_CHOICES[1][0]
+    PERIOD_DEFAULT = PERIOD_CHOICES[0][0] if datetime.date.today(
+    ).month <= 6 else PERIOD_CHOICES[1][0]
 
     _cls = StringField(required=True)
     date_stamp = DateTimeField(default=datetime.datetime.now)
@@ -361,12 +363,13 @@ class Request(DynamicDocument):
     consecutive_minute = IntField(
         min_value=0, default=0, display='Número del Acta de Consejo de Facultad')
     consecutive_minute_ac = IntField(
-        min_value=0, default=0, display='Número del Acta de Comité Asesor') #ac stands for advisory committe
+        min_value=0, default=0, display='Número del Acta de Comité Asesor')  # ac stands for advisory committe
     year = IntField(
         min_value=2000, max_value=2100, display='Año del Acta', default=datetime.date.today().year)
-    to_legal = BooleanField(default=False, display='Sugerir remitir caso a legataria')
+    to_legal = BooleanField(
+        default=False, display='Sugerir remitir caso a Comisión Delegataria')
     date = DateTimeField(default=datetime.date.today,
-                     display='Fecha de radicación')
+                         display='Fecha de radicación')
     academic_program = StringField(
         min_length=4, max_length=4, choices=PLAN_CHOICES,
         display='Programa Académico', default=PI_AGRICOLA)
@@ -392,7 +395,7 @@ class Request(DynamicDocument):
     supports = StringField(default='', display='Soportes')
     extra_analysis = ListField(
         StringField(), display='Analisis Extra')
-    received_date = DateTimeField() #Date when advisor recieves a case from secretary
+    received_date = DateTimeField()  # Date when advisor recieves a case from secretary
 
     regulations = {
         '008|2008|CSU': ('Acuerdo 008 de 2008 del Consejo Superior Universitario',
@@ -547,7 +550,8 @@ class Request(DynamicDocument):
 
 class Professor(EmbeddedDocument):
 
-    name = StringField(required=True, default='Nombre profesor', display='Nombre')
+    name = StringField(
+        required=True, default='Nombre profesor', display='Nombre')
     department = StringField(
         display='Departamento', choices=Request.DP_CHOICES, default=Request.DP_EXTERNO_FACULTAD)
     institution = StringField(display='Institución')
@@ -563,12 +567,14 @@ class Person(DynamicDocument):
     student_name = StringField(
         max_length=512, display='Nombre del Estudiante', default='')
 
+
 class SubjectAutofill(DynamicDocument):
     subject_code = StringField(
         display='Código de la Asignatura')
     subject_name = StringField(
         max_length=512, display='Nombre de la Asignatura', default='')
-        
+
+
 class RequestChanges(DynamicDocument):
     request_id = LazyReferenceField(Request, required=True)
     user = StringField(required=True)
