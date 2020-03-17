@@ -135,7 +135,7 @@ class HCEM(Request):
             paragraph = docx.add_paragraph()
             paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
             paragraph.paragraph_format.space_after = Pt(0)
-            paragraph.add_run(self.str_comittee_header + ' ')
+            paragraph.add_run(self.str_council_header + ' ')
             self.cm_answer(paragraph)
             self.add_single_table(docx)
         else:

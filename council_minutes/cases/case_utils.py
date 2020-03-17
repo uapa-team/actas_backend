@@ -481,20 +481,17 @@ def table_approvals(docx_, subjects, details):
         index = 3
     if len(summary_subjects_right) > len(summary_subjects_left):
         for item in summary_subjects_left:
-            for k in range(5):
+            for k in range(6):
                 mg_c = table.cell(index, k).merge(table.cell(
                     index + len(summary_subjects_left[item]) - 1, k)).paragraphs[0]
                 table.cell(index, k).merge(table.cell(
                     index + len(summary_subjects_left[
                         item]) - 1, k)).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
                 mg_c.add_run(
-                    summary_subjects_left[item][0][k]).font.size = Pt(8)
+                    str(summary_subjects_left[item][0][k])).font.size = Pt(8)
             index += len(summary_subjects_left[item])
         count = 3
         for subject in subjects:
-            table.cell(count, 5).paragraphs[0].add_run(
-                subject[5]).font.size = Pt(8)
-            table.cell(count, 5).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
             table.cell(count, 6).paragraphs[0].add_run(
                 subject[6]).font.size = Pt(8)
             table.cell(count, 6).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
@@ -521,8 +518,8 @@ def table_approvals(docx_, subjects, details):
                         index + len(
                             summary_subjects_right[
                                 item]) - 1, k)).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-                mg_c.add_run(
-                    summary_subjects_right[item][0][k]).font.size = Pt(8)
+                    mg_c.add_run(
+                        summary_subjects_right[item][0][k]).font.size = Pt(8)
                 index += len(summary_subjects_right[item])
         count = 3
         for subject in subjects:
@@ -684,31 +681,45 @@ def table_repprovals(docx_, subjects, details):
     cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
     cellp.add_run('{}\t\t\tDNI.{}'.format(
         details[0], details[1])).font.bold = True
+    cellp.runs[0].font.size = Pt(8)
     cellp = table.cell(1, 0).merge(table.cell(1, 5)).paragraphs[0]
     cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
     cellp.add_run('Asignaturas que no se homologan en el plan de estudios {} ({})'.format(
         get_academic_program(details[2]), details[2])).font.bold = True
+    cellp.runs[0].font.size = Pt(8)
     for i in range(2, asign_number + 3):
         for j in range(6):
             table.cell(
                 i, j).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
     table.cell(2, 0).paragraphs[0].add_run('Periodo').font.bold = True
+    table.cell(2, 0).paragraphs[0].runs[0].font.size = Pt(8)
     table.cell(2, 1).paragraphs[0].add_run(
         'Asignatura Universidad Nacional de Colombia - ({})'.format(details[2])).font.bold = True
+    table.cell(2, 1).paragraphs[0].runs[0].font.size = Pt(8)
     table.cell(2, 2).paragraphs[0].add_run(
         'Asignatura cursada en {}'.format(details[3])).font.bold = True
+    table.cell(2, 2).paragraphs[0].runs[0].font.size = Pt(8)
     table.cell(2, 3).paragraphs[0].add_run('Justificación').font.bold = True
+    table.cell(2, 3).paragraphs[0].runs[0].font.size = Pt(8)
     table.cell(2, 4).paragraphs[0].add_run('C').font.bold = True
+    table.cell(2, 4).paragraphs[0].runs[0].font.size = Pt(8)
     table.cell(2, 5).paragraphs[0].add_run('Nota').font.bold = True
+    table.cell(2, 5).paragraphs[0].runs[0].font.size = Pt(8)
     count = 3
     for subject in subjects:
         table.cell(count, 0).paragraphs[0].add_run(subject[0])
+        table.cell(count, 0).paragraphs[0].runs[0].font.size = Pt(8)
         table.cell(count, 1).paragraphs[0].add_run(subject[1])
+        table.cell(count, 1).paragraphs[0].runs[0].font.size = Pt(8)
         table.cell(count, 2).paragraphs[0].add_run(
             subject[2])
+        table.cell(count, 2).paragraphs[0].runs[0].font.size = Pt(8)
         table.cell(count, 3).paragraphs[0].add_run(str(subject[3]))
+        table.cell(count, 3).paragraphs[0].runs[0].font.size = Pt(8)
         table.cell(count, 4).paragraphs[0].add_run(str(subject[4]))
+        table.cell(count, 4).paragraphs[0].runs[0].font.size = Pt(8)
         table.cell(count, 5).paragraphs[0].add_run(subject[5])
+        table.cell(count, 5).paragraphs[0].runs[0].font.size = Pt(8)
         count += 1
 
 
