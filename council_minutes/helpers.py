@@ -1,5 +1,6 @@
 import datetime
 from django.core.serializers.json import DjangoJSONEncoder
+from mongoengine import ListField
 from mongoengine.base.datastructures import BaseList, EmbeddedDocumentList
 from mongoengine.queryset import QuerySet
 from mongoengine.fields import BaseField
@@ -46,6 +47,9 @@ class QuerySetEncoder(DjangoJSONEncoder):
             pass
         return data
 
+def extract_choices(choices):
+    return [option[1] for option in choices]
+
 def get_fields(_cls):
     schema = {
         'full_name': _cls.full_name,
@@ -76,8 +80,10 @@ def get_schema(_cls):
                 schema[name]['default'] = field.default
 
             if field.choices:
-                schema[name]['choices'] = [option[1]
-                                          for option in field.choices]
+                schema[name]['choices'] = extract_choices(field.choices)
+
+            if isinstance(field, ListField) and field.field.choices:
+                    schema[name]['choices'] = extract_choices(field.field.choices)
 
             if schema[name]['type'] == 'Table':
                 schema[name]['fields'] = get_schema(
