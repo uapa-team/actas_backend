@@ -77,15 +77,40 @@ class Subject(EmbeddedDocument):
         data = [0, 0, 0, 0, 0]
         for sbj in subjects:
             if sbj.tipology == Subject.TIP_PRE_FUND_OBLIGATORIA:
-                data[0] += sbj.credits
+                try:
+                    if float(sbj.grade) >= 3.0:
+                        data[0] += sbj.credits
+                except ValueError:
+                    if sbj.grade in ('AP', 'AS'):
+                        data[0] += sbj.credits
             elif sbj.tipology == Subject.TIP_PRE_FUND_OPTATIVA:
-                data[1] += sbj.credits
+                try:
+                    if float(sbj.grade) >= 3.0:
+                        data[1] += sbj.credits
+                except ValueError:
+                    if sbj.grade in ('AP', 'AS'):
+                        data[1] += sbj.credits
             elif sbj.tipology == Subject.TIP_PRE_DISC_OBLIGATORIA:
-                data[2] += sbj.credits
+                try:
+                    if float(sbj.grade) >= 3.0:
+                        data[2] += sbj.credits
+                except ValueError:
+                    if sbj.grade in ('AP', 'AS'):
+                        data[2] += sbj.credits
             elif sbj.tipology == Subject.TIP_PRE_DISC_OPTATIVA:
-                data[3] += sbj.credits
+                try:
+                    if float(sbj.grade) >= 3.0:
+                        data[3] += sbj.credits
+                except ValueError:
+                    if sbj.grade in ('AP', 'AS'):
+                        data[3] += sbj.credits
             elif sbj.tipology == Subject.TIP_PRE_LIBRE_ELECCION:
-                data[4] += sbj.credits
+                try:
+                    if float(sbj.grade) >= 3.0:
+                        data[4] += sbj.credits
+                except ValueError:
+                    if sbj.grade in ('AP', 'AS'):
+                        data[4] += sbj.credits
         return data
 
 

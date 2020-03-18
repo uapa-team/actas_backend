@@ -118,12 +118,6 @@ class TRASPRE(Request):
     same_degree = BooleanField(
         required=True, default=False,
         display='¿Estos planes de estudios conducen al mismo título?')
-    transit_program_code = StringField(
-        required=True,
-        display='Código del plan de estudios de destino', default='')
-    transit_program_name = StringField(
-        required=True,
-        display='Nombre del plan de estudios de destino', default='')
     origin_program_code = StringField(
         required=True,
         display='Código del plan de estudios de origen', default='')
@@ -551,8 +545,12 @@ class TRASPRE(Request):
             paragraph.add_run(' ').font.size = Pt(8)
             reproved = 0
             for sbj in self.equivalence:
-                if float(sbj.grade) < 3.0:
-                    reproved += 1
+                try:
+                    if float(sbj.grade) < 3.0:
+                        reproved += 1
+                except ValueError:
+                    if sbj.grade == 'RE':
+                        reproved += 1
             table = docx.add_table(
                 rows=(len(self.equivalence) + 3 - reproved), cols=9, style='Table Grid')
             table.style.font.size = Pt(8)
@@ -628,8 +626,12 @@ class TRASPRE(Request):
             index = 2
             total_creds = 0
             for sbj in self.equivalence:
-                if float(sbj.grade) < 3.0:
-                    continue
+                try:
+                    if float(sbj.grade) < 3.0:
+                        continue
+                except ValueError:
+                    if sbj.grade == 'RE':
+                        continue
                 table.cell(index, 0).paragraphs[0].add_run(
                     sbj.period).font.size = Pt(8)
                 table.cell(index, 1).paragraphs[0].add_run(
@@ -756,8 +758,12 @@ class TRASPRE(Request):
                 index = 2
                 total_creds = 0
                 for sbj in self.equivalence:
-                    if float(sbj.grade) >= 3.0:
-                        continue
+                    try:
+                        if float(sbj.grade) >= 3.0:
+                            continue
+                    except ValueError:
+                        if sbj.grade in ('AP', 'AS'):
+                            continue
                     table.cell(index, 0).paragraphs[0].add_run(
                         sbj.period).font.size = Pt(8)
                     table.cell(index, 1).paragraphs[0].add_run(
@@ -1166,7 +1172,7 @@ class TRASPRE(Request):
                 self.str_table[44]).font.bold = True
             table.cell(0, 0).paragraphs[0].runs[0].font.size = Pt(8)
             table.cell(0, 1).paragraphs[0].add_run(
-                str(self.free_choice_pending)).font.size = Pt(8)
+                str(pending_creds[4])).font.size = Pt(8)
             table.cell(
                 0, 1).paragraphs[0].alignment = WD_ALIGN_VERTICAL.CENTER
             paragraph = docx.add_paragraph()
