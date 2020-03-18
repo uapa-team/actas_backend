@@ -36,7 +36,7 @@ class REINPRE(Request):
         required=True, display='Periodo de reingreso',
         choices=Request.PERIOD_CHOICES, default=Request.PERIOD_DEFAULT)
     loss_period = StringField(
-        required=True, display='Periodo de perdida de calidad de estudiante', 
+        required=True, display='Periodo de perdida de calidad de estudiante',
         choices=Request.PERIOD_CHOICES, default=Request.PERIOD_DEFAULT)
     first_reing = BooleanField(
         required=True, display='Primer reingreso', default=True)
@@ -350,7 +350,6 @@ class REINPRE(Request):
         bullet = paragraph.add_run(self.str_pcm_pre[4])
         bullet.font.bold = True
         bullet.font.size = Pt(8)
-
         credits_data = [[self.exi_fund_m, self.exi_fund_o, self.exi_disc_m,
                          self.exi_disc_o, self.exi_free],
                         [self.app_fund_m, self.app_fund_o, self.app_disc_m,
@@ -422,7 +421,7 @@ class REINPRE(Request):
         paragraph.add_run(self.str_answer + ':\n').font.bold = True
         paragraph.add_run(self.str_comittee_header + ' ')
         self.pcm_answer(paragraph)
-        #if self.request_in_date: To ommit tables when the request isn't in time
+        # if self.request_in_date: To ommit tables when the request isn't in time
         self.cm_pcm_paragraph(docx)
         self.rein_general_data_table(docx)
         self.rein_academic_info(docx)
@@ -433,7 +432,7 @@ class REINPRE(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
-        #if self.request_in_date: To ommit tables when the request isn't in time
+        # if self.request_in_date: To ommit tables when the request isn't in time
         paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
         self.rein_general_data_table(docx)
@@ -512,7 +511,7 @@ class REINPRE(Request):
     def resource_analysis(self, docx):
         last_paragraph = docx.paragraphs[-1]
         self.pcm_answer(last_paragraph)
-    
+
     def resource_pre_answer(self, docx):
         last_paragraph = docx.paragraphs[-1]
         self.pcm_answer(last_paragraph)

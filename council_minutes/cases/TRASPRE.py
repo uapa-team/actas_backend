@@ -183,9 +183,6 @@ class TRASPRE(Request):
     optative_remaining = EmbeddedDocumentListField(
         Optative,
         display='Agrupaciones de las asignaturas pendientes optativas')
-    free_choice_pending = IntField(min_value=0, required=True,
-                                   display='Créditos pendientes de libre elección',
-                                   default=0)
 
     regulation_list = ['008|2008|CSU', '089|2014|CAC']  # List of regulations
 
