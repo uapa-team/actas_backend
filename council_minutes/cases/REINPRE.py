@@ -1,4 +1,5 @@
 import datetime
+import functools
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
@@ -14,6 +15,7 @@ class REINPRE(Request):
     RL_ANSWER_CUPO_CREDITOS = 'CC'
     RL_ANSWER_SANCION = 'SA'
     RL_ANSWER_OTRO = 'OT'
+    RL_ANSWER_PAPA_CREDITOS = 'PC'
     RL_ANSWER_CHOICES = (
         (RL_ANSWER_RENOV_MATRICULA, 'No cumplir con los requisitos exigidos para la' +
          ' renovación de la matrícula, en los plazos señalados por la Universidad.'),
@@ -25,6 +27,10 @@ class REINPRE(Request):
         (RL_ANSWER_SANCION,
          'Recibir sanción disciplinaria de expulsión o suspensión impuesta de acuerdo' +
          ' con las normas vigentes.'),
+        (RL_ANSWER_PAPA_CREDITOS,
+         'Presentar un Promedio Aritmético Ponderado Acumulado menor que tres punto cero (3.0) y' +
+         ' no disponer de un cupo de créditos suficiente para inscribir las asignaturas' +
+         ' del plan de estudios pendientes de aprobación.'),
         (RL_ANSWER_OTRO, 'Otro.')
     )
 
@@ -49,27 +55,12 @@ class REINPRE(Request):
     reason_of_loss = StringField(choices=RL_ANSWER_CHOICES,
                                  default=RL_ANSWER_OTRO,
                                  display='Razón pérdida calidad de estudiante')
-    credits_minus_remaining = IntField(
-        required=True, display='Cupo de créditos menos créditos pendientes', default=0)
-    credits_remaining = IntField(
-        required=True, display='Créditos restantes', default=0)
+    credits_bag = IntField(
+        required=True, display='Cupo de créditos disponible para inscripción', default=0)
     credits_english = IntField(
-        required=True, display='Créditos inglés', default=0)
-    credits_add = IntField(
-        required=True, display='Créditos requeridos para inscribir asignaturas', default=0)
-
-    min_grade_12c = StringField(
-        required=True, display='Promedio semestral mínimo requerido para mantener la ' +
-        'calidad de estudiante con 12 créditos inscritos: ', default='')
-    min_grade_15c = StringField(
-        required=True, display='Promedio semestral mínimo requerido para mantener la ' +
-        'calidad de estudiante con 15 créditos inscritos: ', default='')
-    min_grade_18c = StringField(
-        required=True, display='Promedio semestral mínimo requerido para mantener la ' +
-        'calidad de estudiante con 18 créditos inscritos: ', default='')
-    min_grade_21c = StringField(
-        required=True, display='Promedio semestral mínimo requerido para mantener la ' +
-        'calidad de estudiante con 21 créditos inscritos: ', default='')
+        required=True, display='Créditos pendientes inglés', default=0)
+    credits_coursed = IntField(
+        required=True, display="Créditos cursados (Aprobados + No Aprobados)")
 
     # Exiged credits
     exi_fund_m = IntField(
@@ -95,18 +86,6 @@ class REINPRE(Request):
     app_free = IntField(
         required=True, display='Créditos de libre elección aprobados', default=0)
 
-    # Remaining credits
-    rem_fund_m = IntField(
-        required=True, display='Créditos de fundamentación obligatorios restantes', default=0)
-    rem_fund_o = IntField(
-        required=True, display='Créditos de fundamentación optativos restantes', default=0)
-    rem_disc_m = IntField(
-        required=True, display='Créditos disciplinares obligatorios restantes', default=0)
-    rem_disc_o = IntField(
-        required=True, display='Créditos disciplinares optativos restantes', default=0)
-    rem_free = IntField(
-        required=True, display='Créditos de libre elección restantes', default=0)
-
     comitee_act = StringField(
         required=True, display='Número de acta de comité', default='00')
 
@@ -115,14 +94,14 @@ class REINPRE(Request):
     )
 
     # Pre-cm variables
-    request_in_date = BooleanField(display='Solicitud a tiempo', default=True)
-    credits_granted = IntField(display='Créditos otorgados', default=0)
+    request_in_date = BooleanField(
+        display='Solicitud entregada a tiempo', default=True)
 
     str_pcm_pre = [
         # Used in pcm and cm:
         'reingreso por única vez a partir del periodo académico ',
-        'Si el estudiante no renueva su matrícula en el semestre de reingreso, el acto' +
-        ' académico expedido por el Consejo de Facultad queda sin efecto.',
+        '. Si el estudiante no renueva su matrícula en el semestre de reingreso, el acto' +
+        ' académico expedido por el Consejo de Facultad queda sin efecto. ',
         '1. Datos Generales:',
         '2. Información Académica:',
         '3. Resumen general de créditos del plan de estudios:',
@@ -243,46 +222,53 @@ class REINPRE(Request):
         table.columns[1].width = 3200000
         table.columns[2].width = 1600000
         table.cell(0, 0).merge(table.cell(0, 1)).paragraphs[0].add_run(
-            self.str_pcm_pre_acadinfo[0])
-        table.cell(0, 2).paragraphs[0].add_run(self.admission_period)
+            self.str_pcm_pre_acadinfo[0]).font.size = Pt(8)
+        table.cell(0, 2).paragraphs[0].add_run(
+            self.admission_period).font.size = Pt(8)
         table.cell(0, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(1, 0).merge(table.cell(1, 1)).paragraphs[0].add_run(
-            self.str_pcm_pre_acadinfo[1])
+            self.str_pcm_pre_acadinfo[1]).font.size = Pt(8)
 
         if self.first_reing:
-            table.cell(1, 2).paragraphs[0].add_run('Sí')
+            table.cell(1, 2).paragraphs[0].add_run('Sí').font.size = Pt(8)
         else:
-            table.cell(1, 2).paragraphs[0].add_run('No')
+            table.cell(1, 2).paragraphs[0].add_run('No').font.size = Pt(8)
 
         table.cell(1, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(2, 0).merge(table.cell(2, 2)).paragraphs[0].add_run(
-            self.str_pcm_pre_acadinfo[2])
+            self.str_pcm_pre_acadinfo[2]).font.size = Pt(8)
         table.cell(3, 0).merge(table.cell(3, 1)).paragraphs[0].add_run(
-            self.str_pcm_pre_acadinfo[3])
-        table.cell(3, 2).paragraphs[0].add_run(self.loss_period)
+            self.str_pcm_pre_acadinfo[3]).font.size = Pt(8)
+        table.cell(3, 2).paragraphs[0].add_run(
+            self.loss_period).font.size = Pt(8)
         table.cell(3, 2).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         table.cell(3, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(4, 0).merge(table.cell(4, 1)).paragraphs[0].add_run(
-            self.str_pcm_pre_acadinfo[4])
-        table.cell(4, 2).paragraphs[0].add_run(str(self.periods_since))
+            self.str_pcm_pre_acadinfo[4]).font.size = Pt(8)
+        table.cell(4, 2).paragraphs[0].add_run(
+            str(self.periods_since)).font.size = Pt(8)
         table.cell(4, 2).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         table.cell(4, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(5, 0).merge(table.cell(5, 2)).paragraphs[0].add_run(
-            self.str_pcm_pre_acadinfo[5])
+            self.str_pcm_pre_acadinfo[5]).font.size = Pt(8)
         table.cell(6, 0).merge(table.cell(6, 1)
-                               ).paragraphs[0].add_run(self.str_pcm_pre_acadinfo[6])
-        table.cell(6, 2).paragraphs[0].add_run(str(self.papa))
+                               ).paragraphs[0].add_run(
+                                   self.str_pcm_pre_acadinfo[6]).font.size = Pt(8)
+        table.cell(6, 2).paragraphs[0].add_run(
+            str(self.papa)).font.size = Pt(8)
         table.cell(6, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(7, 0).merge(table.cell(7, 1)).paragraphs[0].add_run(
-            self.str_pcm_pre_acadinfo[7])
+            self.str_pcm_pre_acadinfo[7]).font.size = Pt(8)
         table.cell(7, 0).merge(table.cell(7, 1)
                                ).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         table.cell(7, 2).paragraphs[0].add_run(
             # pylint: disable=no-member
-            self.get_reason_of_loss_display())
+            self.get_reason_of_loss_display()).font.size = Pt(8)
         table.cell(7, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(8, 0).merge(table.cell(8, 2)).paragraphs[0].add_run(
-            self.str_pcm_pre_acadinfo[8]).font.bold = True
+        mg_cll = table.cell(8, 0).merge(table.cell(8, 2)).paragraphs[0].add_run(
+            self.str_pcm_pre_acadinfo[8])
+        mg_cll.font.bold = True
+        mg_cll.font.size = Pt(8)
         table.cell(9, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(9, 0).paragraphs[0].add_run('1').font.bold = True
         table.cell(10, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -291,28 +277,44 @@ class REINPRE(Request):
         table.cell(11, 0).paragraphs[0].add_run('3').font.bold = True
         table.cell(12, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(12, 0).paragraphs[0].add_run('4').font.bold = True
+        for i in range(9, 13):
+            table.cell(
+                i, 0).paragraphs[0].runs[0].font.size = Pt(8)
         table.cell(9, 1).paragraphs[0].add_run(
-            self.str_pcm_pre_acadinfo[9])
+            self.str_pcm_pre_acadinfo[9]).font.size = Pt(8)
         table.cell(10, 1).paragraphs[0].add_run(
-            self.str_pcm_pre_acadinfo[10])
+            self.str_pcm_pre_acadinfo[10]).font.size = Pt(8)
         table.cell(11, 1).paragraphs[0].add_run(
-            self.str_pcm_pre_acadinfo[11])
+            self.str_pcm_pre_acadinfo[11]).font.size = Pt(8)
         table.cell(12, 1).paragraphs[0].add_run(
-            self.str_pcm_pre_acadinfo[12])
+            self.str_pcm_pre_acadinfo[12]).font.size = Pt(8)
         table.cell(9, 2).paragraphs[0].add_run(
-            str(self.credits_minus_remaining))
+            str((self.credits_bag - functools.reduce(lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
+                                                                        self.exi_fund_o - self.app_fund_o,
+                                                                        self.exi_disc_m - self.app_disc_m,
+                                                                        self.exi_disc_o - self.app_disc_o,
+                                                                        self.exi_free - self.app_free]) - self.credits_english))).font.size = Pt(8)
         table.cell(9, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(10, 2).paragraphs[0].add_run(
-            str(self.credits_remaining))
+            str(functools.reduce(lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
+                                                    self.exi_fund_o - self.app_fund_o,
+                                                    self.exi_disc_m - self.app_disc_m,
+                                                    self.exi_disc_o - self.app_disc_o,
+                                                    self.exi_free - self.app_free]))).font.size = Pt(8)
         table.cell(10, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(11, 2).paragraphs[0].add_run(
-            str(self.credits_english))
+            str(self.credits_english)).font.size = Pt(8)
         table.cell(11, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(12, 2).paragraphs[0].add_run(str(self.credits_add))
+        table.cell(12, 2).paragraphs[0].add_run(
+            str((self.credits_bag - functools.reduce(lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
+                                                                        self.exi_fund_o - self.app_fund_o,
+                                                                        self.exi_disc_m - self.app_disc_m,
+                                                                        self.exi_disc_o - self.app_disc_o,
+                                                                        self.exi_free - self.app_free]) - self.credits_english)*(-1))).font.size = Pt(8)
         table.cell(12, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
 
         # Optional: Grade needed with N credits to keep student condition.
-        if self.reason_of_loss == self.RL_ANSWER_CUPO_CREDITOS:
+        if self.reason_of_loss in (self.RL_ANSWER_PAPA, self.RL_ANSWER_PAPA_CREDITOS):
             table = docx.add_table(rows=5, cols=2)
             for col in table.columns:
                 for cell in col.cells:
@@ -331,17 +333,33 @@ class REINPRE(Request):
             table.cell(0, 0).merge(table.cell(0, 1)).paragraphs[0].add_run(
                 self.str_pcm_pre_acadinfo[13])
             table.cell(1, 0).paragraphs[0].add_run(
-                self.str_pcm_pre_acadinfo[14])
+                self.str_pcm_pre_acadinfo[14]).font.size = Pt(8)
             table.cell(2, 0).paragraphs[0].add_run(
-                self.str_pcm_pre_acadinfo[15])
+                self.str_pcm_pre_acadinfo[15]).font.size = Pt(8)
             table.cell(3, 0).paragraphs[0].add_run(
-                self.str_pcm_pre_acadinfo[16])
+                self.str_pcm_pre_acadinfo[16]).font.size = Pt(8)
             table.cell(4, 0).paragraphs[0].add_run(
-                self.str_pcm_pre_acadinfo[17])
-            table.cell(1, 1).paragraphs[0].add_run(str(self.min_grade_12c))
-            table.cell(2, 1).paragraphs[0].add_run(str(self.min_grade_15c))
-            table.cell(3, 1).paragraphs[0].add_run(str(self.min_grade_18c))
-            table.cell(4, 1).paragraphs[0].add_run(str(self.min_grade_21c))
+                self.str_pcm_pre_acadinfo[17]).font.size = Pt(8)
+            table.cell(1, 1).paragraphs[0].add_run(
+                str(round(
+                    ((3*(
+                        self.credits_coursed+12)-self.papa*self.credits_coursed)/12),
+                    1))).font.size = Pt(8)
+            table.cell(2, 1).paragraphs[0].add_run(
+                str(round(
+                    ((3*(
+                        self.credits_coursed+15)-self.papa*self.credits_coursed)/15),
+                    1))).font.size = Pt(8)
+            table.cell(3, 1).paragraphs[0].add_run(
+                str(round(
+                    ((3*(
+                        self.credits_coursed+18)-self.papa*self.credits_coursed)/18),
+                    1))).font.size = Pt(8)
+            table.cell(4, 1).paragraphs[0].add_run(
+                str(round(
+                    ((3*(
+                        self.credits_coursed+21)-self.papa*self.credits_coursed)/21),
+                    1))).font.size = Pt(8)
 
     def rein_credits_summary(self, docx):
         paragraph = docx.add_paragraph()
@@ -354,8 +372,11 @@ class REINPRE(Request):
                          self.exi_disc_o, self.exi_free],
                         [self.app_fund_m, self.app_fund_o, self.app_disc_m,
                          self.app_disc_o, self.app_free],
-                        [self.rem_fund_m, self.rem_fund_o, self.rem_disc_m,
-                         self.rem_disc_o, self.rem_free]]
+                        [self.exi_fund_m - self.app_fund_m,
+                         self.exi_fund_o - self.app_fund_o,
+                         self.exi_disc_m - self.app_disc_m,
+                         self.exi_disc_o - self.app_disc_o,
+                         self.exi_free - self.app_free]]
         case = 'REINGRESO'
         table_credits_summary(docx, credits_data, case)
 
@@ -385,7 +406,11 @@ class REINPRE(Request):
         table_recommend(docx, details)
 
     def extra_credits(self, paragraph):
-        paragraph.add_run(self.str_pcm_pre[18] + str(self.credits_granted) +
+        paragraph.add_run(' ' + self.str_pcm_pre[18] + str((self.credits_bag - functools.reduce(lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
+                                                                                                                   self.exi_fund_o - self.app_fund_o,
+                                                                                                                   self.exi_disc_m - self.app_disc_m,
+                                                                                                                   self.exi_disc_o - self.app_disc_o,
+                                                                                                                   self.exi_free - self.app_free]) - self.credits_english)*(-1)) +
                           self.str_pcm_pre[19])
 
     def get_analysis(self):
@@ -404,10 +429,18 @@ class REINPRE(Request):
             modifier, self.regulations['239|2009|VAC'][0],
             self.regulations['008|2008|CSU'][0], self.papa
         ))
-        modifier = 'D' if self.credits_remaining > 0 else 'No d'
+        modifier = 'D' if functools.reduce(lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
+                                                              self.exi_fund_o - self.app_fund_o,
+                                                              self.exi_disc_m - self.app_disc_m,
+                                                              self.exi_disc_o - self.app_disc_o,
+                                                              self.exi_free - self.app_free]) > 0 else 'No d'
         analysis.append(self.str_analysis[3].format(
             modifier, self.regulations['008|2008|CSU'][0],
-            self.credits_remaining, self.regulations['012|2014|VAC'][0]
+            functools.reduce(lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
+                                                self.exi_fund_o - self.app_fund_o,
+                                                self.exi_disc_m - self.app_disc_m,
+                                                self.exi_disc_o - self.app_disc_o,
+                                                self.exi_free - self.app_free]), self.regulations['012|2014|VAC'][0]
         ))
         modifier = '' if self.request_in_date else 'no '
         analysis.append(self.str_analysis[4].format(modifier))
@@ -435,6 +468,7 @@ class REINPRE(Request):
         # if self.request_in_date: To ommit tables when the request isn't in time
         paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
+        self.cm_pcm_paragraph(docx)
         self.rein_general_data_table(docx)
         self.rein_academic_info(docx)
         self.rein_credits_summary(docx)
@@ -453,19 +487,33 @@ class REINPRE(Request):
     def cm_pcm_paragraph(self, docx):
         if not self.request_in_date:
             return  # Skip when it's out of date
+        if self.credits_english == 0:
+            return
         para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         para.paragraph_format.space_after = Pt(0)
         para.add_run(self.str_pcm_pre[6] + self.student_name +
-                     self.str_pcm_pre[7] + str(self.credits_remaining))
+                     self.str_pcm_pre[7] + str(functools.reduce(lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
+                                                                                   self.exi_fund_o - self.app_fund_o,
+                                                                                   self.exi_disc_m - self.app_disc_m,
+                                                                                   self.exi_disc_o - self.app_disc_o,
+                                                                                   self.exi_free - self.app_free])))
         para.add_run(self.str_pcm_pre[8] +
                      # pylint: disable=no-member
                      self.get_academic_program_display())
         para.add_run(
             self.str_pcm_pre[9] + str(self.credits_english) + self.str_pcm_pre[10])
         para.add_run(self.str_pcm_pre[11])
-        para.add_run(str(self.credits_remaining +
-                         self.credits_minus_remaining))
+        para.add_run(str(functools.reduce(lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
+                                                             self.exi_fund_o - self.app_fund_o,
+                                                             self.exi_disc_m - self.app_disc_m,
+                                                             self.exi_disc_o - self.app_disc_o,
+                                                             self.exi_free - self.app_free]) +
+                         (self.credits_bag - functools.reduce(lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
+                                                                                 self.exi_fund_o - self.app_fund_o,
+                                                                                 self.exi_disc_m - self.app_disc_m,
+                                                                                 self.exi_disc_o - self.app_disc_o,
+                                                                                 self.exi_free - self.app_free]) - self.credits_english)))
         para.add_run(self.str_pcm_pre[12])
         para = docx.add_paragraph()
         para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
@@ -474,7 +522,12 @@ class REINPRE(Request):
             self.str_pcm_pre[13] + self.regulations['008|2008|CSU'][0])
         para.add_run(self.str_pcm_pre[14])
         para.add_run(self.str_pcm_pre[15]).font.italic = True
-        para.add_run(self.str_pcm_pre[16] + str(self.credits_granted))
+        para.add_run(self.str_pcm_pre[16] +
+                     str((self.credits_bag - functools.reduce(lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
+                                                                                 self.exi_fund_o - self.app_fund_o,
+                                                                                 self.exi_disc_m - self.app_disc_m,
+                                                                                 self.exi_disc_o - self.app_disc_o,
+                                                                                 self.exi_free - self.app_free]) - self.credits_english)*(-1)))
         para.add_run(self.str_pcm_pre[17])
         para.add_run(
             # pylint: disable=no-member
@@ -490,16 +543,20 @@ class REINPRE(Request):
     def standard_answer(self, paragraph, affirmative):
 
         paragraph.add_run(self.str_pcm_pre[0])
-        paragraph.add_run(self.academic_period + ' ')
+        paragraph.add_run(self.reing_period)
 
-        if self.credits_granted > 0:
+        if ((self.credits_bag - functools.reduce(lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
+                                                                    self.exi_fund_o - self.app_fund_o,
+                                                                    self.exi_disc_m - self.app_disc_m,
+                                                                    self.exi_disc_o - self.app_disc_o,
+                                                                    self.exi_free - self.app_free]) - self.credits_english)) < 0:
             # Y otorga n créditos adicionales:
             self.extra_credits(paragraph)
 
         if affirmative:
             paragraph.add_run(self.str_pcm_pre[1])
         else:
-            paragraph.add_run(self.council_decision + '.')
+            paragraph.add_run('. Debido a que ' + self.council_decision + '.')
 
         paragraph.add_run('({}).'.format(
             self.regulations['012|2014|VAC'][0] + "; Artículo 46, " +

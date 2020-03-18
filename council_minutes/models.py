@@ -406,7 +406,7 @@ class Request(DynamicDocument):
     student_name = StringField(
         max_length=512, display='Nombre del Estudiante', default='')
     academic_period = StringField(
-        max_length=10, display='Periodo', choices=PERIOD_CHOICES, default=PERIOD_DEFAULT)
+        max_length=10, display='Periodo Académico Actual', choices=PERIOD_CHOICES, default=PERIOD_DEFAULT)
     approval_status = StringField(
         min_length=2, max_length=2, choices=AS_CHOICES,
         default=AS_EN_ESPERA, display='Estado de Aprobación')
