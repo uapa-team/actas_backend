@@ -28,9 +28,7 @@ class REINPRE(Request):
          'Recibir sanción disciplinaria de expulsión o suspensión impuesta de acuerdo' +
          ' con las normas vigentes.'),
         (RL_ANSWER_PAPA_CREDITOS,
-         'Presentar un Promedio Aritmético Ponderado Acumulado menor que tres punto cero (3.0) y' +
-         ' no disponer de un cupo de créditos suficiente para inscribir las asignaturas' +
-         ' del plan de estudios pendientes de aprobación.'),
+         'PAPA menor a 3.0 y cupo de créditos insuficiente.'),
         (RL_ANSWER_OTRO, 'Otro.')
     )
 
@@ -59,8 +57,9 @@ class REINPRE(Request):
         required=True, display='Cupo de créditos disponible para inscripción', default=0)
     credits_english = IntField(
         required=True, display='Créditos pendientes inglés', default=0)
-    credits_coursed = IntField(
-        required=True, display="Créditos cursados (Aprobados + No Aprobados)")
+    credits_coursed = IntField(required=True,
+                               display='Créditos cursados (Aprobados + No Aprobados)' +
+                               ' con calificación numérica')
 
     # Exiged credits
     exi_fund_m = IntField(
@@ -261,9 +260,14 @@ class REINPRE(Request):
             self.str_pcm_pre_acadinfo[7]).font.size = Pt(8)
         table.cell(7, 0).merge(table.cell(7, 1)
                                ).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-        table.cell(7, 2).paragraphs[0].add_run(
-            # pylint: disable=no-member
-            self.get_reason_of_loss_display()).font.size = Pt(8)
+        # pylint: disable=no-member
+        if self.reason_of_loss == self.RL_ANSWER_PAPA_CREDITOS:
+            table.cell(7, 2).paragraphs[0].add_run(
+                self.RL_ANSWER_CHOICES[1][1] + '\n' +
+                self.RL_ANSWER_CHOICES[2][1]).font.size = Pt(8)
+        else:
+            table.cell(7, 2).paragraphs[0].add_run(
+                self.get_reason_of_loss_display()).font.size = Pt(8)
         table.cell(7, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         mg_cll = table.cell(8, 0).merge(table.cell(8, 2)).paragraphs[0].add_run(
             self.str_pcm_pre_acadinfo[8])
@@ -289,28 +293,33 @@ class REINPRE(Request):
         table.cell(12, 1).paragraphs[0].add_run(
             self.str_pcm_pre_acadinfo[12]).font.size = Pt(8)
         table.cell(9, 2).paragraphs[0].add_run(
-            str((self.credits_bag - functools.reduce(lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
-                                                                        self.exi_fund_o - self.app_fund_o,
-                                                                        self.exi_disc_m - self.app_disc_m,
-                                                                        self.exi_disc_o - self.app_disc_o,
-                                                                        self.exi_free - self.app_free]) - self.credits_english))).font.size = Pt(8)
+            str((self.credits_bag - functools.reduce(
+                lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
+                                   self.exi_fund_o - self.app_fund_o,
+                                   self.exi_disc_m - self.app_disc_m,
+                                   self.exi_disc_o - self.app_disc_o,
+                                   self.exi_free - self.app_free]) -
+                 self.credits_english))).font.size = Pt(8)
         table.cell(9, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(10, 2).paragraphs[0].add_run(
-            str(functools.reduce(lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
-                                                    self.exi_fund_o - self.app_fund_o,
-                                                    self.exi_disc_m - self.app_disc_m,
-                                                    self.exi_disc_o - self.app_disc_o,
-                                                    self.exi_free - self.app_free]))).font.size = Pt(8)
+            str(functools.reduce(
+                lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
+                                   self.exi_fund_o - self.app_fund_o,
+                                   self.exi_disc_m - self.app_disc_m,
+                                   self.exi_disc_o - self.app_disc_o,
+                                   self.exi_free - self.app_free]))).font.size = Pt(8)
         table.cell(10, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(11, 2).paragraphs[0].add_run(
             str(self.credits_english)).font.size = Pt(8)
         table.cell(11, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        additional_creds_required = self.credits_bag - functools.reduce(
+            lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
+                               self.exi_fund_o - self.app_fund_o,
+                               self.exi_disc_m - self.app_disc_m,
+                               self.exi_disc_o - self.app_disc_o,
+                               self.exi_free - self.app_free]) - self.credits_english
         table.cell(12, 2).paragraphs[0].add_run(
-            str((self.credits_bag - functools.reduce(lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
-                                                                        self.exi_fund_o - self.app_fund_o,
-                                                                        self.exi_disc_m - self.app_disc_m,
-                                                                        self.exi_disc_o - self.app_disc_o,
-                                                                        self.exi_free - self.app_free]) - self.credits_english)*(-1))).font.size = Pt(8)
+            str(additional_creds_required*(-1) if additional_creds_required < 0 else 0)).font.size = Pt(8)
         table.cell(12, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
 
         # Optional: Grade needed with N credits to keep student condition.
@@ -331,7 +340,7 @@ class REINPRE(Request):
             table.cell(0, 0).merge(table.cell(0, 1)
                                    ).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
             table.cell(0, 0).merge(table.cell(0, 1)).paragraphs[0].add_run(
-                self.str_pcm_pre_acadinfo[13])
+                self.str_pcm_pre_acadinfo[13]).font.size = Pt(8)
             table.cell(1, 0).paragraphs[0].add_run(
                 self.str_pcm_pre_acadinfo[14]).font.size = Pt(8)
             table.cell(2, 0).paragraphs[0].add_run(
@@ -406,11 +415,15 @@ class REINPRE(Request):
         table_recommend(docx, details)
 
     def extra_credits(self, paragraph):
-        paragraph.add_run(' ' + self.str_pcm_pre[18] + str((self.credits_bag - functools.reduce(lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
-                                                                                                                   self.exi_fund_o - self.app_fund_o,
-                                                                                                                   self.exi_disc_m - self.app_disc_m,
-                                                                                                                   self.exi_disc_o - self.app_disc_o,
-                                                                                                                   self.exi_free - self.app_free]) - self.credits_english)*(-1)) +
+        paragraph.add_run(' ' + self.str_pcm_pre[18] +
+                          str((self.credits_bag -
+                               functools.reduce(
+                                   lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
+                                                      self.exi_fund_o - self.app_fund_o,
+                                                      self.exi_disc_m - self.app_disc_m,
+                                                      self.exi_disc_o - self.app_disc_o,
+                                                      self.exi_free - self.app_free]) -
+                               self.credits_english)*(-1)) +
                           self.str_pcm_pre[19])
 
     def get_analysis(self):
@@ -429,18 +442,21 @@ class REINPRE(Request):
             modifier, self.regulations['239|2009|VAC'][0],
             self.regulations['008|2008|CSU'][0], self.papa
         ))
-        modifier = 'D' if functools.reduce(lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
-                                                              self.exi_fund_o - self.app_fund_o,
-                                                              self.exi_disc_m - self.app_disc_m,
-                                                              self.exi_disc_o - self.app_disc_o,
-                                                              self.exi_free - self.app_free]) > 0 else 'No d'
+        modifier = 'D' if functools.reduce(
+            lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
+                               self.exi_fund_o - self.app_fund_o,
+                               self.exi_disc_m - self.app_disc_m,
+                               self.exi_disc_o - self.app_disc_o,
+                               self.exi_free - self.app_free]) > 0 else 'No d'
         analysis.append(self.str_analysis[3].format(
             modifier, self.regulations['008|2008|CSU'][0],
-            functools.reduce(lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
-                                                self.exi_fund_o - self.app_fund_o,
-                                                self.exi_disc_m - self.app_disc_m,
-                                                self.exi_disc_o - self.app_disc_o,
-                                                self.exi_free - self.app_free]), self.regulations['012|2014|VAC'][0]
+            functools.reduce(
+                lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
+                                   self.exi_fund_o - self.app_fund_o,
+                                   self.exi_disc_m - self.app_disc_m,
+                                   self.exi_disc_o - self.app_disc_o,
+                                   self.exi_free -
+                                   self.app_free]), self.regulations['012|2014|VAC'][0]
         ))
         modifier = '' if self.request_in_date else 'no '
         analysis.append(self.str_analysis[4].format(modifier))
@@ -485,53 +501,60 @@ class REINPRE(Request):
             self.standard_answer(paragraph, aff)
 
     def cm_pcm_paragraph(self, docx):
-        if not self.request_in_date:
-            return  # Skip when it's out of date
-        if self.credits_english == 0:
-            return
-        para = docx.add_paragraph()
-        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.paragraph_format.space_after = Pt(0)
-        para.add_run(self.str_pcm_pre[6] + self.student_name +
-                     self.str_pcm_pre[7] + str(functools.reduce(lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
-                                                                                   self.exi_fund_o - self.app_fund_o,
-                                                                                   self.exi_disc_m - self.app_disc_m,
-                                                                                   self.exi_disc_o - self.app_disc_o,
-                                                                                   self.exi_free - self.app_free])))
-        para.add_run(self.str_pcm_pre[8] +
-                     # pylint: disable=no-member
-                     self.get_academic_program_display())
-        para.add_run(
-            self.str_pcm_pre[9] + str(self.credits_english) + self.str_pcm_pre[10])
-        para.add_run(self.str_pcm_pre[11])
-        para.add_run(str(functools.reduce(lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
-                                                             self.exi_fund_o - self.app_fund_o,
-                                                             self.exi_disc_m - self.app_disc_m,
-                                                             self.exi_disc_o - self.app_disc_o,
-                                                             self.exi_free - self.app_free]) +
-                         (self.credits_bag - functools.reduce(lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
-                                                                                 self.exi_fund_o - self.app_fund_o,
-                                                                                 self.exi_disc_m - self.app_disc_m,
-                                                                                 self.exi_disc_o - self.app_disc_o,
-                                                                                 self.exi_free - self.app_free]) - self.credits_english)))
-        para.add_run(self.str_pcm_pre[12])
-        para = docx.add_paragraph()
-        para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        para.paragraph_format.space_after = Pt(0)
-        para.add_run(
-            self.str_pcm_pre[13] + self.regulations['008|2008|CSU'][0])
-        para.add_run(self.str_pcm_pre[14])
-        para.add_run(self.str_pcm_pre[15]).font.italic = True
-        para.add_run(self.str_pcm_pre[16] +
-                     str((self.credits_bag - functools.reduce(lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
-                                                                                 self.exi_fund_o - self.app_fund_o,
-                                                                                 self.exi_disc_m - self.app_disc_m,
-                                                                                 self.exi_disc_o - self.app_disc_o,
-                                                                                 self.exi_free - self.app_free]) - self.credits_english)*(-1)))
-        para.add_run(self.str_pcm_pre[17])
-        para.add_run(
-            # pylint: disable=no-member
-            self.get_academic_program_display() + '.')
+        pass
+        # if not self.request_in_date:
+        #     return  # Skip when it's out of date
+        # if self.credits_english == 0:
+        #     return
+        # para = docx.add_paragraph()
+        # para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        # para.paragraph_format.space_after = Pt(0)
+        # para.add_run(self.str_pcm_pre[6] + self.student_name +
+        #              self.str_pcm_pre[7] + str(functools.reduce(
+        #                  lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
+        #                                     self.exi_fund_o - self.app_fund_o,
+        #                                     self.exi_disc_m - self.app_disc_m,
+        #                                     self.exi_disc_o - self.app_disc_o,
+        #                                     self.exi_free - self.app_free])))
+        # para.add_run(self.str_pcm_pre[8] +
+        #              # pylint: disable=no-member
+        #              self.get_academic_program_display())
+        # para.add_run(
+        #     self.str_pcm_pre[9] + str(self.credits_english) + self.str_pcm_pre[10])
+        # para.add_run(self.str_pcm_pre[11])
+        # para.add_run(str(functools.reduce(
+        #     lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
+        #                        self.exi_fund_o - self.app_fund_o,
+        #                        self.exi_disc_m - self.app_disc_m,
+        #                        self.exi_disc_o - self.app_disc_o,
+        #                        self.exi_free - self.app_free]) +
+        #                  (self.credits_bag - functools.reduce(
+        #                      lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
+        #                                         self.exi_fund_o - self.app_fund_o,
+        #                                         self.exi_disc_m - self.app_disc_m,
+        #                                         self.exi_disc_o - self.app_disc_o,
+        #                                         self.exi_free - self.app_free]) -
+        #                   self.credits_english)))
+        # para.add_run(self.str_pcm_pre[12])
+        # para = docx.add_paragraph()
+        # para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        # para.paragraph_format.space_after = Pt(0)
+        # para.add_run(
+        #     self.str_pcm_pre[13] + self.regulations['008|2008|CSU'][0])
+        # para.add_run(self.str_pcm_pre[14])
+        # para.add_run(self.str_pcm_pre[15]).font.italic = True
+        # para.add_run(self.str_pcm_pre[16] +
+        #              str((self.credits_bag - functools.reduce(
+        #                  lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
+        #                                     self.exi_fund_o - self.app_fund_o,
+        #                                     self.exi_disc_m - self.app_disc_m,
+        #                                     self.exi_disc_o - self.app_disc_o,
+        #                                     self.exi_free - self.app_free]) -
+        #                   self.credits_english)*(-1)))
+        # para.add_run(self.str_pcm_pre[17])
+        # para.add_run(
+        #     # pylint: disable=no-member
+        #     self.get_academic_program_display() + '.')
 
     def cm_answer(self, paragraph):
         paragraph.add_run(
@@ -545,11 +568,12 @@ class REINPRE(Request):
         paragraph.add_run(self.str_pcm_pre[0])
         paragraph.add_run(self.reing_period)
 
-        if ((self.credits_bag - functools.reduce(lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
-                                                                    self.exi_fund_o - self.app_fund_o,
-                                                                    self.exi_disc_m - self.app_disc_m,
-                                                                    self.exi_disc_o - self.app_disc_o,
-                                                                    self.exi_free - self.app_free]) - self.credits_english)) < 0:
+        if ((self.credits_bag - functools.reduce(
+                lambda a, b: a+b, [self.exi_fund_m - self.app_fund_m,
+                                   self.exi_fund_o - self.app_fund_o,
+                                   self.exi_disc_m - self.app_disc_m,
+                                   self.exi_disc_o - self.app_disc_o,
+                                   self.exi_free - self.app_free]) - self.credits_english)) < 0:
             # Y otorga n créditos adicionales:
             self.extra_credits(paragraph)
 
