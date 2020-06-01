@@ -1,5 +1,5 @@
 dateparser
-Django
+Django==2.2
 django-auth-ldap
 djangorestframework
 django-cors-headers
