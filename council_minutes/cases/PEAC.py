@@ -19,7 +19,8 @@ class PEAC(Request):
         required=True, display='Fecha de fin del permiso', default=datetime.date.today)
 
     str_cm = [
-        'otorgar permiso académico desde el {} hasta el {} con el objetivo de {}', ' debido a que {}.',
+        'otorgar permiso académico desde el {} hasta el {} con el objetivo de {}',
+        ' debido a que {}.',
     ]
 
     regulation_list = ['070|2012|CSU']  # List of regulations
@@ -40,7 +41,8 @@ class PEAC(Request):
         paragraph.add_run(self.str_cm[0].format(
             string_to_date(str(self.from_date)),
             string_to_date(str(self.to_date)),
-            str(self.reason_permision)[0].lower()+str(self.reason_permision)[1:]
+            str(self.reason_permision)[0].lower() +
+            str(self.reason_permision)[1:]
         ))
         if not self.is_affirmative_response_approval_status():
             paragraph.add_run(self.str_cm[1].format(self.council_decision))
@@ -68,9 +70,10 @@ class PEAC(Request):
         paragraph.add_run(self.str_cm[0].format(
             string_to_date(str(self.from_date)),
             string_to_date(str(self.to_date)),
-            str(self.reason_permision)[0].lower()+str(self.reason_permision)[1:]
+            str(self.reason_permision)[0].lower() +
+            str(self.reason_permision)[1:]
         ))
-        if not self.is_affirmative_response_approval_status():
+        if not self.is_affirmative_response_advisor_response():
             paragraph.add_run(self.str_cm[1].format(self.council_decision))
         else:
             paragraph.add_run('.')

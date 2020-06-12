@@ -8,7 +8,7 @@ from .case_utils import add_analysis_paragraph
 
 class EMSP(Request):
 
-    full_name = 'Exención por mejor saber pro'
+    full_name = 'Exención resultados destacados en SABER PRO'
 
     regulation_list = ['002|2011|CFA']  # List of regulations
 
@@ -35,7 +35,7 @@ class EMSP(Request):
     str_pcm = [
         'la exención del {}% del pago de los derechos académicos y renovación de matrícula {} de' +
         'l Examen de Estado de la Calidad de la Educación Superior (SABER PRO) {} - {} para el pe' +
-        'riodo académico {}. (Literal b, Artículo 16 del {}).'
+        'riodo académico {}{}. (Literal b, Artículo 16 del {}).', 'debido a que '
     ]
 
     def cm(self, docx):
@@ -49,9 +49,18 @@ class EMSP(Request):
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True
-        paragraph.add_run(self.str_cm[0].format(
-            # pylint: disable=no-member
-            self.get_academic_program_display(), self.academic_program))
+        paragraph.add_run(
+            self.str_pcm[0].format(
+                # pylint: disable=no-member
+                self.percentaje,
+                self.str_pcm_modifiers[1] if self.is_best else self.str_pcm_modifiers[2],
+                self.date_presentation.year,
+                self.get_academic_program_display(),
+                self.academic_period,
+                '' if self.is_affirmative_response_approval_status() else (
+                    ' ' + self.str_pcm[1] + self.council_decision),
+                self.regulations['002|2011|CFA'][0]
+            ))
 
     def pcm(self, docx):
         self.pcm_analysis(docx)
@@ -76,6 +85,8 @@ class EMSP(Request):
                 self.date_presentation.year,
                 self.get_academic_program_display(),
                 self.academic_period,
+                '' if self.is_affirmative_response_advisor_response() else (
+                    ' ' + self.str_pcm[1] + self.council_decision),
                 self.regulations['002|2011|CFA'][0]
             ))
 
@@ -87,7 +98,7 @@ class EMSP(Request):
     def resource_analysis(self, docx):
         last_paragraph = docx.paragraphs[-1]
         self.pcm_answer(last_paragraph)
-    
+
     def resource_pre_answer(self, docx):
         last_paragraph = docx.paragraphs[-1]
         self.pcm_answer(last_paragraph)

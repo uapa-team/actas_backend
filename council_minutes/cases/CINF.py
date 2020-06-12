@@ -1,6 +1,6 @@
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from mongoengine import FloatField, IntField
+from mongoengine import FloatField, IntField, BooleanField
 from ..models import Request
 from .case_utils import add_analysis_paragraph
 
@@ -16,8 +16,7 @@ class CINF(Request):
     advance_percentage = FloatField(
         required=True, display='Porcentaje de avance', default=0.0, min_value=0.0, max_value=100.0)
     enrolled_academic_periods = IntField(
-        required=True, display='Número de matrículas', min_value=0, default=0
-    )
+        required=True, display='Número de matrículas', min_value=0, default=0)
 
     regulation_list = ['008|2008|CSU']  # List of regulations
 
@@ -103,7 +102,7 @@ class CINF(Request):
     def resource_analysis(self, docx):
         last_paragraph = docx.paragraphs[-1]
         self.pcm_answer(last_paragraph)
-    
+
     def resource_pre_answer(self, docx):
         last_paragraph = docx.paragraphs[-1]
         self.pcm_answer(last_paragraph)
