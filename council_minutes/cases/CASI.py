@@ -122,10 +122,16 @@ class CASI(Request):
             self.pcm_answers_cn(paragraph)
 
     def cm_ap(self, paragraph):
-        paragraph.add_run(self.str_cm[1].format('') + ' ')
+        if self.council_decision == Request.council_decision.default or len(self.council_decision) == 0:
+            paragraph.add_run(self.str_cm[1].format('') + ' ')    
+        else:
+            paragraph.add_run(self.council_decision + ' ')
 
     def cm_na(self, paragraph):
-        paragraph.add_run(self.str_cm[1].format('no ') + ' ')
+        if self.council_decision == Request.council_decision.default or len(self.council_decision) == 0:
+            paragraph.add_run(self.str_cm[1].format('no ') + ' ')
+        else:
+            paragraph.add_run(self.council_decision + ' ')
 
     def pcm_analysis(self, docx):
         analysis_list = []

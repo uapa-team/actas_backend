@@ -66,9 +66,9 @@ class CINF(Request):
             self.pcm_answers_ng(paragraph)
 
     def cm_af(self, paragraph):
-        paragraph.add_run(
-            self.str_cm[1] + self.str_cm[2].format(self.str_cm[3] +
-                                                   self.regulations['008|2008|CSU'][0]))
+        paragraph.add_run(self.council_decision + '. ' +
+                          self.str_cm[2].format(self.str_cm[3] +
+                                                self.regulations['008|2008|CSU'][0]))
 
     def cm_ng(self, paragraph):
         paragraph.add_run(self.council_decision + '. ' +

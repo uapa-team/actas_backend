@@ -141,7 +141,7 @@ class EPTU(Request):
             paragraph.add_run(self.str_pcma_cna[3].format(
                 self.academic_period) + ' ')
         elif self.cna == self.CNA_OTRO:
-            paragraph.add_run(self.str_pcma_cna[4] + ' ')
+            paragraph.add_run(self.council_decision + ' ')
 
     def pcm_analysis(self, docx):
         analysis_list = []

@@ -45,8 +45,11 @@ class AAUT(Request):
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
-        paragraph.add_run(self.str_cm[1].format(
-            '' if self.is_affirmative_response_approval_status() else 'no ') + '. ')
+        if self.council_decision == Request.council_decision.default or len(self.council_decision) == 0:
+            paragraph.add_run(self.str_cm[1].format(
+                '' if self.is_affirmative_response_approval_status() else 'no '))
+        else:
+            paragraph.add_run(self.council_decision + '. ')
         paragraph.add_run('({}. {}). '.format(
             self.regulations[self.regulation_list[0]][0],
             self.regulations[self.regulation_list[1]][0]))

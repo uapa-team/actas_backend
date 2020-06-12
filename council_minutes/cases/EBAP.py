@@ -17,7 +17,7 @@ class EBAP(Request):
     regulation_list = ['008|2008|CSU']  # List of regulations
 
     str_cm = [
-        'eliminar la historia académica BAPI, debido a que {}realiza debidamente la solicitud.',
+        'eliminar la historia académica BAPI, debido a que {}.',
     ]
 
     str_pcm = [
@@ -66,8 +66,7 @@ class EBAP(Request):
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_advisor_response_display().upper() + ' ').font.bold = True
-        paragraph.add_run(self.str_cm[0].format(
-            '' if self.is_affirmative_response_advisor_response() else 'no '))
+        paragraph.add_run(self.str_cm[0].format(self.council_decision))
 
     def resource_analysis(self, docx):
         last_paragraph = docx.paragraphs[-1]

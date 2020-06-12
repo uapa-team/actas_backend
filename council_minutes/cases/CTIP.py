@@ -23,7 +23,7 @@ class CTIP(Request):
     str_cm = [
         'cambiar de componente la(s) siguiente(s) asignatura(s) del programa {} ({}), cursada en ' +
         'el periodo académico {}',
-        'debido a que {}realiza adecuadamente la solicitud.'
+        'debido a que {}.'
     ]
 
     str_pcm = [
@@ -38,8 +38,7 @@ class CTIP(Request):
         paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
         paragraph.add_run(self.str_cm[1].format(
-            ', ' +
-            '' if self.is_affirmative_response_approval_status() else 'no ') + '. ')
+            ', ' + self.council_decision)
         if self.is_affirmative_response_approval_status():
             self.add_subjects_change_tipology_table(docx)
 
@@ -62,8 +61,7 @@ class CTIP(Request):
         paragraph.add_run(self.str_comittee_header + ' ')
         self.cm_answer(paragraph)
         paragraph.add_run(self.str_cm[1].format(
-            ', ' +
-            '' if self.is_affirmative_response_advisor_response() else 'no ') + '. ')
+            ', ' + council_decision)
         if self.is_affirmative_response_advisor_response():
             self.add_subjects_change_tipology_table(docx)
 

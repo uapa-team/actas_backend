@@ -52,7 +52,10 @@ class CAIM(Request):
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.style = 'List Bullet'
         self.cm_answer(paragraph)
-        paragraph.add_run(self.str_cm[2].format('') + ' ')
+        if self.council_decision == Request.council_decision.default or len(self.council_decision) == 0:
+            paragraph.add_run(self.str_cm[2].format('') + ' ')
+        else:
+            paragraph.add_run(self.council_decision + ' ')
         paragraph.add_run(self.str_cm[3].format(
             Request.regulations[self.regulation_list[0]][0]))
         paragraph = docx.add_paragraph()
@@ -73,7 +76,10 @@ class CAIM(Request):
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
-        paragraph.add_run(self.str_cm[2].format('no ') + ' ')
+        if self.council_decision == Request.council_decision.default or len(self.council_decision) == 0:
+            paragraph.add_run(self.str_cm[2].format('no ') + ' ')
+        else:
+            paragraph.add_run(self.council_decision + ' ')
         paragraph.add_run(self.str_cm[3].format(
             Request.regulations[self.regulation_list[0]][0]))
         table_subjects(docx, Subject.subjects_to_array(self.subjects))

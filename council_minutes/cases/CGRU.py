@@ -31,7 +31,7 @@ class CGRU(Request):
         'El grupo {} de la asignatura {} ({}) cuenta con {} cupos.',
         'cambio de grupo de la asignatura/actividad {}, código {}, ' +
         'inscrita en el periodo {}, del grupo {} al grupo {} con ' +
-        'el profesor {} del {}, debido a que {}justifica debidamente la solicitud.'
+        'el profesor {} del {}, debido a que {}.'
     ]
 
     def cm(self, docx):
@@ -45,7 +45,7 @@ class CGRU(Request):
         # pylint: disable=no-member
         paragraph.add_run(
             self.get_approval_status_display().upper() + ' ').font.bold = True
-        if self.is_affirmative_response_approval_status():
+        if self.council_decision == Request.council_decision.default or len(self.council_decision) == 0:
             modifier = self.str_cm[1]
         else:
             modifier = self.council_decision
@@ -66,13 +66,9 @@ class CGRU(Request):
         # pylint: disable=no-member
         paragraph.add_run(
             self.get_advisor_response_display().upper() + ' ').font.bold = True
-        if self.is_affirmative_response_advisor_response():
-            modifier = ''
-        else:
-            modifier = 'no '
         paragraph.add_run(self.str_pcm[1].format(
             self.name, self.code, self.academic_period, self.group,
-            self.new_group, self.professor, self.get_department_display(), modifier
+            self.new_group, self.professor, self.get_department_display(), self.council_decision
         ))
 
     def create_analysis(self):
