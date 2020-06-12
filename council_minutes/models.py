@@ -523,11 +523,11 @@ class Request(DynamicDocument):
 
     @staticmethod
     def get_cases():
-        return {
-            'cases': [
-                {'code': type_case.__name__, 'name': type_case.full_name}
+        cases = [{'code': type_case.__name__, 'name': type_case.full_name}
                 for type_case in Request.get_subclasses()]
-        }
+        cases.sort(key=lambda case: case['name'])
+        
+        return { 'cases': cases }
 
     @classmethod
     def translate(cls, data):
