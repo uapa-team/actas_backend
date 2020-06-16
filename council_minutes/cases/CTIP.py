@@ -37,8 +37,7 @@ class CTIP(Request):
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
-        paragraph.add_run(self.str_cm[1].format(
-            ', ' + self.council_decision)
+        paragraph.add_run(', ' + self.str_cm[1].format(self.council_decision))
         if self.is_affirmative_response_approval_status():
             self.add_subjects_change_tipology_table(docx)
 
@@ -60,8 +59,7 @@ class CTIP(Request):
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(self.str_comittee_header + ' ')
         self.cm_answer(paragraph)
-        paragraph.add_run(self.str_cm[1].format(
-            ', ' + council_decision)
+        paragraph.add_run(', ' + self.str_cm[1].format(self.council_decision))
         if self.is_affirmative_response_advisor_response():
             self.add_subjects_change_tipology_table(docx)
 
