@@ -47,12 +47,8 @@ class RCUP(Request):
         # pylint: disable=no-member
         paragraph.add_run(
             self.get_approval_status_display().upper() + ' ').font.bold = True
-        if self.is_affirmative_response_approval_status():
-            modifier = self.str_cm[1]
-        else:
-            modifier = self.council_decision
         paragraph.add_run(self.str_cm[0].format(
-            self.academic_period, modifier))
+            self.academic_period, self.council_decision))
         paragraph.add_run(self.str_cm[2].format(
             self.regulations[self.regulation_list[0]][0]))
 

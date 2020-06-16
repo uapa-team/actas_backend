@@ -62,16 +62,12 @@ class TGRA(Request):
                          self.get_type_tgra_display(), '1', Subject.TIP_PRE_TRAB_GRADO[1], '6']])
 
     def cm_answer(self, paragraph):
-        if self.is_affirmative_response_approval_status():
-            ans = ''
-        else:
-            ans = 'no '
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True
         paragraph.add_run(self.str_cm[0].format(
             # pylint: disable=no-member
-            self.academic_period, self.get_type_tgra_display(), self.professor, ans))
+            self.academic_period, self.get_type_tgra_display(), self.professor, self.council_decision))
 
     def pcm(self, docx):
         self.pcm_analysis(docx)
@@ -111,16 +107,12 @@ class TGRA(Request):
         add_analysis_paragraph(docx, analysis_list)
 
     def pcm_answer(self, paragraph):
-        if self.is_affirmative_response_advisor_response():
-            ans = ''
-        else:
-            ans = 'no '
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_advisor_response_display().upper() + ' ').font.bold = True
         paragraph.add_run(self.str_cm[0].format(
             # pylint: disable=no-member
-            self.academic_period, self.get_type_tgra_display(), self.professor, ans))
+            self.academic_period, self.get_type_tgra_display(), self.professor, self.council_decision))
 
     def disciplinar_credits_approved_for_program(self):
         if self.academic_program == self.PI_AGRICOLA:

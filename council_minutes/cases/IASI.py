@@ -20,7 +20,7 @@ class IASI(Request):
 
     str_cm = [
         'inscribir la(s) siguiente(s) asignatura(s) del programa {} ({}), en el periodo académico' +
-        ' {}, debido a que {}realiza adecuadamente su solicitud.',
+        ' {}, debido a que {}.',
     ]
 
     str_pcm = [
@@ -64,7 +64,7 @@ class IASI(Request):
             self.get_academic_program_display(),
             self.academic_program,
             self.academic_period,
-            '' if self.is_affirmative_response_approval_status() else 'no '))
+            self.council_decision))
         paragraph.add_run('({}).'.format(self.regulations['008|2008|CSU'][0]))
 
     def cm_answer_approved(self, paragraph):
@@ -76,7 +76,7 @@ class IASI(Request):
             self.get_academic_program_display(),
             self.academic_program,
             self.academic_period,
-            ''))
+            self.council_decision))
         paragraph.add_run('({}).'.format(self.regulations['008|2008|CSU'][0]))
 
     def cm_answer_not_approved(self, paragraph):
@@ -88,7 +88,7 @@ class IASI(Request):
             self.get_academic_program_display(),
             self.academic_program,
             self.academic_period,
-            'no '))
+            self.council_decision))
         paragraph.add_run('({}).'.format(self.regulations['008|2008|CSU'][0]))
 
     def pcm(self, docx):
@@ -140,7 +140,7 @@ class IASI(Request):
             self.get_academic_program_display(),
             self.academic_program,
             self.academic_period,
-            '' if self.is_affirmative_response_advisor_response() else 'no '))
+            self.council_decision))
 
     def pcm_answer_approved(self, paragraph):
         paragraph.add_run(
@@ -151,7 +151,7 @@ class IASI(Request):
             self.get_academic_program_display(),
             self.academic_program,
             self.academic_period,
-            ''))
+            self.council_decision))
 
     def pcm_answer_not_approved(self, paragraph):
         paragraph.add_run(
@@ -162,7 +162,7 @@ class IASI(Request):
             self.get_academic_program_display(),
             self.academic_program,
             self.academic_period,
-            'no '))
+            self.council_decision))
 
     def resource_analysis(self, docx):
         last_paragraph = docx.paragraphs[-1]
