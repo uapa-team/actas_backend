@@ -35,7 +35,7 @@ class TGRA(Request):
 
     str_cm = [
         'inscribir la(s) siguiente(s) asignatura(s) en el periodo académico {}, en modalidad {}, ' +
-        'bajo la dirección del profesor {}, debido a que {}realiza correctamente la solicitud.'
+        'bajo la dirección del profesor {}, debido a que {}.'
     ]
 
     str_pcm = [

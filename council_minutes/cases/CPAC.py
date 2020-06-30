@@ -32,7 +32,7 @@ class CPAC(Request):
     str_cm_reason = [
         'debido a que justifica adecauadamente la fuerza mayor o caso fortuito.',
         'debido a que la situación expuesta no constituye causa extraña (no es una situación ' +
-        'intempestiva, insuperable o irresistible), por tanto, no es una situación de fuerza' +
+        'intempestiva, insuperable o irresistible), por tanto, no es una situación de fuerza ' +
         'mayor o caso fortuito que implique la cancelación del periodo académico. '
     ]
 
