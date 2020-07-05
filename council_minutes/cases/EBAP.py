@@ -1,7 +1,7 @@
 import datetime
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import IntField, DateField
+from mongoengine import IntField, DateTimeField
 from ..models import Request
 from .case_utils import add_analysis_paragraph, num_to_month
 
@@ -11,7 +11,7 @@ class EBAP(Request):
     full_name = 'Eliminación de la historia académica BAPI'
 
     commite_cm = IntField(default=1, display='Acta de comité')
-    commite_cm_date = DateField(
+    commite_cm_date = DateTimeField(
         display='Fecha acta de comité', default=datetime.date.today)
 
     regulation_list = ['008|2008|CSU']  # List of regulations

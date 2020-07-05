@@ -1,7 +1,7 @@
 import datetime
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import FloatField, BooleanField, DateField
+from mongoengine import FloatField, BooleanField, DateTimeField
 from ..models import Request
 from .case_utils import add_analysis_paragraph
 
@@ -18,7 +18,7 @@ class EMSP(Request):
         display='Es renovación de beca', default=False)
     is_best = BooleanField(
         display='¿Es el mejor puntaje?', default=False)
-    date_presentation = DateField(display='Fecha de presentación del examen',
+    date_presentation = DateTimeField(display='Fecha de presentación del examen',
                                   default=datetime.date.today)
 
     str_cm = [

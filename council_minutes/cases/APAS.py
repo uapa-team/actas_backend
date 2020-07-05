@@ -1,7 +1,7 @@
 import datetime
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from mongoengine import StringField, BooleanField, DateField
+from mongoengine import StringField, BooleanField, DateTimeField
 from ..models import Request
 from .case_utils import add_analysis_paragraph, string_to_date
 
@@ -19,9 +19,9 @@ class APAS(Request):
         (GO_TESIS_DOCTORADO, 'Tesis de Doctorado')
     )
 
-    date_start = DateField(
+    date_start = DateTimeField(
         required=True, display='Fecha de inicio de la pasantía', default=datetime.date.today)
-    date_finish = DateField(
+    date_finish = DateTimeField(
         required=True, display='Fecha de finalización de la pasantía', default=datetime.date.today)
     place = StringField(
         required=True, display='Lugar: Ciudad, País', default='')

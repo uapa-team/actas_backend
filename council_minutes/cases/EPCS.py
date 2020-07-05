@@ -2,7 +2,7 @@ import datetime
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from num2words import num2words
-from mongoengine import DateField, StringField, IntField, BooleanField
+from mongoengine import DateTimeField, StringField, IntField, BooleanField
 from ..models import Request
 from .case_utils import num_to_month, add_analysis_paragraph
 import datetime
@@ -48,7 +48,7 @@ class EPCS(Request):
         default=Request.PERIOD_DEFAULT)
     is_in_right_date = BooleanField(
         display='Solicitud realizada en fechas debidas', default=True)
-    right_date = DateField(
+    right_date = DateTimeField(
         display='Fecha máxima para realizar solicitud.', default=datetime.date.today)
     points = IntField(display='Cantidad de puntos a eximir', default=0)
     # CARE: Choices must be all the programas in the university not only engineering faculty

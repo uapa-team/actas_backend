@@ -1,6 +1,6 @@
 import datetime
 import json
-from mongoengine import DynamicDocument, EmbeddedDocument, DateField, StringField, BooleanField
+from mongoengine import DynamicDocument, EmbeddedDocument, StringField, BooleanField
 from mongoengine import ListField, IntField, EmbeddedDocumentField, EmbeddedDocumentListField
 from mongoengine import LazyReferenceField, DictField, DateTimeField
 from mongoengine.errors import ValidationError, DoesNotExist

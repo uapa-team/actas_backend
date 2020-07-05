@@ -2,7 +2,7 @@
 import datetime
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import StringField, DateField
+from mongoengine import StringField, DateTimeField
 from ..models import Request
 from .case_utils import add_analysis_paragraph, string_to_date
 
@@ -13,9 +13,9 @@ class PEAC(Request):
 
     reason_permision = StringField(required=True, default='Con el objetivo de ...',
                                    display='Razón del permiso académico')
-    from_date = DateField(
+    from_date = DateTimeField(
         required=True, display='Fecha de inicio del permiso', default=datetime.date.today)
-    to_date = DateField(
+    to_date = DateTimeField(
         required=True, display='Fecha de fin del permiso', default=datetime.date.today)
 
     str_cm = [

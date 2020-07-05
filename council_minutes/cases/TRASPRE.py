@@ -2,7 +2,7 @@ import datetime
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
-from mongoengine import StringField, BooleanField, DateField, IntField
+from mongoengine import StringField, BooleanField, DateTimeField, IntField
 from mongoengine import EmbeddedDocumentListField, FloatField, EmbeddedDocument
 from ..models import Request, Subject
 from .case_utils import add_analysis_paragraph, table_general_data, string_to_date
@@ -151,7 +151,7 @@ class TRASPRE(Request):
     creds_for_transit = IntField(
         required=True, default=0, min_value=0,
         display='Cupo de créditos para traslado')
-    advisor_meeting_date = DateField(
+    advisor_meeting_date = DateTimeField(
         display='Fecha de reunión del comité', default=datetime.date.today)
     council_number_advisor = IntField(
         required=True, default=1, min_value=1,
