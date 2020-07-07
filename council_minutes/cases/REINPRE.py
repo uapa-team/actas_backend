@@ -59,7 +59,7 @@ class REINPRE(Request):
         required=True, display='Créditos pendientes inglés', default=0)
     credits_coursed = IntField(required=True,
                                display='Créditos cursados (Aprobados + No Aprobados)' +
-                               ' con calificación numérica')
+                               ' con calificación numérica', default=0)
 
     # Exiged credits
     exi_fund_m = IntField(

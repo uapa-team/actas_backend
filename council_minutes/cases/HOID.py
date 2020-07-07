@@ -40,7 +40,7 @@ class HOID(Request):
         'por obtener una calificación de {} en el exámen {}, siendo {} el mínimo exigido.',
         'teniendo en cuenta que presenta un certificado de estudios expedido por una ' +
         'institución de educación superior {}, indicando que ha cursado un total ' +
-        'acumulado de horas equivalente al requerido para alcanzar el nivel {}.'
+        'acumulado de horas equivalente al requerido para alcanzar el nivel {} (375 horas).'
     ]
 
     def cm(self, docx):

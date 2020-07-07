@@ -87,7 +87,7 @@ class CPAC(Request):
         paragraph = self.add_paragraph(docx)
         paragraph.add_run(self.str_council_header + ' ')
         paragraph.add_run(
-            self.get_approval_status_display().upper() + ':').font.bold = True
+            self.get_advisor_response_display().upper() + ':').font.bold = True
         self.cm_answer(self.add_paragraph_bullet_list(docx))
         self.cm_answer1(self.add_paragraph_bullet_list(docx))
 

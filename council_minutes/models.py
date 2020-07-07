@@ -461,7 +461,7 @@ class Request(DynamicDocument):
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=69990'),
         '239|2009|VAC': ('Resolución 239 de 2009 de Vicerrectoría Académica',
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34644'),
-        '241|2009|VAC': ('Resolución 241 DE 2009 de la Vicerrectoría Académica',
+        '241|2009|VAC': ('Resolución 241 de 2009 de la Vicerrectoría Académica',
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34651'),
         '001|2019|VSB': ('Circular 001 de 2019 de Vicerrectoría de Sede Bogotá',
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=92579'),

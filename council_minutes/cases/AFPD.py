@@ -26,7 +26,7 @@ class AFPD(Request):
     ]
     str_pcm = [
         'El estudiante tiene la historia académica activa.',
-        'recomiendar al Consejo de Facultad presentar con concepto positivo al Comité ' +
+        'recomendar al Consejo de Facultad presentar con concepto positivo al Comité ' +
         'de Matrículas de la Sede Bogotá, la expedición de un único recibo correspondiente ' +
         'a los derechos académicos y administrativos para el periodo académico {} ' +
         'y se le concede como fecha de pago el {}, teniendo en cuenta el estado de pago ' +

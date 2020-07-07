@@ -90,7 +90,7 @@ class TEPR(Request):
         )]
         analysis_list += [self.str_pcm[3].format(
             '' if self.on_time else 'no ',
-            Request.regulations[self.regulation_list[2]]
+            Request.regulations[self.regulation_list[2]][0]
         )]
         analysis_list += self.extra_analysis
         add_analysis_paragraph(docx, analysis_list)

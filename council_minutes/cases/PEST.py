@@ -135,7 +135,7 @@ class PEST(Request):
             self.regulations[self.regulation_list[2]][0]))
 
         modifier = '' if self.documentation else 'no '
-        self.str_analysis[3].format(self.str_analysis[3].format(modifier))
+        analysis.append(self.str_analysis[3].format(modifier))
 
         return analysis + self.extra_analysis
 
