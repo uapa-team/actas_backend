@@ -7,8 +7,7 @@ from .case_utils import add_analysis_paragraph
 
 class CPTE(Request):
 
-    full_name = 'Cambio de proyecto de tesis de maestría/doctorado o ' + \
-        'propuesta de trabajo final de maestría'
+    full_name = 'Cambio de proyecto de tesis de maestría'
 
     GO_TRABAJO_FINAL_MAESTRIA = 'TFM'
     GO_TESIS_MAESTRIA = 'TSM'
@@ -20,18 +19,18 @@ class CPTE(Request):
     )
 
     title = StringField(
-        required=True, display='Nuevo título de la tesis/trabajo final', default='')
+        required=True, display='Nuevo título de la tesis', default='')
     grade_option = StringField(
-        required=True, display='Tipo de tesis/trabajo final',
+        required=True,# display='Tipo de tesis/trabajo final',
         choices=GO_CHOICES, default=GO_TESIS_MAESTRIA)
     new_advisor = StringField(
-        required=True, display='Nuevo director de tesis/trabajo final', default='')
+        required=True, display='Nuevo director de tesis', default='')
     old_advisor = StringField(
-        display='Antiguo director de tesis/trabajo final', default='')
+        display='Antiguo director de tesis', default='')
     new_co_advisor = StringField(
-        display='Nuevo codirector de tesis/trabajo final', default='')
+        display='Nuevo codirector de tesis', default='')
     old_co_advisor = StringField(
-        display='Antiguo codirector de tesis/trabajo final', default='')
+        display='Antiguo codirector de tesis', default='')
     inst_new_advisor = StringField(choices=Request.DP_CHOICES,
                                    display='Departamento de adscripción del nuevo director',
                                    default=Request.DP_EMPTY)
