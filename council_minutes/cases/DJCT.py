@@ -8,17 +8,16 @@ from .case_utils import add_analysis_paragraph
 
 class DJCT(Request):
 
-    full_name = 'Designación de jurados calificadores de tesis de maestría ' + \
-        'o evaluadores de trabajo final de maestría'
+    full_name = 'Designación de jurados calificadores de tesis de maestría'
 
     node = StringField(
         display='Perfil', choices=Request.PROFILE_CHOICES, default=Request.PROFILE_INVE)
     grade_option = StringField(
-        required=True, choices=Request.GRADE_OPTION_CHOICES, display='Opción de grado',
+        required=True, choices=Request.GRADE_OPTION_CHOICES,# display='Opción de grado',
         default=Request.GRADE_OPTION_TESIS_MAESTRIA)
     advisor = StringField(required=True, display='Director', default='')
     title = StringField(
-        requiered=True, display='Título de Tesis/Trabajo Final', default='')
+        requiered=True, display='Título de Tesis', default='')
     date_approval = DateTimeField(required=True, display='Fecha de Aprobación',
                               default=datetime.date.today)
     proposal_jury = BooleanField(
