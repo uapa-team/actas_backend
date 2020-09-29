@@ -7,8 +7,9 @@ from .case_utils import table_change_typology, add_analysis_paragraph
 
 class ChangeTipologySubject(Subject):
     new_tipology = StringField(
-        required=True, choices=Subject.TIP_CHOICES, display='Nuevo componente')
-    grade = StringField(display='Nota obtenida')
+        required=True, choices=Subject.TIP_CHOICES, display='Nuevo componente',
+        default=Subject.TIP_PRE_FUND_OBLIGATORIA)
+    grade = StringField(display='Nota obtenida', default='')
 
 
 class CTIP(Request):

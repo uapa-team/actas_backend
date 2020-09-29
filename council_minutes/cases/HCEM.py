@@ -24,12 +24,13 @@ class HCEM(Request):
         old_credits = IntField(default=3, min_value=0, required=True,
                                display='Créditos de la asignatura en la anterior institución')
         old_name = StringField(
-            required=True, display='Nombre Asignatura en la anterior institución')
+            required=True, display='Nombre Asignatura en la anterior institución', default='')
         old_grade = StringField(
-            required=True, default='3.0', display='Calificación anterior del estudiante')
+            required=True, default='', display='Calificación anterior del estudiante')
         grade = StringField(
-            required=True, default='3.0', display='Nueva calificación del estudiante')
-        period = StringField(max_length=10, display='Periodo')
+            required=True, default='', display='Nueva calificación del estudiante')
+        period = StringField(display='Periodo', choices=Request.PERIOD_CHOICES,
+                default=Request.PERIOD_DEFAULT)
         approved = BooleanField(
             default=True, required=True, display='¿Fue aprobada la homologación?')
         reason = StringField(
@@ -44,10 +45,11 @@ class HCEM(Request):
             (GD_AP, 'aprobada'),
             (GD_NA, 'reprobada'),
         )
-        period = StringField(max_length=10, display='Periodo')
-        code = StringField(display='Código de la asignatura')
+        period = StringField(display='Periodo', 
+                choices=Request.PERIOD_CHOICES, default=Request.PERIOD_DEFAULT)
+        code = StringField(display='Código de la asignatura', default='')
         grade = StringField(display='Calificación',
-                            default='AP', choices=HT_CHOICES)
+                            default=GD_AP, choices=HT_CHOICES)
 
     full_name = 'Homologación, convalidación o equivalencia'
 

@@ -8,15 +8,16 @@ from .case_utils import add_analysis_paragraph, table_change_typology, table_app
 class ChangeTipologySubject(Subject):
     new_tipology = StringField(
         required=True, choices=Subject.TIP_CHOICES,
-        default='', display='Nueva tipología')
+        default=Subject.TIP_PRE_FUND_OBLIGATORIA, display='Nueva tipología')
     grade = StringField(display='Nota obtenida', default='')
 
 
 class HomologationSubject(Subject):
-    period = StringField(display='Periodo de vista la materia')
-    grade = StringField(display='Nota obtenida')
-    new_grade = StringField(display='Nota a homologar')
-    new_name = StringField(display='Nombre de la materia a homologar')
+    period = StringField(display='Periodo de vista la materia',
+        choices=Request.PERIOD_CHOICES, default=Request.PERIOD_DEFAULT)
+    grade = StringField(display='Nota obtenida', default='')
+    new_grade = StringField(display='Nota a homologar', default='')
+    new_name = StringField(display='Nombre de la materia a homologar', default='')
 
 
 class CPER(Request):

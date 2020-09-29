@@ -20,14 +20,13 @@ class TRASPOS(Request):
             (TIP_ELEGIBLE, 'Elegible'),
         )
         new_name = StringField(
-            required=True, display='Nuevo Nombre Asignatura')
+            required=True, display='Nuevo Nombre Asignatura', default='')
         new_code = StringField(
-            required=True, display='Nuevo Código Asignatura')
+            required=True, display='Nuevo Código Asignatura', default='')
         tipology = StringField(
-            required=True, choices=TIP_CHOICES, display='Tipología')
+            required=True, choices=TIP_CHOICES, display='Tipología', default=TIP_OBLIGATORIA)
         group = None
-        grade = StringField(required=True, default='3.5',
-                            display='Calificación', min_length=2, max_length=3)
+        grade = StringField(required=True, default='', display='Calificación')
 
     full_name = 'Traslado de programa curricular (Posgrado)'
 

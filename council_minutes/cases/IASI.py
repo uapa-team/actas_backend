@@ -6,9 +6,9 @@ from .case_utils import table_subjects, add_analysis_paragraph
 
 
 class IASISubject(Subject):
-    offered = BooleanField(display='Ofrecida para el plan de estudios')
-    overlap = BooleanField(display='Materia cruzada')
-    approved = BooleanField(display='Aprobado inscribir materia')
+    offered = BooleanField(display='Ofrecida para el plan de estudios', default=True)
+    overlap = BooleanField(display='Materia cruzada', default=False)
+    approved = BooleanField(display='Aprobado inscribir materia', default=True)
 
 
 class IASI(Request):

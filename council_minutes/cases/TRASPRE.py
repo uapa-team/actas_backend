@@ -19,11 +19,12 @@ class TRASPRE(Request):
             (Subject.TIP_PRE_DISC_OPTATIVA, 'Fundamentación Optativa'),
             (Subject.TIP_PRE_LIBRE_ELECCION, 'Libre Elección'),
         )
-        name2 = StringField(required=True, display='Nuevo Nombre Asignatura')
-        code2 = StringField(required=True, display='Nuevo Código')
-        group = StringField(required=True, display='Agrupación')
-        grade = StringField(required=True, display='Nota')
-        period = StringField(required=True, display='Periodo')
+        name2 = StringField(required=True, display='Nuevo Nombre Asignatura', default='')
+        code2 = StringField(required=True, display='Nuevo Código', default='')
+        group = StringField(required=True, display='Agrupación', default='')
+        grade = StringField(required=True, display='Nota', default='')
+        period = StringField(required=True, display='Periodo',
+                choices=Request.PERIOD_CHOICES, default=Request.PERIOD_DEFAULT)
 
     class PendingSubject(Subject):
         TIP_FUNDAMENTACION = 'B'
@@ -32,9 +33,9 @@ class TRASPRE(Request):
             (TIP_FUNDAMENTACION, 'Fundamentación'),
             (TIP_DISCIPLINAR, 'Disciplinar'),
         )
-        group = StringField(required=True, display='Agrupación')
+        group = StringField(required=True, display='Agrupación', default='')
         tipology = StringField(
-            required=True, choices=TIP_CHOICES, display='Tipología')
+            required=True, choices=TIP_CHOICES, display='Tipología', default=TIP_FUNDAMENTACION)
 
     class Optative(EmbeddedDocument):
         TIP_FUNDAMENTACION = 'B'
@@ -43,13 +44,13 @@ class TRASPRE(Request):
             (TIP_FUNDAMENTACION, 'Fundamentación'),
             (TIP_DISCIPLINAR, 'Disciplinar'),
         )
-        group = StringField(required=True, display='Agrupación')
+        group = StringField(required=True, display='Agrupación', default='')
         tipology = StringField(
-            required=True, choices=TIP_CHOICES, display='Tipología')
+            required=True, choices=TIP_CHOICES, display='Tipología', default=TIP_FUNDAMENTACION)
         required_creds = IntField(min_value=0, required=True,
-                                  display='Créditos requeridos')
+                                  display='Créditos requeridos', default=0)
         pending_creds = IntField(min_value=0, required=True,
-                                 display='Créditos pendientes')
+                                 display='Créditos pendientes', default=0)
 
     full_name = 'Traslado de programa curricular (Pregrado)'
 

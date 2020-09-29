@@ -7,9 +7,9 @@ from .case_utils import table_approvals, add_analysis_paragraph
 
 class SubjectMovility(Subject):
     name_origin = StringField(
-        required=True, display='Nombre Asignatura Origen')
-    grade_origin = StringField(required=True, display='Nota obtenida')
-    grade = StringField(required=True, display='Nota homologada')
+        required=True, display='Nombre Asignatura Origen', default='')
+    grade_origin = StringField(required=True, display='Nota obtenida', default='')
+    grade = StringField(required=True, display='Nota homologada', default='')
     min_grade_origin = StringField(
         required=True, display='Mínima nota', default='0.0')
     max_grade_origin = StringField(

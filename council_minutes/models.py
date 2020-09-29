@@ -44,12 +44,12 @@ class Subject(EmbeddedDocument):
         (TIP_DOC_ELEGIBLE, 'Elegible Doctorado (U)'),
     )
 
-    name = StringField(required=True, display='Nombre Asignatura')
-    code = StringField(required=True, display='Código')
-    credits = IntField(required=True, display='Créditos')
-    group = StringField(required=True, display='Grupo')
+    name = StringField(required=True, display='Nombre Asignatura', default='')
+    code = StringField(required=True, display='Código', default='')
+    credits = IntField(required=True, display='Créditos', default=0)
+    group = StringField(required=True, display='Grupo', default='')
     tipology = StringField(
-        required=True, choices=TIP_CHOICES, display='Tipología')
+        required=True, choices=TIP_CHOICES, display='Tipología', default=TIP_PRE_FUND_OBLIGATORIA)
 
     @staticmethod
     def subjects_to_array(subjects):
@@ -379,8 +379,8 @@ class Request(DynamicDocument):
     )
 
     PERIOD_CHOICES = get_period_choices()
-    PERIOD_DEFAULT = PERIOD_CHOICES[0][0] if datetime.date.today(
-    ).month <= 6 else PERIOD_CHOICES[1][0]
+    PERIOD_DEFAULT = PERIOD_CHOICES[1][0] if datetime.date.today(
+    ).month <= 6 else PERIOD_CHOICES[0][0]
 
     _cls = StringField(required=True)
     date_stamp = DateTimeField(default=datetime.datetime.now)
@@ -576,11 +576,11 @@ class Request(DynamicDocument):
 class Professor(EmbeddedDocument):
 
     name = StringField(
-        required=True, default='Nombre profesor', display='Nombre')
+        required=True, default='', display='Nombre')
     department = StringField(
-        display='Departamento', choices=Request.DP_CHOICES, default=Request.DP_EXTERNO_FACULTAD)
-    institution = StringField(display='Institución')
-    country = StringField(display='País')
+        display='Departamento', choices=Request.DP_CHOICES, default=Request.DP_EMPTY)
+    institution = StringField(display='Institución', default='')
+    country = StringField(display='País', default='')
 
 
 class Person(DynamicDocument):

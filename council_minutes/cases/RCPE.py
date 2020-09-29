@@ -21,11 +21,11 @@ class Register(EmbeddedDocument):
     )
 
     _type = StringField(
-        required=True, display='Tipo de Registro', choices=TYPE_CHOICES)
-    code = StringField(required=True, display='Código')
+        required=True, display='Tipo de Registro', choices=TYPE_CHOICES, default=TYPE_TESIS)
+    code = StringField(required=True, display='Código', default='')
     grade = StringField(
-        required=True, display='Calificación', choices=GRADE_CHOICES)
-    title = StringField(display='Título')
+        required=True, display='Calificación', choices=GRADE_CHOICES, default=GRADE_AP)
+    title = StringField(display='Título', default='')
 
 
 class RCPE(Request):
