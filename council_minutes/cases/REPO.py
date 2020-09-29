@@ -44,7 +44,7 @@ class REPO(Request):
     # @Override
     advisor_response = StringField(
         min_length=3, max_length=3, choices=ARCR_CHOICES,
-        default=AS_EN_ESPERA, display='Respuesta del Comité')
+        default=ARCR_EN_ESPERA, display='Respuesta del Comité')
 
     str_cm = [
         'en atención al recurso de reposición',
