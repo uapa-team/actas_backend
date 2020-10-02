@@ -10,14 +10,14 @@ class QuerySetEncoder(DjangoJSONEncoder):
 
     # pylint: disable=method-hidden
     def default(self, obj):
-        json_obj = {}
-        json_obj['cases'] = []
+        json_obj = []
+        print(obj)
         if isinstance(obj, QuerySet):
             for element in obj:
-                json_obj['cases'].append(
+                json_obj.append(
                     QuerySetEncoder.encode_object(element))
         else:
-            json_obj['cases'].append(QuerySetEncoder.encode_object(obj))
+            json_obj.append(QuerySetEncoder.encode_object(obj))
 
         return json_obj
 
