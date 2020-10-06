@@ -503,7 +503,12 @@ class Request(DynamicDocument):
     @staticmethod
     def get_cases_by_query(query):
         # pylint: disable=no-member
-        return Request.objects(**query).filter(approval_status__nin=[Request.AS_ANULADA, Request.AS_RENUNCIA])
+
+        ## Get all cases that follows the query
+        cases = Request.objects(**query) 
+        ## Ignore "deleted" cases
+        cases = cases.filter(approval_status__nin=[Request.AS_ANULADA, Request.AS_RENUNCIA])
+        return cases.order_by('-date_stamp')
 
     @staticmethod
     def get_case_by_id(caseid):
