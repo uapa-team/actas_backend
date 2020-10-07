@@ -231,6 +231,7 @@ class Request(DynamicDocument):
     PDI_CIENCIA_Y_TECNOLOGIA_DE_MATERIALES = '2682'
     PDI_MECANICA_Y_MECATRONICA = '2839'
     PMI_DE_SISTEMAS_Y_COMPUTACION = '2702'
+    PDI_ESTUDIOS_AMBIENTALES = '2979'
     PMI_ELECTRICA_CONVENIO_SEDE_MANIZALES = '2794'
     PMI_DE_SISTEMAS_Y_COMPUTACION_CONV_UPC = '2856'
     PMI_DE_SISTEMAS_Y_COMPUTACION_CONV_UNILLANOS = '2928'
@@ -323,6 +324,7 @@ class Request(DynamicDocument):
          'Maestría en Ingeniería - Ingeniería de Sistemas y Computación - Conv UPC'),
         (PMI_DE_SISTEMAS_Y_COMPUTACION_CONV_UNILLANOS,
          'Maestría en Ingeniería - Ingeniería de Sistemas y Computación - Conv Unillanos'),
+        (PDI_ESTUDIOS_AMBIENTALES, 'Doctorado en Estudios Ambientales'),
         (BAP_ARTES,
          'Modalidad de Asignaturas de Posgrado Facultad de Artes'),
         (BAP_CIENCIAS,
