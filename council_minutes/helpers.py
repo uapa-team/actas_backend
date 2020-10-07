@@ -11,7 +11,6 @@ class QuerySetEncoder(DjangoJSONEncoder):
     # pylint: disable=method-hidden
     def default(self, obj):
         json_obj = []
-        print(obj)
         if isinstance(obj, QuerySet):
             for element in obj:
                 json_obj.append(
