@@ -206,6 +206,20 @@ def mark_received(request):
     except KeyError:
         return JsonResponse({'response': 'Not found'}, status=HTTP_404_NOT_FOUND, safe=False)
 
+@api_view(["POST"])
+def add_notes(request):
+    try:
+        id = request.GET['id']
+        req = Request.get_case_by_id(id)
+        notes = json.loads(request.body)['notes']
+        req.notes.extend(notes)
+        req.save()
+        return JsonResponse(req, QuerySetEncoder, status=HTTP_200_OK, safe=False)
+    except KeyError:
+        return JsonResponse({'response': 'Not found'}, status=HTTP_404_NOT_FOUND, safe=False)
+    except TypeError:
+        return JsonResponse({'response': 'notes is not iterable'}, status=HTTP_400_BAD_REQUEST, safe=False)
+
 # TODO: Rewrite this code, no mongoengine libraries should be called here
 # @api_view(["PATCH"])
 # def change_case_type(request):

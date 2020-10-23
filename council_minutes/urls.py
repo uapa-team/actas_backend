@@ -18,4 +18,5 @@ urlpatterns = [
          name='Docx generation by case query'),
     path('autofill', views.autofill, name='autofill'),
     path('mark_received', views.mark_received, name='mark_received'),
+    path('add_notes', views.add_notes, name='add_notes')
 ] + static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)
