@@ -2,7 +2,7 @@ import datetime
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
-from mongoengine import StringField, BooleanField, DateField, IntField
+from mongoengine import StringField, BooleanField, DateTimeField, IntField
 from mongoengine import EmbeddedDocumentListField, FloatField, EmbeddedDocument
 from ..models import Request, Subject
 from .case_utils import add_analysis_paragraph, table_general_data, string_to_date
@@ -19,11 +19,12 @@ class TRASPRE(Request):
             (Subject.TIP_PRE_DISC_OPTATIVA, 'Fundamentación Optativa'),
             (Subject.TIP_PRE_LIBRE_ELECCION, 'Libre Elección'),
         )
-        name2 = StringField(required=True, display='Nuevo Nombre Asignatura')
-        code2 = StringField(required=True, display='Nuevo Código')
-        group = StringField(required=True, display='Agrupación')
-        grade = StringField(required=True, display='Nota')
-        period = StringField(required=True, display='Periodo')
+        name2 = StringField(required=True, display='Nuevo Nombre Asignatura', default='')
+        code2 = StringField(required=True, display='Nuevo Código', default='')
+        group = StringField(required=True, display='Agrupación', default='')
+        grade = StringField(required=True, display='Nota', default='')
+        period = StringField(required=True, display='Periodo',
+                choices=Request.PERIOD_CHOICES, default=Request.PERIOD_DEFAULT)
 
     class PendingSubject(Subject):
         TIP_FUNDAMENTACION = 'B'
@@ -32,9 +33,9 @@ class TRASPRE(Request):
             (TIP_FUNDAMENTACION, 'Fundamentación'),
             (TIP_DISCIPLINAR, 'Disciplinar'),
         )
-        group = StringField(required=True, display='Agrupación')
+        group = StringField(required=True, display='Agrupación', default='')
         tipology = StringField(
-            required=True, choices=TIP_CHOICES, display='Tipología')
+            required=True, choices=TIP_CHOICES, display='Tipología', default=TIP_FUNDAMENTACION)
 
     class Optative(EmbeddedDocument):
         TIP_FUNDAMENTACION = 'B'
@@ -43,13 +44,13 @@ class TRASPRE(Request):
             (TIP_FUNDAMENTACION, 'Fundamentación'),
             (TIP_DISCIPLINAR, 'Disciplinar'),
         )
-        group = StringField(required=True, display='Agrupación')
+        group = StringField(required=True, display='Agrupación', default='')
         tipology = StringField(
-            required=True, choices=TIP_CHOICES, display='Tipología')
+            required=True, choices=TIP_CHOICES, display='Tipología', default=TIP_FUNDAMENTACION)
         required_creds = IntField(min_value=0, required=True,
-                                  display='Créditos requeridos')
+                                  display='Créditos requeridos', default=0)
         pending_creds = IntField(min_value=0, required=True,
-                                 display='Créditos pendientes')
+                                 display='Créditos pendientes', default=0)
 
     full_name = 'Traslado de programa curricular (Pregrado)'
 
@@ -118,12 +119,6 @@ class TRASPRE(Request):
     same_degree = BooleanField(
         required=True, default=False,
         display='¿Estos planes de estudios conducen al mismo título?')
-    transit_program_code = StringField(
-        required=True,
-        display='Código del plan de estudios de destino', default='')
-    transit_program_name = StringField(
-        required=True,
-        display='Nombre del plan de estudios de destino', default='')
     origin_program_code = StringField(
         required=True,
         display='Código del plan de estudios de origen', default='')
@@ -157,7 +152,7 @@ class TRASPRE(Request):
     creds_for_transit = IntField(
         required=True, default=0, min_value=0,
         display='Cupo de créditos para traslado')
-    advisor_meeting_date = DateField(
+    advisor_meeting_date = DateTimeField(
         display='Fecha de reunión del comité', default=datetime.date.today)
     council_number_advisor = IntField(
         required=True, default=1, min_value=1,
@@ -189,9 +184,6 @@ class TRASPRE(Request):
     optative_remaining = EmbeddedDocumentListField(
         Optative,
         display='Agrupaciones de las asignaturas pendientes optativas')
-    free_choice_pending = IntField(min_value=0, required=True,
-                                   display='Créditos pendientes de libre elección',
-                                   default=0)
 
     regulation_list = ['008|2008|CSU', '089|2014|CAC']  # List of regulations
 
@@ -267,11 +259,11 @@ class TRASPRE(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
         self.add_tables(docx)
 
     def cm_answer(self, paragraph):
-        paragraph.add_run(self.str_council_header + ' ')
         # pylint: disable=no-member
         paragraph.add_run(
             self.get_approval_status_display().upper() + ' ').font.bold = True
@@ -292,13 +284,13 @@ class TRASPRE(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_answer + ': ').font.bold = True
+        paragraph.add_run(self.str_comittee_header + ' ')
         self.pcm_answer(paragraph)
         self.add_tables(docx)
 
     def pcm_answer(self, paragraph):
         # pylint: disable=no-member
-        paragraph.add_run(self.str_answer + ': ').font.bold = True
-        paragraph.add_run(self.str_comittee_header + ' ')
         paragraph.add_run(
             self.get_advisor_response_display().upper() + ' ').font.bold = True
         paragraph.add_run(
@@ -394,16 +386,22 @@ class TRASPRE(Request):
         for i in range(4):
             table.cell(
                 i, 1).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        table.cell(0, 0).paragraphs[0].add_run(self.str_table[8])
-        table.cell(0, 1).paragraphs[0].add_run(self.admission_period)
-        table.cell(1, 0).paragraphs[0].add_run(self.str_table[9])
-        table.cell(1, 1).paragraphs[0].add_run('Sí' if self.enrroled else 'No')
-        table.cell(2, 0).paragraphs[0].add_run(self.str_table[10])
+        table.cell(0, 0).paragraphs[0].add_run(
+            self.str_table[8]).font.size = Pt(8)
+        table.cell(0, 1).paragraphs[0].add_run(
+            self.admission_period).font.size = Pt(8)
+        table.cell(1, 0).paragraphs[0].add_run(
+            self.str_table[9]).font.size = Pt(8)
+        table.cell(1, 1).paragraphs[0].add_run(
+            'Sí' if self.enrroled else 'No').font.size = Pt(8)
+        table.cell(2, 0).paragraphs[0].add_run(
+            self.str_table[10]).font.size = Pt(8)
         table.cell(2, 1).paragraphs[0].add_run(
-            'Sí' if self.prev_plan else 'No')
-        table.cell(3, 0).paragraphs[0].add_run(self.str_table[11])
+            'Sí' if self.prev_plan else 'No').font.size = Pt(8)
+        table.cell(3, 0).paragraphs[0].add_run(
+            self.str_table[11]).font.size = Pt(8)
         table.cell(3, 1).paragraphs[0].add_run(
-            str(self.completion_percentage) + '%')
+            str(self.completion_percentage) + '%').font.size = Pt(8)
         table = docx.add_table(rows=2, cols=2, style='Table Grid')
         table.alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.columns[0].width = 4350000
@@ -416,19 +414,24 @@ class TRASPRE(Request):
             cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         creds_study = True
         if self.completion_percentage < 30.0:
-            table.cell(0, 0).paragraphs[0].add_run(self.str_table[15])
+            table.cell(0, 0).paragraphs[0].add_run(
+                self.str_table[15]).font.size = Pt(8)
             table.cell(0, 1).paragraphs[0].add_run(
-                str(self.student_admission_score))
-            table.cell(1, 0).paragraphs[0].add_run(self.str_table[16])
+                str(self.student_admission_score)).font.size = Pt(8)
+            table.cell(1, 0).paragraphs[0].add_run(
+                self.str_table[16]).font.size = Pt(8)
             table.cell(1, 1).paragraphs[0].add_run(
-                str(self.last_admitted_score))
+                str(self.last_admitted_score)).font.size = Pt(8)
             creds_study = creds_study and self.student_admission_score > self.last_admitted_score
         else:
-            table.cell(0, 0).paragraphs[0].add_run(self.str_table[17])
-            table.cell(0, 1).paragraphs[0].add_run(str(self.PAPA))
-            table.cell(1, 0).paragraphs[0].add_run(self.str_table[18])
+            table.cell(0, 0).paragraphs[0].add_run(
+                self.str_table[17]).font.size = Pt(8)
+            table.cell(0, 1).paragraphs[0].add_run(
+                str(self.PAPA)).font.size = Pt(8)
+            table.cell(1, 0).paragraphs[0].add_run(
+                self.str_table[18]).font.size = Pt(8)
             table.cell(1, 1).paragraphs[0].add_run(
-                'Sí' if self.PAPA_in_threshold else 'No')
+                'Sí' if self.PAPA_in_threshold else 'No').font.size = Pt(8)
             table.cell(
                 1, 1).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
             creds_study = creds_study and self.PAPA_in_threshold
@@ -440,11 +443,12 @@ class TRASPRE(Request):
             paragraph.paragraph_format.space_after = Pt(0)
             paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
             paragraph.add_run(' ').font.size = Pt(8)
+            paragraph.runs[0].font.size = Pt(8)
             details = [self.str_cm[3].format(
                 self.get_academic_program_display()), self.advisor_meeting_date.strftime(
                     '%d/%m/%Y '), self.council_number_advisor,
-                       self.council_year_advisor,
-                       self.is_affirmative_response_advisor_response()]
+                self.council_year_advisor,
+                self.is_affirmative_response_advisor_response()]
             table_recommend(docx, details)
         else:
             paragraph = docx.add_paragraph()
@@ -466,20 +470,25 @@ class TRASPRE(Request):
             for cell in table.columns[2].cells:
                 cell.width = 850000
                 cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-            table.cell(0, 0).merge(table.cell(
-                0, 2)).paragraphs[0].add_run(self.str_table[19]).font.bold = True
-            table.cell(1, 0).paragraphs[0].add_run('1')
-            table.cell(1, 1).paragraphs[0].add_run(self.str_table[20])
+            mg_cell = table.cell(0, 0).merge(table.cell(
+                0, 2)).paragraphs[0].add_run(self.str_table[19])
+            mg_cell.font.bold = True
+            mg_cell.font.size = Pt(8)
+            table.cell(1, 0).paragraphs[0].add_run('1').font.size = Pt(8)
+            table.cell(1, 1).paragraphs[0].add_run(
+                self.str_table[20]).font.size = Pt(8)
             table.cell(1, 2).paragraphs[0].add_run(
-                str(self.creds_miunus_remaining))
-            table.cell(2, 0).paragraphs[0].add_run('2')
+                str(self.creds_miunus_remaining)).font.size = Pt(8)
+            table.cell(2, 0).paragraphs[0].add_run('2').font.size = Pt(8)
             table.cell(2, 1).paragraphs[0].add_run(
-                self.str_table[21].format(Request.regulations['089|2014|CAC'][0]))
-            table.cell(2, 2).paragraphs[0].add_run(str(self.creds_for_transit))
-            table.cell(3, 0).paragraphs[0].add_run('3')
-            table.cell(3, 1).paragraphs[0].add_run(self.str_table[22])
+                self.str_table[21].format(Request.regulations['089|2014|CAC'][0])).font.size = Pt(8)
+            table.cell(2, 2).paragraphs[0].add_run(
+                str(self.creds_for_transit)).font.size = Pt(8)
+            table.cell(3, 0).paragraphs[0].add_run('3').font.size = Pt(8)
+            table.cell(3, 1).paragraphs[0].add_run(
+                self.str_table[22]).font.size = Pt(8)
             table.cell(3, 2).paragraphs[0].add_run(
-                'Sí' if self.creds_for_transit >= self.creds_miunus_remaining else 'No')
+                'Sí' if self.creds_for_transit >= self.creds_miunus_remaining else 'No').font.size = Pt(8)
             for i in range(1, 4):
                 table.cell(
                     i, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -495,10 +504,11 @@ class TRASPRE(Request):
             run.font.bold = True
             equivalence_creds = Subject.creds_summary(
                 self.equivalence)
-            pending_creds = [self.exiged_b_ob - equivalence_creds[0], self.exiged_b_op - \
-                 equivalence_creds[1], self.exiged_c_ob - equivalence_creds[2],
-                             self.exiged_c_op - equivalence_creds[3], self.exiged_l - \
-                 equivalence_creds[4]]
+            pending_creds = [self.exiged_b_ob - equivalence_creds[0], self.exiged_b_op -
+                             equivalence_creds[1], self.exiged_c_ob -
+                             equivalence_creds[2],
+                             self.exiged_c_op - equivalence_creds[3], self.exiged_l -
+                             equivalence_creds[4]]
             table_credits_summary(docx, [[self.exiged_b_ob, self.exiged_b_op, self.exiged_c_ob,
                                           self.exiged_c_op, self.exiged_l], equivalence_creds,
                                          pending_creds], 'TRASLADO')
@@ -512,9 +522,9 @@ class TRASPRE(Request):
             paragraph.add_run(' ').font.size = Pt(8)
             details = [self.str_cm[3].format(
                 self.get_academic_program_display()),
-                       self.advisor_meeting_date.strftime('%d/%m/%Y '),
-                       self.council_number_advisor, self.council_year_advisor,
-                       self.is_affirmative_response_advisor_response]
+                self.advisor_meeting_date.strftime('%d/%m/%Y '),
+                self.council_number_advisor, self.council_year_advisor,
+                self.is_affirmative_response_advisor_response]
             table_recommend(docx, details)
             paragraph = docx.add_paragraph()
             paragraph.paragraph_format.space_after = Pt(0)
@@ -533,8 +543,12 @@ class TRASPRE(Request):
             paragraph.add_run(' ').font.size = Pt(8)
             reproved = 0
             for sbj in self.equivalence:
-                if float(sbj.grade) < 3.0:
-                    reproved += 1
+                try:
+                    if float(sbj.grade) < 3.0:
+                        reproved += 1
+                except ValueError:
+                    if sbj.grade == 'RE':
+                        reproved += 1
             table = docx.add_table(
                 rows=(len(self.equivalence) + 3 - reproved), cols=9, style='Table Grid')
             table.style.font.size = Pt(8)
@@ -578,10 +592,12 @@ class TRASPRE(Request):
             cellm = table.cell(0, 0).merge(table.cell(0, 2)).paragraphs[0]
             cellm.add_run(
                 self.str_table[26].format('1')).font.bold = True
+            cellm.runs[0].font.size = Pt(8)
             cellm.alignment = WD_ALIGN_PARAGRAPH.CENTER
             cellm = table.cell(0, 3).merge(table.cell(0, 8)).paragraphs[0]
             cellm.add_run(
                 self.str_table[26].format('2')).font.bold = True
+            cellm.runs[0].font.size = Pt(8)
             cellm.alignment = WD_ALIGN_PARAGRAPH.CENTER
             table.cell(1, 0).paragraphs[0].add_run(
                 self.str_table[27]).font.bold = True
@@ -604,31 +620,49 @@ class TRASPRE(Request):
             for i in range(9):
                 table.cell(
                     1, i).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+                table.cell(1, i).paragraphs[0].runs[0].font.size = Pt(8)
             index = 2
             total_creds = 0
             for sbj in self.equivalence:
-                if float(sbj.grade) < 3.0:
-                    continue
-                table.cell(index, 0).paragraphs[0].add_run(sbj.period)
-                table.cell(index, 1).paragraphs[0].add_run(sbj.code)
-                table.cell(index, 2).paragraphs[0].add_run(sbj.name)
-                table.cell(index, 3).paragraphs[0].add_run(sbj.code2)
-                table.cell(index, 4).paragraphs[0].add_run(sbj.name2)
-                table.cell(index, 5).paragraphs[0].add_run(sbj.tipology[-1])
-                table.cell(index, 6).paragraphs[0].add_run(sbj.group)
-                table.cell(index, 7).paragraphs[0].add_run(str(sbj.credits))
-                table.cell(index, 8).paragraphs[0].add_run(str(sbj.grade))
+                try:
+                    if float(sbj.grade) < 3.0:
+                        continue
+                except ValueError:
+                    if sbj.grade == 'RE':
+                        continue
+                table.cell(index, 0).paragraphs[0].add_run(
+                    sbj.period).font.size = Pt(8)
+                table.cell(index, 1).paragraphs[0].add_run(
+                    sbj.code).font.size = Pt(8)
+                table.cell(index, 2).paragraphs[0].add_run(
+                    sbj.name).font.size = Pt(8)
+                table.cell(index, 3).paragraphs[0].add_run(
+                    sbj.code2).font.size = Pt(8)
+                table.cell(index, 4).paragraphs[0].add_run(
+                    sbj.name2).font.size = Pt(8)
+                table.cell(index, 5).paragraphs[0].add_run(
+                    sbj.tipology[-1]).font.size = Pt(8)
+                table.cell(index, 6).paragraphs[0].add_run(
+                    sbj.group).font.size = Pt(8)
+                table.cell(index, 7).paragraphs[0].add_run(
+                    str(sbj.credits)).font.size = Pt(8)
+                table.cell(index, 8).paragraphs[0].add_run(
+                    str(sbj.grade)).font.size = Pt(8)
                 total_creds += sbj.credits
                 for i in range(9):
                     table.cell(
                         index, i).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
                 index += 1
-            table.cell(index, 0).merge(table.cell(index, 6)).paragraphs[0].add_run(
-                self.str_table[47]).font.bold = True
+            mg_cll = table.cell(index, 0).merge(table.cell(index, 6)).paragraphs[0].add_run(
+                self.str_table[47])
+            mg_cll.font.bold = True
+            mg_cll.font.size = Pt(8)
             table.cell(index, 0).merge(table.cell(index, 6)
                                        ).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-            table.cell(index, 7).merge(table.cell(index, 8)).paragraphs[0].add_run(
-                str(total_creds)).font.bold = True
+            mg_cll = table.cell(index, 7).merge(table.cell(index, 8)).paragraphs[0].add_run(
+                str(total_creds))
+            mg_cll.font.bold = True
+            mg_cll.font.size = Pt(8)
             table.cell(index, 7).merge(table.cell(index, 8)
                                        ).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
             if reproved > 0:
@@ -690,11 +724,13 @@ class TRASPRE(Request):
                 cellm = table.cell(0, 0).merge(table.cell(0, 2)).paragraphs[0]
                 cellm.add_run(
                     self.str_table[26].format('1')).font.bold = True
+                cellm.runs[0].font.size = Pt(8)
                 cellm.alignment = WD_ALIGN_PARAGRAPH.CENTER
                 cellm = table.cell(0, 3).merge(table.cell(0, 8)).paragraphs[0]
                 cellm.add_run(
                     self.str_table[26].format('2')).font.bold = True
                 cellm.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                cellm.runs[0].font.size = Pt(8)
                 table.cell(1, 0).paragraphs[0].add_run(
                     self.str_table[27]).font.bold = True
                 table.cell(1, 1).paragraphs[0].add_run(
@@ -716,33 +752,49 @@ class TRASPRE(Request):
                 for i in range(9):
                     table.cell(
                         1, i).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+                    table.cell(1, i).paragraphs[0].runs[0].font.size = Pt(8)
                 index = 2
                 total_creds = 0
                 for sbj in self.equivalence:
-                    if float(sbj.grade) >= 3.0:
-                        continue
-                    table.cell(index, 0).paragraphs[0].add_run(sbj.period)
-                    table.cell(index, 1).paragraphs[0].add_run(sbj.code)
-                    table.cell(index, 2).paragraphs[0].add_run(sbj.name)
-                    table.cell(index, 3).paragraphs[0].add_run(sbj.code2)
-                    table.cell(index, 4).paragraphs[0].add_run(sbj.name2)
+                    try:
+                        if float(sbj.grade) >= 3.0:
+                            continue
+                    except ValueError:
+                        if sbj.grade in ('AP', 'AS'):
+                            continue
+                    table.cell(index, 0).paragraphs[0].add_run(
+                        sbj.period).font.size = Pt(8)
+                    table.cell(index, 1).paragraphs[0].add_run(
+                        sbj.code).font.size = Pt(8)
+                    table.cell(index, 2).paragraphs[0].add_run(
+                        sbj.name).font.size = Pt(8)
+                    table.cell(index, 3).paragraphs[0].add_run(
+                        sbj.code2).font.size = Pt(8)
+                    table.cell(index, 4).paragraphs[0].add_run(
+                        sbj.name2).font.size = Pt(8)
                     table.cell(index, 5).paragraphs[0].add_run(
-                        sbj.tipology[-1])
-                    table.cell(index, 6).paragraphs[0].add_run(sbj.group)
+                        sbj.tipology[-1]).font.size = Pt(8)
+                    table.cell(index, 6).paragraphs[0].add_run(
+                        sbj.group).font.size = Pt(8)
                     table.cell(index, 7).paragraphs[0].add_run(
-                        str(sbj.credits))
-                    table.cell(index, 8).paragraphs[0].add_run(str(sbj.grade))
+                        str(sbj.credits)).font.size = Pt(8)
+                    table.cell(index, 8).paragraphs[0].add_run(
+                        str(sbj.grade)).font.size = Pt(8)
                     total_creds += sbj.credits
                     for i in range(9):
                         table.cell(
                             index, i).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
                     index += 1
-                table.cell(index, 0).merge(table.cell(index, 6)).paragraphs[0].add_run(
-                    self.str_table[47]).font.bold = True
+                mg_cll = table.cell(index, 0).merge(table.cell(index, 6)).paragraphs[0].add_run(
+                    self.str_table[47])
+                mg_cll.font.bold = True
+                mg_cll.font.size = Pt(8)
                 table.cell(index, 0).merge(table.cell(index, 6)
                                            ).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-                table.cell(index, 7).merge(table.cell(index, 8)).paragraphs[0].add_run(
-                    str(total_creds)).font.bold = True
+                mg_cll = table.cell(index, 7).merge(table.cell(index, 8)).paragraphs[0].add_run(
+                    str(total_creds))
+                mg_cll.font.bold = True
+                mg_cll.font.size = Pt(8)
                 table.cell(index, 7).merge(table.cell(index, 8)
                                            ).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
             paragraph = docx.add_paragraph()
@@ -799,19 +851,28 @@ class TRASPRE(Request):
             for cell in table.columns[4].cells:
                 cell.width = 1200000
                 cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-            table.cell(0, 0).merge(table.cell(0, 4)).paragraphs[0].add_run(
-                self.str_table[36]).font.bold = True
-            table.cell(1, 0).merge(table.cell(1, 4)).paragraphs[0].add_run(
-                self.str_table[37]).font.bold = True
+            mg_cll = table.cell(0, 0).merge(table.cell(0, 4)).paragraphs[0].add_run(
+                self.str_table[36])
+            mg_cll.font.bold = True
+            mg_cll.font.size = Pt(8)
+            mg_cll = table.cell(1, 0).merge(table.cell(1, 4)).paragraphs[0].add_run(
+                self.str_table[37])
+            mg_cll.font.bold = True
+            mg_cll.font.size = Pt(8)
             table.cell(0, 0).merge(table.cell(
                 0, 4)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
             table.cell(1, 0).merge(table.cell(
                 1, 4)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-            table.cell(2, 0).paragraphs[0].add_run(self.str_table[31])
-            table.cell(2, 1).paragraphs[0].add_run(self.str_table[28])
-            table.cell(2, 2).paragraphs[0].add_run(self.str_table[29])
-            table.cell(2, 3).paragraphs[0].add_run(self.str_table[38])
-            table.cell(2, 4).paragraphs[0].add_run(self.str_table[39])
+            table.cell(2, 0).paragraphs[0].add_run(
+                self.str_table[31]).font.size = Pt(8)
+            table.cell(2, 1).paragraphs[0].add_run(
+                self.str_table[28]).font.size = Pt(8)
+            table.cell(2, 2).paragraphs[0].add_run(
+                self.str_table[29]).font.size = Pt(8)
+            table.cell(2, 3).paragraphs[0].add_run(
+                self.str_table[38]).font.size = Pt(8)
+            table.cell(2, 4).paragraphs[0].add_run(
+                self.str_table[39]).font.size = Pt(8)
             for i in range(5):
                 table.cell(
                     2, i).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -834,29 +895,33 @@ class TRASPRE(Request):
                 fc = table.cell(index, 0).merge(table.cell(
                     index + len(proceced_remaining[i]) - 1, 0)).paragraphs[0]
                 fc.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                fc.add_run(i)
+                fc.add_run(i).font.size = Pt(8)
                 sc = table.cell(index, 4).merge(table.cell(
                     index + len(proceced_remaining[i]) - 1, 4)).paragraphs[0]
                 sc.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                sc.add_run(str(proceced_creds[i]))
+                sc.add_run(str(proceced_creds[i])).font.size = Pt(8)
                 index += len(proceced_remaining[i])
                 ordered_list += proceced_remaining[i]
             index = 3
             for sbj in ordered_list:
-                table.cell(index, 1).paragraphs[0].add_run(sbj.code)
-                table.cell(index, 2).paragraphs[0].add_run(sbj.name)
+                table.cell(index, 1).paragraphs[0].add_run(
+                    sbj.code).font.size = Pt(8)
+                table.cell(index, 2).paragraphs[0].add_run(
+                    sbj.name).font.size = Pt(8)
                 table.cell(index, 3).paragraphs[0].add_run(
-                    str(sbj.credits))
+                    str(sbj.credits)).font.size = Pt(8)
                 for i in range(1, 4):
                     table.cell(
                         index, i).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
                 index += 1
-            table.cell(index, 0).merge(
-                table.cell(index, 2)).paragraphs[0].add_run(self.str_table[40]).font.bold = True
+            mg_cll = table.cell(index, 0).merge(
+                table.cell(index, 2)).paragraphs[0].add_run(self.str_table[40])
+            mg_cll.font.bold = True
+            mg_cll.font.size = Pt(8)
             table.cell(index, 0).merge(
                 table.cell(index, 2)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
             table.cell(index, 3).merge(
-                table.cell(index, 4)).paragraphs[0].add_run(str(total_creds))
+                table.cell(index, 4)).paragraphs[0].add_run(str(total_creds)).font.size = Pt(8)
             table.cell(index, 3).merge(
                 table.cell(index, 4)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
             fundam = 0
@@ -883,15 +948,19 @@ class TRASPRE(Request):
             cell = table.cell(0, 0).merge(table.cell(0, 2)).paragraphs[0]
             cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
             cell.add_run(self.str_table[45]).font.bold = True
+            cell.runs[0].font.size = Pt(8)
             cell = table.cell(1, 0).paragraphs[0]
             cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
             cell.add_run(self.str_table[41]).font.bold = True
+            cell.runs[0].font.size = Pt(8)
             cell = table.cell(1, 1).paragraphs[0]
             cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
             cell.add_run(self.str_table[39]).font.bold = True
+            cell.runs[0].font.size = Pt(8)
             cell = table.cell(1, 2).paragraphs[0]
             cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
             cell.add_run(self.str_table[41]).font.bold = True
+            cell.runs[0].font.size = Pt(8)
             index = 2
             total = 0
             for agr in self.optative_remaining:
@@ -899,22 +968,23 @@ class TRASPRE(Request):
                     continue
                 cell = table.cell(index, 0).paragraphs[0]
                 cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                cell.add_run(agr.group)
+                cell.add_run(agr.group).font.size = Pt(8)
                 cell = table.cell(index, 1).paragraphs[0]
                 cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                cell.add_run(str(agr.required_creds))
+                cell.add_run(str(agr.required_creds)).font.size = Pt(8)
                 cell = table.cell(index, 2).paragraphs[0]
                 cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                cell.add_run(str(agr.pending_creds))
+                cell.add_run(str(agr.pending_creds)).font.size = Pt(8)
                 total += agr.pending_creds
                 index += 1
             cell = table.cell(index, 0).merge(
                 table.cell(index, 1)).paragraphs[0]
             cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
             cell.add_run(self.str_table[40]).font.bold = True
+            cell.runs[0].font.size = Pt(8)
             cell = table.cell(index, 2).paragraphs[0]
             cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            cell.add_run(str(total))
+            cell.add_run(str(total)).font.size = Pt(8)
             paragraph = docx.add_paragraph()
             paragraph.paragraph_format.space_after = Pt(0)
             paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -947,19 +1017,28 @@ class TRASPRE(Request):
             for cell in table.columns[4].cells:
                 cell.width = 1200000
                 cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-            table.cell(0, 0).merge(table.cell(0, 4)).paragraphs[0].add_run(
-                self.str_table[43]).font.bold = True
-            table.cell(1, 0).merge(table.cell(1, 4)).paragraphs[0].add_run(
-                self.str_table[37]).font.bold = True
+            mg_cll = table.cell(0, 0).merge(table.cell(0, 4)).paragraphs[0].add_run(
+                self.str_table[43])
+            mg_cll.font.bold = True
+            mg_cll.font.size = Pt(8)
+            mg_cll = table.cell(1, 0).merge(table.cell(1, 4)).paragraphs[0].add_run(
+                self.str_table[37])
+            mg_cll.font.bold = True
+            mg_cll.font.size = Pt(8)
             table.cell(0, 0).merge(table.cell(
                 0, 4)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
             table.cell(1, 0).merge(table.cell(
                 1, 4)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-            table.cell(2, 0).paragraphs[0].add_run(self.str_table[31])
-            table.cell(2, 1).paragraphs[0].add_run(self.str_table[28])
-            table.cell(2, 2).paragraphs[0].add_run(self.str_table[29])
-            table.cell(2, 3).paragraphs[0].add_run(self.str_table[38])
-            table.cell(2, 4).paragraphs[0].add_run(self.str_table[39])
+            table.cell(2, 0).paragraphs[0].add_run(
+                self.str_table[31]).font.size = Pt(8)
+            table.cell(2, 1).paragraphs[0].add_run(
+                self.str_table[28]).font.size = Pt(8)
+            table.cell(2, 2).paragraphs[0].add_run(
+                self.str_table[29]).font.size = Pt(8)
+            table.cell(2, 3).paragraphs[0].add_run(
+                self.str_table[38]).font.size = Pt(8)
+            table.cell(2, 4).paragraphs[0].add_run(
+                self.str_table[39]).font.size = Pt(8)
             for i in range(5):
                 table.cell(
                     2, i).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -982,29 +1061,33 @@ class TRASPRE(Request):
                 fc = table.cell(index, 0).merge(table.cell(
                     index + len(proceced_remaining[i]) - 1, 0)).paragraphs[0]
                 fc.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                fc.add_run(i)
+                fc.add_run(i).font.size = Pt(8)
                 sc = table.cell(index, 4).merge(table.cell(
                     index + len(proceced_remaining[i]) - 1, 4)).paragraphs[0]
                 sc.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                sc.add_run(str(proceced_creds[i]))
+                sc.add_run(str(proceced_creds[i])).font.size = Pt(8)
                 index += len(proceced_remaining[i])
                 ordered_list += proceced_remaining[i]
             index = 3
             for sbj in ordered_list:
-                table.cell(index, 1).paragraphs[0].add_run(sbj.code)
-                table.cell(index, 2).paragraphs[0].add_run(sbj.name)
+                table.cell(index, 1).paragraphs[0].add_run(
+                    sbj.code).font.size = Pt(8)
+                table.cell(index, 2).paragraphs[0].add_run(
+                    sbj.name).font.size = Pt(8)
                 table.cell(index, 3).paragraphs[0].add_run(
-                    str(sbj.credits))
+                    str(sbj.credits)).font.size = Pt(8)
                 for i in range(1, 4):
                     table.cell(
                         index, i).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
                 index += 1
-            table.cell(index, 0).merge(
-                table.cell(index, 2)).paragraphs[0].add_run(self.str_table[40]).font.bold = True
+            mg_cll = table.cell(index, 0).merge(
+                table.cell(index, 2)).paragraphs[0].add_run(self.str_table[40])
+            mg_cll.font.bold = True
+            mg_cll.font.size = Pt(8)
             table.cell(index, 0).merge(
                 table.cell(index, 2)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
             table.cell(index, 3).merge(
-                table.cell(index, 4)).paragraphs[0].add_run(str(total_creds))
+                table.cell(index, 4)).paragraphs[0].add_run(str(total_creds)).font.size = Pt(8)
             table.cell(index, 3).merge(
                 table.cell(index, 4)).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
             disc = 0
@@ -1031,15 +1114,19 @@ class TRASPRE(Request):
             cell = table.cell(0, 0).merge(table.cell(0, 2)).paragraphs[0]
             cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
             cell.add_run(self.str_table[45]).font.bold = True
+            cell.runs[0].font.size = Pt(8)
             cell = table.cell(1, 0).paragraphs[0]
             cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
             cell.add_run(self.str_table[41]).font.bold = True
+            cell.runs[0].font.size = Pt(8)
             cell = table.cell(1, 1).paragraphs[0]
             cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
             cell.add_run(self.str_table[39]).font.bold = True
+            cell.runs[0].font.size = Pt(8)
             cell = table.cell(1, 2).paragraphs[0]
             cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
             cell.add_run(self.str_table[41]).font.bold = True
+            cell.runs[0].font.size = Pt(8)
             index = 2
             total = 0
             for agr in self.optative_remaining:
@@ -1047,22 +1134,23 @@ class TRASPRE(Request):
                     continue
                 cell = table.cell(index, 0).paragraphs[0]
                 cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                cell.add_run(agr.group)
+                cell.add_run(agr.group).font.size = Pt(8)
                 cell = table.cell(index, 1).paragraphs[0]
                 cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                cell.add_run(str(agr.required_creds))
+                cell.add_run(str(agr.required_creds)).font.size = Pt(8)
                 cell = table.cell(index, 2).paragraphs[0]
                 cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                cell.add_run(str(agr.pending_creds))
+                cell.add_run(str(agr.pending_creds)).font.size = Pt(8)
                 total += agr.pending_creds
                 index += 1
             cell = table.cell(index, 0).merge(
                 table.cell(index, 1)).paragraphs[0]
             cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
             cell.add_run(self.str_table[40]).font.bold = True
+            cell.runs[0].font.size = Pt(8)
             cell = table.cell(index, 2).paragraphs[0]
             cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            cell.add_run(str(total))
+            cell.add_run(str(total)).font.size = Pt(8)
             paragraph = docx.add_paragraph()
             paragraph.paragraph_format.space_after = Pt(0)
             paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -1080,8 +1168,9 @@ class TRASPRE(Request):
                 cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
             table.cell(0, 0).paragraphs[0].add_run(
                 self.str_table[44]).font.bold = True
+            table.cell(0, 0).paragraphs[0].runs[0].font.size = Pt(8)
             table.cell(0, 1).paragraphs[0].add_run(
-                str(self.free_choice_pending))
+                str(pending_creds[4])).font.size = Pt(8)
             table.cell(
                 0, 1).paragraphs[0].alignment = WD_ALIGN_VERTICAL.CENTER
             paragraph = docx.add_paragraph()
@@ -1092,7 +1181,20 @@ class TRASPRE(Request):
             paragraph.paragraph_format.space_after = Pt(0)
             paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
             run = paragraph.add_run(self.str_table[46].format(
-                self.get_academic_program_display(), *self.offer_regulation[self.academic_program]))
+                self.get_academic_program_display(), *self.offer_regulation[
+                    self.academic_program]))
             run.font.size = Pt(8)
             run.font.italic = True
             run.font.underline = True
+
+    def resource_analysis(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+
+    def resource_pre_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+
+    def resource_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.cm_answer(last_paragraph)

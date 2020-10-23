@@ -9,6 +9,8 @@ https://docs.djangoproject.com/en/2.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
+# pylint: disable=no-member
+
 
 import os
 import ldap
@@ -145,15 +147,25 @@ MONGODB_USER = os.environ.get('ACTAS_DB_USER')
 MONGODB_HOST = os.environ.get('ACTAS_DB_HOST')
 MONGODB_NAME = os.environ.get('ACTAS_DB_NAME')
 MONGODB_PASS = os.environ.get('ACTAS_DB_PASS')
+MONGODB_PORT = 27017
+MONGODB_AMCH = 'SCRAM-SHA-1'
 
 DATABASES = {
     'default': {
-        'ENGINE'        : 'djongo',
-        'AUTH_SOURCE'   : MONGODB_AUTH,
-        'NAME'          : MONGODB_NAME,
-        'HOST'          : MONGODB_HOST,
-        'USER'          : MONGODB_USER,
-        'PASSWORD'      : MONGODB_PASS
+        'ENGINE': 'djongo',
+        'AUTH_SOURCE': MONGODB_AUTH,
+        'NAME': MONGODB_NAME,
+        'HOST': MONGODB_HOST,
+        'USER': MONGODB_USER,
+        'PASSWORD': MONGODB_PASS,
+        'CLIENT': {
+            'host': MONGODB_HOST,
+            'port': MONGODB_PORT,
+            'username': MONGODB_USER,
+            'password': MONGODB_PASS,
+            'authSource': MONGODB_AUTH,
+            'authMechanism': MONGODB_AMCH
+        }
     }
 }
 

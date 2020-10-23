@@ -24,12 +24,13 @@ class HCEM(Request):
         old_credits = IntField(default=3, min_value=0, required=True,
                                display='Créditos de la asignatura en la anterior institución')
         old_name = StringField(
-            required=True, display='Nombre Asignatura en la anterior institución')
+            required=True, display='Nombre Asignatura en la anterior institución', default='')
         old_grade = StringField(
-            required=True, default='3.0', display='Calificación anterior del estudiante')
+            required=True, default='', display='Calificación anterior del estudiante')
         grade = StringField(
-            required=True, default='3.0', display='Nueva calificación del estudiante')
-        period = StringField(max_length=10, display='Periodo')
+            required=True, default='', display='Nueva calificación del estudiante')
+        period = StringField(display='Periodo', choices=Request.PERIOD_CHOICES,
+                default=Request.PERIOD_DEFAULT)
         approved = BooleanField(
             default=True, required=True, display='¿Fue aprobada la homologación?')
         reason = StringField(
@@ -44,10 +45,11 @@ class HCEM(Request):
             (GD_AP, 'aprobada'),
             (GD_NA, 'reprobada'),
         )
-        period = StringField(max_length=10, display='Periodo')
-        code = StringField(display='Código de la asignatura')
+        period = StringField(display='Periodo', 
+                choices=Request.PERIOD_CHOICES, default=Request.PERIOD_DEFAULT)
+        code = StringField(display='Código de la asignatura', default='')
         grade = StringField(display='Calificación',
-                            default='AP', choices=HT_CHOICES)
+                            default=GD_AP, choices=HT_CHOICES)
 
     full_name = 'Homologación, convalidación o equivalencia'
 
@@ -135,6 +137,7 @@ class HCEM(Request):
             paragraph = docx.add_paragraph()
             paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
             paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.add_run(self.str_council_header + ' ')
             self.cm_answer(paragraph)
             self.add_single_table(docx)
         else:
@@ -142,7 +145,6 @@ class HCEM(Request):
 
     def cm_answer(self, paragraph):
         # pylint: disable=no-member
-        paragraph.add_run(self.str_comittee_header + ' ')
         paragraph.add_run(
             self.get_approval_status_display().upper() + ' ').font.bold = True
         paragraph.add_run(self.str_cm[0].format(
@@ -188,7 +190,7 @@ class HCEM(Request):
                    self.academic_program, self.str_cm[1].format(
                        self.origin_plan, self.institution_origin)]
         for i in range(len(types)):
-            for j in range(len(types[list(types.keys())[i]])):
+            for j in range(len(types[list(types.keys())[i]]) - 1, -1, -1):
                 if len(types[list(types.keys())[i]][j]) != 0:
                     paragraph = docx.add_paragraph()
                     paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
@@ -245,6 +247,8 @@ class HCEM(Request):
             paragraph = docx.add_paragraph()
             paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
             paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.add_run(self.str_answer + ': ').font.bold = True
+            paragraph.add_run(self.str_comittee_header + ' ')
             self.pcm_answer(paragraph)
             self.add_single_table(docx)
         else:
@@ -252,8 +256,6 @@ class HCEM(Request):
 
     def pcm_answer(self, paragraph):
         # pylint: disable=no-member
-        paragraph.add_run(self.str_answer + ': ').font.bold = True
-        paragraph.add_run(self.str_comittee_header + ' ')
         paragraph.add_run(
             self.get_advisor_response_display().upper() + ' ').font.bold = True
         paragraph.add_run(self.str_cm[0].format(
@@ -273,3 +275,15 @@ class HCEM(Request):
         table_approvals(docx, data, [self.student_name, self.student_dni,
                                      self.academic_program, self.str_cm[1].format(
                                          self.origin_plan, self.institution_origin)])
+
+    def resource_analysis(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+
+    def resource_pre_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+
+    def resource_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.cm_answer(last_paragraph)

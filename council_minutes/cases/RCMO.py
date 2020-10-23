@@ -7,9 +7,9 @@ from .case_utils import table_approvals, add_analysis_paragraph
 
 class SubjectMovility(Subject):
     name_origin = StringField(
-        required=True, display='Nombre Asignatura Origen')
-    grade_origin = StringField(required=True, display='Nota obtenida')
-    grade = StringField(required=True, display='Nota homologada')
+        required=True, display='Nombre Asignatura Origen', default='')
+    grade_origin = StringField(required=True, display='Nota obtenida', default='')
+    grade = StringField(required=True, display='Nota homologada', default='')
     min_grade_origin = StringField(
         required=True, display='Mínima nota', default='0.0')
     max_grade_origin = StringField(
@@ -120,6 +120,7 @@ class RCMO(Request):
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(self.str_answer + ': ').bold = True
+        paragraph.add_run(self.str_comittee_header + ' ')
         self.pcm_answer(paragraph)
 
     def pcm_analysis(self, docx):
@@ -146,10 +147,9 @@ class RCMO(Request):
         add_analysis_paragraph(docx, analysis_list)
 
     def pcm_answer(self, paragraph):
-        paragraph.add_run(self.str_comittee_header)
         paragraph.add_run(
             # pylint: disable=no-member
-            ' ' + self.get_advisor_response_display().upper()).font.bold = True
+            self.get_advisor_response_display().upper()).font.bold = True
         paragraph.add_run(' ')
         paragraph.add_run(self.str_pcm[2].format(
             # pylint: disable=no-member
@@ -159,3 +159,15 @@ class RCMO(Request):
             self.subject_period,
             self.get_advisor_response_display().upper(),
             self.subject_period))
+
+    def resource_analysis(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+    
+    def resource_pre_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+
+    def resource_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.cm_answer(last_paragraph)

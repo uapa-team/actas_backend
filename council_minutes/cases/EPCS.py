@@ -2,7 +2,7 @@ import datetime
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from num2words import num2words
-from mongoengine import DateField, StringField, IntField, BooleanField
+from mongoengine import DateTimeField, StringField, IntField, BooleanField
 from ..models import Request
 from .case_utils import num_to_month, add_analysis_paragraph
 import datetime
@@ -48,7 +48,7 @@ class EPCS(Request):
         default=Request.PERIOD_DEFAULT)
     is_in_right_date = BooleanField(
         display='Solicitud realizada en fechas debidas', default=True)
-    right_date = DateField(
+    right_date = DateTimeField(
         display='Fecha máxima para realizar solicitud.', default=datetime.date.today)
     points = IntField(display='Cantidad de puntos a eximir', default=0)
     # CARE: Choices must be all the programas in the university not only engineering faculty
@@ -82,12 +82,12 @@ class EPCS(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
         paragraph.add_run(self.str_cm[1].format(
             Request.regulations[self.regulation_list[0]][0]))
 
     def cm_answer(self, paragraph):
-        paragraph.add_run(self.str_council_header + ' ')
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True
@@ -150,3 +150,15 @@ class EPCS(Request):
             ))]
         analysis_list += self.extra_analysis
         add_analysis_paragraph(docx, analysis_list)
+
+    def resource_analysis(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+    
+    def resource_pre_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+
+    def resource_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.cm_answer(last_paragraph)

@@ -17,8 +17,8 @@ class APGD(Request):
         co_advisor_ext = StringField(
             display='Institución externa', default='')
 
-    full_name = 'Aprobación de propuesta de trabajo final de maestría/doctorado' + \
-        ' o de proyecto de tesis de maestría y designación de director y co-director'
+    full_name = 'Aprobación de propuesta de proyecto de tesis de maestria y ' +\
+        'designación de director y co-director'
 
     GO_TRABAJO_FINAL_MAESTRIA = 'TFM'
     GO_TESIS_MAESTRIA = 'TSM'
@@ -46,11 +46,10 @@ class APGD(Request):
     )
 
     grade_option = StringField(
-        required=True, display='Tipo de tesis/trabajo final',
+        required=True,# display='Tipo de tesis/trabajo final',
         choices=GO_CHOICES, default=GO_TESIS_MAESTRIA)
     enrolled_proyect = BooleanField(
-        required=True, default=False, display='¿Tiene inscrita la asignatura ' +
-        '(proyecto de tesis)/(propuesta de trabajo final de maestría)?')
+        required=True, default=False, display='¿Tiene inscrita la asignatura proyecto de tesis?')
     have_signature = BooleanField(required=True, default=False,
                                   display='¿Tiene la firma del (los) director(es)?')
     enrroled_periods = IntField(
@@ -62,12 +61,12 @@ class APGD(Request):
     specific_objetives = ListField(StringField(),
         display='Objetivos específicos')
     title = StringField(
-        required=True, display='Título de la tesis/trabajo final', default='')
+        required=True, display='Título de la tesis', default='')
     ownership_ig = StringField(
         required=True, choices=IG_CHOICES, default=IG_UNDEFINED,
         display='¿El proyecto hace parte de un grupo de investigación?')
     advisor = StringField(
-        display='Director de tesis/trabajo final', default='', required=True)
+        display='Director de tesis', default='', required=True)
     advisor_inst = StringField(
         display='Departamento de adscripción del director',
         required=True, choices=Request.DP_CHOICES, default=Request.DP_EMPTY)
@@ -75,7 +74,7 @@ class APGD(Request):
         display='Institución externa', default='')
     co_advisor_list = EmbeddedDocumentListField(
         Coadvisor, display='Codirector(es)')
-    grade_proyect = StringField(required=True, display='Calificación de la propuesta/proyecto',
+    grade_proyect = StringField(required=True, display='Calificación del proyecto',
                                 choices=CP_CHOICES, default=CP_APROBADA)
 
     regulation_list = ['040|2017|CFA', '056|2012|CSU']  # List of regulations
@@ -106,6 +105,7 @@ class APGD(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
         self.cm_grade(docx)
         if self.is_affirmative_response_approval_status():
@@ -118,7 +118,6 @@ class APGD(Request):
                 ' ' + self.str_cm[8] + ' ' + self.council_decision + '.')
 
     def cm_answer(self, paragraph):
-        paragraph.add_run(self.str_council_header + ' ')
         # pylint: disable=no-member
         paragraph.add_run(
             self.get_approval_status_display().upper() + ':').font.bold = True
@@ -128,6 +127,8 @@ class APGD(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_answer + ': ').font.bold = True
+        paragraph.add_run(self.str_comittee_header + ' ')
         self.pcm_answer(paragraph)
         self.cm_grade(docx)
         if self.is_affirmative_response_advisor_response():
@@ -141,8 +142,6 @@ class APGD(Request):
 
     def pcm_answer(self, paragraph):
         # pylint: disable=no-member
-        paragraph.add_run(self.str_answer + ': ').font.bold = True
-        paragraph.add_run(self.str_comittee_header + ' ')
         paragraph.add_run(
             self.get_advisor_response_display().upper() + ':').font.bold = True
 
@@ -247,3 +246,15 @@ class APGD(Request):
                 else:
                     paragraph.add_run(
                         ' ' + self.str_cm[4] + ' ' + co_advc.get_inst_co_advisor_display() + '.')
+
+    def resource_analysis(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+    
+    def resource_pre_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+
+    def resource_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.cm_answer(last_paragraph)

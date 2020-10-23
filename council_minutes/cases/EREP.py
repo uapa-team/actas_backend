@@ -1,7 +1,7 @@
 import datetime
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from mongoengine import DateField, BooleanField
+from mongoengine import DateTimeField, BooleanField
 from ..models import Request
 from .case_utils import string_to_date, add_analysis_paragraph
 
@@ -13,7 +13,7 @@ class EREP(Request):
 
     ah_active = BooleanField(
         required=True, display='¿Tiene activa la historia académica?', default=False)
-    payment_date = DateField(
+    payment_date = DateTimeField(
         display='Fecha límite de pago', default=datetime.date.today)
 
     regulation_list = ['051|2003|CSU']  # List of regulations
@@ -29,10 +29,10 @@ class EREP(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
 
     def cm_answer(self, paragraph):
-        paragraph.add_run(self.str_council_header + ' ')
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True
@@ -44,14 +44,14 @@ class EREP(Request):
 
     def pcm(self, docx):
         self.pcm_analysis(docx)
-        self.pcm_answer(docx)
-
-    def pcm_answer(self, docx):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(self.str_answer + ': ').font.bold = True
         paragraph.add_run(self.str_comittee_header + ' ')
+        self.pcm_answer(paragraph)
+
+    def pcm_answer(self, paragraph):
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_advisor_response_display().upper()).font.bold = True
@@ -82,3 +82,15 @@ class EREP(Request):
 
     def pcm_answers_ng(self, paragraph):
         paragraph.add_run(self.council_decision + '.')
+
+    def resource_analysis(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+    
+    def resource_pre_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+
+    def resource_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.cm_answer(last_paragraph)

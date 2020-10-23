@@ -6,9 +6,9 @@ from .case_utils import table_subjects, add_analysis_paragraph
 
 
 class IASISubject(Subject):
-    offered = BooleanField(display='Ofrecida para el plan de estudios')
-    overlap = BooleanField(display='Materia cruzada')
-    approved = BooleanField(display='Aprobado inscribir materia')
+    offered = BooleanField(display='Ofrecida para el plan de estudios', default=True)
+    overlap = BooleanField(display='Materia cruzada', default=False)
+    approved = BooleanField(display='Aprobado inscribir materia', default=True)
 
 
 class IASI(Request):
@@ -20,7 +20,7 @@ class IASI(Request):
 
     str_cm = [
         'inscribir la(s) siguiente(s) asignatura(s) del programa {} ({}), en el periodo académico' +
-        ' {}, debido a que {}realiza adecuadamente su solicitud.',
+        ' {}, debido a que {}.',
     ]
 
     str_pcm = [
@@ -42,13 +42,15 @@ class IASI(Request):
             paragraph = docx.add_paragraph()
             paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
             paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.add_run(self.str_council_header + ' ')
             self.cm_answer_approved(paragraph)
-            table_subjects(docx, Subject.subjects_to_array(snotapproved))
+            table_subjects(docx, Subject.subjects_to_array(sapproved))
         if len(snotapproved) > 0:
             paragraph = docx.add_paragraph()
             paragraph = docx.add_paragraph()
             paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
             paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.add_run(self.str_council_header + ' ')
             self.cm_answer_not_approved(paragraph)
             table_subjects(docx, Subject.subjects_to_array(snotapproved))
 
@@ -62,11 +64,10 @@ class IASI(Request):
             self.get_academic_program_display(),
             self.academic_program,
             self.academic_period,
-            '' if self.is_affirmative_response_approval_status() else 'no '))
+            self.council_decision))
         paragraph.add_run('({}).'.format(self.regulations['008|2008|CSU'][0]))
 
     def cm_answer_approved(self, paragraph):
-        paragraph.add_run(self.str_council_header + ' ')
         paragraph.add_run(
             # pylint: disable=no-member
             'APRUEBA ').font.bold = True
@@ -75,11 +76,10 @@ class IASI(Request):
             self.get_academic_program_display(),
             self.academic_program,
             self.academic_period,
-            ''))
+            self.council_decision))
         paragraph.add_run('({}).'.format(self.regulations['008|2008|CSU'][0]))
 
     def cm_answer_not_approved(self, paragraph):
-        paragraph.add_run(self.str_council_header + ' ')
         paragraph.add_run(
             # pylint: disable=no-member
             'NO APRUEBA ').font.bold = True
@@ -88,7 +88,7 @@ class IASI(Request):
             self.get_academic_program_display(),
             self.academic_program,
             self.academic_period,
-            'no '))
+            self.council_decision))
         paragraph.add_run('({}).'.format(self.regulations['008|2008|CSU'][0]))
 
     def pcm(self, docx):
@@ -140,7 +140,7 @@ class IASI(Request):
             self.get_academic_program_display(),
             self.academic_program,
             self.academic_period,
-            '' if self.is_affirmative_response_advisor_response() else 'no '))
+            self.council_decision))
 
     def pcm_answer_approved(self, paragraph):
         paragraph.add_run(
@@ -151,7 +151,7 @@ class IASI(Request):
             self.get_academic_program_display(),
             self.academic_program,
             self.academic_period,
-            ''))
+            self.council_decision))
 
     def pcm_answer_not_approved(self, paragraph):
         paragraph.add_run(
@@ -162,4 +162,16 @@ class IASI(Request):
             self.get_academic_program_display(),
             self.academic_program,
             self.academic_period,
-            'no '))
+            self.council_decision))
+
+    def resource_analysis(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+    
+    def resource_pre_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+
+    def resource_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.cm_answer(last_paragraph)

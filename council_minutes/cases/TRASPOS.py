@@ -20,14 +20,13 @@ class TRASPOS(Request):
             (TIP_ELEGIBLE, 'Elegible'),
         )
         new_name = StringField(
-            required=True, display='Nuevo Nombre Asignatura')
+            required=True, display='Nuevo Nombre Asignatura', default='')
         new_code = StringField(
-            required=True, display='Nuevo Código Asignatura')
+            required=True, display='Nuevo Código Asignatura', default='')
         tipology = StringField(
-            required=True, choices=TIP_CHOICES, display='Tipología')
+            required=True, choices=TIP_CHOICES, display='Tipología', default=TIP_OBLIGATORIA)
         group = None
-        grade = StringField(required=True, default='3.5',
-                            display='Calificación', min_length=2, max_length=3)
+        grade = StringField(required=True, default='', display='Calificación')
 
     full_name = 'Traslado de programa curricular (Posgrado)'
 
@@ -187,11 +186,11 @@ class TRASPOS(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
         self.add_tables(docx)
 
     def cm_answer(self, paragraph):
-        paragraph.add_run(self.str_council_header + ' ')
         # pylint: disable=no-member
         paragraph.add_run(
             self.get_approval_status_display().upper() + ' ').font.bold = True
@@ -212,13 +211,13 @@ class TRASPOS(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_answer + ': ').font.bold = True
+        paragraph.add_run(self.str_comittee_header + ' ')
         self.pcm_answer(paragraph)
         self.add_tables(docx)
 
     def pcm_answer(self, paragraph):
         # pylint: disable=no-member
-        paragraph.add_run(self.str_answer + ': ').font.bold = True
-        paragraph.add_run(self.str_comittee_header + ' ')
         paragraph.add_run(
             self.get_advisor_response_display().upper() + ' ').font.bold = True
         paragraph.add_run(
@@ -336,3 +335,15 @@ class TRASPOS(Request):
             str(self.agreement_year)))
         run.font.underline = True
         run.font.size = Pt(8)
+
+    def resource_analysis(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+    
+    def resource_pre_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+
+    def resource_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.cm_answer(last_paragraph)

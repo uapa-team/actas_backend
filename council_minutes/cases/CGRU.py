@@ -31,21 +31,21 @@ class CGRU(Request):
         'El grupo {} de la asignatura {} ({}) cuenta con {} cupos.',
         'cambio de grupo de la asignatura/actividad {}, código {}, ' +
         'inscrita en el periodo {}, del grupo {} al grupo {} con ' +
-        'el profesor {} del {}, debido a que {}justifica debidamente la solicitud.'
+        'el profesor {} del {}, debido a que {}.'
     ]
 
     def cm(self, docx):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
 
     def cm_answer(self, paragraph):
         # pylint: disable=no-member
-        paragraph.add_run(self.str_council_header + ' ')
         paragraph.add_run(
             self.get_approval_status_display().upper() + ' ').font.bold = True
-        if self.is_affirmative_response_approval_status():
+        if self.council_decision == Request.council_decision.default or len(self.council_decision) == 0:
             modifier = self.str_cm[1]
         else:
             modifier = self.council_decision
@@ -58,21 +58,17 @@ class CGRU(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_answer + ' ').font.bold = True
+        paragraph.add_run(self.str_comittee_header + ' ')
         self.pcm_answer(paragraph)
 
     def pcm_answer(self, paragraph):
         # pylint: disable=no-member
-        paragraph.add_run(self.str_answer + ' ').font.bold = True
-        paragraph.add_run(self.str_comittee_header + ' ')
         paragraph.add_run(
             self.get_advisor_response_display().upper() + ' ').font.bold = True
-        if self.is_affirmative_response_advisor_response():
-            modifier = ''
-        else:
-            modifier = 'no '
         paragraph.add_run(self.str_pcm[1].format(
             self.name, self.code, self.academic_period, self.group,
-            self.new_group, self.professor, self.get_department_display(), modifier
+            self.new_group, self.professor, self.get_department_display(), self.council_decision
         ))
 
     def create_analysis(self):
@@ -80,3 +76,15 @@ class CGRU(Request):
             self.str_pcm[0].format(self.group, self.name,
                                    self.code, self.free_places)
         ] + self.extra_analysis
+
+    def resource_analysis(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+    
+    def resource_pre_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+
+    def resource_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.cm_answer(last_paragraph)

@@ -14,6 +14,7 @@ from mongoengine.errors import ValidationError
 from .models import Request, Person, SubjectAutofill
 from .helpers import QuerySetEncoder, get_fields, get_period_choices, get_queries_by_groups
 from .writter import UnifiedWritter
+from .updater import update_request
 from .cases import *
 
 
@@ -46,6 +47,7 @@ def login(request):
     return JsonResponse({'token': token.key, 'group': user.groups.first().name},
                         status=HTTP_200_OK)
 
+
 @api_view(["GET"])
 @permission_classes((IsAuthenticated,))
 def api_logout(request):
@@ -53,11 +55,13 @@ def api_logout(request):
     logout(request)
     return JsonResponse({'successful': 'Logout Success'}, status=HTTP_200_OK)
 
+
 @api_view(["GET"])
 @permission_classes((AllowAny,))
 def details(_):
     programs = Request.get_programs()
-    programs.update({'periods': [period[0] for period in get_period_choices()]})
+    programs.update({'periods': [period[0]
+                                 for period in get_period_choices()]})
     return JsonResponse(programs, status=HTTP_200_OK, safe=False)
 
 
@@ -91,31 +95,27 @@ def case(request):
                 inserted_items += [str(new_request.save().id)]
             except ValidationError as e:
                 errors += [e.message]
-        return JsonResponse({'inserted_items': inserted_items, 'errors': errors},
-                            status=HTTP_200_OK, safe=False)
+        return JsonResponse(
+            {'inserted_items': inserted_items, 'errors': errors},
+            status=(HTTP_200_OK if len(inserted_items) != 0 else HTTP_400_BAD_REQUEST),
+            safe=False)
     if request.method == 'PATCH':
         body = json.loads(request.body)
-        subs = [c.__name__ for c in Request.get_subclasses()]
         errors = []
         edited_items = []
         not_found = []
         for item_request in body['items']:
             try:
-                req = Request.get_case_by_id(item_request['id'])
+                Request.get_case_by_id(item_request['id'])
             except (ValueError, KeyError):
                 not_found += [item_request['id']]
                 continue
             item_request['user'] = request.user.username
-            case = req.__class__
-            item_request['_cls'] = case.get_entire_name()
-            new_request = case().from_json(case.translate(
-                json.dumps(item_request)), True)
-            try:
-                new_request.save()
-            except ValidationError as e:
-                errors += [e.message]
+            result = update_request(item_request)
+            if 'error' in result:
+                errors += [result['error']]
             else:
-                edited_items += [new_request]
+                edited_items += [result]
         return JsonResponse({'edited_items': edited_items,
                              'errors': errors, 'not_found': not_found},
                             status=HTTP_400_BAD_REQUEST if edited_items == [] else HTTP_200_OK,
@@ -147,36 +147,39 @@ def get_docx_genquerie(request):
     generator.generate_document_by_querie(query_dict, precm)
     return JsonResponse({'url': generator.filename}, status=HTTP_200_OK)
 
+
 @api_view(["POST"])
 def autofill(request):
     # pylint: disable=no-member
     body = json.loads(request.body)
     if 'field' not in body:
-        return JsonResponse({'error':'"field" key is not in body'}, status=HTTP_400_BAD_REQUEST)
+        return JsonResponse({'error': '"field" key is not in body'}, status=HTTP_400_BAD_REQUEST)
     try:
         if body['field'] == 'name':
             if 'student_dni' not in body:
-                return JsonResponse({'error':'"student_dni" key is not in body'}, status=HTTP_400_BAD_REQUEST)
+                return JsonResponse({'error': '"student_dni" key is not in body'}, status=HTTP_400_BAD_REQUEST)
             try:
-                student = Person.objects.filter(student_dni=body['student_dni'])[0]
+                student = Person.objects.filter(
+                    student_dni=body['student_dni'])[0]
             except IndexError:
-                return JsonResponse({'error':'dni not found'}, status=HTTP_204_NO_CONTENT)
+                return JsonResponse({'error': 'dni not found'}, status=HTTP_204_NO_CONTENT)
             else:
                 return JsonResponse({'student_dni': student.student_dni,
-                'student_dni_type': student.student_dni_type,
-                'student_name': student.student_name}, status=HTTP_200_OK)
+                                     'student_dni_type': student.student_dni_type,
+                                     'student_name': student.student_name}, status=HTTP_200_OK)
         elif body['field'] == 'subject':
             if 'subject_code' not in body:
-                return JsonResponse({'error':'"subject_code" key is not in body'}, status=HTTP_400_BAD_REQUEST)
+                return JsonResponse({'error': '"subject_code" key is not in body'}, status=HTTP_400_BAD_REQUEST)
             try:
-                subject = SubjectAutofill.objects.filter(subject_code=body['subject_code'])[0]
+                subject = SubjectAutofill.objects.filter(
+                    subject_code=body['subject_code'])[0]
             except IndexError:
-                return JsonResponse({'error':'subject code not found'}, status=HTTP_204_NO_CONTENT)
+                return JsonResponse({'error': 'subject code not found'}, status=HTTP_204_NO_CONTENT)
             else:
                 return JsonResponse({'subject_code': subject.subject_code,
-                'subject_name': subject.subject_name}, status=HTTP_200_OK)
+                                     'subject_name': subject.subject_name}, status=HTTP_200_OK)
     except ValueError:
-        return JsonResponse({'error':'field "field" no encontrado'}, safe=False, status=HTTP_400_BAD_REQUEST)
+        return JsonResponse({'error': 'field "field" no encontrado'}, safe=False, status=HTTP_400_BAD_REQUEST)
 
 
 @api_view(["GET"])
@@ -185,41 +188,37 @@ def programs_defined(_):
     programs = sorted([plan[1] for plan in Request.PLAN_CHOICES])
     return JsonResponse({'programs': programs})
 
-
-def querydict_to_dict(query_dict):
-    data = {}
-    for key in query_dict.keys():
-        v = query_dict.getlist(key)
-        if len(v) == 1:
-            v = v[0]
-        data[key] = v
-    return data
-
-
 @api_view(["GET"])
-def get_docx_genquerie(request):
-    query_dict = querydict_to_dict(request.GET)
-    try:
-        precm = query_dict['pre'] == 'true'
-        del query_dict['pre']
-    except KeyError:
-        return JsonResponse({'error': "'pre' Key not provided"}, status=HTTP_400_BAD_REQUEST)
-
-    generator = UnifiedWritter()
-    generator.filename = 'public/' + \
-        str(request.user) + str(datetime.date.today()) + '.docx'
-    generator.generate_document_by_querie(query_dict, precm)
-    return JsonResponse({'url': generator.filename}, status=HTTP_200_OK)
-
-@api_view(["GET"])
-@permission_classes((AllowAny,))
-def generate_spec(_):
-    return JsonResponse({'': ''})
-    
 def allow_generate(request):
     groups = [group.name for group in request.user.groups.all()]
     options = get_queries_by_groups(groups)
     return JsonResponse(options, status=HTTP_200_OK, safe=False)
+
+@api_view(["PATCH"])
+def mark_received(request):
+    try:
+        id = request.GET['id']
+        req = Request.get_case_by_id(id)
+        if req.received_date is None:
+            req.received_date = datetime.datetime.now
+            req.save()
+        return JsonResponse(req, QuerySetEncoder, status=HTTP_200_OK, safe=False)
+    except KeyError:
+        return JsonResponse({'response': 'Not found'}, status=HTTP_404_NOT_FOUND, safe=False)
+
+@api_view(["POST"])
+def add_notes(request):
+    try:
+        id = request.GET['id']
+        req = Request.get_case_by_id(id)
+        notes = json.loads(request.body)['notes']
+        req.notes.extend(notes)
+        req.save()
+        return JsonResponse(req, QuerySetEncoder, status=HTTP_200_OK, safe=False)
+    except KeyError:
+        return JsonResponse({'response': 'Not found'}, status=HTTP_404_NOT_FOUND, safe=False)
+    except TypeError:
+        return JsonResponse({'response': 'notes is not iterable'}, status=HTTP_400_BAD_REQUEST, safe=False)
 
 # TODO: Rewrite this code, no mongoengine libraries should be called here
 # @api_view(["PATCH"])

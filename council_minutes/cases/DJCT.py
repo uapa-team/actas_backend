@@ -1,25 +1,24 @@
 import datetime
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import StringField, DateField, BooleanField
+from mongoengine import StringField, DateTimeField, BooleanField
 from mongoengine import EmbeddedDocumentListField
 from ..models import Request, Professor
 from .case_utils import add_analysis_paragraph
 
 class DJCT(Request):
 
-    full_name = 'Designación de jurados calificadores de tesis de maestría/doctorado ' + \
-        'o evaluadores de trabajo final de maestría'
+    full_name = 'Designación de jurados calificadores de tesis de maestría'
 
     node = StringField(
         display='Perfil', choices=Request.PROFILE_CHOICES, default=Request.PROFILE_INVE)
     grade_option = StringField(
-        required=True, choices=Request.GRADE_OPTION_CHOICES, display='Opción de grado',
+        required=True, choices=Request.GRADE_OPTION_CHOICES,# display='Opción de grado',
         default=Request.GRADE_OPTION_TESIS_MAESTRIA)
     advisor = StringField(required=True, display='Director', default='')
     title = StringField(
-        requiered=True, display='Título de Tesis/Trabajo Final', default='')
-    date_approval = DateField(required=True, display='Fecha de Aprobación',
+        requiered=True, display='Título de Tesis', default='')
+    date_approval = DateTimeField(required=True, display='Fecha de Aprobación',
                               default=datetime.date.today)
     proposal_jury = BooleanField(
         required=True, display='¿Jurados Propuestos?', default=False)
@@ -69,10 +68,10 @@ class DJCT(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
 
     def cm_answer(self, paragraph):
-        paragraph.add_run(self.str_council_header + ' ')
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True
@@ -83,8 +82,6 @@ class DJCT(Request):
         self.pcm_answer_handler(docx)
 
     def pcm_answer(self, paragraph):
-        paragraph.add_run(self.str_answer + ':\n').font.bold = True
-        paragraph.add_run(self.str_comittee_header + ' ')
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_advisor_response_display().upper() + ' ').font.bold = True
@@ -118,6 +115,8 @@ class DJCT(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_answer + ':\n').font.bold = True
+        paragraph.add_run(self.str_comittee_header + ' ')
         self.pcm_answer(paragraph)
 
     def pcm_analysis_handler(self, docx):
@@ -149,3 +148,15 @@ class DJCT(Request):
             self.str_pcm_doc[3].format(proposed),
             self.str_pcm_doc[4]
         ]
+
+    def resource_analysis(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+    
+    def resource_pre_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+
+    def resource_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.cm_answer(last_paragraph)

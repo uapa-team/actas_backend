@@ -21,11 +21,11 @@ class Register(EmbeddedDocument):
     )
 
     _type = StringField(
-        required=True, display='Tipo de Registro', choices=TYPE_CHOICES)
-    code = StringField(required=True, display='Código')
+        required=True, display='Tipo de Registro', choices=TYPE_CHOICES, default=TYPE_TESIS)
+    code = StringField(required=True, display='Código', default='')
     grade = StringField(
-        required=True, display='Calificación', choices=GRADE_CHOICES)
-    title = StringField(display='Título')
+        required=True, display='Calificación', choices=GRADE_CHOICES, default=GRADE_AP)
+    title = StringField(display='Título', default='')
 
 
 class RCPE(Request):
@@ -53,11 +53,11 @@ class RCPE(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
         self.add_registers(docx)
 
     def cm_answer(self, paragraph):
-        paragraph.add_run(self.str_council_header + ' ')
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_approval_status_display().upper() + ':').font.bold = True
@@ -67,12 +67,12 @@ class RCPE(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_answer + ' ').font.bold = True
+        paragraph.add_run(self.str_comittee_header + ' ')
         self.pcm_answer(paragraph)
         self.add_registers(docx)
 
     def pcm_answer(self, paragraph):
-        paragraph.add_run(self.str_answer + ' ').font.bold = True
-        paragraph.add_run(self.str_comittee_header + ' ')
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_advisor_response_display().upper() + ':').font.bold = True
@@ -104,3 +104,15 @@ class RCPE(Request):
             else:
                 raise AssertionError(
                     self.assertionerror['CHOICES'].format(register._type))
+
+    def resource_analysis(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+    
+    def resource_pre_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+
+    def resource_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.cm_answer(last_paragraph)

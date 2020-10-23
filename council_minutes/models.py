@@ -1,10 +1,12 @@
 import datetime
 import json
-from mongoengine import DynamicDocument, EmbeddedDocument, DateField, StringField, BooleanField
+from mongoengine import DynamicDocument, EmbeddedDocument, StringField, BooleanField
 from mongoengine import ListField, IntField, EmbeddedDocumentField, EmbeddedDocumentListField
+from mongoengine import LazyReferenceField, DictField, DateTimeField
 from mongoengine.errors import ValidationError, DoesNotExist
 from mongoengine.fields import BaseField
 from.helpers import get_period_choices
+
 
 class Subject(EmbeddedDocument):
 
@@ -42,12 +44,12 @@ class Subject(EmbeddedDocument):
         (TIP_DOC_ELEGIBLE, 'Elegible Doctorado (U)'),
     )
 
-    name = StringField(required=True, display='Nombre Asignatura')
-    code = StringField(required=True, display='Código')
-    credits = IntField(required=True, display='Créditos')
-    group = StringField(required=True, display='Grupo')
+    name = StringField(required=True, display='Nombre Asignatura', default='')
+    code = StringField(required=True, display='Código', default='')
+    credits = IntField(required=True, display='Créditos', default=0)
+    group = StringField(required=True, display='Grupo', default='')
     tipology = StringField(
-        required=True, choices=TIP_CHOICES, display='Tipología')
+        required=True, choices=TIP_CHOICES, display='Tipología', default=TIP_PRE_FUND_OBLIGATORIA)
 
     @staticmethod
     def subjects_to_array(subjects):
@@ -75,15 +77,40 @@ class Subject(EmbeddedDocument):
         data = [0, 0, 0, 0, 0]
         for sbj in subjects:
             if sbj.tipology == Subject.TIP_PRE_FUND_OBLIGATORIA:
-                data[0] += sbj.credits
+                try:
+                    if float(sbj.grade) >= 3.0:
+                        data[0] += sbj.credits
+                except ValueError:
+                    if sbj.grade in ('AP', 'AS'):
+                        data[0] += sbj.credits
             elif sbj.tipology == Subject.TIP_PRE_FUND_OPTATIVA:
-                data[1] += sbj.credits
+                try:
+                    if float(sbj.grade) >= 3.0:
+                        data[1] += sbj.credits
+                except ValueError:
+                    if sbj.grade in ('AP', 'AS'):
+                        data[1] += sbj.credits
             elif sbj.tipology == Subject.TIP_PRE_DISC_OBLIGATORIA:
-                data[2] += sbj.credits
+                try:
+                    if float(sbj.grade) >= 3.0:
+                        data[2] += sbj.credits
+                except ValueError:
+                    if sbj.grade in ('AP', 'AS'):
+                        data[2] += sbj.credits
             elif sbj.tipology == Subject.TIP_PRE_DISC_OPTATIVA:
-                data[3] += sbj.credits
+                try:
+                    if float(sbj.grade) >= 3.0:
+                        data[3] += sbj.credits
+                except ValueError:
+                    if sbj.grade in ('AP', 'AS'):
+                        data[3] += sbj.credits
             elif sbj.tipology == Subject.TIP_PRE_LIBRE_ELECCION:
-                data[4] += sbj.credits
+                try:
+                    if float(sbj.grade) >= 3.0:
+                        data[4] += sbj.credits
+                except ValueError:
+                    if sbj.grade in ('AP', 'AS'):
+                        data[4] += sbj.credits
         return data
 
 
@@ -103,7 +130,7 @@ class Request(DynamicDocument):
     )
     decision_maker = decision_makers[0]
 
-    #Request is in cm, pcm (or not)
+    # Request is in cm, pcm (or not)
     in_cm = True
     in_pcm = True
 
@@ -204,6 +231,7 @@ class Request(DynamicDocument):
     PDI_CIENCIA_Y_TECNOLOGIA_DE_MATERIALES = '2682'
     PDI_MECANICA_Y_MECATRONICA = '2839'
     PMI_DE_SISTEMAS_Y_COMPUTACION = '2702'
+    PDI_ESTUDIOS_AMBIENTALES = '2979'
     PMI_ELECTRICA_CONVENIO_SEDE_MANIZALES = '2794'
     PMI_DE_SISTEMAS_Y_COMPUTACION_CONV_UPC = '2856'
     PMI_DE_SISTEMAS_Y_COMPUTACION_CONV_UNILLANOS = '2928'
@@ -296,6 +324,7 @@ class Request(DynamicDocument):
          'Maestría en Ingeniería - Ingeniería de Sistemas y Computación - Conv UPC'),
         (PMI_DE_SISTEMAS_Y_COMPUTACION_CONV_UNILLANOS,
          'Maestría en Ingeniería - Ingeniería de Sistemas y Computación - Conv Unillanos'),
+        (PDI_ESTUDIOS_AMBIENTALES, 'Doctorado en Estudios Ambientales'),
         (BAP_ARTES,
          'Modalidad de Asignaturas de Posgrado Facultad de Artes'),
         (BAP_CIENCIAS,
@@ -348,25 +377,26 @@ class Request(DynamicDocument):
     GRADE_OPTION_TESIS_DOCTORADO = 'TSD'
     GRADE_OPTION_CHOICES = (
         (GRADE_OPTION_TRABAJO_FINAL_MAESTRIA, 'Trabajo Final de Maestría'),
-        (GRADE_OPTION_TESIS_MAESTRIA, 'Tesis de Maestría'),
-        (GRADE_OPTION_TESIS_DOCTORADO, 'Tesis de Doctorado')
+        (GRADE_OPTION_TESIS_MAESTRIA, 'Tesis de Maestría')
     )
 
     PERIOD_CHOICES = get_period_choices()
-    PERIOD_DEFAULT = PERIOD_CHOICES[0][0] if datetime.date.today().month <= 6 else PERIOD_CHOICES[1][0]
+    PERIOD_DEFAULT = PERIOD_CHOICES[1][0] if datetime.date.today(
+    ).month <= 6 else PERIOD_CHOICES[0][0]
 
     _cls = StringField(required=True)
-    date_stamp = DateField(default=datetime.date.today)
+    date_stamp = DateTimeField(default=datetime.datetime.now)
     user = StringField(max_length=255, required=True)
     consecutive_minute = IntField(
         min_value=0, default=0, display='Número del Acta de Consejo de Facultad')
     consecutive_minute_ac = IntField(
-        min_value=0, default=0, display='Número del Acta de Comité Asesor') #ac stands for advisory committe
+        min_value=0, default=0, display='Número del Acta de Comité Asesor')  # ac stands for advisory committe
     year = IntField(
         min_value=2000, max_value=2100, display='Año del Acta', default=datetime.date.today().year)
-    to_legal = BooleanField(default=False, display='Sugerir remitir caso a legataria')
-    date = DateField(default=datetime.date.today,
-                     display='Fecha de radicación')
+    to_legal = BooleanField(
+        default=False, display='Sugerir remitir caso a Comisión Delegataria')
+    date = DateTimeField(default=datetime.date.today,
+                         display='Fecha de radicación')
     academic_program = StringField(
         min_length=4, max_length=4, choices=PLAN_CHOICES,
         display='Programa Académico', default=PI_AGRICOLA)
@@ -378,7 +408,7 @@ class Request(DynamicDocument):
     student_name = StringField(
         max_length=512, display='Nombre del Estudiante', default='')
     academic_period = StringField(
-        max_length=10, display='Periodo', choices=PERIOD_CHOICES, default=PERIOD_DEFAULT)
+        max_length=10, display='Periodo Académico Actual', choices=PERIOD_CHOICES, default=PERIOD_DEFAULT)
     approval_status = StringField(
         min_length=2, max_length=2, choices=AS_CHOICES,
         default=AS_EN_ESPERA, display='Estado de Aprobación')
@@ -392,6 +422,8 @@ class Request(DynamicDocument):
     supports = StringField(default='', display='Soportes')
     extra_analysis = ListField(
         StringField(), display='Analisis Extra')
+    received_date = DateTimeField()  # Date when advisor recieves a case from secretary
+    notes = ListField(StringField())
 
     regulations = {
         '008|2008|CSU': ('Acuerdo 008 de 2008 del Consejo Superior Universitario',
@@ -432,7 +464,7 @@ class Request(DynamicDocument):
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=69990'),
         '239|2009|VAC': ('Resolución 239 de 2009 de Vicerrectoría Académica',
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34644'),
-        '241|2009|VAC': ('Resolución 241 DE 2009 de la Vicerrectoría Académica',
+        '241|2009|VAC': ('Resolución 241 de 2009 de la Vicerrectoría Académica',
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=34651'),
         '001|2019|VSB': ('Circular 001 de 2019 de Vicerrectoría de Sede Bogotá',
                          'http://www.legal.unal.edu.co/rlunal/home/doc.jsp?d_i=92579'),
@@ -474,7 +506,12 @@ class Request(DynamicDocument):
     @staticmethod
     def get_cases_by_query(query):
         # pylint: disable=no-member
-        return Request.objects(**query).filter(approval_status__nin=[Request.AS_ANULADA, Request.AS_RENUNCIA])
+
+        ## Get all cases that follows the query
+        cases = Request.objects(**query) 
+        ## Ignore "deleted" cases
+        cases = cases.filter(approval_status__nin=[Request.AS_ANULADA, Request.AS_RENUNCIA])
+        return cases.order_by('-date_stamp')
 
     @staticmethod
     def get_case_by_id(caseid):
@@ -494,11 +531,11 @@ class Request(DynamicDocument):
 
     @staticmethod
     def get_cases():
-        return {
-            'cases': [
-                {'code': type_case.__name__, 'name': type_case.full_name}
+        cases = [{'code': type_case.__name__, 'name': type_case.full_name}
                 for type_case in Request.get_subclasses()]
-        }
+        cases.sort(key=lambda case: case['name'])
+        
+        return { 'cases': cases }
 
     @classmethod
     def translate(cls, data):
@@ -546,11 +583,12 @@ class Request(DynamicDocument):
 
 class Professor(EmbeddedDocument):
 
-    name = StringField(required=True, display='Nombre')
+    name = StringField(
+        required=True, default='', display='Nombre')
     department = StringField(
         display='Departamento', choices=Request.DP_CHOICES, default=Request.DP_EMPTY)
-    institution = StringField(display='Institución')
-    country = StringField(display='País')
+    institution = StringField(display='Institución', default='')
+    country = StringField(display='País', default='')
 
 
 class Person(DynamicDocument):
@@ -562,9 +600,16 @@ class Person(DynamicDocument):
     student_name = StringField(
         max_length=512, display='Nombre del Estudiante', default='')
 
+
 class SubjectAutofill(DynamicDocument):
     subject_code = StringField(
         display='Código de la Asignatura')
     subject_name = StringField(
         max_length=512, display='Nombre de la Asignatura', default='')
-        
+
+
+class RequestChanges(DynamicDocument):
+    request_id = LazyReferenceField(Request, required=True)
+    user = StringField(required=True)
+    date_stamp = DateTimeField(default=datetime.datetime.now)
+    changes = DictField(required=True)

@@ -1,7 +1,7 @@
 import datetime
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import StringField, IntField, DateField
+from mongoengine import StringField, IntField, DateTimeField
 from ..models import Request, Subject
 from .case_utils import table_subjects, add_analysis_paragraph, num_to_month
 
@@ -28,14 +28,14 @@ class TGRA(Request):
         default='', display='Profesor director del trabajo')
     dc_approved = IntField(display='Número de créditos aprobados', default=0)
     commite_cm = IntField(default=0, display='Acta de comité')
-    commite_cm_date = DateField(
+    commite_cm_date = DateTimeField(
         display='Fecha acta de comité', default=datetime.date.today)
 
     regulation_list = ['026|2012|CSU', '040|2017|CSU']  # List of regulations
 
     str_cm = [
         'inscribir la(s) siguiente(s) asignatura(s) en el periodo académico {}, en modalidad {}, ' +
-        'bajo la dirección del profesor {}, debido a que {}realiza correctamente la solicitud.'
+        'bajo la dirección del profesor {}, debido a que {}.'
     ]
 
     str_pcm = [
@@ -54,6 +54,7 @@ class TGRA(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
         # pylint: disable=no-member
         table_subjects(docx,
@@ -61,17 +62,12 @@ class TGRA(Request):
                          self.get_type_tgra_display(), '1', Subject.TIP_PRE_TRAB_GRADO[1], '6']])
 
     def cm_answer(self, paragraph):
-        if self.is_affirmative_response_approval_status():
-            ans = ''
-        else:
-            ans = 'no '
-        paragraph.add_run(self.str_council_header + ' ')
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True
         paragraph.add_run(self.str_cm[0].format(
             # pylint: disable=no-member
-            self.academic_period, self.get_type_tgra_display(), self.professor, ans))
+            self.academic_period, self.get_type_tgra_display(), self.professor, self.council_decision))
 
     def pcm(self, docx):
         self.pcm_analysis(docx)
@@ -79,6 +75,7 @@ class TGRA(Request):
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(self.str_answer + ': ').bold = True
+        paragraph.add_run(self.str_comittee_header + ' ')
         self.pcm_answer(paragraph)
         if self.is_affirmative_response_advisor_response():
             # pylint: disable=no-member
@@ -110,17 +107,12 @@ class TGRA(Request):
         add_analysis_paragraph(docx, analysis_list)
 
     def pcm_answer(self, paragraph):
-        if self.is_affirmative_response_advisor_response():
-            ans = ''
-        else:
-            ans = 'no '
-        paragraph.add_run(self.str_comittee_header + ' ')
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_advisor_response_display().upper() + ' ').font.bold = True
         paragraph.add_run(self.str_cm[0].format(
             # pylint: disable=no-member
-            self.academic_period, self.get_type_tgra_display(), self.professor, ans))
+            self.academic_period, self.get_type_tgra_display(), self.professor, self.council_decision))
 
     def disciplinar_credits_approved_for_program(self):
         if self.academic_program == self.PI_AGRICOLA:
@@ -143,3 +135,15 @@ class TGRA(Request):
             return 60
         else:
             raise AssertionError('TGRA for no PRE academic program!')
+
+    def resource_analysis(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+    
+    def resource_pre_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+
+    def resource_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.cm_answer(last_paragraph)

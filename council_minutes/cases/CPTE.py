@@ -7,8 +7,7 @@ from .case_utils import add_analysis_paragraph
 
 class CPTE(Request):
 
-    full_name = 'Cambio de proyecto de tesis de maestría/doctorado o ' + \
-        'propuesta de trabajo final de maestría'
+    full_name = 'Cambio de proyecto de tesis de maestría'
 
     GO_TRABAJO_FINAL_MAESTRIA = 'TFM'
     GO_TESIS_MAESTRIA = 'TSM'
@@ -20,18 +19,18 @@ class CPTE(Request):
     )
 
     title = StringField(
-        required=True, display='Nuevo título de la tesis/trabajo final', default='')
+        required=True, display='Nuevo título de la tesis', default='')
     grade_option = StringField(
-        required=True, display='Tipo de tesis/trabajo final',
+        required=True,# display='Tipo de tesis/trabajo final',
         choices=GO_CHOICES, default=GO_TESIS_MAESTRIA)
     new_advisor = StringField(
-        required=True, display='Nuevo director de tesis/trabajo final', default='')
+        required=True, display='Nuevo director de tesis', default='')
     old_advisor = StringField(
-        display='Antiguo director de tesis/trabajo final', default='')
+        display='Antiguo director de tesis', default='')
     new_co_advisor = StringField(
-        display='Nuevo codirector de tesis/trabajo final', default='')
+        display='Nuevo codirector de tesis', default='')
     old_co_advisor = StringField(
-        display='Antiguo codirector de tesis/trabajo final', default='')
+        display='Antiguo codirector de tesis', default='')
     inst_new_advisor = StringField(choices=Request.DP_CHOICES,
                                    display='Departamento de adscripción del nuevo director',
                                    default=Request.DP_EMPTY)
@@ -71,10 +70,10 @@ class CPTE(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
 
     def cm_answer(self, paragraph):
-        paragraph.add_run(self.str_council_header + ' ')
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True
@@ -89,14 +88,14 @@ class CPTE(Request):
 
     def pcm(self, docx):
         self.pcm_analysis(docx)
-        self.pcm_answer(docx)
-
-    def pcm_answer(self, docx):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(self.str_answer + ': ').font.bold = True
         paragraph.add_run(self.str_comittee_header + ' ')
+        self.pcm_answer(paragraph)
+
+    def pcm_answer(self, paragraph):
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_advisor_response_display().upper()).font.bold = True
@@ -183,3 +182,15 @@ class CPTE(Request):
         for extra_a in self.extra_analysis:
             final_analysis += [extra_a]
         add_analysis_paragraph(docx, final_analysis)
+
+    def resource_analysis(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+    
+    def resource_pre_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+
+    def resource_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.cm_answer(last_paragraph)

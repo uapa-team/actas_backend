@@ -13,10 +13,10 @@ class ADIC(Request):
                        default=Request.PROFILE_INVE, display='Perfil')
     title = StringField(required=True, display='Título de Tesis/Trabajo Final',
                         default='')
-    council_number = StringField(
-        required=True, max_length=2, default='00', display='# Acta de cancelación')
-    council_year = StringField(
-        required=True, min_length=4, max_length=4, display='Año del Acta', default='0000')
+    council_number_propuest = StringField(
+        required=True, max_length=2, default='00', display='# Acta de aprobación propuesta')
+    council_year_propuest = StringField(
+        required=True, min_length=4, max_length=4, display='Año del Acta de aprobación propuesta', default='0000')
     proffesors = EmbeddedDocumentListField(Professor, display='Docentes')
 
     regulation_list = []
@@ -36,10 +36,10 @@ class ADIC(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
 
     def cm_answer(self, paragraph):
-        paragraph.add_run(self.str_council_header + ' ')
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True
@@ -50,11 +50,11 @@ class ADIC(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_answer + ' ').font.bold = True
+        paragraph.add_run(self.str_comittee_header + ' ')
         self.pcm_answer(paragraph)
 
     def pcm_answer(self, paragraph):
-        paragraph.add_run(self.str_answer + ' ').font.bold = True
-        paragraph.add_run(self.str_comittee_header + ' ')
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_advisor_response_display().upper() + ' ').font.bold = True
@@ -71,7 +71,7 @@ class ADIC(Request):
             self.str_pcm[0].format(
                 self.get_academic_program_display(), modifier),
             self.str_pcm[2].format(
-                self.council_number, self.council_year
+                self.council_number_propuest, self.council_year_propuest
             )
         ] + self.extra_analysis
 
@@ -81,7 +81,7 @@ class ADIC(Request):
             self.get_academic_program_display()))
         paragraph.add_run('"{}" '.format(self.title)).font.italic = True
         paragraph.add_run(self.str_cm[1].format(
-            self.council_number, self.council_year))
+            self.council_number_propuest, self.council_year_propuest))
         self.add_proffesors(paragraph)
 
     def add_proffesors(self, paragraph):
@@ -95,3 +95,15 @@ class ADIC(Request):
             end = ', ' if i + 1 < len(self.proffesors) else '.'
             paragraph.add_run(
                 '{} - {}{}'.format(self.proffesors[i].name, mod, end))
+
+    def resource_analysis(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+    
+    def resource_pre_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+
+    def resource_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.cm_answer(last_paragraph)

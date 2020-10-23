@@ -40,20 +40,20 @@ class HOID(Request):
         'por obtener una calificación de {} en el exámen {}, siendo {} el mínimo exigido.',
         'teniendo en cuenta que presenta un certificado de estudios expedido por una ' +
         'institución de educación superior {}, indicando que ha cursado un total ' +
-        'acumulado de horas equivalente al requerido para alcanzar el nivel {}.'
+        'acumulado de horas equivalente al requerido para alcanzar el nivel {} (375 horas).'
     ]
 
     def cm(self, docx):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
         if self.is_affirmative_response_approval_status():
             self.add_subjects(docx)
 
     def cm_answer(self, paragraph):
         # pylint: disable=no-member
-        paragraph.add_run(self.str_council_header + ' ')
         paragraph.add_run(
             self.get_approval_status_display().upper() + ' ').font.bold = True
         self.add_answer(paragraph)
@@ -64,13 +64,13 @@ class HOID(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_answer + ':\n').font.bold = True
+        paragraph.add_run(self.str_comittee_header + ' ')
         self.pcm_answer(paragraph)
         if self.is_affirmative_response_advisor_response():
             self.add_subjects(docx)
 
     def pcm_answer(self, paragraph):
-        paragraph.add_run(self.str_answer + ':\n').font.bold = True
-        paragraph.add_run(self.str_comittee_header + ' ')
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_advisor_response_display().upper() + ' ').font.bold = True
@@ -89,3 +89,15 @@ class HOID(Request):
     def add_subjects(self, docx):
         data = Subject.subjects_to_array(self.subjects)
         table_subjects(docx, data)
+
+    def resource_analysis(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+    
+    def resource_pre_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+
+    def resource_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.cm_answer(last_paragraph)

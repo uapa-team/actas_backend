@@ -81,10 +81,10 @@ class EPTU(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
 
     def cm_answer(self, paragraph):
-        paragraph.add_run(self.str_council_header + ' ')
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True
@@ -141,7 +141,7 @@ class EPTU(Request):
             paragraph.add_run(self.str_pcma_cna[3].format(
                 self.academic_period) + ' ')
         elif self.cna == self.CNA_OTRO:
-            paragraph.add_run(self.str_pcma_cna[4] + ' ')
+            paragraph.add_run(self.council_decision + ' ')
 
     def pcm_analysis(self, docx):
         analysis_list = []
@@ -162,3 +162,15 @@ class EPTU(Request):
         analysis_list += [self.str_pcm[5]]
         analysis_list += self.extra_analysis
         add_analysis_paragraph(docx, analysis_list)
+
+    def resource_analysis(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+    
+    def resource_pre_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+
+    def resource_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.cm_answer(last_paragraph)

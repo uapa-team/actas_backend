@@ -1,7 +1,7 @@
 import datetime
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from mongoengine import StringField, BooleanField, DateField
+from mongoengine import StringField, BooleanField, DateTimeField
 from ..models import Request
 from .case_utils import add_analysis_paragraph, string_to_date
 
@@ -19,9 +19,9 @@ class APAS(Request):
         (GO_TESIS_DOCTORADO, 'Tesis de Doctorado')
     )
 
-    date_start = DateField(
+    date_start = DateTimeField(
         required=True, display='Fecha de inicio de la pasantía', default=datetime.date.today)
-    date_finish = DateField(
+    date_finish = DateTimeField(
         required=True, display='Fecha de finalización de la pasantía', default=datetime.date.today)
     place = StringField(
         required=True, display='Lugar: Ciudad, País', default='')
@@ -56,10 +56,10 @@ class APAS(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
 
     def cm_answer(self, paragraph):
-        paragraph.add_run(self.str_council_header + ' ')
         # pylint: disable=no-member
         paragraph.add_run(
             self.get_approval_status_display().upper() + ' ').font.bold = True
@@ -121,3 +121,15 @@ class APAS(Request):
         for extra_a in self.extra_analysis:
             final_analysis += [extra_a]
         add_analysis_paragraph(docx, final_analysis)
+
+    def resource_analysis(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+    
+    def resource_pre_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+
+    def resource_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.cm_answer(last_paragraph)

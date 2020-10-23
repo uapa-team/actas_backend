@@ -86,11 +86,11 @@ class CASI(Request):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
         table_subjects(docx, Subject.subjects_to_array(self.subjects))
 
     def cm_answer(self, paragraph):
-        paragraph.add_run(self.str_council_header + ' ')
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True
@@ -107,11 +107,11 @@ class CASI(Request):
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(self.str_answer + ': ').bold = True
+        paragraph.add_run(self.str_comittee_header)
         self.pcm_answer(paragraph)
         table_subjects(docx, Subject.subjects_to_array(self.subjects))
 
     def pcm_answer(self, paragraph):
-        paragraph.add_run(self.str_comittee_header)
         paragraph.add_run(
             # pylint: disable=no-member
             ' ' + self.get_advisor_response_display().upper()).font.bold = True
@@ -122,10 +122,16 @@ class CASI(Request):
             self.pcm_answers_cn(paragraph)
 
     def cm_ap(self, paragraph):
-        paragraph.add_run(self.str_cm[1].format('') + ' ')
+        if self.council_decision == Request.council_decision.default or len(self.council_decision) == 0:
+            paragraph.add_run(self.str_cm[1].format('') + ' ')    
+        else:
+            paragraph.add_run(self.council_decision + ' ')
 
     def cm_na(self, paragraph):
-        paragraph.add_run(self.str_cm[1].format('no ') + ' ')
+        if self.council_decision == Request.council_decision.default or len(self.council_decision) == 0:
+            paragraph.add_run(self.str_cm[1].format('no ') + ' ')
+        else:
+            paragraph.add_run(self.council_decision + ' ')
 
     def pcm_analysis(self, docx):
         analysis_list = []
@@ -175,3 +181,18 @@ class CASI(Request):
             raise AssertionError(
                 self.assertionerror['CHOICES'].format('NRC_answer'))
         paragraph.add_run(' ({}).'.format(self.regulations['008|2008|CSU'][0]))
+
+    def resource_analysis(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+        table_subjects(docx, Subject.subjects_to_array(self.subjects))
+    
+    def resource_pre_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+        table_subjects(docx, Subject.subjects_to_array(self.subjects))
+
+    def resource_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.cm_answer(last_paragraph)
+        table_subjects(docx, Subject.subjects_to_array(self.subjects))

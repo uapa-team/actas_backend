@@ -25,7 +25,7 @@ class CAIM(Request):
     str_cm = [
         'cursar el periodo académico {} con un número de créditos inferior al mínimo exigido, ',
         'cancelar la(s) siguiente(s) asignatura(s) inscrita(s) del periodo {}.',
-        'debido a que {}realiza debidamente la solicitud.',
+        'debido a que {}.',
         '(Artículo 10 del {}).',
         '(Artículo 15 del {}).'
     ]
@@ -52,7 +52,7 @@ class CAIM(Request):
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.style = 'List Bullet'
         self.cm_answer(paragraph)
-        paragraph.add_run(self.str_cm[2].format('') + ' ')
+        paragraph.add_run(self.council_decision + ' ')
         paragraph.add_run(self.str_cm[3].format(
             Request.regulations[self.regulation_list[0]][0]))
         paragraph = docx.add_paragraph()
@@ -73,7 +73,7 @@ class CAIM(Request):
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
-        paragraph.add_run(self.str_cm[2].format('no ') + ' ')
+        paragraph.add_run(self.council_decision + ' ')
         paragraph.add_run(self.str_cm[3].format(
             Request.regulations[self.regulation_list[0]][0]))
         table_subjects(docx, Subject.subjects_to_array(self.subjects))
@@ -101,7 +101,7 @@ class CAIM(Request):
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.style = 'List Bullet'
         self.pcm_answer(paragraph)
-        paragraph.add_run(self.str_cm[2].format('') + ' ')
+        paragraph.add_run(self.str_cm[2].format(self.council_decision))
         paragraph.add_run(self.str_cm[3].format(
             Request.regulations[self.regulation_list[0]][0]))
         paragraph = docx.add_paragraph()
@@ -122,7 +122,7 @@ class CAIM(Request):
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(self.str_comittee_header + ' ')
         self.pcm_answer(paragraph)
-        paragraph.add_run(self.str_cm[2].format('no ') + ' ')
+        paragraph.add_run(self.str_cm[2].format(self.council_decision))
         paragraph.add_run(self.str_cm[3].format(
             Request.regulations[self.regulation_list[0]][0]))
         table_subjects(docx, Subject.subjects_to_array(self.subjects))
@@ -149,3 +149,15 @@ class CAIM(Request):
         )]
         analysis_list += self.extra_analysis
         add_analysis_paragraph(docx, analysis_list)
+
+    def resource_analysis(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+    
+    def resource_pre_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+
+    def resource_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.cm_answer(last_paragraph)

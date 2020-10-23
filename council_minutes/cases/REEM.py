@@ -37,12 +37,12 @@ class REEM(Request):
     def cm(self, docx):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
 
     def cm_answer(self, paragraph):
         # pylint: disable=no-member
         cancelation_case = Request.objects.get(id=self.cancelation_case)
-        paragraph.add_run(self.str_council_header + ' ')
         paragraph.add_run(
             # pylint: disable=no-member
             self.get_approval_status_display().upper() + ' ').font.bold = True
@@ -65,6 +65,8 @@ class REEM(Request):
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run('{}: '.format(self.str_answer)).font.bold = True
         paragraph = docx.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.add_run(self.str_comittee_header)
         self.pcm_answer(paragraph)
 
     def pcm_analysis(self, docx):
@@ -82,8 +84,6 @@ class REEM(Request):
     def pcm_answer(self, paragraph):
         # pylint: disable=no-member
         cancelation_case = Request.objects.get(id=self.cancelation_case)
-        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        paragraph.add_run(self.str_comittee_header)
         paragraph.add_run(
             # pylint: disable=no-member
             ' ' + self.get_advisor_response_display().upper() + ' ').font.bold = True
@@ -92,3 +92,15 @@ class REEM(Request):
             self.percentage,
             cancelation_case.academic_period
         ))
+
+    def resource_analysis(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+    
+    def resource_pre_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.pcm_answer(last_paragraph)
+
+    def resource_answer(self, docx):
+        last_paragraph = docx.paragraphs[-1]
+        self.cm_answer(last_paragraph)
