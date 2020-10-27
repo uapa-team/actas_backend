@@ -95,8 +95,11 @@ def cases(request):
     return JsonResponse(response, safe=False, encoder=QuerySetEncoder)
 
 # pylint: disable=no-member
-@api_view(["PATCH", "POST"])
+@api_view(["GET", "PATCH", "POST"])
 def case(request):
+    if request.method == 'GET':
+        responses = Request.get_cases_by_query(querydict_to_dict(request.GET))
+        return JsonResponse(responses, safe=False, encoder=QuerySetEncoder)
     if request.method == 'POST':
         body = json.loads(request.body)
         subs = [c.__name__ for c in Request.get_subclasses()]
