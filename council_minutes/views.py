@@ -98,8 +98,21 @@ def cases(request):
 @api_view(["GET", "PATCH", "POST"])
 def case(request):
     if request.method == 'GET':
-        responses = Request.get_cases_by_query(querydict_to_dict(request.GET))
-        return JsonResponse(responses, safe=False, encoder=QuerySetEncoder)
+        body = json.loads(request.body) if len(request.body) > 0 else {}
+        page = body['page_number'] if 'page_number' in body else 1
+        size = body['page_size'] if 'page_size' in body else 10
+
+        if not isinstance(page, int) or not isinstance(size, int) or page < 1 or size < 1:
+            return JsonResponse(
+                {'error': 'page_number and page_size must be positive numbers'},
+                status=HTTP_400_BAD_REQUEST)
+        offset = (page - 1) * size
+        cases = Request.get_cases_by_query(querydict_to_dict(request.GET))
+        response = {
+            'cases': cases.skip(offset).limit(size),
+            'total_cases': cases.count()
+        }
+        return JsonResponse(response, safe=False, encoder=QuerySetEncoder)
     if request.method == 'POST':
         body = json.loads(request.body)
         subs = [c.__name__ for c in Request.get_subclasses()]
