@@ -76,28 +76,27 @@ def info_cases(request):
                 return JsonResponse(get_fields(type_case))
         return JsonResponse({'response': 'Not found'}, status=HTTP_404_NOT_FOUND)
 
+@api_view(["POST"])
+def cases(request):
+    body = json.loads(request.body) if len(request.body) > 0 else {}
+    page = body['page_number'] if 'page_number' in body else 1
+    size = body['page_size'] if 'page_size' in body else 10
+
+    if not isinstance(page, int) or not isinstance(size, int) or page < 1 or size < 1:
+        return JsonResponse(
+            {'error': 'page_number and page_size must be positive numbers'},
+            status=HTTP_400_BAD_REQUEST)
+    offset = (page - 1) * size
+    cases = Request.get_cases_by_query(querydict_to_dict(request.GET))
+    response = {
+        'cases': cases.skip(offset).limit(size),
+        'total_cases': cases.count()
+    }
+    return JsonResponse(response, safe=False, encoder=QuerySetEncoder)
 
 # pylint: disable=no-member
-@api_view(["GET", "PATCH", "POST"])
+@api_view(["PATCH", "POST"])
 def case(request):
-    if request.method == 'GET':
-        body = json.loads(request.body) if len(request.body) > 0 else {}
-        page = body['page_number'] if 'page_number' in body else 1
-        size = body['page_size'] if 'page_size' in body else 10
-
-        if not isinstance(page, int) or not isinstance(size, int) or page < 1 or size < 1:
-            return JsonResponse(
-                {'error': 'page_number and page_size must be positive numbers'},
-                status=HTTP_400_BAD_REQUEST)
-
-        offset = (page - 1) * size
-        cases = Request.get_cases_by_query(querydict_to_dict(request.GET))
-        response = {
-            'cases': cases.skip(offset).limit(size),
-            'total_cases': cases.count()
-        }
-        return JsonResponse(response, safe=False, encoder=QuerySetEncoder)
-
     if request.method == 'POST':
         body = json.loads(request.body)
         subs = [c.__name__ for c in Request.get_subclasses()]
