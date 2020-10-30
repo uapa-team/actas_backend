@@ -410,6 +410,9 @@ class Request(DynamicDocument):
     approval_status = StringField(
         min_length=2, max_length=2, choices=AS_CHOICES,
         default=AS_EN_ESPERA, display='Estado de Aprobación')
+    archive_note = StringField(
+        max_length=200, default=None
+    )
     advisor_response = StringField(
         min_length=3, max_length=3, choices=ARCR_CHOICES,
         default=ARCR_EN_ESPERA, display='Respuesta del Comité')
