@@ -412,16 +412,19 @@ class Request(DynamicDocument):
     approval_status = StringField(
         min_length=2, max_length=2, choices=AS_CHOICES,
         default=AS_EN_ESPERA, display='Estado de Aprobación')
+    archive_note = StringField(
+        max_length=200, default=None
+    )
     advisor_response = StringField(
         min_length=3, max_length=3, choices=ARCR_CHOICES,
         default=ARCR_EN_ESPERA, display='Respuesta del Comité')
     council_decision = StringField(
-        max_length=255, default='justifica debidamente la solicitud', display='Justificación del Consejo')
+        max_length=255, default='Justifica debidamente la solicitud.', display='Justificación del Consejo')
     student_justification = StringField(
         default='', display='Justificación del Estudiante')
     supports = StringField(default='', display='Soportes')
     extra_analysis = ListField(
-        StringField(), display='Analisis Extra')
+        StringField(), display='Análisis Extra')
     received_date = DateTimeField()  # Date when advisor recieves a case from secretary
     notes = ListField(StringField())
 
