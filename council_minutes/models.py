@@ -231,6 +231,7 @@ class Request(DynamicDocument):
     PDI_CIENCIA_Y_TECNOLOGIA_DE_MATERIALES = '2682'
     PDI_MECANICA_Y_MECATRONICA = '2839'
     PMI_DE_SISTEMAS_Y_COMPUTACION = '2702'
+    PDI_ESTUDIOS_AMBIENTALES = '2979'
     PMI_ELECTRICA_CONVENIO_SEDE_MANIZALES = '2794'
     PMI_DE_SISTEMAS_Y_COMPUTACION_CONV_UPC = '2856'
     PMI_DE_SISTEMAS_Y_COMPUTACION_CONV_UNILLANOS = '2928'
@@ -323,6 +324,7 @@ class Request(DynamicDocument):
          'Maestría en Ingeniería - Ingeniería de Sistemas y Computación - Conv UPC'),
         (PMI_DE_SISTEMAS_Y_COMPUTACION_CONV_UNILLANOS,
          'Maestría en Ingeniería - Ingeniería de Sistemas y Computación - Conv Unillanos'),
+        (PDI_ESTUDIOS_AMBIENTALES, 'Doctorado en Estudios Ambientales'),
         (BAP_ARTES,
          'Modalidad de Asignaturas de Posgrado Facultad de Artes'),
         (BAP_CIENCIAS,
@@ -417,13 +419,14 @@ class Request(DynamicDocument):
         min_length=3, max_length=3, choices=ARCR_CHOICES,
         default=ARCR_EN_ESPERA, display='Respuesta del Comité')
     council_decision = StringField(
-        max_length=255, default='justifica debidamente la solicitud', display='Justificación del Consejo')
+        max_length=255, default='Justifica debidamente la solicitud.', display='Justificación del Consejo')
     student_justification = StringField(
         default='', display='Justificación del Estudiante')
     supports = StringField(default='', display='Soportes')
     extra_analysis = ListField(
-        StringField(), display='Analisis Extra')
+        StringField(), display='Análisis Extra')
     received_date = DateTimeField()  # Date when advisor recieves a case from secretary
+    notes = ListField(StringField())
 
     regulations = {
         '008|2008|CSU': ('Acuerdo 008 de 2008 del Consejo Superior Universitario',
@@ -506,7 +509,12 @@ class Request(DynamicDocument):
     @staticmethod
     def get_cases_by_query(query):
         # pylint: disable=no-member
-        return Request.objects(**query).filter(approval_status__nin=[Request.AS_ANULADA, Request.AS_RENUNCIA])
+
+        ## Get all cases that follows the query
+        cases = Request.objects(**query) 
+        ## Ignore "deleted" cases
+        cases = cases.filter(approval_status__nin=[Request.AS_ANULADA, Request.AS_RENUNCIA])
+        return cases.order_by('-date_stamp')
 
     @staticmethod
     def get_case_by_id(caseid):
