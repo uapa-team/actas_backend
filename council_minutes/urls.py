@@ -12,6 +12,7 @@ urlpatterns = [
     path('details', views.details, name='Details'),
     path('infocase', views.info_cases, name='Info about cases'),
     path('case', views.case, name='Case object manipulation'),
+    path('cases', views.cases, name='Retrieve cases'),
 
     path('allow_generate', views.allow_generate, name='allow_generate'),
     path('generate', views.get_docx_genquerie,
