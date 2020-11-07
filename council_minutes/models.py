@@ -616,3 +616,13 @@ class RequestChanges(DynamicDocument):
     user = StringField(required=True)
     date_stamp = DateTimeField(default=datetime.datetime.now)
     changes = DictField(required=True)
+
+class Subgroup(EmbeddedDocument):
+    name = StringField(required=True)
+    key = StringField(required=True)
+    programs = ListField(StringField())
+
+class GroupsInfo(DynamicDocument):
+
+    name = StringField(required=True)
+    subgroups = EmbeddedDocumentListField(Subgroup)

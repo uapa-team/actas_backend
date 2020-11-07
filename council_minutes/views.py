@@ -12,8 +12,8 @@ from rest_framework.status import *
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 from mongoengine.errors import ValidationError
-from .models import Request, Person, SubjectAutofill
-from .helpers import QuerySetEncoder, get_fields, get_period_choices, get_queries_by_groups
+from .models import Request, Person, SubjectAutofill, GroupsInfo, Subgroup
+from .helpers import QuerySetEncoder, get_fields, get_period_choices
 from .writter import UnifiedWritter
 from .updater import update_request
 from .cases import *
@@ -223,7 +223,29 @@ def programs_defined(_):
 @api_view(["GET"])
 def allow_generate(request):
     groups = [group.name for group in request.user.groups.all()]
-    options = get_queries_by_groups(groups)
+    options = {}
+    options['ALL'] = {
+        'display': 'Todos',
+        'filter': ''
+    }
+
+    for group in groups:
+        try:
+            g = GroupsInfo.objects.get(name=group)
+            for sub in g.subgroups:
+                filter = ''
+                if len(sub.programs) == 1:
+                    filter = f'academic_program={sub.programs[0]}'
+                else:
+                    for p in sub.programs:
+                        filter += f'academic_program__in={p}&'
+                    filter = filter[:-1]
+                options[sub.key] = {
+                    'display': sub.name,
+                    'filter': filter}
+        except Exception:
+            print(f'Group {group} does not exist')
+
     return JsonResponse(options, status=HTTP_200_OK, safe=False)
 
 @api_view(["PATCH"])
