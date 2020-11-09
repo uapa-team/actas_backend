@@ -385,6 +385,7 @@ class Request(DynamicDocument):
     ).month <= 6 else PERIOD_CHOICES[0][0]
 
     _cls = StringField(required=True)
+    _cls_display = StringField(default=full_name)
     date_stamp = DateTimeField(default=datetime.datetime.now)
     user = StringField(max_length=255, required=True)
     consecutive_minute = IntField(

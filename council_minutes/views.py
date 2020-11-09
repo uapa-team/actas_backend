@@ -87,7 +87,22 @@ def cases(request):
             {'error': 'page_number and page_size must be positive numbers'},
             status=HTTP_400_BAD_REQUEST)
     offset = (page - 1) * size
-    cases = Request.get_cases_by_query(querydict_to_dict(request.GET))
+
+    querydict = request.GET.copy()
+
+    # This block don't looks fine, but it works for a filter in frontend :c
+    if 'academic_program__icontains' in querydict:
+        string = querydict['academic_program__icontains'].lower()
+        for code, program in Request.PLAN_CHOICES:
+            if string in program.lower():
+                if 'academic_program__in' in querydict:
+                    querydict['academic_program__in'].append(code)
+                else:
+                    querydict['academic_program__in'] = [code]
+
+        del querydict['academic_program__icontains']
+
+    cases = Request.get_cases_by_query(querydict_to_dict(querydict))
     
     ## Filter only cases that are in the groups of the user
     allowed_programs = set()
@@ -111,6 +126,37 @@ def cases(request):
 # pylint: disable=no-member
 @api_view(["GET", "PATCH", "POST"])
 def case(request):
+    #TODO: move this part of the method only to cases()
+    if request.method == 'GET':
+        body = json.loads(request.body) if len(request.body) > 0 else {}
+        page = body['page_number'] if 'page_number' in body else 1
+        size = body['page_size'] if 'page_size' in body else 10
+
+        if not isinstance(page, int) or not isinstance(size, int) or page < 1 or size < 1:
+            return JsonResponse(
+                {'error': 'page_number and page_size must be positive numbers'},
+                status=HTTP_400_BAD_REQUEST)
+        offset = (page - 1) * size
+        cases = Request.get_cases_by_query(querydict_to_dict(request.GET))
+        
+        ## Filter only cases that are in the groups of the user
+        allowed_programs = set()
+        groups = [group.name for group in request.user.groups.all()]
+        for group in groups:
+            try:
+                # pylint: disable=no-member
+                g = GroupsInfo.objects.get(name=group)
+                for sub in g.subgroups:
+                    allowed_programs.update(sub.programs)
+            except Exception:
+                print(f'Group {group} does not exist')
+        cases = cases.filter(academic_program__in=allowed_programs)
+
+        response = {
+            'cases': cases.skip(offset).limit(size),
+            'total_cases': cases.count()
+        }
+        return JsonResponse(response, safe=False, encoder=QuerySetEncoder)
     if request.method == 'POST':
         body = json.loads(request.body)
         subs = [c.__name__ for c in Request.get_subclasses()]
@@ -120,6 +166,7 @@ def case(request):
             item_request['user'] = str(request.user)
             case = Request.get_subclasses()[subs.index(item_request['_cls'])]
             item_request['_cls'] = case.get_entire_name()
+            item_request['_cls_display'] = case().full_name
             new_request = case().from_json(case.translate(json.dumps(item_request)))
             try:
                 inserted_items += [str(new_request.save().id)]
