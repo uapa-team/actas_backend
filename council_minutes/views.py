@@ -12,8 +12,8 @@ from rest_framework.status import *
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 from mongoengine.errors import ValidationError
-from .models import Request, Person, SubjectAutofill
-from .helpers import QuerySetEncoder, get_fields, get_period_choices, get_queries_by_groups
+from .models import Request, Person, SubjectAutofill, GroupsInfo, Subgroup
+from .helpers import QuerySetEncoder, get_fields, get_period_choices
 from .writter import UnifiedWritter
 from .updater import update_request
 from .cases import *
@@ -76,7 +76,7 @@ def info_cases(request):
                 return JsonResponse(get_fields(type_case))
         return JsonResponse({'response': 'Not found'}, status=HTTP_404_NOT_FOUND)
 
-@api_view(["POST"])
+@api_view(["GET", "POST"])
 def cases(request):
     body = json.loads(request.body) if len(request.body) > 0 else {}
     page = body['page_number'] if 'page_number' in body else 1
@@ -87,7 +87,34 @@ def cases(request):
             {'error': 'page_number and page_size must be positive numbers'},
             status=HTTP_400_BAD_REQUEST)
     offset = (page - 1) * size
-    cases = Request.get_cases_by_query(querydict_to_dict(request.GET))
+
+    querydict = request.GET.copy()
+
+    # This block don't looks fine, but it works for a filter in frontend :c
+    if 'academic_program__icontains' in querydict:
+        string = querydict['academic_program__icontains'].lower()
+        querydict['academic_program__in'] = []
+        for code, program in Request.PLAN_CHOICES:
+            if string in program.lower():
+                querydict['academic_program__in'].append(code)
+
+        del querydict['academic_program__icontains']
+
+    cases = Request.get_cases_by_query(querydict_to_dict(querydict))
+    
+    ## Filter only cases that are in the groups of the user
+    allowed_programs = set()
+    groups = [group.name for group in request.user.groups.all()]
+    for group in groups:
+        try:
+            # pylint: disable=no-member
+            g = GroupsInfo.objects.get(name=group)
+            for sub in g.subgroups:
+                allowed_programs.update(sub.programs)
+        except Exception:
+            print(f'Group {group} does not exist')
+    cases = cases.filter(academic_program__in=allowed_programs)
+
     response = {
         'cases': cases.skip(offset).limit(size),
         'total_cases': cases.count()
@@ -97,6 +124,7 @@ def cases(request):
 # pylint: disable=no-member
 @api_view(["GET", "PATCH", "POST"])
 def case(request):
+    #TODO: move this part of the method only to cases()
     if request.method == 'GET':
         body = json.loads(request.body) if len(request.body) > 0 else {}
         page = body['page_number'] if 'page_number' in body else 1
@@ -108,6 +136,20 @@ def case(request):
                 status=HTTP_400_BAD_REQUEST)
         offset = (page - 1) * size
         cases = Request.get_cases_by_query(querydict_to_dict(request.GET))
+        
+        ## Filter only cases that are in the groups of the user
+        allowed_programs = set()
+        groups = [group.name for group in request.user.groups.all()]
+        for group in groups:
+            try:
+                # pylint: disable=no-member
+                g = GroupsInfo.objects.get(name=group)
+                for sub in g.subgroups:
+                    allowed_programs.update(sub.programs)
+            except Exception:
+                print(f'Group {group} does not exist')
+        cases = cases.filter(academic_program__in=allowed_programs)
+
         response = {
             'cases': cases.skip(offset).limit(size),
             'total_cases': cases.count()
@@ -122,6 +164,7 @@ def case(request):
             item_request['user'] = str(request.user)
             case = Request.get_subclasses()[subs.index(item_request['_cls'])]
             item_request['_cls'] = case.get_entire_name()
+            item_request['_cls_display'] = case().full_name
             new_request = case().from_json(case.translate(json.dumps(item_request)))
             try:
                 inserted_items += [str(new_request.save().id)]
@@ -223,7 +266,29 @@ def programs_defined(_):
 @api_view(["GET"])
 def allow_generate(request):
     groups = [group.name for group in request.user.groups.all()]
-    options = get_queries_by_groups(groups)
+    options = {}
+    options['ALL'] = {
+        'display': 'Todos',
+        'filter': ''
+    }
+
+    for group in groups:
+        try:
+            g = GroupsInfo.objects.get(name=group)
+            for sub in g.subgroups:
+                filter = ''
+                if len(sub.programs) == 1:
+                    filter = f'academic_program={sub.programs[0]}'
+                else:
+                    for p in sub.programs:
+                        filter += f'academic_program__in={p}&'
+                    filter = filter[:-1]
+                options[sub.key] = {
+                    'display': sub.name,
+                    'filter': filter}
+        except Exception:
+            print(f'Group {group} does not exist')
+
     return JsonResponse(options, status=HTTP_200_OK, safe=False)
 
 @api_view(["PATCH"])
