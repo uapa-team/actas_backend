@@ -385,6 +385,7 @@ class Request(DynamicDocument):
     ).month <= 6 else PERIOD_CHOICES[0][0]
 
     _cls = StringField(required=True)
+    _cls_display = StringField(default=full_name)
     date_stamp = DateTimeField(default=datetime.datetime.now)
     user = StringField(max_length=255, required=True)
     consecutive_minute = IntField(
@@ -616,3 +617,13 @@ class RequestChanges(DynamicDocument):
     user = StringField(required=True)
     date_stamp = DateTimeField(default=datetime.datetime.now)
     changes = DictField(required=True)
+
+class Subgroup(EmbeddedDocument):
+    name = StringField(required=True)
+    key = StringField(required=True)
+    programs = ListField(StringField())
+
+class GroupsInfo(DynamicDocument):
+
+    name = StringField(required=True)
+    subgroups = EmbeddedDocumentListField(Subgroup)
