@@ -93,12 +93,10 @@ def cases(request):
     # This block don't looks fine, but it works for a filter in frontend :c
     if 'academic_program__icontains' in querydict:
         string = querydict['academic_program__icontains'].lower()
+        querydict['academic_program__in'] = []
         for code, program in Request.PLAN_CHOICES:
             if string in program.lower():
-                if 'academic_program__in' in querydict:
-                    querydict['academic_program__in'].append(code)
-                else:
-                    querydict['academic_program__in'] = [code]
+                querydict['academic_program__in'].append(code)
 
         del querydict['academic_program__icontains']
 
