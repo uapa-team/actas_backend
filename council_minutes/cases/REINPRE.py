@@ -3,7 +3,7 @@ import functools
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
-from mongoengine import StringField, IntField, FloatField, BooleanField, DateTimeField
+from mongoengine import StringField, IntField, FloatField, BooleanField, DateTimeField, ListField
 from .case_utils import string_to_date, table_general_data
 from .case_utils import table_credits_summary, table_recommend, add_analysis_paragraph
 from ..models import Request
