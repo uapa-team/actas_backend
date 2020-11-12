@@ -563,6 +563,14 @@ class Request(DynamicDocument):
                                 if element[field] in _dict:
                                     element[field] = _dict[element[field]]
 
+                elif isinstance(cls._fields[key], ListField):
+                    choices = cls._fields[key].field.choices
+                    if choices:
+                        _dict = dict((y, x) for x, y in choices)
+                        for i, element in enumerate(data_json[key]):
+                            if element in _dict:
+                                data_json[key][i] = _dict[element]
+
             except KeyError:
                 pass
         return json.dumps(data_json)
