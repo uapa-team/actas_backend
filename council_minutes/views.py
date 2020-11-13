@@ -174,7 +174,7 @@ def case(request):
             {'inserted_items': inserted_items, 'errors': errors},
             status=(HTTP_200_OK if len(inserted_items) != 0 else HTTP_400_BAD_REQUEST),
             safe=False)
-    if request.method == 'PATCH':
+    if request.method == 'PATCH' :
         body = json.loads(request.body)
         errors = []
         edited_items = []
@@ -182,6 +182,7 @@ def case(request):
         for item_request in body['items']:
             try:
                 Request.get_case_by_id(item_request['id'])
+                print(Request.get_case_by_id(item_request['id']).received_date)
             except (ValueError, KeyError):
                 not_found += [item_request['id']]
                 continue
