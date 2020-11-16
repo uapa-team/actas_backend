@@ -294,12 +294,22 @@ def allow_generate(request):
 
 @api_view(["PATCH"])
 def mark_received(request):
+    value = ( request.user.groups.filter(name='Civil y Agrícola').exists() or 
+            request.user.groups.filter(name='Mecánica y Mecatrónica').exists()   or
+            request.user.groups.filter(name='Química y Ambiental').exists()   or
+            request.user.groups.filter(name='Sistemas e Industrial').exists()
+            )
+    value = value and request.user.groups.filter(name='secretary').exists()
+    print(value)
     try:
         id = request.GET['id']
         req = Request.get_case_by_id(id)
         if req.received_date is None:
-            req.received_date = datetime.datetime.now
-            req.save()
+            if value:
+                return JsonResponse({'response': 'Forbidden'}, status=HTTP_403_FORBIDDEN, safe=False)
+            else:
+                req.received_date = datetime.datetime.now
+                req.save()
         return JsonResponse(req, QuerySetEncoder, status=HTTP_200_OK, safe=False)
     except KeyError:
         return JsonResponse({'response': 'Not found'}, status=HTTP_404_NOT_FOUND, safe=False)
