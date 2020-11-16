@@ -1,12 +1,13 @@
 # pylint: disable=no-name-in-module
+import datetime
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import StringField, BooleanField, FloatField, DateTimeField
-from ..models import Request
+from mongoengine import StringField, BooleanField, FloatField, DateTimeField, IntField, EmbeddedDocumentListField
+from ..models import Request,Subject
 from .case_utils import add_analysis_paragraph
 from .case_utils import string_to_date, table_general_data
 from council_minutes.cases.case_utils import table_credits_summary, table_recommend
-import datetime
+
 
 class DTIT(Request):
 
@@ -25,13 +26,19 @@ class DTIT(Request):
     wasnt_student = BooleanField(
         required=True, display='¿Ha perdido calidad de estudiante?', default=False)
     papa = FloatField(required=True, display='P.A.P.A', default=0.0)
+    subjects = EmbeddedDocumentListField(
+        Subject, display='Asignaturas cursadas')
+    ob_fund_credit = IntField(display = 'Créditos de fundamentación obligatorios del segundo plan',
+        default = 0)
+    op_fund_credit = IntField(display = 'Créditos de fundamentación optativos del segundo plan',
+        default = 0)
+    ob_disc_credit = IntField(display = 'Créditos disciplinares obligatorios del segundo plan',
+        default = 0)
+    op_disc_credit = IntField(display = 'Créditos disciplinares optativos del segundo plan',
+        default = 0)
+    free_elect_credit = IntField(display = 'Créditos de libre elección del segundo plan',
+        default = 0)
 
-    comitee_act = StringField(
-        required=True, display='Número de acta de comité', default='00')
-
-    comitee_date = DateTimeField(
-        required=True, display='Fecha de reunión del comité', default=datetime.date.today
-    )
 
     regulation_list = ['008|2008|CSU', '155|2014|CSU']  # List of regulations
 
@@ -180,12 +187,9 @@ class DTIT(Request):
             )
 
         # Migrate to case_utils?
-        year = str(self.comitee_date)[0:4]
-        month = str(self.comitee_date)[5:7]
-        day = str(self.comitee_date)[8:10]
-        details.append(day + '-' + month + '-' + year)
-        details.append(self.comitee_act)
-        details.append(str(self.comitee_date)[0:4])
+        details.append(self.received_dateday + '-' + self.received_datemonth + '-' + self.received_dateyear)
+        details.append(self.consecutive_minute)
+        details.append(self.year)
         if self.advisor_response == self.ARCR_APROBAR:
             details.append(True)
         else:

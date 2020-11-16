@@ -869,7 +869,7 @@ def table_recommend(docx_, details):
     table.cell(0, 0).paragraphs[0].add_run(
         str(details[1])[0:2] + num_to_month(int(str(details[1])[4:5])) + str(details[1])[6:10]).font.size = Pt(8)
     table.cell(0, 0).paragraphs[0].add_run(
-        '. Acta ' + str(details[2]) + ' de ' + str(details[3]) + '.').font.size = Pt(8)
+        '. Acta ' + str(details[2]) + '  de ' + str(details[3]) + '.').font.size = Pt(8)
     table.cell(0, 1).paragraphs[0].add_run('Recomienda').font.size = Pt(8)
     table.cell(0, 1).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
     table.cell(0, 1).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
