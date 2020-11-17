@@ -1,6 +1,7 @@
 # pylint: disable=no-name-in-module
 import datetime
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.enum.table import WD_ALIGN_VERTICAL
 from docx.shared import Pt
 from mongoengine import StringField, BooleanField, FloatField, DateTimeField, IntField, EmbeddedDocumentListField
 from ..models import Request,Subject
@@ -160,7 +161,7 @@ class DTIT(Request):
         bullet = paragraph.add_run(self.str_pcm[7])
         bullet.font.bold = True
         bullet.font.size = Pt(8)
-        credits_data = [[0,0,0,0,0],
+        credits_data = [[self.ob_fund_credit,self.op_fund_credit,self.ob_disc_credit,self.op_disc_credit, self.free_elect_credit],
                         [0,0,0,0,0],
                         [0,0,0,0,0]]
         case = 'DOBLE TITULACIÓN'
@@ -187,7 +188,7 @@ class DTIT(Request):
             )
 
         # Migrate to case_utils?
-        details.append(self.received_dateday + '-' + self.received_datemonth + '-' + self.received_dateyear)
+        details.append(str( self.received_date.day ) + '-' + str(self.received_date.month) + '-' + str(self.received_date.year))
         details.append(self.consecutive_minute)
         details.append(self.year)
         if self.advisor_response == self.ARCR_APROBAR:
@@ -248,6 +249,8 @@ class DTIT(Request):
         self.dtit_general_data_table(docx)
         self.dtit_academic_info_table(docx)
         self.dtit_recommend_table(docx)
+        self.table_subjects(docx, Subject.subjects_to_array(self.subjects))
+
 
     def pcm_adds(self, docx):
         paragraph = docx.add_paragraph()
@@ -303,3 +306,86 @@ class DTIT(Request):
     def resource_answer(self, docx):
         last_paragraph = docx.paragraphs[-1]
         self.cm_answer(last_paragraph)
+
+    def table_subjects(self, docx, subjects):
+        '''Add a generated table with approvals subjects
+            Params:
+                docx_ (docx_): The document to which the table will be added
+                subjects (list): A list of list with the subjects in table,
+                each list must be a list with following data:
+                [0]: Subject's SIA code
+                [1]: Subject's SIA name
+                [2]: Subject's SIA group
+                [3]: Subject's SIA tipology
+                [4]: Subject's SIA credits
+            Raises:
+                IndexError: All lists must have same size
+        '''
+        table = docx.add_table(rows=len(subjects)+2, cols=9)
+        for column in table.columns:
+            for cell in column.cells:
+                cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+        table.style = 'Table Grid'
+        table.style.font.size = Pt(9)
+        table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.columns[0].width = 550000
+        table.columns[1].width = 550000
+        table.columns[2].width = 800000
+        table.columns[3].width = 550000
+        table.columns[4].width = 550000
+        table.columns[5].width = 550000
+        table.columns[6].width = 550000
+        table.columns[7].width = 550000
+        table.columns[8].width = 550000
+        for cell in table.columns[0].cells:
+            cell.width = 550000
+        for cell in table.columns[1].cells:
+            cell.width = 550000
+        for cell in table.columns[2].cells:
+            cell.width = 800000
+        for cell in table.columns[3].cells:
+            cell.width = 550000
+        for cell in table.columns[4].cells:
+            cell.width = 550000
+        for cell in table.columns[5].cells:
+            cell.width = 550000
+        for cell in table.columns[6].cells:
+            cell.width = 550000
+        for cell in table.columns[7].cells:
+            cell.width = 550000
+        for cell in table.columns[8].cells:
+            cell.width = 550000
+        cellp = table.cell(0, 0).merge(table.cell(0, 1)).paragraphs[0]
+        cellp = table.cell(0, 1).merge(table.cell(0, 2)).paragraphs[0]
+        cellp = table.cell(0, 2).merge(table.cell(0, 3)).paragraphs[0]
+        cellp.add_run('PLAN DE ESTUDIOS (1)').font.size = Pt(8)
+        cellp = table.cell(0, 4).merge(table.cell(0, 5)).paragraphs[0]
+        cellp = table.cell(0, 5).merge(table.cell(0, 6)).paragraphs[0]
+        cellp = table.cell(0, 6).merge(table.cell(0, 7)).paragraphs[0]
+        cellp = table.cell(0, 7).merge(table.cell(0, 8)).paragraphs[0]
+        cellp.add_run('PLAN DE ESTUDIOS (2)').font.size = Pt(8)
+        table.cell(1, 0).paragraphs[0].add_run('Período').font.bold = True
+        table.cell(1, 1).paragraphs[0].add_run('Codigo').font.bold = True
+        table.cell(1, 2).paragraphs[0].add_run('Asignatura').font.bold = True
+        table.cell(1, 3).paragraphs[0].add_run('Codigo').font.bold = True
+        table.cell(1, 4).paragraphs[0].add_run('Asignatura').font.bold = True
+        table.cell(1, 5).paragraphs[0].add_run('Tipología').font.bold = True
+        table.cell(1, 6).paragraphs[0].add_run('Agrupación').font.bold = True
+        table.cell(1, 7).paragraphs[0].add_run('Créditos').font.bold = True
+        table.cell(1, 8).paragraphs[0].add_run('Nota').font.bold = True
+        for i in range(9):
+            table.cell(0, i).paragraphs[0].runs[0].font.size = Pt(8)
+        index = 2
+        # for _ in subjects:
+        #     table.cell(index, 0).paragraphs[0].add_run(
+        #         subjects[index-2][0]).font.size = Pt(8)
+        #     table.cell(index, 1).paragraphs[0].add_run(
+        #         subjects[index-2][1]).font.size = Pt(8)
+        #     table.cell(index, 2).paragraphs[0].add_run(
+        #         subjects[index-2][2]).font.size = Pt(8)
+        #     table.cell(index, 3).paragraphs[0].add_run(
+        #         subjects[index-2][3]).font.size = Pt(8)
+        #     table.cell(index, 4).paragraphs[0].add_run(
+        #         subjects[index-2][4]).font.size = Pt(8)
+        #     index = index + 1
