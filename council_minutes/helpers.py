@@ -30,13 +30,20 @@ class QuerySetEncoder(DjangoJSONEncoder):
                 if isinstance(value, EmbeddedDocumentList):
                     data[key] = value
                 else:
-                    data[key] = [str(e) for e in value]
+                    if fields[key].field.choices is not None:
+                        values = []
+                        for element in value:
+                            for k, v in fields[key].field.choices:
+                                if k == element:
+                                    values.append(v)
+                                    break
+                        data[key] = values
+                    else:
+                        data[key] = [str(e) for e in value]
             else:
                 if key in fields and fields[key].choices is not None:
-                    for k, v in fields[key].choices:
-                        if k == value:
-                            data[key] = v
-                            break
+                    method = getattr(obj, f'get_{key}_display')
+                    data[key] = method()
                 else:
                     data[key] = str(value)
         try:

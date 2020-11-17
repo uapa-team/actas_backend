@@ -3,7 +3,7 @@ import functools
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
-from mongoengine import StringField, IntField, FloatField, BooleanField, DateTimeField
+from mongoengine import StringField, IntField, FloatField, BooleanField, DateTimeField, ListField
 from .case_utils import string_to_date, table_general_data
 from .case_utils import table_credits_summary, table_recommend, add_analysis_paragraph
 from ..models import Request
@@ -50,9 +50,8 @@ class REINPRE(Request):
     periods_since = IntField(
         required=True, display='periodos desde pérdida de calidad de estudiante', default=0)
     papa = FloatField(required=True, display='PAPA', default=0.0)
-    reason_of_loss = StringField(choices=RL_ANSWER_CHOICES,
-                                 default=RL_ANSWER_OTRO,
-                                 display='Razón pérdida calidad de estudiante')
+    reason_of_loss = ListField(StringField(choices=RL_ANSWER_CHOICES,
+        default=RL_ANSWER_OTRO), display='Razón pérdida calidad de estudiante')
     credits_bag = IntField(
         required=True, display='Cupo de créditos disponible para inscripción', default=0)
     credits_english = IntField(
@@ -261,7 +260,7 @@ class REINPRE(Request):
         table.cell(7, 0).merge(table.cell(7, 1)
                                ).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         # pylint: disable=no-member
-        if self.reason_of_loss == self.RL_ANSWER_PAPA_CREDITOS:
+        if self.RL_ANSWER_PAPA_CREDITOS in self.reason_of_loss:
             table.cell(7, 2).paragraphs[0].add_run(
                 self.RL_ANSWER_CHOICES[1][1] + '\n' +
                 self.RL_ANSWER_CHOICES[2][1]).font.size = Pt(8)
@@ -323,7 +322,7 @@ class REINPRE(Request):
         table.cell(12, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
 
         # Optional: Grade needed with N credits to keep student condition.
-        if self.reason_of_loss in (self.RL_ANSWER_PAPA, self.RL_ANSWER_PAPA_CREDITOS):
+        if (self.RL_ANSWER_PAPA in self.reason_of_loss or RL_ANSWER_PAPA_CREDITOS in self.reason_of_loss):
             table = docx.add_table(rows=5, cols=2)
             for col in table.columns:
                 for cell in col.cells:
