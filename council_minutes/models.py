@@ -543,8 +543,12 @@ class Request(DynamicDocument):
 
     @classmethod
     def translate(cls, data):
+        to_del = []
         data_json = json.loads(data)
         for key in data_json:
+            if data_json[key] is None or data_json[key] == 'None':
+                to_del.append(key)
+                continue
             try:
                 # pylint: disable=no-member
                 choices = cls._fields[key].choices
@@ -573,6 +577,8 @@ class Request(DynamicDocument):
 
             except KeyError:
                 pass
+        for key in to_del:
+            del data_json[key]
         return json.dumps(data_json)
 
     @classmethod

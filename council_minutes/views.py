@@ -174,7 +174,7 @@ def case(request):
             {'inserted_items': inserted_items, 'errors': errors},
             status=(HTTP_200_OK if len(inserted_items) != 0 else HTTP_400_BAD_REQUEST),
             safe=False)
-    if request.method == 'PATCH' and request.user.groups.first().name != 'secretary':
+    if request.method == 'PATCH':
         body = json.loads(request.body)
         errors = []
         edited_items = []
