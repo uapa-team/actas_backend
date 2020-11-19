@@ -76,7 +76,14 @@ def get_schema(_cls):
                 }
 
             #Default can be a function, part of choices list or just a value
-            if callable(field.default):
+            
+            if schema[name]['type'] == 'Table':
+                newdefault = []
+                for element in field.default:
+                    aux = QuerySetEncoder.encode_object(element)
+                    newdefault.append(aux)
+                schema[name]['default'] = newdefault
+            elif callable(field.default):
                 schema[name]['default'] = field.default()
             elif field.choices:
                 k = 'get_{}_display'.format(name)
@@ -88,7 +95,7 @@ def get_schema(_cls):
                 schema[name]['choices'] = extract_choices(field.choices)
 
             if isinstance(field, ListField) and field.field.choices:
-                    schema[name]['choices'] = extract_choices(field.field.choices)
+                schema[name]['choices'] = extract_choices(field.field.choices)
 
             if schema[name]['type'] == 'Table':
                 schema[name]['fields'] = get_schema(
