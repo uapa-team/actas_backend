@@ -29,15 +29,19 @@ class HOID(Request):
 
     
     subs = []
-    subs.append(Subject(name="Inglés I- Semestral",   code='1000044', credits=3, group='', tipology='PE'))
-    subs.append(Subject(name="Inglés II- Semestral",  code='1000045', credits=3, group='', tipology='PE'))
-    subs.append(Subject(name="Inglés III- Semestral", code='1000046', credits=3, group='', tipology='PE'))
-    subs.append(Subject(name="Inglés IV- Semestral",  code='1000047', credits=3, group='', tipology='PE'))
+    subs.append(Subject(name="Inglés I- Semestral",   code='1000044', credits=3, 
+                            tipology=Subject.TIP_PRE_NIVELACION))
+    subs.append(Subject(name="Inglés II- Semestral",  code='1000045', credits=3, 
+                            tipology=Subject.TIP_PRE_NIVELACION))
+    subs.append(Subject(name="Inglés III- Semestral", code='1000046', credits=3, 
+                            tipology=Subject.TIP_PRE_NIVELACION))
+    subs.append(Subject(name="Inglés IV- Semestral",  code='1000047', credits=3, 
+                            tipology=Subject.TIP_PRE_NIVELACION))
 
     subjects = EmbeddedDocumentListField(
         Subject,
-        display='Asignaturas Homologadas'
-        ,default=list(subs)
+        display='Asignaturas Homologadas',
+        default=list(subs)
     )
 
     regulation_list = ['102|2013|CSU', '001|2016|VAC']

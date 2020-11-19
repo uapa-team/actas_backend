@@ -74,8 +74,6 @@ def get_schema(_cls):
                 newdefault = []
                 for element in field.default:
                     aux = QuerySetEncoder.encode_object(element)
-                    print("AUX:")
-                    print(str(aux).encode('utf-8'))
                     newdefault.append(aux)
                 schema[name]['default'] = newdefault
             elif callable(field.default):
