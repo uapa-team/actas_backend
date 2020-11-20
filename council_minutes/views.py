@@ -195,6 +195,9 @@ def case(request):
                              'errors': errors, 'not_found': not_found},
                             status=HTTP_400_BAD_REQUEST if edited_items == [] else HTTP_200_OK,
                             encoder=QuerySetEncoder, safe=False)
+    else:
+        return JsonResponse({'error': 'Error en ActasDB, usuario sin permisos en la aplicación.'},
+                            status=HTTP_403_FORBIDDEN)
 
 
 def querydict_to_dict(query_dict):
