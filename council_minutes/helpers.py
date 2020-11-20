@@ -79,7 +79,8 @@ def get_schema(_cls):
             
             if schema[name]['type'] == 'Table':
                 newdefault = []
-                for element in field.default:
+                default_list = field.default() if callable(field.default) else field.default 
+                for element in default_list:
                     aux = QuerySetEncoder.encode_object(element)
                     newdefault.append(aux)
                 schema[name]['default'] = newdefault
