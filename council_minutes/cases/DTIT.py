@@ -687,10 +687,11 @@ class DTIT(Request):
         
         cont_fund_OB = 0
         fund_OB_index = []
+        aux_group = []
         for i in range (len(data)):
             if data[i][2] == 'B':
                 cont_fund_OB = cont_fund_OB + 1
-                fund_OB_index.append(i)
+                fund_OB_index.append(i)    
 
         table = docx.add_table(rows=cont_fund_OB+4, cols=5)
         for column in table.columns:
@@ -738,34 +739,100 @@ class DTIT(Request):
         for i in range(5):
             table.cell(2, i).paragraphs[0].runs[0].font.size = Pt(8)
         
-        print(cont_fund_OB)
-        print(data[0][2])
-        if cont_fund_OB == 1:
-            table.cell(3, 0).paragraphs[0].add_run('Agrupación XX').font.size = Pt(8)
-            table.cell(3, 4).paragraphs[0].add_run('NOTA').font.size = Pt(8)
-        else:
-            for i in range(cont_fund_OB-1):
-                cellp1 = table.cell(i+3, 0).merge(table.cell(i+4, 0)).paragraphs[0]
-                cellp2 = table.cell(i+3, 4).merge(table.cell(i+4, 4)).paragraphs[0]
-            cellp1.add_run('Agrupación XX').font.size = Pt(8)
-            cellp2.add_run('NOTA').font.size = Pt(8)
-
         idx = 0
-        for index in fund_OB_index:
-            table.cell(idx + 3, 1).paragraphs[0].add_run(
-                data[index][1]).font.size = Pt(8)
-            table.cell(idx + 3, 2).paragraphs[0].add_run(
-                data[index][2]).font.size = Pt(8)
-            table.cell(idx + 3, 3).paragraphs[0].add_run(
-                data[index][1]).font.size = Pt(8)
-            idx = idx +1
+        #Credits sum
+        sum_group = 0
+        sum_total = 0
+        cont_subject = 0
+        merge_subjects = []
+        credits_subjects = []
+
+        for i in range(cont_fund_OB):
+            if len(aux_group) == 0:
+                var = data[i][3]
+                aux_group.append(var)
+                table.cell(idx + 3, 1).paragraphs[0].add_run(
+                    data[fund_OB_index[i]][0]).font.size = Pt(8)
+                table.cell(idx + 3, 2).paragraphs[0].add_run(
+                    data[fund_OB_index[i]][1]).font.size = Pt(8)
+                table.cell(idx + 3, 3).paragraphs[0].add_run(
+                    data[fund_OB_index[i]][4]).font.size = Pt(8)
+                sum_group = sum_group + int(data[fund_OB_index[i]][4])
+                cont_subject = cont_subject + 1
+                idx = idx +1
+
+                for j in range (i+1, cont_fund_OB):
+                    if var == data[j][3]:
+                        table.cell(idx + 3, 1).paragraphs[0].add_run(
+                            data[fund_OB_index[j]][0]).font.size = Pt(8)
+                        table.cell(idx + 3, 2).paragraphs[0].add_run(
+                            data[fund_OB_index[j]][1]).font.size = Pt(8)
+                        table.cell(idx + 3, 3).paragraphs[0].add_run(
+                            data[fund_OB_index[j]][4]).font.size = Pt(8)
+                        sum_group = sum_group + int(data[fund_OB_index[j]][4])
+                        cont_subject = cont_subject + 1
+                        idx = idx +1
+                merge_subjects.append(cont_subject)
+                credits_subjects.append(sum_group)
+                sum_total = sum_total + sum_group
+                cont_subject = 0
+                sum_group = 0
+            elif data[i][3] not in aux_group:
+                var = data[i][3]
+                aux_group.append(var)
+                table.cell(idx + 3, 1).paragraphs[0].add_run(
+                    data[fund_OB_index[i]][0]).font.size = Pt(8)
+                table.cell(idx + 3, 2).paragraphs[0].add_run(
+                    data[fund_OB_index[i]][1]).font.size = Pt(8)
+                table.cell(idx + 3, 3).paragraphs[0].add_run(
+                    data[fund_OB_index[i]][4]).font.size = Pt(8)
+                sum_group = sum_group + int(data[fund_OB_index[i]][4])
+                cont_subject = cont_subject + 1
+                idx = idx +1
+
+                for j in range (i+1, cont_fund_OB):
+                    if var == data[j][3]:
+                        table.cell(idx + 3, 1).paragraphs[0].add_run(
+                            data[fund_OB_index[j]][0]).font.size = Pt(8)
+                        table.cell(idx + 3, 2).paragraphs[0].add_run(
+                            data[fund_OB_index[j]][1]).font.size = Pt(8)
+                        table.cell(idx + 3, 3).paragraphs[0].add_run(
+                            data[fund_OB_index[j]][4]).font.size = Pt(8)
+                        sum_group = sum_group + int(data[fund_OB_index[j]][4])
+                        cont_subject = cont_subject + 1
+                        idx = idx +1
+                merge_subjects.append(cont_subject)
+                credits_subjects.append(sum_group)
+                sum_total = sum_total + sum_group
+                cont_subject = 0
+                sum_group = 0
+            else:
+                continue
+        
+        cont = 0
+        aux = 0
+        for i in merge_subjects:
+            if i == 1:
+                print(cont)
+                table.cell(cont + 3, 0).paragraphs[0].add_run(data[fund_OB_index[cont]][3]).font.size = Pt(8)
+                table.cell(cont + 3, 4).paragraphs[0].add_run(str(credits_subjects[aux])).font.size = Pt(8)
+                cont = cont + i 
+                aux = aux + 1
+            else:
+                for a in range(i-1):
+                    cellp3 = table.cell(a + cont + 3, 0).merge(table.cell(a + cont + 4, 0)).paragraphs[0]
+                    cellp4 = table.cell(a + cont + 3, 4).merge(table.cell(a + cont + 4, 4)).paragraphs[0]
+                cellp3.add_run(data[fund_OB_index[cont]][3]).font.size = Pt(8)
+                cellp4.add_run(str(credits_subjects[aux])).font.size = Pt(8)
+                aux = aux + 1
+                cont = cont + i 
 
         cellp = table.cell(cont_fund_OB+3, 0).merge(table.cell(cont_fund_OB+3, 1)).paragraphs[0]
         cellp = table.cell(cont_fund_OB+3, 1).merge(table.cell(cont_fund_OB+3, 2)).paragraphs[0]
         cellp = table.cell(cont_fund_OB+3, 2).merge(table.cell(cont_fund_OB+3, 3)).paragraphs[0]
         cellp.add_run('Total créditos pendientes').font.bold = True
         cellp.runs[0].font.size = Pt(8)
-        table.cell(cont_fund_OB+3, 4).paragraphs[0].add_run('NOTAX2').font.size = Pt(8)
+        table.cell(cont_fund_OB+3, 4).paragraphs[0].add_run(str(sum_total)).font.size = Pt(8)
 
 
         # Second part of table
@@ -897,8 +964,8 @@ class DTIT(Request):
             for i in range(cont_disc_OB-1):
                 cellp1 = table.cell(i+3, 0).merge(table.cell(i+4, 0)).paragraphs[0]
                 cellp2 = table.cell(i+3, 4).merge(table.cell(i+4, 4)).paragraphs[0]
-            cellp1.add_run('Agrupación XX').font.size = Pt(8)
-            cellp2.add_run('NOTA').font.size = Pt(8)
+            # cellp1.add_run('Agrupación XX').font.size = Pt(8)
+            # cellp2.add_run('NOTA').font.size = Pt(8)
 
         idx = 0
         for index in disc_OB_index:
