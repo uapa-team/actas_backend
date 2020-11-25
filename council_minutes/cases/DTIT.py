@@ -182,8 +182,7 @@ class DTIT(Request):
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
-        if self.is_affirmative_response_approval_status():
-            # is_affirmative_response_advisor_response
+        if self.is_affirmative_response_advisor_response():
             self.cm_adds(docx)
             self.pcm_adds(docx)
             self.dtit_general_data_table(docx)
