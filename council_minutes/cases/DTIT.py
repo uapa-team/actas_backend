@@ -1,9 +1,9 @@
 # pylint: disable=no-name-in-module
 import datetime
-from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_COLOR_INDEX
 from docx.enum.table import WD_ALIGN_VERTICAL
 from docx.shared import Pt
-from mongoengine import StringField, BooleanField, FloatField, DateTimeField, IntField, EmbeddedDocumentListField
+from mongoengine import StringField, BooleanField, EmbeddedDocument, FloatField, DateTimeField, IntField, EmbeddedDocumentListField
 from ..models import Request,Subject
 from .case_utils import add_analysis_paragraph
 from .case_utils import string_to_date, table_general_data
@@ -56,6 +56,28 @@ class DTIT_pending_subject(Subject):
                     str(subject.credits),
                 ])
             return data
+
+class DTIT_pending_group(EmbeddedDocument):
+    #Class of pending groups
+
+    group = StringField(required = True, display='Agrupación', default='')
+    tipology = StringField( required=True, choices=Subject.TIP_CHOICES
+        , display='Tipología', default=Subject.TIP_PRE_FUND_OBLIGATORIA)
+    credits = IntField(required = True, display='Créditos', default='0')
+
+    def groups_to_array(self, groups):
+        """
+        A function that converts a List of Groups into a classic array.
+        : param groups: EmbeddedDocumentListField of Groups to be converted
+        """
+        data = []
+        for group in groups:
+            data.append([
+                group.group,
+                group.credits,
+                group.tipology[-1],
+            ])
+        return data
 class DTIT(Request):
 
     full_name = 'Doble Titulación'
@@ -73,21 +95,28 @@ class DTIT(Request):
     wasnt_student = BooleanField(
         required=True, display='¿Ha perdido calidad de estudiante?', default=False)
     papa = FloatField(required=True, display='P.A.P.A', default=0.0)
+    quota_credits = IntField(display = 'Cupo de créditos menos créditos pendientes del primer plan',
+        default = 0)
 
     subjects = EmbeddedDocumentListField(
         DTIT_subject, display='Asignaturas cursadas')
     pending_subjects = EmbeddedDocumentListField(
         DTIT_pending_subject, display='Asignaturas no cursadas')
-    ob_fund_credit = IntField(display = 'Créditos de fundamentación obligatorios del segundo plan',
+    groups = EmbeddedDocumentListField(
+        DTIT_pending_group, display='Agrupaciones optativas faltantes') 
+    ob_fund_credit = IntField(display = 'Créditos necesarios de fundamentación obligatorios del segundo plan',
         default = 0)
-    op_fund_credit = IntField(display = 'Créditos de fundamentación optativos del segundo plan',
+    op_fund_credit = IntField(display = 'Créditos necesarios de fundamentación optativos del segundo plan',
         default = 0)
-    ob_disc_credit = IntField(display = 'Créditos disciplinares obligatorios del segundo plan',
+    ob_disc_credit = IntField(display = 'Créditos necesarios disciplinares obligatorios del segundo plan',
         default = 0)
-    op_disc_credit = IntField(display = 'Créditos disciplinares optativos del segundo plan',
+    op_disc_credit = IntField(display = 'Créditos necesarios disciplinares optativos del segundo plan',
         default = 0)
-    free_elect_credit = IntField(display = 'Créditos de libre elección del segundo plan',
+    free_elect_credit = IntField(display = 'Créditos necesarios de libre elección del segundo plan',
         default = 0)
+    
+    equivalent_credits_subjects = []
+    pending_credits_subjects = []
 
 
     regulation_list = ['008|2008|CSU', '155|2014|CSU']  # List of regulations
@@ -154,8 +183,15 @@ class DTIT(Request):
         paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
         if self.is_affirmative_response_approval_status():
+            # is_affirmative_response_advisor_response
             self.cm_adds(docx)
-
+            self.pcm_adds(docx)
+            self.dtit_general_data_table(docx)
+            self.dtit_academic_info_table(docx)
+            self.table_subjects(docx, DTIT_subject.subjects_to_array(self, self.subjects))
+            self.table_pending_subjects(docx, DTIT_pending_subject.subjects_to_array(self, self.pending_subjects),
+                    DTIT_pending_group.groups_to_array(self, self.groups))
+            self.dtit_recommend_table(docx)
 
     def cm_answer(self, paragraph):
         # pylint: disable=no-member
@@ -195,11 +231,12 @@ class DTIT(Request):
         self.pcm_answer(paragraph)
         if self.is_affirmative_response_advisor_response():
             self.pcm_adds(docx)
-        self.dtit_general_data_table(docx)
-        self.dtit_academic_info_table(docx)
-        self.table_subjects(docx, DTIT_subject.subjects_to_array(self, self.subjects))
-        self.table_pending_subjects(docx, DTIT_pending_subject.subjects_to_array(self, self.pending_subjects))
-        self.dtit_recommend_table(docx)
+            self.dtit_general_data_table(docx)
+            self.dtit_academic_info_table(docx)
+            self.table_subjects(docx, DTIT_subject.subjects_to_array(self, self.subjects))
+            self.table_pending_subjects(docx, DTIT_pending_subject.subjects_to_array(self, self.pending_subjects),
+                    DTIT_pending_group.groups_to_array(self, self.groups))
+            self.dtit_recommend_table(docx)
 
 
     def pcm_adds(self, docx):
@@ -351,7 +388,7 @@ class DTIT(Request):
         cellp = table.cell(3, 1).merge(table.cell(3, 2)).paragraphs[0]
         cellp = table.cell(3, 2).merge(table.cell(3, 3)).paragraphs[0]
         cellp = table.cell(3, 3).merge(table.cell(3, 4)).paragraphs[0]
-        cellp.add_run(str(2)).font.size = Pt(8)
+        cellp.add_run(str( self.quota_credits )).font.size = Pt(8)
 
         if self.was_student:
             table.cell(0, 2).paragraphs[0].add_run('X').font.size = Pt(8)
@@ -398,6 +435,7 @@ class DTIT(Request):
 
         # first table
         cont_fund = 0
+        sum_total = 0
         fund_index = []
         for i in range (len(data)):
             if data[i][3] == 'B' or data[i][3] == 'O':
@@ -483,16 +521,56 @@ class DTIT(Request):
                 data[index][5]).font.size = Pt(8)
             table.cell(idx + 2, 8).paragraphs[0].add_run(
                 data[index][6]).font.size = Pt(8)
+            sum_total = sum_total + int(data[index][5])
             idx = idx + 1
+
+        cont_B = 0
+        cont_O = 0
+        for i in range (len(data)):
+            if data[i][3] == 'B':
+                cont_B = cont_B + int(data[i][5])
+            elif data[i][3] == 'O':
+                cont_O = cont_O + int(data[i][5])
+            else:
+                continue
+
+        self.equivalent_credits_subjects.append(cont_B)
+        self.equivalent_credits_subjects.append(cont_O)
+        
+        table = docx.add_table(rows=1, cols=2)
+        for column in table.columns:
+            for cell in column.cells:
+                cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+        table.style = 'Table Grid'
+        table.style.font.size = Pt(9)
+        table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.columns[0].width = 2500000
+        table.columns[1].width = 750000
+        for cell in table.columns[0].cells:
+            cell.width = 2500000
+        for cell in table.columns[1].cells:
+            cell.width = 750000
+        
+        table.cell(0, 0).paragraphs[0].add_run('Total créditos ' + 
+                'convalidados/equivalentes en el componente').font.size = Pt(8)
+        table.cell(0, 1).paragraphs[0].add_run(str( sum_total )).font.size = Pt(8)
+        
+        paragraph = docx.add_paragraph()
+        paragraph.paragraph_format.space_after = Pt(0)
+        bullet = paragraph.add_run('Ob: obligatoria. Op: optativa. C: créditos')
+        bullet.font.size = Pt(8)
+        bullet.font.italic = True
+        bullet.font.underline = True
 
         paragraph = docx.add_paragraph()
         paragraph.paragraph_format.space_after = Pt(0)
-        paragraph.add_run('Total créditos convalidados/equivalentes en el componente').font.size = Pt(8)
-        paragraph = docx.add_paragraph()
-        paragraph.add_run('Ob: obligatoria. Op: optativa. C: créditos').font.size = Pt(8)
-        
+        paragraph.add_run('\n').font.size = Pt(8)
+
+
         # Table #2
         cont_disc = 0
+        sum_total = 0
         disc_index = []
         for i in range (len(data)):
             if data[i][3] == 'C' or data[i][3] == 'T':
@@ -580,23 +658,62 @@ class DTIT(Request):
                 data[index][5]).font.size = Pt(8)
             table.cell(idx + 2, 8).paragraphs[0].add_run(
                 data[index][6]).font.size = Pt(8)
+            sum_total = sum_total + int(data[index][5])
             idx = idx +1
             
+        cont_C = 0
+        cont_T = 0
+        for i in range (len(data)):
+            if data[i][3] == 'C':
+                cont_C = cont_C + int(data[i][5])
+            elif data[i][3] == 'T':
+                cont_T = cont_T + int(data[i][5])
+            else:
+                continue
+
+        self.equivalent_credits_subjects.append(cont_C)
+        self.equivalent_credits_subjects.append(cont_T)
+
+        table = docx.add_table(rows=1, cols=2)
+        for column in table.columns:
+            for cell in column.cells:
+                cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+        table.style = 'Table Grid'
+        table.style.font.size = Pt(9)
+        table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.columns[0].width = 2500000
+        table.columns[1].width = 750000
+        for cell in table.columns[0].cells:
+            cell.width = 2500000
+        for cell in table.columns[1].cells:
+            cell.width = 750000
+        
+        table.cell(0, 0).paragraphs[0].add_run('Total créditos ' + 
+                'convalidados/equivalentes en el componente').font.size = Pt(8)
+        table.cell(0, 1).paragraphs[0].add_run(str( sum_total )).font.size = Pt(8)
+        
+        paragraph = docx.add_paragraph()
+        paragraph.paragraph_format.space_after = Pt(0)
+        bullet = paragraph.add_run('Ob: obligatoria. Op: optativa. C: créditos')
+        bullet.font.size = Pt(8)
+        bullet.font.italic = True
+        bullet.font.underline = True
 
         paragraph = docx.add_paragraph()
         paragraph.paragraph_format.space_after = Pt(0)
-        paragraph.add_run('Total créditos convalidados/equivalentes en el componente').font.size = Pt(8)
-        paragraph = docx.add_paragraph()
-        paragraph.add_run('Ob: obligatoria. Op: optativa. C: créditos').font.size = Pt(8)
+        paragraph.add_run('\n').font.size = Pt(8)
 
-        # Table #3
+        # Free election table 
         cont_free = 0
+        cont_credits = 0
+        sum_total = 0
         free_index = []
         for i in range (len(data)):
             if data[i][3] == 'L':
                 cont_free = cont_free + 1
                 free_index.append(i)
-    
+                cont_credits = cont_credits + int(data[i][5])
 
         table = docx.add_table(rows=cont_free+2, cols=7)
         for column in table.columns:
@@ -663,21 +780,40 @@ class DTIT(Request):
                 data[index][5]).font.size = Pt(8)
             table.cell(idx + 2, 6).paragraphs[0].add_run(
                 data[index][6]).font.size = Pt(8)
+            sum_total = sum_total + int(data[index][5])
             idx = idx +1
         
-        paragraph = docx.add_paragraph()
-        paragraph.paragraph_format.space_after = Pt(0)
-        paragraph.add_run('Total créditos convalidados/equivalentes en el componente').font.size = Pt(8)
+        self.equivalent_credits_subjects.append(cont_credits)
+
+        table = docx.add_table(rows=1, cols=2)
+        for column in table.columns:
+            for cell in column.cells:
+                cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+        table.style = 'Table Grid'
+        table.style.font.size = Pt(9)
+        table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.columns[0].width = 2500000
+        table.columns[1].width = 750000
+        for cell in table.columns[0].cells:
+            cell.width = 2500000
+        for cell in table.columns[1].cells:
+            cell.width = 750000
+        
+        table.cell(0, 0).paragraphs[0].add_run('Total créditos ' + 
+                'convalidados/equivalentes en el componente').font.size = Pt(8)
+        table.cell(0, 1).paragraphs[0].add_run(str( sum_total )).font.size = Pt(8)
+        
         paragraph = docx.add_paragraph()
         paragraph.add_run('C: créditos').font.size = Pt(8)
-
+      
         paragraph = docx.add_paragraph()
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run('\n').font.size = Pt(8)
 
 
     #Forth table of docx
-    def table_pending_subjects(self, docx, data):
+    def table_pending_subjects(self, docx, data, group_data):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
@@ -739,8 +875,8 @@ class DTIT(Request):
         for i in range(5):
             table.cell(2, i).paragraphs[0].runs[0].font.size = Pt(8)
         
+        #Required to build table
         idx = 0
-        #Credits sum
         sum_group = 0
         sum_total = 0
         cont_subject = 0
@@ -749,7 +885,7 @@ class DTIT(Request):
 
         for i in range(cont_fund_OB):
             if len(aux_group) == 0:
-                var = data[i][3]
+                var = data[fund_OB_index[i]][3]
                 aux_group.append(var)
                 table.cell(idx + 3, 1).paragraphs[0].add_run(
                     data[fund_OB_index[i]][0]).font.size = Pt(8)
@@ -778,7 +914,7 @@ class DTIT(Request):
                 cont_subject = 0
                 sum_group = 0
             elif data[i][3] not in aux_group:
-                var = data[i][3]
+                var = data[fund_OB_index[i]][3]
                 aux_group.append(var)
                 table.cell(idx + 3, 1).paragraphs[0].add_run(
                     data[fund_OB_index[i]][0]).font.size = Pt(8)
@@ -813,7 +949,6 @@ class DTIT(Request):
         aux = 0
         for i in merge_subjects:
             if i == 1:
-                print(cont)
                 table.cell(cont + 3, 0).paragraphs[0].add_run(data[fund_OB_index[cont]][3]).font.size = Pt(8)
                 table.cell(cont + 3, 4).paragraphs[0].add_run(str(credits_subjects[aux])).font.size = Pt(8)
                 cont = cont + i 
@@ -827,19 +962,21 @@ class DTIT(Request):
                 aux = aux + 1
                 cont = cont + i 
 
+        self.pending_credits_subjects.append(sum_total)
         cellp = table.cell(cont_fund_OB+3, 0).merge(table.cell(cont_fund_OB+3, 1)).paragraphs[0]
         cellp = table.cell(cont_fund_OB+3, 1).merge(table.cell(cont_fund_OB+3, 2)).paragraphs[0]
         cellp = table.cell(cont_fund_OB+3, 2).merge(table.cell(cont_fund_OB+3, 3)).paragraphs[0]
         cellp.add_run('Total créditos pendientes').font.bold = True
         cellp.runs[0].font.size = Pt(8)
+        cellp.runs[0].font.highlight_color = WD_COLOR_INDEX.YELLOW
         table.cell(cont_fund_OB+3, 4).paragraphs[0].add_run(str(sum_total)).font.size = Pt(8)
 
 
         # Second part of table
         cont_fund_OP = 0
         fund_OP_index = []
-        for i in range (len(data)):
-            if data[i][2] == 'O':
+        for i in range (len(group_data)):
+            if group_data[i][2] == 'O':
                 cont_fund_OP = cont_fund_OP + 1
                 fund_OP_index.append(i)
 
@@ -872,31 +1009,33 @@ class DTIT(Request):
         
         for i in range(3):
             table.cell(1, i).paragraphs[0].runs[0].font.bold = True
-        
-        # if cont_fund_OP == 1:
-        #     table.cell(2, 0).paragraphs[0].add_run('Agrupación XX').font.size = Pt(8)
-        #     table.cell(3, 4).paragraphs[0].add_run('NOTA').font.size = Pt(8)
-        # else:
-        #     for i in range(cont_fund_OP-1):
-        #         cellp1 = table.cell(i+3, 0).merge(table.cell(i+4, 0)).paragraphs[0]
-        #         cellp2 = table.cell(i+3, 4).merge(table.cell(i+4, 4)).paragraphs[0]
-        #     cellp1.add_run('Agrupación XX').font.size = Pt(8)
-        #     cellp2.add_run('NOTA').font.size = Pt(8)
 
-        idx = 0
-        for index in fund_OP_index:
-            table.cell(idx + 2, 0).paragraphs[0].add_run(
-                data[index][0]).font.size = Pt(8)
-            table.cell(idx + 2, 1).paragraphs[0].add_run(
-                data[index][1]).font.size = Pt(8)
-            table.cell(idx + 2, 2).paragraphs[0].add_run(
-                data[index][2]).font.size = Pt(8)
-            idx = idx +1
+        if cont_fund_OP != 0:
+            idx = 0
+            sum_total = 0
 
+            for index in fund_OP_index:
+                table.cell(idx + 2, 0).paragraphs[0].add_run(
+                    group_data[index][0]).font.size = Pt(8)
+                table.cell(idx + 2, 1).paragraphs[0].add_run(
+                    str(group_data[index][1])).font.size = Pt(8)
+
+                sum_total = sum_total + group_data[index][1]
+                idx = idx +1
+
+            if cont_fund_OP == 1:
+                table.cell(2, 2).paragraphs[0].add_run(str( sum_total )).font.size = Pt(8)
+            else:
+                for index in range(cont_fund_OP - 1):
+                    cellp = table.cell(index + 2, 2).merge(table.cell(index + 3, 2)).paragraphs[0]    
+                cellp.add_run(str( sum_total )).font.size = Pt(8)
+
+        self.pending_credits_subjects.append(sum_total)
         cellp = table.cell(cont_fund_OP+2, 0).merge(table.cell(cont_fund_OP+2, 1)).paragraphs[0]
         cellp.add_run('Total créditos pendientes').font.bold = True
         cellp.runs[0].font.size = Pt(8)
-        table.cell(cont_fund_OP+2, 2).paragraphs[0].add_run('NOTAX2').font.size = Pt(8)
+        cellp.runs[0].font.highlight_color = WD_COLOR_INDEX.YELLOW
+        table.cell(cont_fund_OP+2, 2).paragraphs[0].add_run(str( sum_total )).font.size = Pt(8)
 
 
         paragraph = docx.add_paragraph()
@@ -906,6 +1045,7 @@ class DTIT(Request):
         # Disciplinar table
         cont_disc_OB = 0
         disc_OB_index = []
+        aux_group = []
         for i in range (len(data)):
             if data[i][2] == 'C':
                 cont_disc_OB = cont_disc_OB + 1
@@ -957,39 +1097,108 @@ class DTIT(Request):
         for i in range(5):
             table.cell(2, i).paragraphs[0].runs[0].font.size = Pt(8)
         
-        if cont_disc_OB == 1:
-            table.cell(3, 0).paragraphs[0].add_run('Agrupación XX').font.size = Pt(8)
-            table.cell(3, 4).paragraphs[0].add_run('NOTA').font.size = Pt(8)
-        else:
-            for i in range(cont_disc_OB-1):
-                cellp1 = table.cell(i+3, 0).merge(table.cell(i+4, 0)).paragraphs[0]
-                cellp2 = table.cell(i+3, 4).merge(table.cell(i+4, 4)).paragraphs[0]
-            # cellp1.add_run('Agrupación XX').font.size = Pt(8)
-            # cellp2.add_run('NOTA').font.size = Pt(8)
-
+        #Required to build table
         idx = 0
-        for index in disc_OB_index:
-            table.cell(idx + 3, 1).paragraphs[0].add_run(
-                data[index][1]).font.size = Pt(8)
-            table.cell(idx + 3, 2).paragraphs[0].add_run(
-                data[index][2]).font.size = Pt(8)
-            table.cell(idx + 3, 3).paragraphs[0].add_run(
-                data[index][1]).font.size = Pt(8)
-            idx = idx +1
+        sum_group = 0
+        sum_total = 0
+        cont_subject = 0
+        merge_subjects = []
+        credits_subjects = []
 
+        for i in range(cont_disc_OB):
+            if len(aux_group) == 0:
+                var = data[disc_OB_index[i]][3]
+                aux_group.append(var)
+                table.cell(idx + 3, 1).paragraphs[0].add_run(
+                    data[disc_OB_index[i]][0]).font.size = Pt(8)
+                table.cell(idx + 3, 2).paragraphs[0].add_run(
+                    data[disc_OB_index[i]][1]).font.size = Pt(8)
+                table.cell(idx + 3, 3).paragraphs[0].add_run(
+                    data[disc_OB_index[i]][4]).font.size = Pt(8)
+                sum_group = sum_group + int(data[disc_OB_index[i]][4])
+                cont_subject = cont_subject + 1
+                idx = idx +1
+
+                for j in range (i+1, cont_disc_OB):
+                    if var == data[j][3]:
+                        table.cell(idx + 3, 1).paragraphs[0].add_run(
+                            data[disc_OB_index[j]][0]).font.size = Pt(8)
+                        table.cell(idx + 3, 2).paragraphs[0].add_run(
+                            data[disc_OB_index[j]][1]).font.size = Pt(8)
+                        table.cell(idx + 3, 3).paragraphs[0].add_run(
+                            data[disc_OB_index[j]][4]).font.size = Pt(8)
+                        sum_group = sum_group + int(data[disc_OB_index[j]][4])
+                        cont_subject = cont_subject + 1
+                        idx = idx +1
+                merge_subjects.append(cont_subject)
+                credits_subjects.append(sum_group)
+                sum_total = sum_total + sum_group
+                cont_subject = 0
+                sum_group = 0
+            elif data[i][3] not in aux_group:
+                var = data[disc_OB_index[i]][3]
+                aux_group.append(var)
+                table.cell(idx + 3, 1).paragraphs[0].add_run(
+                    data[disc_OB_index[i]][0]).font.size = Pt(8)
+                table.cell(idx + 3, 2).paragraphs[0].add_run(
+                    data[disc_OB_index[i]][1]).font.size = Pt(8)
+                table.cell(idx + 3, 3).paragraphs[0].add_run(
+                    data[disc_OB_index[i]][4]).font.size = Pt(8)
+                sum_group = sum_group + int(data[disc_OB_index[i]][4])
+                cont_subject = cont_subject + 1
+                idx = idx +1
+
+                for j in range (i+1, cont_disc_OB):
+                    if var == data[j][3]:
+                        table.cell(idx + 3, 1).paragraphs[0].add_run(
+                            data[disc_OB_index[j]][0]).font.size = Pt(8)
+                        table.cell(idx + 3, 2).paragraphs[0].add_run(
+                            data[disc_OB_index[j]][1]).font.size = Pt(8)
+                        table.cell(idx + 3, 3).paragraphs[0].add_run(
+                            data[disc_OB_index[j]][4]).font.size = Pt(8)
+                        sum_group = sum_group + int(data[disc_OB_index[j]][4])
+                        cont_subject = cont_subject + 1
+                        idx = idx +1
+                merge_subjects.append(cont_subject)
+                credits_subjects.append(sum_group)
+                sum_total = sum_total + sum_group
+                cont_subject = 0
+                sum_group = 0
+            else:
+                continue
+        
+        cont = 0
+        aux = 0
+        for i in merge_subjects:
+            if i == 1:
+                table.cell(cont + 3, 0).paragraphs[0].add_run(data[disc_OB_index[cont]][3]).font.size = Pt(8)
+                table.cell(cont + 3, 4).paragraphs[0].add_run(str(credits_subjects[aux])).font.size = Pt(8)
+                cont = cont + i 
+                aux = aux + 1
+            else:
+                for a in range(i-1):
+                    cellp3 = table.cell(a + cont + 3, 0).merge(table.cell(a + cont + 4, 0)).paragraphs[0]
+                    cellp4 = table.cell(a + cont + 3, 4).merge(table.cell(a + cont + 4, 4)).paragraphs[0]
+                cellp3.add_run(data[disc_OB_index[cont]][3]).font.size = Pt(8)
+                cellp4.add_run(str(credits_subjects[aux])).font.size = Pt(8)
+                aux = aux + 1
+                cont = cont + i 
+
+        self.pending_credits_subjects.append(sum_total)
         cellp = table.cell(cont_disc_OB+3, 0).merge(table.cell(cont_disc_OB+3, 1)).paragraphs[0]
         cellp = table.cell(cont_disc_OB+3, 1).merge(table.cell(cont_disc_OB+3, 2)).paragraphs[0]
         cellp = table.cell(cont_disc_OB+3, 2).merge(table.cell(cont_disc_OB+3, 3)).paragraphs[0]
         cellp.add_run('Total créditos pendientes').font.bold = True
         cellp.runs[0].font.size = Pt(8)
-        table.cell(cont_disc_OB+3, 4).paragraphs[0].add_run('NOTAX2').font.size = Pt(8)
+        cellp.runs[0].font.highlight_color = WD_COLOR_INDEX.YELLOW
+        table.cell(cont_disc_OB+3, 4).paragraphs[0].add_run(str(sum_total)).font.size = Pt(8)
 
 
         # Second part of table
         cont_disc_OP = 0
         disc_OP_index = []
-        for i in range (len(data)):
-            if data[i][3] == 'T':
+        for i in range (len(group_data)):
+            if group_data[i][2] == 'T':
                 cont_disc_OP = cont_disc_OP + 1
                 disc_OP_index.append(i)
 
@@ -1023,33 +1232,54 @@ class DTIT(Request):
         for i in range(3):
             table.cell(1, i).paragraphs[0].runs[0].font.bold = True
         
-        # if cont_fund_OP == 1:
-        #     table.cell(2, 0).paragraphs[0].add_run('Agrupación XX').font.size = Pt(8)
-        #     table.cell(3, 4).paragraphs[0].add_run('NOTA').font.size = Pt(8)
-        # else:
-        #     for i in range(cont_fund_OP-1):
-        #         cellp1 = table.cell(i+3, 0).merge(table.cell(i+4, 0)).paragraphs[0]
-        #         cellp2 = table.cell(i+3, 4).merge(table.cell(i+4, 4)).paragraphs[0]
-        #     cellp1.add_run('Agrupación XX').font.size = Pt(8)
-        #     cellp2.add_run('NOTA').font.size = Pt(8)
+        if cont_disc_OP != 0:
+            idx = 0
+            sum_total = 0
 
-        idx = 0
-        for index in disc_OP_index:
-            table.cell(idx + 2, 0).paragraphs[0].add_run(
-                data[index][0]).font.size = Pt(8)
-            table.cell(idx + 2, 1).paragraphs[0].add_run(
-                data[index][1]).font.size = Pt(8)
-            table.cell(idx + 2, 2).paragraphs[0].add_run(
-                data[index][2]).font.size = Pt(8)
-            idx = idx +1
+            for index in disc_OP_index:
+                table.cell(idx + 2, 0).paragraphs[0].add_run(
+                    group_data[index][0]).font.size = Pt(8)
+                table.cell(idx + 2, 1).paragraphs[0].add_run(
+                    str(group_data[index][1])).font.size = Pt(8)
 
+                sum_total = sum_total + group_data[index][1]
+                idx = idx +1
+
+            if cont_fund_OP == 1:
+                table.cell(2, 2).paragraphs[0].add_run(str( sum_total )).font.size = Pt(8)
+            else:
+                for index in range(cont_disc_OP - 1):
+                    cellp = table.cell(index + 2, 2).merge(table.cell(index + 3, 2)).paragraphs[0]    
+                cellp.add_run(str( sum_total )).font.size = Pt(8)
+
+        self.pending_credits_subjects.append(sum_total)
         cellp = table.cell(cont_disc_OP+2, 0).merge(table.cell(cont_disc_OP+2, 1)).paragraphs[0]
         cellp.add_run('Total créditos pendientes').font.bold = True
         cellp.runs[0].font.size = Pt(8)
-        table.cell(cont_disc_OP+2, 2).paragraphs[0].add_run('NOTAX2').font.size = Pt(8)
+        cellp.runs[0].font.highlight_color = WD_COLOR_INDEX.YELLOW
+        table.cell(cont_disc_OP+2, 2).paragraphs[0].add_run(str( sum_total )).font.size = Pt(8)
         paragraph = docx.add_paragraph()
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run('\n').font.size = Pt(8)
+
+        # Free subjects
+        table = docx.add_table(rows= 1, cols= 2)
+        for column in table.columns:
+            for cell in column.cells:
+                cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+        table.style = 'Table Grid'
+        table.style.font.size = Pt(9)
+        table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.columns[0].width = 4100000
+        table.columns[1].width = 1100000
+        for cell in table.columns[0].cells:
+            cell.width = 4100000
+        for cell in table.columns[1].cells:
+            cell.width = 1100000
+
+        table.cell(0, 0).paragraphs[0].add_run("Componente de Libre Elección (L) (Créditos pendientes)").font.size = Pt(8)
+        table.cell(0, 1).paragraphs[0].add_run( str(self.free_elect_credit - self.equivalent_credits_subjects[4]) ).font.size = Pt(8)
         paragraph = docx.add_paragraph()
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run('\n').font.size = Pt(8)
@@ -1063,9 +1293,14 @@ class DTIT(Request):
         bullet = paragraph.add_run(self.str_pcm[7])
         bullet.font.bold = True
         bullet.font.size = Pt(8)
-        credits_data = [[self.ob_fund_credit,self.op_fund_credit,self.ob_disc_credit,self.op_disc_credit, self.free_elect_credit],
-                        [0,0,0,0,0],
-                        [0,0,0,0,0]]
+        credits_data = [[self.ob_fund_credit, self.op_fund_credit, self.ob_disc_credit, 
+                            self.op_disc_credit, self.free_elect_credit],
+                        [self.equivalent_credits_subjects[0], self.equivalent_credits_subjects[1], 
+                            self.equivalent_credits_subjects[2], self.equivalent_credits_subjects[3], 
+                                self.equivalent_credits_subjects[4]],
+                        [self.pending_credits_subjects[0], self.pending_credits_subjects[1], 
+                            self.pending_credits_subjects[2],self.pending_credits_subjects[3], 
+                                self.free_elect_credit - self.equivalent_credits_subjects[4]]]
         case = 'DOBLE TITULACIÓN'
         table_credits_summary(docx, credits_data, case)
 
