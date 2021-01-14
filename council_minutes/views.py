@@ -183,6 +183,10 @@ def case(request):
             try:
                 Request.get_case_by_id(item_request['id'])
                 print(Request.get_case_by_id(item_request['id']).received_date)
+                print(request.user.groups.filter(name='secretary').exists())
+                if(Request.get_case_by_id(item_request['id']).isMarked and request.user.groups.filter(name='secretary').exists()):
+                    return JsonResponse({'error': 'Error en ActasDB, usuario sin permisos en la aplicación.'},
+                            status=HTTP_403_FORBIDDEN)
             except (ValueError, KeyError):
                 not_found += [item_request['id']]
                 continue
@@ -302,16 +306,12 @@ def mark_received(request):
             request.user.groups.filter(name='Química y Ambiental').exists()   or
             request.user.groups.filter(name='Sistemas e Industrial').exists()
             )
-    value = value and request.user.groups.filter(name='secretary').exists()
-    print(value)
     try:
         id = request.GET['id']
         req = Request.get_case_by_id(id)
         if req.received_date is None:
-            if value:
-                return JsonResponse({'response': 'Forbidden'}, status=HTTP_403_FORBIDDEN, safe=False)
-            else:
                 req.received_date = datetime.datetime.now
+                req.isMarked = True
                 req.save()
         return JsonResponse(req, QuerySetEncoder, status=HTTP_200_OK, safe=False)
     except KeyError:
