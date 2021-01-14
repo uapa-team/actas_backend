@@ -428,6 +428,7 @@ class Request(DynamicDocument):
         StringField(), display='Análisis Extra')
     received_date = DateTimeField()  # Date when advisor recieves a case from secretary
     notes = ListField(StringField())
+    isMarked = BooleanField(default=False)
 
     regulations = {
         '008|2008|CSU': ('Acuerdo 008 de 2008 del Consejo Superior Universitario',

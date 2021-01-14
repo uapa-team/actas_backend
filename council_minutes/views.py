@@ -174,7 +174,7 @@ def case(request):
             {'inserted_items': inserted_items, 'errors': errors},
             status=(HTTP_200_OK if len(inserted_items) != 0 else HTTP_400_BAD_REQUEST),
             safe=False)
-    if request.method == 'PATCH':
+    if request.method == 'PATCH' :
         body = json.loads(request.body)
         errors = []
         edited_items = []
@@ -182,6 +182,11 @@ def case(request):
         for item_request in body['items']:
             try:
                 Request.get_case_by_id(item_request['id'])
+                print(Request.get_case_by_id(item_request['id']).received_date)
+                print(request.user.groups.filter(name='secretary').exists())
+                if(Request.get_case_by_id(item_request['id']).isMarked and request.user.groups.filter(name='secretary').exists()):
+                    return JsonResponse({'error': 'Error en ActasDB, usuario sin permisos en la aplicación.'},
+                            status=HTTP_403_FORBIDDEN)
             except (ValueError, KeyError):
                 not_found += [item_request['id']]
                 continue
@@ -296,12 +301,18 @@ def allow_generate(request):
 
 @api_view(["PATCH"])
 def mark_received(request):
+    value = ( request.user.groups.filter(name='Civil y Agrícola').exists() or 
+            request.user.groups.filter(name='Mecánica y Mecatrónica').exists()   or
+            request.user.groups.filter(name='Química y Ambiental').exists()   or
+            request.user.groups.filter(name='Sistemas e Industrial').exists()
+            )
     try:
         id = request.GET['id']
         req = Request.get_case_by_id(id)
         if req.received_date is None:
-            req.received_date = datetime.datetime.now
-            req.save()
+                req.received_date = datetime.datetime.now
+                req.isMarked = True
+                req.save()
         return JsonResponse(req, QuerySetEncoder, status=HTTP_200_OK, safe=False)
     except KeyError:
         return JsonResponse({'response': 'Not found'}, status=HTTP_404_NOT_FOUND, safe=False)
