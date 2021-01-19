@@ -376,7 +376,7 @@ class TRASPRE(Request):
         run.font.bold = True
         run.font.size = Pt(8)
         table = docx.add_table(rows=4, cols=2, style='Table Grid')
-        table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.alignment = WD_ALIGN_PARAGRAPH.LEFT
         table.columns[0].width = 4350000
         table.columns[1].width = 850000
         for cell in table.columns[0].cells:
@@ -403,7 +403,7 @@ class TRASPRE(Request):
         table.cell(3, 1).paragraphs[0].add_run(
             str(self.completion_percentage) + '%').font.size = Pt(8)
         table = docx.add_table(rows=2, cols=2, style='Table Grid')
-        table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.alignment = WD_ALIGN_PARAGRAPH.LEFT
         table.columns[0].width = 4350000
         table.columns[1].width = 850000
         for cell in table.columns[0].cells:
@@ -457,7 +457,7 @@ class TRASPRE(Request):
             run = paragraph.add_run(' ').font.size = Pt(8)
             table = docx.add_table(rows=4, cols=3, style='Table Grid')
             table.style.font.size = Pt(8)
-            table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.alignment = WD_ALIGN_PARAGRAPH.LEFT
             table.columns[0].width = 200000
             table.columns[1].width = 4150000
             table.columns[2].width = 850000
@@ -552,7 +552,7 @@ class TRASPRE(Request):
             table = docx.add_table(
                 rows=(len(self.equivalence) + 3 - reproved), cols=9, style='Table Grid')
             table.style.font.size = Pt(8)
-            table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.alignment = WD_ALIGN_PARAGRAPH.LEFT
             table.columns[0].width = 550000
             table.columns[1].width = 550000
             table.columns[2].width = 900000
@@ -684,7 +684,7 @@ class TRASPRE(Request):
                 table = docx.add_table(
                     rows=(reproved + 3), cols=9, style='Table Grid')
                 table.style.font.size = Pt(8)
-                table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                table.alignment = WD_ALIGN_PARAGRAPH.LEFT
                 table.columns[0].width = 550000
                 table.columns[1].width = 550000
                 table.columns[2].width = 900000
@@ -830,7 +830,7 @@ class TRASPRE(Request):
             table = docx.add_table(
                 rows=(len(self.remaining) - disciplinare + 4), cols=5, style='Table Grid')
             table.style.font.size = Pt(8)
-            table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.alignment = WD_ALIGN_PARAGRAPH.LEFT
             table.columns[0].width = 1000000
             table.columns[1].width = 600000
             table.columns[2].width = 1700000
@@ -932,7 +932,7 @@ class TRASPRE(Request):
             table = docx.add_table(
                 rows=(fundam + 3), cols=3, style='Table Grid')
             table.style.font.size = Pt(8)
-            table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.alignment = WD_ALIGN_PARAGRAPH.LEFT
             table.columns[0].width = 2000000
             table.columns[1].width = 2000000
             table.columns[2].width = 1200000
@@ -996,7 +996,7 @@ class TRASPRE(Request):
             table = docx.add_table(
                 rows=(len(self.remaining) - fundam + 4), cols=5, style='Table Grid')
             table.style.font.size = Pt(8)
-            table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.alignment = WD_ALIGN_PARAGRAPH.LEFT
             table.columns[0].width = 1000000
             table.columns[1].width = 600000
             table.columns[2].width = 1700000
@@ -1098,7 +1098,7 @@ class TRASPRE(Request):
             table = docx.add_table(
                 rows=(disc + 3), cols=3, style='Table Grid')
             table.style.font.size = Pt(8)
-            table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.alignment = WD_ALIGN_PARAGRAPH.LEFT
             table.columns[0].width = 2000000
             table.columns[1].width = 2000000
             table.columns[2].width = 1200000
@@ -1157,7 +1157,7 @@ class TRASPRE(Request):
             paragraph.add_run(' ').font.size = Pt(8)
             table = docx.add_table(rows=1, cols=2, style='Table Grid')
             table.style.font.size = Pt(8)
-            table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.alignment = WD_ALIGN_PARAGRAPH.LEFT
             table.columns[0].width = 4350000
             table.columns[1].width = 850000
             for cell in table.columns[0].cells:
