@@ -296,7 +296,7 @@ class TRASPOS(Request):
         run.font.size = Pt(8)
         table = docx.add_table(rows=4, cols=2, style='Table Grid')
         table.alignment = WD_ALIGN_PARAGRAPH.LEFT
-        indent_table(table, 850)
+        indent_table(table, 963)
         table.columns[0].width = 4350000
         table.columns[1].width = 850000
         for cell in table.columns[0].cells:
