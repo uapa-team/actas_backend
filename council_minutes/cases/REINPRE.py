@@ -209,8 +209,7 @@ class REINPRE(Request):
         table = docx.add_table(rows=13, cols=3)
         table.style = 'Table Grid'
         table.style.font.size = Pt(8)
-        table.alignment = WD_ALIGN_PARAGRAPH.LEFT
-        table.left_margin = Cm(1.7)
+        table.alignment = WD_ALIGN_PARAGRAPH.LEFT + Cm(1.7)
         for cell in table.columns[0].cells:
             cell.width = 400000
         for cell in table.columns[1].cells:
@@ -330,8 +329,7 @@ class REINPRE(Request):
                     cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
             table.style = 'Table Grid'
             table.style.font.size = Pt(8)
-            table.alignment = WD_ALIGN_PARAGRAPH.LEFT
-            table.left_margin = Cm(1.7)
+            table.alignment = WD_ALIGN_PARAGRAPH.LEFT + Cm(1.7)
             for cell in table.columns[0].cells:
                 cell.width = 3100000
             for cell in table.columns[1].cells:
