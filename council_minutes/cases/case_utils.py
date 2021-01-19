@@ -157,7 +157,7 @@ def table_general_data(general_data, case, docx_):
                             cols=3, style='Table Grid')
     table.style.font.size = Pt(8)
     table.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    indent_table(table, 1700)
+    indent_table(table, 850)
     table.columns[0].width = 400000
     table.columns[1].width = 2400000
     table.columns[2].width = 2400000
@@ -220,7 +220,7 @@ def table_subjects(docx_, data):
     table.style = 'Table Grid'
     table.style.font.size = Pt(9)
     table.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    indent_table(table, 1700)
+    indent_table(table, 850)
     table.columns[0].width = 700000
     table.columns[1].width = 2250000
     table.columns[2].width = 600000
@@ -286,7 +286,7 @@ def table_english(docx_, subjects, details):
     table.style = 'Table Grid'
     table.style.font.size = Pt(8)
     table.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    indent_table(table, 1700)
+    indent_table(table, 850)
     table.columns[0].width = 600000
     table.columns[1].width = 1800000
     table.columns[2].width = 300000
@@ -411,7 +411,7 @@ def table_approvals(docx_, subjects, details):
     table = docx_.add_table(
         rows=(3+asign_number), cols=8, style='Table Grid')
     table.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    indent_table(table, 1700)
+    indent_table(table, 850)
     table.columns[0].width = 500000
     table.columns[1].width = 550000
     table.columns[2].width = 1350000
@@ -591,7 +591,7 @@ def table_approvals(docx_, subjects, details):
     table = docx_.add_table(
         rows=(tipology_number+1), cols=8, style='Table Grid')
     table.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    indent_table(table, 1700)
+    indent_table(table, 850)
     table.columns[0].width = 500000
     table.columns[1].width = 550000
     table.columns[2].width = 1350000
@@ -671,7 +671,7 @@ def table_repprovals(docx_, subjects, details):
         rows=(3+asign_number), cols=6, style='Table Grid')
     table.style.font.size = Pt(8)
     table.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    indent_table(table, 1700)
+    indent_table(table, 850)
     table.columns[0].width = 500000
     table.columns[1].width = 850000
     table.columns[2].width = 1400000
@@ -770,7 +770,7 @@ def table_credits_summary(docx_, credits_, case):
     table = docx_.add_table(rows=5, cols=7, style='Table Grid')
     table.style.font.size = Pt(8)
     table.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    indent_table(table, 1700)
+    indent_table(table, 850)
     for cell in table.columns[0].cells:
         cell.width = 1610000
     for cell in table.columns[1].cells:
@@ -857,7 +857,7 @@ def table_recommend(docx_, details):
     table.style = 'Table Grid'
     table.style.font.size = Pt(8)
     table.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    indent_table(table, 1700)
+    indent_table(table, 850)
     for cell in table.columns[0].cells:
         cell.width = 3000000
     for cell in table.columns[1].cells:
@@ -912,7 +912,7 @@ def table_change_typology(docx_, subjects):
     '''
     table = docx_.add_table(rows=len(subjects)+1, cols=5)
     table.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    indent_table(table, 1700)
+    indent_table(table, 850)
     table.style = 'Table Grid'
     table.style.font.size = Pt(9)
     table.columns[0].width = 700000

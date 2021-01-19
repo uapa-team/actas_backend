@@ -210,7 +210,7 @@ class REINPRE(Request):
         table.style = 'Table Grid'
         table.style.font.size = Pt(8)
         table.alignment = WD_ALIGN_PARAGRAPH.LEFT
-        indent_table(table, 1700)
+        indent_table(table, 850)
         for cell in table.columns[0].cells:
             cell.width = 400000
         for cell in table.columns[1].cells:
@@ -331,7 +331,7 @@ class REINPRE(Request):
             table.style = 'Table Grid'
             table.style.font.size = Pt(8)
             table.alignment = WD_ALIGN_PARAGRAPH.LEFT
-            indent_table(table, 1700)
+            indent_table(table, 850)
             for cell in table.columns[0].cells:
                 cell.width = 3100000
             for cell in table.columns[1].cells:
