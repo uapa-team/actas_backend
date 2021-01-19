@@ -1,6 +1,6 @@
 import datetime
 import functools
-from docx.shared import Pt
+from docx.shared import Pt, Cm
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
 from mongoengine import StringField, IntField, FloatField, BooleanField, DateTimeField, ListField

@@ -1,4 +1,4 @@
-from docx.shared import Pt
+from docx.shared import Pt, Cm
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from mongoengine import StringField, BooleanField, IntField
 from mongoengine import EmbeddedDocumentListField, FloatField
