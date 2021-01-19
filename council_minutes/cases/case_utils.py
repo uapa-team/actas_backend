@@ -157,7 +157,7 @@ def table_general_data(general_data, case, docx_):
                             cols=3, style='Table Grid')
     table.style.font.size = Pt(8)
     table.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    table_align
+    indent_table(table, 1700)
     table.columns[0].width = 400000
     table.columns[1].width = 2400000
     table.columns[2].width = 2400000
