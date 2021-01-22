@@ -48,7 +48,7 @@ class REINPRE(Request):
         required=True, display='Periodo de admisión',
         choices=Request.PERIOD_CHOICES, default=Request.PERIOD_DEFAULT)
     periods_since = IntField(
-        required=True, display='periodos desde pérdida de calidad de estudiante', default=0)
+        required=True, display='Periodos desde pérdida de calidad de estudiante', default=0)
     papa = FloatField(required=True, display='PAPA', default=0.0)
     reason_of_loss = ListField(StringField(choices=RL_ANSWER_CHOICES,
         default=RL_ANSWER_OTRO), display='Razón pérdida calidad de estudiante')
