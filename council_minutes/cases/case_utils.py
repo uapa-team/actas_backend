@@ -772,26 +772,26 @@ def table_credits_summary(docx_, credits_, case):
     table.alignment = WD_ALIGN_PARAGRAPH.LEFT
     indent_table(table, 963)
     for cell in table.columns[0].cells:
-        cell.width = 1610000
+        cell.width = 1600000
     for cell in table.columns[1].cells:
-        cell.width = 690000
+        cell.width = 670000
     for cell in table.columns[2].cells:
         cell.width = 610000
     for cell in table.columns[3].cells:
-        cell.width = 690000
+        cell.width = 670000
     for cell in table.columns[4].cells:
         cell.width = 610000
     for cell in table.columns[5].cells:
-        cell.width = 675000
+        cell.width = 670000
     for cell in table.columns[6].cells:
-        cell.width = 375000
-    table.columns[0].width = 1610000
-    table.columns[1].width = 690000
+        cell.width = 370000
+    table.columns[0].width = 1600000
+    table.columns[1].width = 670000
     table.columns[2].width = 610000
-    table.columns[3].width = 690000
+    table.columns[3].width = 670000
     table.columns[4].width = 610000
-    table.columns[5].width = 675000
-    table.columns[6].width = 375000
+    table.columns[5].width = 670000
+    table.columns[6].width = 370000
     for column in table.columns:
         for cell in column.cells:
             cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
@@ -916,20 +916,20 @@ def table_change_typology(docx_, subjects):
     table.style = 'Table Grid'
     table.style.font.size = Pt(9)
     table.columns[0].width = 700000
-    table.columns[1].width = 2000000
+    table.columns[1].width = 1900000
     table.columns[2].width = 600000
-    table.columns[3].width = 1050000
-    table.columns[4].width = 1050000
+    table.columns[3].width = 1000000
+    table.columns[4].width = 1000000
     for cell in table.columns[0].cells:
         cell.width = 700000
     for cell in table.columns[1].cells:
-        cell.width = 2000000
+        cell.width = 1900000
     for cell in table.columns[2].cells:
         cell.width = 600000
     for cell in table.columns[3].cells:
-        cell.width = 1050000
+        cell.width = 1000000
     for cell in table.columns[4].cells:
-        cell.width = 1050000
+        cell.width = 1000000
     table.cell(0, 0).paragraphs[0].add_run('Código').font.bold = True
     table.cell(0, 1).paragraphs[0].add_run('Asignatura').font.bold = True
     table.cell(0, 2).paragraphs[0].add_run('Nota').font.bold = True
