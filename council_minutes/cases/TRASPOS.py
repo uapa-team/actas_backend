@@ -1,9 +1,9 @@
-from docx.shared import Pt
+from docx.shared import Pt, Cm
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from mongoengine import StringField, BooleanField, IntField
 from mongoengine import EmbeddedDocumentListField, FloatField
 from ..models import Request, Subject
-from .case_utils import add_analysis_paragraph, table_general_data, string_to_date, table_approvals
+from .case_utils import add_analysis_paragraph, table_general_data, string_to_date, table_approvals, indent_table
 
 
 class TRASPOS(Request):
@@ -295,7 +295,8 @@ class TRASPOS(Request):
         run.font.bold = True
         run.font.size = Pt(8)
         table = docx.add_table(rows=4, cols=2, style='Table Grid')
-        table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        indent_table(table, 963)
         table.columns[0].width = 4350000
         table.columns[1].width = 850000
         for cell in table.columns[0].cells:
