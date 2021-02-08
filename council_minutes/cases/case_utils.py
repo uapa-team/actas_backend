@@ -1,7 +1,9 @@
 import docx
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
-from docx.shared import Pt
+from docx.shared import Pt, Cm
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
 from ..models import Request
 
 
@@ -154,7 +156,8 @@ def table_general_data(general_data, case, docx_):
     table = docx_.add_table(rows=len(general_data) + 1,
                             cols=3, style='Table Grid')
     table.style.font.size = Pt(8)
-    table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    table.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    indent_table(table, 963)
     table.columns[0].width = 400000
     table.columns[1].width = 2400000
     table.columns[2].width = 2400000
@@ -216,7 +219,8 @@ def table_subjects(docx_, data):
             cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
     table.style = 'Table Grid'
     table.style.font.size = Pt(9)
-    table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    table.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    indent_table(table, 963)
     table.columns[0].width = 700000
     table.columns[1].width = 2250000
     table.columns[2].width = 600000
@@ -281,7 +285,8 @@ def table_english(docx_, subjects, details):
     table = docx_.add_table(rows=len(subjects)+5, cols=7)
     table.style = 'Table Grid'
     table.style.font.size = Pt(8)
-    table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    table.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    indent_table(table, 963)
     table.columns[0].width = 600000
     table.columns[1].width = 1800000
     table.columns[2].width = 300000
@@ -405,7 +410,8 @@ def table_approvals(docx_, subjects, details):
     tipology_number = len(tipology)
     table = docx_.add_table(
         rows=(3+asign_number), cols=8, style='Table Grid')
-    table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    table.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    indent_table(table, 963)
     table.columns[0].width = 500000
     table.columns[1].width = 550000
     table.columns[2].width = 1350000
@@ -584,7 +590,8 @@ def table_approvals(docx_, subjects, details):
     total_homologated = 0
     table = docx_.add_table(
         rows=(tipology_number+1), cols=8, style='Table Grid')
-    table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    table.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    indent_table(table, 963)
     table.columns[0].width = 500000
     table.columns[1].width = 550000
     table.columns[2].width = 1350000
@@ -663,7 +670,8 @@ def table_repprovals(docx_, subjects, details):
     table = docx_.add_table(
         rows=(3+asign_number), cols=6, style='Table Grid')
     table.style.font.size = Pt(8)
-    table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    table.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    indent_table(table, 963)
     table.columns[0].width = 500000
     table.columns[1].width = 850000
     table.columns[2].width = 1400000
@@ -761,28 +769,29 @@ def table_credits_summary(docx_, credits_, case):
     '''
     table = docx_.add_table(rows=5, cols=7, style='Table Grid')
     table.style.font.size = Pt(8)
-    table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    table.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    indent_table(table, 963)
     for cell in table.columns[0].cells:
-        cell.width = 1610000
+        cell.width = 1600000
     for cell in table.columns[1].cells:
-        cell.width = 690000
+        cell.width = 670000
     for cell in table.columns[2].cells:
         cell.width = 610000
     for cell in table.columns[3].cells:
-        cell.width = 690000
+        cell.width = 670000
     for cell in table.columns[4].cells:
         cell.width = 610000
     for cell in table.columns[5].cells:
-        cell.width = 675000
+        cell.width = 670000
     for cell in table.columns[6].cells:
-        cell.width = 375000
-    table.columns[0].width = 1610000
-    table.columns[1].width = 690000
+        cell.width = 370000
+    table.columns[0].width = 1600000
+    table.columns[1].width = 670000
     table.columns[2].width = 610000
-    table.columns[3].width = 690000
+    table.columns[3].width = 670000
     table.columns[4].width = 610000
-    table.columns[5].width = 675000
-    table.columns[6].width = 375000
+    table.columns[5].width = 670000
+    table.columns[6].width = 370000
     for column in table.columns:
         for cell in column.cells:
             cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
@@ -847,7 +856,8 @@ def table_recommend(docx_, details):
     table = docx_.add_table(rows=1, cols=5)
     table.style = 'Table Grid'
     table.style.font.size = Pt(8)
-    table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    table.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    indent_table(table, 963)
     for cell in table.columns[0].cells:
         cell.width = 3000000
     for cell in table.columns[1].cells:
@@ -869,7 +879,7 @@ def table_recommend(docx_, details):
     table.cell(0, 0).paragraphs[0].add_run(
         str(details[1])[0:2] + num_to_month(int(str(details[1])[4:5])) + str(details[1])[6:10]).font.size = Pt(8)
     table.cell(0, 0).paragraphs[0].add_run(
-        '. Acta ' + str(details[2]) + ' de ' + str(details[3]) + '.').font.size = Pt(8)
+        '. Acta ' + str(details[2]) + '  de ' + str(details[3]) + '.').font.size = Pt(8)
     table.cell(0, 1).paragraphs[0].add_run('Recomienda').font.size = Pt(8)
     table.cell(0, 1).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
     table.cell(0, 1).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -901,24 +911,25 @@ def table_change_typology(docx_, subjects):
             IndexError: All lists must have same size
     '''
     table = docx_.add_table(rows=len(subjects)+1, cols=5)
-    table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    table.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    indent_table(table, 963)
     table.style = 'Table Grid'
     table.style.font.size = Pt(9)
     table.columns[0].width = 700000
-    table.columns[1].width = 2000000
+    table.columns[1].width = 1900000
     table.columns[2].width = 600000
-    table.columns[3].width = 1050000
-    table.columns[4].width = 1050000
+    table.columns[3].width = 1000000
+    table.columns[4].width = 1000000
     for cell in table.columns[0].cells:
         cell.width = 700000
     for cell in table.columns[1].cells:
-        cell.width = 2000000
+        cell.width = 1900000
     for cell in table.columns[2].cells:
         cell.width = 600000
     for cell in table.columns[3].cells:
-        cell.width = 1050000
+        cell.width = 1000000
     for cell in table.columns[4].cells:
-        cell.width = 1050000
+        cell.width = 1000000
     table.cell(0, 0).paragraphs[0].add_run('Código').font.bold = True
     table.cell(0, 1).paragraphs[0].add_run('Asignatura').font.bold = True
     table.cell(0, 2).paragraphs[0].add_run('Nota').font.bold = True
@@ -940,3 +951,12 @@ def table_change_typology(docx_, subjects):
         table.cell(
             index+1, 4).paragraphs[0].add_run(subject[4]).font.size = Pt(8)
         index = index + 1
+
+def indent_table(table, indent):
+    # noinspection PyProtectedMember
+    tbl_pr = table._element.xpath('w:tblPr')
+    if tbl_pr:
+        e = OxmlElement('w:tblInd')
+        e.set(qn('w:w'), str(indent))
+        e.set(qn('w:type'), 'dxa')
+        tbl_pr[0].append(e)

@@ -1,10 +1,10 @@
 import datetime
 import functools
-from docx.shared import Pt
+from docx.shared import Pt, Cm
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
 from mongoengine import StringField, IntField, FloatField, BooleanField, DateTimeField, ListField
-from .case_utils import string_to_date, table_general_data
+from .case_utils import string_to_date, table_general_data, indent_table
 from .case_utils import table_credits_summary, table_recommend, add_analysis_paragraph
 from ..models import Request
 
@@ -48,7 +48,7 @@ class REINPRE(Request):
         required=True, display='Periodo de admisión',
         choices=Request.PERIOD_CHOICES, default=Request.PERIOD_DEFAULT)
     periods_since = IntField(
-        required=True, display='periodos desde pérdida de calidad de estudiante', default=0)
+        required=True, display='Periodos desde pérdida de calidad de estudiante', default=0)
     papa = FloatField(required=True, display='PAPA', default=0.0)
     reason_of_loss = ListField(StringField(choices=RL_ANSWER_CHOICES,
         default=RL_ANSWER_OTRO), display='Razón pérdida calidad de estudiante')
@@ -209,7 +209,8 @@ class REINPRE(Request):
         table = docx.add_table(rows=13, cols=3)
         table.style = 'Table Grid'
         table.style.font.size = Pt(8)
-        table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        indent_table(table, 963)
         for cell in table.columns[0].cells:
             cell.width = 400000
         for cell in table.columns[1].cells:
@@ -329,7 +330,8 @@ class REINPRE(Request):
                     cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
             table.style = 'Table Grid'
             table.style.font.size = Pt(8)
-            table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            table.alignment = WD_ALIGN_PARAGRAPH.LEFT
+            indent_table(table, 963)
             for cell in table.columns[0].cells:
                 cell.width = 3100000
             for cell in table.columns[1].cells:
