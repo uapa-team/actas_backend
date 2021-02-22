@@ -2,6 +2,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
 from mongoengine import ListField, StringField
 from ..models import Request
+from .case_utils import add_analysis_paragraph
 
 
 class OTRO(Request):
@@ -40,6 +41,11 @@ class OTRO(Request):
         paragraph.add_run(' ' + self.council_answer)
 
     def pcm(self, docx):
+        final_analysis = []
+        if len(self.extra_analysis) > 0:
+            for i in self.extra_analysis:
+                final_analysis.append(i)
+        add_analysis_paragraph(docx, final_analysis)
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
