@@ -28,7 +28,7 @@ class CTIP(Request):
     ]
 
     str_pcm = [
-        'Se solicita cambiar la tipología de la asignatura {} ({}). Tipología original: {}. Tipol' +
+        'Se solicita cambiar la tipología de la asignatura {} ({}). Tipología original: {}. Tipo' +
         'logía destino: {}. Nota obtenida: {}.'
     ]
 
