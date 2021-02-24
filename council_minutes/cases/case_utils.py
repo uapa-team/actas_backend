@@ -52,7 +52,7 @@ def add_analysis_paragraph(docx_, analysis_list, header=True):
     paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
     paragraph.paragraph_format.space_after = Pt(0)
     if header:
-        paragraph.add_run('Analisis: ').font.bold = True
+        paragraph.add_run('Análisis: ').font.bold = True
     add_analysis_list(docx_, analysis_list)
 
 
