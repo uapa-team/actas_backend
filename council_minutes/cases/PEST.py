@@ -12,15 +12,24 @@ class PEST(Request):
     SUB_P1 = 'P1'
     SUB_P2 = 'P2'
     SUB_P3 = 'P3'
+    SUB_P4 = 'P4'
+    SUB_P5 = 'P5'
+    SUB_P6 = 'P6'
     SUBJECT_CHOICES = (
         (SUB_P1, 'Práctica Estudiantil I'),
         (SUB_P2, 'Práctica Estudiantil II'),
-        (SUB_P3, 'Práctica Estudiantil III')
+        (SUB_P3, 'Práctica Estudiantil III'),
+        (SUB_P4, 'Práctica Colombia I'),
+        (SUB_P5, 'Práctica Colombia II'),
+        (SUB_P6, 'Práctica Colombia III')
     )
     SUBJECT_INFO = {
         SUB_P1: ('2016762', 3),
         SUB_P2: ('2016763', 6),
-        SUB_P3: ('2016764', 9)
+        SUB_P3: ('2016764', 9),
+        SUB_P4: ('1000070', 3),
+        SUB_P5: ('1000071', 6),
+        SUB_P6: ('1000072', 9)
     }
 
     institution = StringField(required=True, display='Institución/Empresa', default='')
