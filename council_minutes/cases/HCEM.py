@@ -90,7 +90,7 @@ class HCEM(Request):
         HomologatedSubject.HT_INTERNACIONAL: 'homologar'}
 
     str_cm = [
-        '{} la(s) siguiente(s) asignatura(s) cursada(s) en', 'el programa {} de la institución {}',
+        '{} la(s) siguiente(s) asignatura(s) cursada(s) en', 'el programa {} de la {}',
         'el intercambio académico internacional en la institución', 'el convenio con la ' +
         'Universidad de los Andes', 'de la siguiente manera', 'por la siguiente razones',
         'calificar', 'la asignatura {} - {}, en el periodo {}']
