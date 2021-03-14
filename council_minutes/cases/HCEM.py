@@ -3,7 +3,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from mongoengine import (StringField, BooleanField, IntField,
                          EmbeddedDocumentListField, EmbeddedDocument)
 from ..models import Request, Subject
-from .case_utils import table_approvals, add_analysis_paragraph, table_repprovals
+from .case_utils import table_approvals_cases, table_repprovals_cases, add_analysis_paragraph 
 
 
 class HCEM(Request):
@@ -165,7 +165,7 @@ class HCEM(Request):
         aux = 'S' if self.greatger_than_50 else 'No s'
         final_analysis += [self.list_analysis[2].format(
             aux, self.regulations['008|2008|CSU'][0])]
-        aux = 'S' if self.prev_hcem else 'No h'
+        aux = 'H' if self.prev_hcem else 'No h'
         final_analysis += [self.list_analysis[3].format(
             aux, self.regulations['008|2008|CSU'][0])]
         for extra_a in self.extra_analysis:
@@ -212,14 +212,14 @@ class HCEM(Request):
                         for sbj in types[list(types.keys())[i]][j]:
                             data.append([sbj.period, sbj.code, sbj.name, sbj.credits,
                                          sbj.tipology[-1], sbj.grade, sbj.old_name, sbj.old_grade])
-                        table_approvals(docx, data, details)
+                        table_approvals_cases(docx, data, details, [list(types.keys())[i]][j])
                     else:
                         paragraph.add_run(' ' + self.str_cm[5] + ':')
                         data = []
                         for sbj in types[list(types.keys())[i]][j]:
                             data.append([sbj.period, sbj.name, sbj.old_name, sbj.reason,
                                          sbj.credits, sbj.grade])
-                        table_repprovals(docx, data, details)
+                        table_repprovals_cases(docx, data, details, [list(types.keys())[i]][j])
         if self.mobility_subject != []:
             for sbj in self.mobility_subject:
                 paragraph = docx.add_paragraph()
@@ -272,9 +272,9 @@ class HCEM(Request):
         for sbj in self.homologated_subjects:
             data.append([sbj.period, sbj.code, sbj.name, sbj.credits,
                          sbj.tipology[-1], sbj.grade, sbj.old_name, sbj.old_grade])
-        table_approvals(docx, data, [self.student_name, self.student_dni,
+        table_approvals_cases(docx, data, [self.student_name, self.student_dni,
                                      self.academic_program, self.str_cm[1].format(
-                                         self.origin_plan, self.institution_origin)])
+                                         self.origin_plan, self.institution_origin)], 'H')
 
     def resource_analysis(self, docx):
         last_paragraph = docx.paragraphs[-1]

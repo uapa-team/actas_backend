@@ -2,7 +2,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
 from mongoengine import EmbeddedDocumentListField, StringField
 from ..models import Request, Subject
-from .case_utils import add_analysis_paragraph, table_subjects
+from .case_utils import add_analysis_paragraph, table_english
 
 
 class HOID(Request):
@@ -27,7 +27,6 @@ class HOID(Request):
     grade_got = StringField(required=True, default='B1',
                             display='Nivel Obtenido')
 
-    
     subs = []
     subs.append(Subject(name="Inglés I- Semestral",   code='1000044', credits=3, 
                             tipology=Subject.TIP_PRE_NIVELACION))
@@ -108,7 +107,15 @@ class HOID(Request):
 
     def add_subjects(self, docx):
         data = Subject.subjects_to_array(self.subjects)
-        table_subjects(docx, data)
+        details = []
+        details.append(self.certification_type)
+        details.append(self.grade_got)
+        print(self.student_name)
+        details.append(self.student_name)
+        details.append(self.student_dni)
+        details.append(self.academic_program)
+        details.append(self.academic_program)
+        table_english(docx, data, details)
 
     def resource_analysis(self, docx):
         last_paragraph = docx.paragraphs[-1]
