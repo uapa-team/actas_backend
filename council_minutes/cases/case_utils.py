@@ -1,6 +1,7 @@
 import docx
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
+from docx.table import _Cell
 from docx.shared import Pt, Cm
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
@@ -629,13 +630,23 @@ def table_approvals(docx_, subjects, details):
         table.cell(
             count, 6).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         total_homologated += int(tipology[tip])
+
+        # Set required white table borders in last two columns:
+        set_cell_border(table.cell(count, 0),
+        bottom={"sz": 0, "color": "#FFFFFF"},
+        start={"sz": 0, "color": "#FFFFFF"})
+        set_cell_border(table.cell(count, 0), 
+        bottom={"sz": 0, "color": "#FFFFFF"},
+        end={"sz": 0, "color": "#FFFFFF"})
         count += 1
+
     table.cell(count, 2).paragraphs[0].add_run(
         'Total créditos que se homologan').font.size = Pt(8)
     table.cell(count, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
     table.cell(count, 3).paragraphs[0].add_run(
         str(total_homologated)).font.size = Pt(8)
     table.cell(count, 3).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+
     table.cell(0, 0).merge(table.cell(count, 1))
     table.cell(0, 4).merge(table.cell(count, 7))
 
@@ -960,3 +971,42 @@ def indent_table(table, indent):
         e.set(qn('w:w'), str(indent))
         e.set(qn('w:type'), 'dxa')
         tbl_pr[0].append(e)
+
+# Extrated from https://programmersought.com/article/74085524416/ to edit cell borders:
+def set_cell_border(cell: _Cell, **kwargs):
+    """
+    Set cell`s border
+    Usage:
+    set_cell_border(
+        cell,
+        top={"sz": 12, "val": "single", "color": "#FF0000", "space": "0"},
+        bottom={"sz": 12, "color": "#00FF00", "val": "single"},
+        start={"sz": 24, "val": "dashed", "shadow": "true"},
+        end={"sz": 12, "val": "dashed"},
+    )
+    """
+    tc = cell._tc
+    tcPr = tc.get_or_add_tcPr()
+ 
+    # check for tag existnace, if none found, then create one
+    tcBorders = tcPr.first_child_found_in("w:tcBorders")
+    if tcBorders is None:
+        tcBorders = OxmlElement('w:tcBorders')
+        tcPr.append(tcBorders)
+ 
+    # list over all available tags
+    for edge in ('start', 'top', 'end', 'bottom', 'insideH', 'insideV'):
+        edge_data = kwargs.get(edge)
+        if edge_data:
+            tag = 'w:{}'.format(edge)
+ 
+            # check for tag existnace, if none found, then create one
+            element = tcBorders.find(qn(tag))
+            if element is None:
+                element = OxmlElement(tag)
+                tcBorders.append(element)
+ 
+            # looks like order of attributes is important
+            for key in ["sz", "val", "color", "space", "shadow"]:
+                if key in edge_data:
+                    element.set(qn('w:{}'.format(key)), str(edge_data[key]))
