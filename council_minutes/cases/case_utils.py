@@ -642,12 +642,12 @@ def table_approvals(docx_, subjects, details):
     table.cell(0, 4).merge(table.cell(count, 7))
     
     # Set required white table borders in last two columns:
-    for cell in table.columns[0]:
+    for cell in table.columns[0].cells:
         set_cell_border(cell,
         bottom={"val": "nil"},
         start={"val": "nil"})
 
-    for cell in table.columns[4]:
+    for cell in table.columns[4].cells:
         set_cell_border(cell,
         bottom={"val": "nil"},
         start={"val": "nil"})    
