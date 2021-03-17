@@ -641,14 +641,16 @@ def table_approvals(docx_, subjects, details):
     table.cell(0, 0).merge(table.cell(count, 1))
     table.cell(0, 4).merge(table.cell(count, 7))
     
-    # Set required white table borders in last two columns:    
-    set_cell_border(table.cell(0, 0),
+    # Set required white table borders in last two columns:
+    for cell in table.columns[0]:
+        set_cell_border(cell,
         bottom={"val": "nil"},
         start={"val": "nil"})
-    set_cell_border(table.cell(0, 4), 
+
+    for cell in table.columns[4]:
+        set_cell_border(cell,
         bottom={"val": "nil"},
-        end={"val": "nil"})
-    
+        start={"val": "nil"})    
 
 def table_repprovals(docx_, subjects, details):
     '''Add a generated table with repprovals subjects
