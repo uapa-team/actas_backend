@@ -646,17 +646,15 @@ def table_approvals(docx_, subjects, details):
     table.cell(count, 3).paragraphs[0].add_run(
         str(total_homologated)).font.size = Pt(8)
     table.cell(count, 3).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-    table.cell(0, 0).merge(table.cell(count, 1))
-    table.cell(0, 4).merge(table.cell(count, 7))
-
     # Set required white table borders in last two columns:    
     set_cell_border(table.cell(count, 0),
         bottom={"val": "nil"},
         start={"val": "nil"})
-    set_cell_border(table.cell(count, 4), 
+    set_cell_border(table.cell(count, 7), 
         bottom={"val": "nil"},
         end={"val": "nil"})
-
+    #table.cell(0, 0).merge(table.cell(count, 1))
+    #table.cell(0, 4).merge(table.cell(count, 7))
 
 def table_repprovals(docx_, subjects, details):
     '''Add a generated table with repprovals subjects
