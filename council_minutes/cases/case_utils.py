@@ -632,12 +632,12 @@ def table_approvals(docx_, subjects, details):
         total_homologated += int(tipology[tip])
 
         # Set required white table borders in last two columns:
-        set_cell_border(table.cell(count, 0),
-        bottom={"sz": 0, "color": "#FFFFFF"},
-        start={"sz": 0, "color": "#FFFFFF"})
         set_cell_border(table.cell(count, 0), 
-        bottom={"sz": 0, "color": "#FFFFFF"},
-        end={"sz": 0, "color": "#FFFFFF"})
+            bottom={"sz": 0, "color": "#FFFFFF"},
+            start={"sz": 0, "color": "#FFFFFF"})
+        set_cell_border(table.cell(count, 7), 
+            bottom={"sz": 0, "color": "#FFFFFF"},
+            end={"sz": 0, "color": "#FFFFFF"})
         count += 1
 
     table.cell(count, 2).paragraphs[0].add_run(
@@ -646,6 +646,14 @@ def table_approvals(docx_, subjects, details):
     table.cell(count, 3).paragraphs[0].add_run(
         str(total_homologated)).font.size = Pt(8)
     table.cell(count, 3).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    # Set required white table borders in last two columns:
+    set_cell_border(table.cell(count, 0),
+        bottom={"sz": 0, "color": "#FFFFFF"},
+        start={"sz": 0, "color": "#FFFFFF"})
+    set_cell_border(table.cell(count, 7), 
+        bottom={"sz": 0, "color": "#FFFFFF"},
+        end={"sz": 0, "color": "#FFFFFF"})
 
     table.cell(0, 0).merge(table.cell(count, 1))
     table.cell(0, 4).merge(table.cell(count, 7))
