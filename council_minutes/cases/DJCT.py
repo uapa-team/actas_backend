@@ -16,6 +16,10 @@ class DJCT(Request):
         required=True, choices=Request.GRADE_OPTION_CHOICES,# display='Opción de grado',
         default=Request.GRADE_OPTION_TESIS_MAESTRIA)
     advisor = StringField(required=True, display='Director', default='')
+    
+    # Added by request (not used when added - remove this when used):
+    coadvisor = StringField(display='Codirector', default='')
+    
     title = StringField(
         requiered=True, display='Título de Tesis', default='')
     date_approval = DateTimeField(required=True, display='Fecha de Aprobación',
