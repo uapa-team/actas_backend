@@ -630,14 +630,6 @@ def table_approvals(docx_, subjects, details):
         table.cell(
             count, 6).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         total_homologated += int(tipology[tip])
-
-        # Set required white table borders in last two columns:
-        set_cell_border(table.cell(count, 0), 
-            bottom={"sz": 0, "color": "#FFFFFF"},
-            start={"sz": 0, "color": "#FFFFFF"})
-        set_cell_border(table.cell(count, 7), 
-            bottom={"sz": 0, "color": "#FFFFFF"},
-            end={"sz": 0, "color": "#FFFFFF"})
         count += 1
 
     table.cell(count, 2).paragraphs[0].add_run(
@@ -648,10 +640,13 @@ def table_approvals(docx_, subjects, details):
     table.cell(count, 3).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
 
     # Set required white table borders in last two columns:
+    table.cell(count, 0).paragraphs[0].add_run("Test cell 0").font.size = Pt(8)
+    table.cell(count, 4).paragraphs[0].add_run("Test cell 4").font.size = Pt(8)
+    table.cell(count, 7).paragraphs[0].add_run("Test cell 7").font.size = Pt(8)
     set_cell_border(table.cell(count, 0),
         bottom={"sz": 0, "color": "#FFFFFF"},
         start={"sz": 0, "color": "#FFFFFF"})
-    set_cell_border(table.cell(count, 7), 
+    set_cell_border(table.cell(count, 4), 
         bottom={"sz": 0, "color": "#FFFFFF"},
         end={"sz": 0, "color": "#FFFFFF"})
 
