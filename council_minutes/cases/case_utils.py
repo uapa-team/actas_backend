@@ -646,11 +646,31 @@ def table_approvals(docx_, subjects, details):
         set_cell_border(cell,
         bottom={"val": "nil"},
         start={"val": "nil"})
+    
+    for cell in table.columns[1].cells:
+        set_cell_border(cell,
+        bottom={"val": "nil"},
+        start={"val": "nil"})
 
     for cell in table.columns[4].cells:
         set_cell_border(cell,
         bottom={"val": "nil"},
-        start={"val": "nil"})    
+        end={"val": "nil"}) 
+    
+    for cell in table.columns[5].cells:
+        set_cell_border(cell,
+        bottom={"val": "nil"},
+        end={"val": "nil"}) 
+    
+    for cell in table.columns[6].cells:
+        set_cell_border(cell,
+        bottom={"val": "nil"},
+        end={"val": "nil"}) 
+
+    for cell in table.columns[7].cells:
+        set_cell_border(cell,
+        bottom={"val": "nil"},
+        end={"val": "nil"})   
 
 def table_repprovals(docx_, subjects, details):
     '''Add a generated table with repprovals subjects
