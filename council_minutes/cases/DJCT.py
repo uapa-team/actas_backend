@@ -18,7 +18,7 @@ class DJCT(Request):
     advisor = StringField(required=True, display='Director', default='')
     
     # Added by request (not used when added - remove this when used):
-    coadvisor = StringField(display='Codirector', default='')
+    coadvisor = ListField(StringField(), display='Codirector(es)')
     
     title = StringField(
         requiered=True, display='Título de Tesis', default='')

@@ -680,11 +680,8 @@ def table_approvals(docx_, subjects, details):
         top={"val": "nil"},
         bottom={"val": "nil"},
         start={"val": "nil"},
-        end={"val": "nil"})   
-    
-    # Previously used to make the table look better:
-    #table.cell(0, 0).merge(table.cell(count, 1))
-    #table.cell(0, 4).merge(table.cell(count, 7))
+        end={"val": "nil"})
+        
 
 def table_repprovals(docx_, subjects, details):
     '''Add a generated table with repprovals subjects
