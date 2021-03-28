@@ -3,7 +3,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from mongoengine import (StringField, BooleanField, IntField,
                          EmbeddedDocumentListField, EmbeddedDocument)
 from ..models import Request, Subject
-from .case_utils import table_approvals_cases, table_repprovals_cases, add_analysis_paragraph 
+from .case_utils import table_approvals, table_repprovals,table_approvals_cases, table_repprovals_cases, add_analysis_paragraph 
 
 
 class HCEM(Request):
@@ -92,7 +92,7 @@ class HCEM(Request):
     str_cm = [
         '{} la(s) siguiente(s) asignatura(s) cursada(s) en', 'el programa {} de la {}',
         'el intercambio académico internacional en la institución', 'el convenio con la ' +
-        'Universidad de los Andes', 'de la siguiente manera', 'por la siguiente razones',
+        'Universidad de los Andes', 'de la siguiente manera', 'por la(s) siguiente(s) razon(es)',
         'calificar', 'la asignatura {} - {}, en el periodo {}']
 
     list_analysis = ['Solicitud de homologación de {} asignaturas del programa {} de' +
@@ -211,15 +211,54 @@ class HCEM(Request):
                         data = []
                         for sbj in types[list(types.keys())[i]][j]:
                             data.append([sbj.period, sbj.code, sbj.name, sbj.credits,
-                                         sbj.tipology[-1], sbj.grade, sbj.old_name, sbj.old_grade])
-                        table_approvals_cases(docx, data, details, [list(types.keys())[i]][j])
+                                         sbj.tipology[-1], sbj.grade, sbj.old_name, sbj.old_grade, sbj.old_credits])
+                        idxSaved = []
+                        # #Calculate grade of subjects many to one 
+                        for a in range (len(data)-1):
+                            print(idxSaved)
+                            if a in idxSaved:
+                                continue
+                            else:
+                                auxArr = []
+                                auxArr.append(a)
+                                for b in range( a + 1 , len(data) ):
+                                    if data[a][2] == data[b][2]:
+                                        auxArr.append(b)
+                                    
+                                auxGrades = [] 
+                                auxCredits = 0
+
+                                # Calculate final grade, multiple subjects to one
+                                for c in range(len(auxArr)):
+                                    gradeSub = float(data[auxArr[c]][7]) * int(data[auxArr[c]][8])
+                                    auxGrades.append(round(gradeSub,1))
+                                    auxCredits = auxCredits + int(data[auxArr[c]][8])
+
+                                if(len(auxArr) == 1):
+                                    finalNote = round(auxGrades[0] / auxCredits, 1)
+                                else:
+                                    finalNote = round(sum(auxGrades) / auxCredits, 1)
+
+                                # Update all grades of that subject
+                                for a in range(len(auxArr)):
+                                    data[auxArr[a]][5] = finalNote
+
+                                idxSaved.extend(auxArr)
+
+                        if  len(data)-1 not in idxSaved:
+                            data[len(data)-1][5] = data[len(data)-1][7]
+                        
+                        # for i in data:
+                        #     print(i)
+                        # print(types[list(types.keys())[i]][j][0].h_type)
+                        table_approvals_cases(docx, data, details, types[list(types.keys())[i]][j][0].h_type)
                     else:
                         paragraph.add_run(' ' + self.str_cm[5] + ':')
                         data = []
                         for sbj in types[list(types.keys())[i]][j]:
                             data.append([sbj.period, sbj.name, sbj.old_name, sbj.reason,
                                          sbj.credits, sbj.grade])
-                        table_repprovals_cases(docx, data, details, [list(types.keys())[i]][j])
+                        table_repprovals_cases(docx, data, details,types[list(types.keys())[i]][j][0].h_type)
         if self.mobility_subject != []:
             for sbj in self.mobility_subject:
                 paragraph = docx.add_paragraph()
@@ -271,7 +310,48 @@ class HCEM(Request):
         data = []
         for sbj in self.homologated_subjects:
             data.append([sbj.period, sbj.code, sbj.name, sbj.credits,
-                         sbj.tipology[-1], sbj.grade, sbj.old_name, sbj.old_grade])
+                         sbj.tipology[-1], sbj.grade, sbj.old_name, sbj.old_grade, sbj.old_credits])
+        
+        idxSaved = []
+        
+        #Calculate grade of subjects many to one 
+        for i in range (len(data)-1):
+            print(idxSaved)
+            if i in idxSaved:
+                continue
+            else:
+                auxArr = []
+                auxArr.append(i)
+                for j in range( i + 1 , len(data) ):
+                    if data[i][2] == data[j][2]:
+                        auxArr.append(j)
+                    
+                auxGrades = [] 
+                auxCredits = 0
+
+                # Calculate final grade, multiple subjects to one
+                for c in range(len(auxArr)):
+                    gradeSub = float(data[auxArr[c]][7]) * int(data[auxArr[c]][8])
+                    auxGrades.append(round(gradeSub,1))
+                    auxCredits = auxCredits + int(data[auxArr[c]][8])
+
+                if(len(auxArr) == 1):
+                    finalNote = round(auxGrades[0] / auxCredits, 1)
+                else:
+                    finalNote = round(sum(auxGrades) / auxCredits, 1)
+
+                # Update all grades of that subject
+                for a in range(len(auxArr)):
+                    data[auxArr[a]][5] = finalNote
+
+                idxSaved.extend(auxArr)
+
+        if  len(data)-1 not in idxSaved:
+            data[len(data)-1][5] = data[len(data)-1][7]
+        
+        for i in data:
+            print(i)
+
         table_approvals_cases(docx, data, [self.student_name, self.student_dni,
                                      self.academic_program, self.str_cm[1].format(
                                          self.origin_plan, self.institution_origin)], 'H')

@@ -2,7 +2,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
 from mongoengine import EmbeddedDocumentListField, StringField
 from ..models import Request, Subject
-from .case_utils import add_analysis_paragraph, table_english
+from .case_utils import add_analysis_paragraph, table_english, get_academic_program
 
 
 class HOID(Request):
@@ -113,7 +113,7 @@ class HOID(Request):
         print(self.student_name)
         details.append(self.student_name)
         details.append(self.student_dni)
-        details.append(self.academic_program)
+        details.append(get_academic_program(self.academic_program))
         details.append(self.academic_program)
         table_english(docx, data, details)
 

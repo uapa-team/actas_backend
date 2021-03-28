@@ -380,7 +380,7 @@ def table_english(docx_, subjects, details):
     cellp.add_run(str(credits_sum)).font.size = Pt(8)
 
 
-def table_approvals(docx_, subjects, details, case):
+def table_approvals(docx_, subjects, details):
     '''Add a generated table with approvals subjects
 
     Params:
@@ -988,6 +988,7 @@ def table_approvals_cases(docx_, subjects, details, case):
         [5]: Subject's SIA grade
         [6]: Subject's old name
         [7]: Subject's old grade
+        [8]: Subject's old credits
         details (list): A list with the datails of homologation,
         must be contains the following data:
         [0]: Student's name
@@ -1050,9 +1051,9 @@ def table_approvals_cases(docx_, subjects, details, case):
     cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
     
-    if case == 'C':
+    if str(case) == 'C':
         cadenaAux = 'Asignaturas a convalidar' 
-    elif case == 'E':
+    elif str(case) == 'E':
         cadenaAux = 'Asignaturas a equivaler' 
     else:
         cadenaAux = 'Asignaturas a homologar'
@@ -1110,6 +1111,10 @@ def table_approvals_cases(docx_, subjects, details, case):
             else:
                 summary_subjects_left.update({sbj[1]: [sbj]})
         index = 3
+    print(summary_subjects_right)
+    print(summary_subjects_left)
+    print(len(summary_subjects_right))
+    print(len(summary_subjects_left))
     if len(summary_subjects_right) > len(summary_subjects_left):
         for item in summary_subjects_left:
             for k in range(6):
@@ -1176,6 +1181,7 @@ def table_approvals_cases(docx_, subjects, details, case):
     else:
         count = 3
         for subject in subjects:
+            print(subject)
             table.cell(count, 0).paragraphs[0].add_run(
                 subject[0]).font.size = Pt(8)
             table.cell(count, 0).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
@@ -1191,8 +1197,8 @@ def table_approvals_cases(docx_, subjects, details, case):
             table.cell(count, 4).paragraphs[0].add_run(
                 subject[4]).font.size = Pt(8)
             table.cell(count, 4).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-            table.cell(count, 5).paragraphs[0].add_run(
-                subject[5]).font.size = Pt(8)
+            table.cell(count, 5).paragraphs[0].add_run(str(subject[5])
+                ).font.size = Pt(8)
             table.cell(count, 5).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
             table.cell(count, 6).paragraphs[0].add_run(
                 subject[6]).font.size = Pt(8)
