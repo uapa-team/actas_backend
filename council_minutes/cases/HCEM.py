@@ -215,7 +215,6 @@ class HCEM(Request):
                         idxSaved = []
                         # #Calculate grade of subjects many to one 
                         for a in range (len(data)-1):
-                            print(idxSaved)
                             if a in idxSaved:
                                 continue
                             else:
@@ -248,9 +247,6 @@ class HCEM(Request):
                         if  len(data)-1 not in idxSaved:
                             data[len(data)-1][5] = data[len(data)-1][7]
                         
-                        # for i in data:
-                        #     print(i)
-                        # print(types[list(types.keys())[i]][j][0].h_type)
                         table_approvals_cases(docx, data, details, types[list(types.keys())[i]][j][0].h_type)
                     else:
                         paragraph.add_run(' ' + self.str_cm[5] + ':')
@@ -316,7 +312,6 @@ class HCEM(Request):
         
         #Calculate grade of subjects many to one 
         for i in range (len(data)-1):
-            print(idxSaved)
             if i in idxSaved:
                 continue
             else:
@@ -349,9 +344,6 @@ class HCEM(Request):
         if  len(data)-1 not in idxSaved:
             data[len(data)-1][5] = data[len(data)-1][7]
         
-        for i in data:
-            print(i)
-
         table_approvals_cases(docx, data, [self.student_name, self.student_dni,
                                      self.academic_program, self.str_cm[1].format(
                                          self.origin_plan, self.institution_origin)], 'H')
