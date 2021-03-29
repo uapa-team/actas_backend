@@ -42,8 +42,8 @@ class TGRA(Request):
         'Formato de registro diligenciado (Artículo 8): Revisado.',
         'Dirección de un profesor de la Universidad, aceptado y formalizado (Artículo 6) en Acta ' +
         '{} de Comité del {}{}{} en modalidad: {}.',
-        '{}a cursado por lo menos {} céditos del componente disciplinar. SIA: {} créditos',
-        'Tífulo del trabajo de grado: {}.',
+        '{}a cursado por lo menos {} créditos del componente disciplinar. SIA: {} créditos',
+        'Título del trabajo de grado: {}.',
         'Institución: {}',
         'Docente encargado: {}'
         'Debido a que formalizó la inscripción de la asignatura Trabajo de Grado en los plazos es' +

@@ -22,7 +22,7 @@ class DJCT(Request):
                               default=datetime.date.today)
     proposal_jury = BooleanField(
         required=True, display='¿Jurados Propuestos?', default=False)
-    proffesors = EmbeddedDocumentListField(Professor, display='Docentes')
+    professors = EmbeddedDocumentListField(Professor, display='Docentes')
 
     regulation_list = ['040|2017|CFA', '056|2012|CSU']
 
@@ -97,19 +97,19 @@ class DJCT(Request):
             name, self.get_grade_option_display()))
         paragraph.add_run('"{}" '.format(self.title)).font.italic = True
         paragraph.add_run(self.str_pcm[1])
-        self.add_proffesors(paragraph)
+        self.add_professors(paragraph)
 
-    def add_proffesors(self, paragraph):
-        for i in range(len(self.proffesors)):
-            if self.proffesors[i].department not in (self.DP_EMPTY, self.DP_EXTERNO_FACULTAD):
-                mod = self.proffesors[i].get_department_display()
+    def add_professors(self, paragraph):
+        for i in range(len(self.professors)):
+            if self.professors[i].department not in (self.DP_EMPTY, self.DP_EXTERNO_FACULTAD):
+                mod = self.professors[i].get_department_display()
             else:
-                mod = self.proffesors[i].institution
-                if self.proffesors[i].country != '':
-                    mod += ' ({})'.format(self.proffesors[i].country)
-            end = ', ' if i + 1 < len(self.proffesors) else '.'
+                mod = self.professors[i].institution
+                if self.professors[i].country != '':
+                    mod += ' ({})'.format(self.professors[i].country)
+            end = ', ' if i + 1 < len(self.professors) else '.'
             paragraph.add_run(
-                '{} - {}{}'.format(self.proffesors[i].name, mod, end))
+                '{} - {}{}'.format(self.professors[i].name, mod, end))
 
     def pcm_answer_handler(self, docx):
         paragraph = docx.add_paragraph()

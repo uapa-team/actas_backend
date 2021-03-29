@@ -17,7 +17,7 @@ class ADIC(Request):
         required=True, max_length=2, default='00', display='# Acta de aprobación propuesta')
     council_year_propuest = StringField(
         required=True, min_length=4, max_length=4, display='Año del Acta de aprobación propuesta', default='0000')
-    proffesors = EmbeddedDocumentListField(Professor, display='Docentes')
+    professors = EmbeddedDocumentListField(Professor, display='Docentes')
 
     regulation_list = []
 
@@ -82,19 +82,19 @@ class ADIC(Request):
         paragraph.add_run('"{}" '.format(self.title)).font.italic = True
         paragraph.add_run(self.str_cm[1].format(
             self.council_number_propuest, self.council_year_propuest))
-        self.add_proffesors(paragraph)
+        self.add_professors(paragraph)
 
-    def add_proffesors(self, paragraph):
-        for i in range(len(self.proffesors)):
-            if self.proffesors[i].department not in (self.DP_EMPTY, self.DP_EXTERNO_FACULTAD):
-                mod = self.proffesors[i].get_department_display()
+    def add_professors(self, paragraph):
+        for i in range(len(self.professors)):
+            if self.professors[i].department not in (self.DP_EMPTY, self.DP_EXTERNO_FACULTAD):
+                mod = self.professors[i].get_department_display()
             else:
-                mod = self.proffesors[i].institution
-                if self.proffesors[i].country != '':
-                    mod += ' ({})'.format(self.proffesors[i].country)
-            end = ', ' if i + 1 < len(self.proffesors) else '.'
+                mod = self.professors[i].institution
+                if self.professors[i].country != '':
+                    mod += ' ({})'.format(self.professors[i].country)
+            end = ', ' if i + 1 < len(self.professors) else '.'
             paragraph.add_run(
-                '{} - {}{}'.format(self.proffesors[i].name, mod, end))
+                '{} - {}{}'.format(self.professors[i].name, mod, end))
 
     def resource_analysis(self, docx):
         last_paragraph = docx.paragraphs[-1]
