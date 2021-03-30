@@ -253,7 +253,7 @@ class HCEM(Request):
                         data = []
                         for sbj in types[list(types.keys())[i]][j]:
                             data.append([sbj.period, sbj.name, sbj.old_name, sbj.reason,
-                                         sbj.credits, sbj.grade])
+                                         sbj.credits, sbj.old_grade])
                         table_repprovals_cases(docx, data, details,types[list(types.keys())[i]][j][0].h_type)
         if self.mobility_subject != []:
             for sbj in self.mobility_subject:
