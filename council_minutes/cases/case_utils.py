@@ -370,14 +370,11 @@ def table_english(docx_, subjects, details):
         table.cell(index+3, 4).paragraphs[0].add_run(subject[2]).font.size = Pt(8)
         table.cell(index+3, 3).paragraphs[0].add_run(subject[3]).font.size = Pt(8)
         index = index + 1
-    cellp = table.cell(index+3, 0).merge(table.cell(index+3, 3)).paragraphs[0]
-    cellp.add_run('Créditos homologados E').font.size = Pt(8)
-    cellp = table.cell(index+3, 4).merge(table.cell(index+3, 6)).paragraphs[0]
-    cellp.add_run(str(credits_sum)).font.size = Pt(8)
-    cellp = table.cell(index+4, 0).merge(table.cell(index+4, 3)).paragraphs[0]
-    cellp.add_run('Total créditos que se homologan').font.size = Pt(8)
-    cellp = table.cell(index+4, 4).merge(table.cell(index+4, 6)).paragraphs[0]
-    cellp.add_run(str(credits_sum)).font.size = Pt(8)
+    
+    table.cell(index+3, 1).paragraphs[0].add_run('Créditos homologados E').font.size = Pt(8)
+    table.cell(index+3, 2).paragraphs[0].add_run(str(credits_sum)).font.size = Pt(8)
+    table.cell(index+4, 1).paragraphs[0].add_run('Total créditos que se homologan').font.size = Pt(8)
+    table.cell(index+4, 2).paragraphs[0].add_run(str(credits_sum)).font.size = Pt(8)
 
 
 def table_approvals(docx_, subjects, details):
