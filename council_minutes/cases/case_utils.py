@@ -1268,7 +1268,7 @@ def table_repprovals_cases(docx_, subjects, details, case):
         [1]: Subject's SIA name
         [2]: Subject's old name
         [3]: Subject's justification
-        [4]: Subject's credits
+        [4]: Subject's old credits
         [5]: Subject's grade
         details (list): A list with the datails of homologation,
         must be contains the following data:

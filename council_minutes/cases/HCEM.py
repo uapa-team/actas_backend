@@ -3,7 +3,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from mongoengine import (StringField, BooleanField, IntField,
                          EmbeddedDocumentListField, EmbeddedDocument)
 from ..models import Request, Subject
-from .case_utils import table_approvals, table_repprovals,table_approvals_cases, table_repprovals_cases, add_analysis_paragraph 
+from .case_utils import table_approvals_cases, table_repprovals_cases, add_analysis_paragraph 
 
 
 class HCEM(Request):
@@ -38,7 +38,7 @@ class HCEM(Request):
         h_type = StringField(required=True, default=HT_HOMOLOGACION,
                              choices=HT_CHOICES, display='Tipo de homologación')
 
-    class MobilitySubject(EmbeddedDocument):
+    class MobilitySubject(Subject):
         GD_AP = 'AP'
         GD_NA = 'NA'
         HT_CHOICES = (
@@ -253,7 +253,7 @@ class HCEM(Request):
                         data = []
                         for sbj in types[list(types.keys())[i]][j]:
                             data.append([sbj.period, sbj.name, sbj.old_name, sbj.reason,
-                                         sbj.credits, sbj.old_grade])
+                                         sbj.old_credits, sbj.old_grade])
                         table_repprovals_cases(docx, data, details,types[list(types.keys())[i]][j][0].h_type)
         if self.mobility_subject != []:
             for sbj in self.mobility_subject:
@@ -327,6 +327,7 @@ class HCEM(Request):
                 # Calculate final grade, multiple subjects to one
                 for c in range(len(auxArr)):
                     gradeSub = float(data[auxArr[c]][7]) * int(data[auxArr[c]][8])
+                    print(float(data[auxArr[c]][7]) * int(data[auxArr[c]][8]))
                     auxGrades.append(round(gradeSub,1))
                     auxCredits = auxCredits + int(data[auxArr[c]][8])
 
