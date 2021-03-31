@@ -229,14 +229,14 @@ class HCEM(Request):
 
                                 # Calculate final grade, multiple subjects to one
                                 for c in range(len(auxArr)):
-                                    gradeSub = float(data[auxArr[c]][7]) * int(data[auxArr[c]][8])
+                                    gradeSub = round(float(data[auxArr[c]][7]) * int(data[auxArr[c]][8]), 1)
                                     auxGrades.append(round(gradeSub,1))
                                     auxCredits = auxCredits + int(data[auxArr[c]][8])
 
                                 if(len(auxArr) == 1):
                                     finalNote = round(auxGrades[0] / auxCredits, 1)
                                 else:
-                                    finalNote = round(sum(auxGrades) / auxCredits, 1)
+                                    finalNote = str(round((sum(auxGrades) / auxCredits) + 0.001, 1) )
 
                                 # Update all grades of that subject
                                 for a in range(len(auxArr)):
@@ -323,11 +323,9 @@ class HCEM(Request):
                     
                 auxGrades = [] 
                 auxCredits = 0
-
                 # Calculate final grade, multiple subjects to one
                 for c in range(len(auxArr)):
-                    gradeSub = float(data[auxArr[c]][7]) * int(data[auxArr[c]][8])
-                    print(float(data[auxArr[c]][7]) * int(data[auxArr[c]][8]))
+                    gradeSub = round(float(data[auxArr[c]][7]) * int(data[auxArr[c]][8]), 1)
                     auxGrades.append(round(gradeSub,1))
                     auxCredits = auxCredits + int(data[auxArr[c]][8])
 
