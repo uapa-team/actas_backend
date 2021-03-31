@@ -1,6 +1,6 @@
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import IntField
+from mongoengine import IntField,StringField
 from ..models import Request
 from .case_utils import add_analysis_paragraph
 
@@ -9,6 +9,19 @@ class RCUP(Request):
 
     full_name = 'Reserva de cupo adicional'
 
+    CJT_ANSWER_DEFAULT = 'DF'
+    CJT_ANSWER_JUST_DEB = 'JD'
+    CJT_ANSWER_OTRO = 'OT'
+
+    CJT_ANSWER_CHOICES = (
+        (CJT_ANSWER_DEFAULT,''),
+        (CJT_ANSWER_JUST_DEB,'Justifica debidamente su solicitud'),
+        (CJT_ANSWER_OTRO, 'Otro')
+    )
+
+    council_decision = StringField(
+        max_length=255, choices=CJT_ANSWER_CHOICES,
+        default=CJT_ANSWER_DEFAULT, display='Justificación del Consejo')
     index = IntField(min_value=0, default=1,
                      display='Reservas adicionales aprobadas')
 

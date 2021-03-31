@@ -38,16 +38,15 @@ class HCEM(Request):
         h_type = StringField(required=True, default=HT_HOMOLOGACION,
                              choices=HT_CHOICES, display='Tipo de homologación')
 
-    class MobilitySubject(EmbeddedDocument):
+    class MobilitySubject(Subject):
         GD_AP = 'AP'
         GD_NA = 'NA'
         HT_CHOICES = (
-            (GD_AP, 'aprobada'),
-            (GD_NA, 'reprobada'),
+            (GD_AP, 'Aprobada'),
+            (GD_NA, 'Reprobada'),
         )
         period = StringField(display='Periodo', 
                 choices=Request.PERIOD_CHOICES, default=Request.PERIOD_DEFAULT)
-        code = StringField(display='Código de la asignatura', default='')
         grade = StringField(display='Calificación',
                             default=GD_AP, choices=HT_CHOICES)
 
@@ -225,21 +224,20 @@ class HCEM(Request):
                 paragraph = docx.add_paragraph()
                 paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
                 paragraph.paragraph_format.space_after = Pt(0)
-                paragraph.style = 'List Bullet'
+                paragraph.style = 'List Number 2'
                 if not pre:
                     paragraph.add_run(self.str_comittee_header + ' ')
                 else:
                     paragraph.add_run(self.str_council_header + ' ')
-                paragraph.add_run(
-                    self.srt_status[pre][1] + ' ').font.bold = True
-                paragraph.add_run(self.str_cm[6] + ' ')
+#                paragraph.add_run(
+#                    self.srt_status[pre][1] + ' ').font.bold = True
+                paragraph.add_run(self.str_cm[6] + ' ')#Calificar
                 paragraph.add_run('{} ({})'.format(
                     sbj.get_grade_display(), sbj.grade) + ' ')
-                try:
-                    paragraph.add_run(self.str_cm[7].format(
-                        sbj.code, self.homologable_subjects[sbj.code], sbj.period) + '.')
-                except KeyError as e:
-                    print(e)
+                
+                paragraph.add_run(self.str_cm[7].format(#Asignatura cod_ - name_ en el periodo _
+                        sbj.code, sbj.name, sbj.period) + '.')
+                
 
     def pcm(self, docx):
         self.add_analysis(docx)

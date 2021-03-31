@@ -33,6 +33,19 @@ class EPCS(Request):
         (HC_TUMACO, 'Sede Tumaco')
     )
 
+    CJT_ANSWER_DEFAULT = 'DF'
+    CJT_ANSWER_JUST_DEB = 'JD'
+    CJT_ANSWER_OTRO = 'OT'
+
+    CJT_ANSWER_CHOICES = (
+        (CJT_ANSWER_DEFAULT,''),
+        (CJT_ANSWER_JUST_DEB,'Justifica debidamente su solicitud'),
+        (CJT_ANSWER_OTRO, 'Otro')
+    )
+
+    council_decision = StringField(
+        max_length=255, choices=CJT_ANSWER_CHOICES,
+        default=CJT_ANSWER_DEFAULT, display='Justificación del Consejo')
     academic_profile = StringField(
         default=Request.PROFILE_INVE, choices=Request.PROFILE_CHOICES,
         display='Perfil de programa curricular')

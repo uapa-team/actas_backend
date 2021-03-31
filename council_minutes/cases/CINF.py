@@ -1,6 +1,6 @@
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from mongoengine import FloatField, IntField, BooleanField
+from mongoengine import FloatField, IntField, BooleanField,StringField
 from ..models import Request
 from .case_utils import add_analysis_paragraph
 
@@ -9,6 +9,19 @@ class CINF(Request):
 
     full_name = 'Autorización carga inferior a la mínima'
 
+    CJT_ANSWER_DEFAULT = 'DF'
+    CJT_ANSWER_JUST_DEB = 'JD'
+    CJT_ANSWER_OTRO = 'OT'
+
+    CJT_ANSWER_CHOICES = (
+        (CJT_ANSWER_DEFAULT,''),
+        (CJT_ANSWER_JUST_DEB,'Justifica debidamente su solicitud'),
+        (CJT_ANSWER_OTRO, 'Otro')
+    )
+
+    council_decision = StringField(
+        max_length=255, choices=CJT_ANSWER_CHOICES,
+        default=CJT_ANSWER_DEFAULT, display='Justificación del Consejo')
     papa = FloatField(
         required=True, display='P.A.P.A.', min_value=0.0, max_value=5, default=0.0)
     available_creds = IntField(

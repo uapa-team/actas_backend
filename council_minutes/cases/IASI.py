@@ -1,6 +1,6 @@
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import EmbeddedDocumentListField, BooleanField
+from mongoengine import EmbeddedDocumentListField, BooleanField, ListField, StringField
 from ..models import Request, Subject
 from .case_utils import table_subjects, add_analysis_paragraph
 
@@ -15,8 +15,26 @@ class IASI(Request):
 
     full_name = 'Inscripción de Asignaturas'
 
+    CJT_ANSWER_DEFAULT = 'DF'
+    CJT_ANSWER_PROC_ACT = 'PA'
+    CJT_ANSWER_HIST_BAPI = 'HB'
+    CJT_ANSWER_PROC_MAS = 'PM'
+    CJT_ANSWER_OTRO = 'OT'
+
+    CJT_ANSWER_CHOICES = (
+        (CJT_ANSWER_DEFAULT,''),
+        (CJT_ANSWER_PROC_ACT,'Proceso de actualización'),
+        (CJT_ANSWER_HIST_BAPI,'Inscripción en la historia académica BAPI'),
+        (CJT_ANSWER_PROC_MAS,'Falta de registro en el proceso masivo'),
+        (CJT_ANSWER_OTRO, 'Otro')
+    )
+
     subjects = EmbeddedDocumentListField(
         IASISubject, display='Asignaturas')
+
+    council_decision = StringField(
+        max_length=255, choices=CJT_ANSWER_CHOICES,
+        default=CJT_ANSWER_DEFAULT, display='Justificación del Consejo')
 
     str_cm = [
         'inscribir la(s) siguiente(s) asignatura(s) del programa {} ({}), en el periodo académico' +
