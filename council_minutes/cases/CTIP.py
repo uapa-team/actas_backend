@@ -24,10 +24,12 @@ class CTIP(Request):
     CJT_ANSWER_DEFAULT = 'DF'
     CJT_ANSWER_JUST_DEB = 'JD'
     CJT_ANSWER_OTRO = 'OT'
+    CJT_ANSWER_N_DEB = 'ND'
 
     CJT_ANSWER_CHOICES = (
         (CJT_ANSWER_DEFAULT,''),
         (CJT_ANSWER_JUST_DEB,'Justifica debidamente su solicitud'),
+        (CJT_ANSWER_N_DEB,'No justifica debidamente su solicitud'),
         (CJT_ANSWER_OTRO, 'Otro')
     )
 

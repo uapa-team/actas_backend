@@ -20,12 +20,14 @@ class IASI(Request):
     CJT_ANSWER_HIST_BAPI = 'HB'
     CJT_ANSWER_PROC_MAS = 'PM'
     CJT_ANSWER_OTRO = 'OT'
+    CJT_ANSWER_N_DEB = 'ND'
 
     CJT_ANSWER_CHOICES = (
         (CJT_ANSWER_DEFAULT,''),
         (CJT_ANSWER_PROC_ACT,'Proceso de actualización'),
         (CJT_ANSWER_HIST_BAPI,'Inscripción en la historia académica BAPI'),
         (CJT_ANSWER_PROC_MAS,'Falta de registro en el proceso masivo'),
+        (CJT_ANSWER_N_DEB,'No justifica debidamente su solicitud'),
         (CJT_ANSWER_OTRO, 'Otro')
     )
 
