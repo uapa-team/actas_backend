@@ -1109,25 +1109,26 @@ def table_approvals_cases(docx_, subjects, details, case):
     for asign in subjects:
         if asign[4] in tipology:
             tipology.update(
-                {asign[4]: tipology[asign[4]] + int(asign[3])})
+                {asign[4]: tipology[asign[4]] + int(asign[8])})
         else:
-            tipology.update({asign[4]: int(asign[3])})
+            tipology.update({asign[4]: int(asign[8])})
         if asign[0] not in periods:
             periods.append(asign[0])
     asign_number = len(subjects)
     tipology_number = len(tipology)
     table = docx_.add_table(
-        rows=(3+asign_number), cols=8, style='Table Grid')
+        rows=(3+asign_number), cols=9, style='Table Grid')
     table.alignment = WD_ALIGN_PARAGRAPH.LEFT
     indent_table(table, 963)
     table.columns[0].width = 500000
     table.columns[1].width = 550000
     table.columns[2].width = 1350000
-    table.columns[3].width = 300000
-    table.columns[4].width = 300000
+    table.columns[3].width = 250000
+    table.columns[4].width = 200000
     table.columns[5].width = 400000
-    table.columns[6].width = 1400000
+    table.columns[6].width = 1300000
     table.columns[7].width = 400000
+    table.columns[8].width = 250000
     for cell in table.columns[0].cells:
         cell.width = 500000
     for cell in table.columns[1].cells:
@@ -1135,16 +1136,18 @@ def table_approvals_cases(docx_, subjects, details, case):
     for cell in table.columns[2].cells:
         cell.width = 1350000
     for cell in table.columns[3].cells:
-        cell.width = 300000
+        cell.width = 250000
     for cell in table.columns[4].cells:
-        cell.width = 300000
+        cell.width = 200000
     for cell in table.columns[5].cells:
         cell.width = 400000
     for cell in table.columns[6].cells:
-        cell.width = 1400000
+        cell.width = 1300000
     for cell in table.columns[7].cells:
         cell.width = 400000
-    cellp = table.cell(0, 0).merge(table.cell(0, 7)).paragraphs[0]
+    for cell in table.columns[8].cells:
+        cell.width = 250000
+    cellp = table.cell(0, 0).merge(table.cell(0, 8)).paragraphs[0]
     cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
     cellp.add_run('{}\t\t\tDNI.{}'.format(
         details[0], details[1])).font.bold = True
@@ -1165,13 +1168,13 @@ def table_approvals_cases(docx_, subjects, details, case):
     cellp.runs[0].font.size = Pt(8)
     table.cell(1, 0).merge(table.cell(1, 5)
                            ).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-    cellp = table.cell(1, 6).merge(table.cell(1, 7)).paragraphs[0]
+    cellp = table.cell(1, 6).merge(table.cell(1, 8)).paragraphs[0]
     cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
     cellp.add_run('Asignaturas cursadas en {}'.format(
         details[3])).font.bold = True
     cellp.runs[0].font.size = Pt(8)
     for i in range(2, asign_number + 3):
-        for j in range(8):
+        for j in range(9):
             table.cell(
                 i, j).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
     table.cell(2, 0).paragraphs[0].add_run('Periodo').font.bold = True
@@ -1190,7 +1193,9 @@ def table_approvals_cases(docx_, subjects, details, case):
     table.cell(2, 6).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
     table.cell(2, 7).paragraphs[0].add_run('Nota').font.bold = True
     table.cell(2, 7).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-    for i in range(8):
+    table.cell(2, 8).paragraphs[0].add_run('C').font.bold = True
+    table.cell(2, 8).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+    for i in range(9):
         table.cell(2, i).paragraphs[0].runs[0].font.size = Pt(8)
     subjects.sort(key=lambda s: (s[0], s[2]))
     summary_subjects_right = {}
@@ -1232,10 +1237,13 @@ def table_approvals_cases(docx_, subjects, details, case):
             table.cell(count, 7).paragraphs[0].add_run(
                 subject[7]).font.size = Pt(8)
             table.cell(count, 7).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 8).paragraphs[0].add_run(str(subject[8])
+                ).font.size = Pt(8)
+            table.cell(count, 8).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
             count += 1
     elif len(summary_subjects_right) < len(summary_subjects_left):
         if len(summary_subjects_right) == 1:
-            for k in (6, 7):
+            for k in (6, 8):
                 mg_c = table.cell(index, k).merge(table.cell(
                     index + len(subjects) - 1, k)).paragraphs[0]
                 table.cell(index, k).merge(table.cell(
@@ -1245,7 +1253,7 @@ def table_approvals_cases(docx_, subjects, details, case):
             index += len(subjects)
         else:
             for item in summary_subjects_right:
-                for k in (6, 7):
+                for k in (6, 8):
                     mg_c = table.cell(index, k).merge(table.cell(
                         index + len(summary_subjects_right[item]) - 1, k)).paragraphs[0]
                     table.cell(index, k).merge(table.cell(
@@ -1303,20 +1311,26 @@ def table_approvals_cases(docx_, subjects, details, case):
             table.cell(count, 7).paragraphs[0].add_run(
                 subject[7]).font.size = Pt(8)
             table.cell(count, 7).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 8).paragraphs[0].add_run(str(subject[8])
+                ).font.size = Pt(8)
+            table.cell(count, 8).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
             count += 1
     total_homologated = 0
     table = docx_.add_table(
-        rows=(tipology_number+1), cols=8, style='Table Grid')
+        rows=(tipology_number+1), cols=9, style='Table Grid')
     table.alignment = WD_ALIGN_PARAGRAPH.LEFT
     indent_table(table, 963)
+
+    
     table.columns[0].width = 500000
     table.columns[1].width = 550000
     table.columns[2].width = 1350000
-    table.columns[3].width = 300000
-    table.columns[4].width = 300000
+    table.columns[3].width = 250000
+    table.columns[4].width = 200000
     table.columns[5].width = 400000
-    table.columns[6].width = 1400000
+    table.columns[6].width = 1300000
     table.columns[7].width = 400000
+    table.columns[8].width = 250000
     for cell in table.columns[0].cells:
         cell.width = 500000
     for cell in table.columns[1].cells:
@@ -1324,15 +1338,17 @@ def table_approvals_cases(docx_, subjects, details, case):
     for cell in table.columns[2].cells:
         cell.width = 1350000
     for cell in table.columns[3].cells:
-        cell.width = 300000
+        cell.width = 250000
     for cell in table.columns[4].cells:
-        cell.width = 300000
+        cell.width = 200000
     for cell in table.columns[5].cells:
         cell.width = 400000
     for cell in table.columns[6].cells:
-        cell.width = 1400000
+        cell.width = 1300000
     for cell in table.columns[7].cells:
         cell.width = 400000
+    for cell in table.columns[8].cells:
+        cell.width = 250000
     count = 0
     for tip in tipology:
         text = 'Créditos homologados ' + str(tip)
@@ -1354,9 +1370,7 @@ def table_approvals_cases(docx_, subjects, details, case):
         str(total_homologated)).font.size = Pt(8)
     table.cell(count, 3).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
     table.cell(0, 0).merge(table.cell(count, 1))
-    table.cell(0, 4).merge(table.cell(count, 7))
-
-
+    table.cell(0, 4).merge(table.cell(count, 8))
 
 
 def table_repprovals_cases(docx_, subjects, details, case):
@@ -1395,8 +1409,8 @@ def table_repprovals_cases(docx_, subjects, details, case):
     table.columns[1].width = 850000
     table.columns[2].width = 1400000
     table.columns[3].width = 1850000
-    table.columns[4].width = 300000
-    table.columns[5].width = 300000
+    table.columns[4].width = 200000
+    table.columns[5].width = 400000
     for cell in table.columns[0].cells:
         cell.width = 500000
         cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
@@ -1410,10 +1424,10 @@ def table_repprovals_cases(docx_, subjects, details, case):
         cell.width = 1850000
         cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
     for cell in table.columns[4].cells:
-        cell.width = 300000
+        cell.width = 200000
         cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
     for cell in table.columns[5].cells:
-        cell.width = 300000
+        cell.width = 400000
         cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
     cellp = table.cell(0, 0).merge(table.cell(0, 5)).paragraphs[0]
     cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
