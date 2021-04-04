@@ -1369,8 +1369,56 @@ def table_approvals_cases(docx_, subjects, details, case):
     table.cell(count, 3).paragraphs[0].add_run(
         str(total_homologated)).font.size = Pt(8)
     table.cell(count, 3).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-    table.cell(0, 0).merge(table.cell(count, 1))
-    table.cell(0, 4).merge(table.cell(count, 8))
+
+    # Set required white table borders in last two columns:
+    for cell in table.columns[0].cells:
+        set_cell_border(cell,
+        top={"val": "nil"},
+        bottom={"val": "nil"},
+        start={"val": "nil"},
+        end={"val": "nil"})
+    
+    for cell in table.columns[1].cells:
+        set_cell_border(cell,
+        top={"val": "nil"},
+        bottom={"val": "nil"},
+        start={"val": "nil"},
+        end={"val": "nil"})
+
+    for cell in table.columns[4].cells:
+        set_cell_border(cell,
+        top={"val": "nil"},
+        bottom={"val": "nil"},
+        start={"val": "nil"},
+        end={"val": "nil"}) 
+    
+    for cell in table.columns[5].cells:
+        set_cell_border(cell,
+        top={"val": "nil"},
+        bottom={"val": "nil"},
+        start={"val": "nil"},
+        end={"val": "nil"}) 
+    
+    for cell in table.columns[6].cells:
+        set_cell_border(cell,
+        top={"val": "nil"},
+        bottom={"val": "nil"},
+        start={"val": "nil"},
+        end={"val": "nil"}) 
+
+    for cell in table.columns[7].cells:
+        set_cell_border(cell,
+        top={"val": "nil"},
+        bottom={"val": "nil"},
+        start={"val": "nil"},
+        end={"val": "nil"})
+    
+    for cell in table.columns[8].cells:
+        set_cell_border(cell,
+        top={"val": "nil"},
+        bottom={"val": "nil"},
+        start={"val": "nil"},
+        end={"val": "nil"})
 
 
 def table_repprovals_cases(docx_, subjects, details, case):
@@ -1481,6 +1529,8 @@ def table_repprovals_cases(docx_, subjects, details, case):
         table.cell(count, 5).paragraphs[0].add_run(subject[5])
         table.cell(count, 5).paragraphs[0].runs[0].font.size = Pt(8)
         count += 1
+
+
 # Extrated from https://programmersought.com/article/74085524416/ to edit cell borders:
 def set_cell_border(cell: _Cell, **kwargs):
     """
