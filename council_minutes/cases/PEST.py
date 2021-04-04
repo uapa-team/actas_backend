@@ -12,15 +12,24 @@ class PEST(Request):
     SUB_P1 = 'P1'
     SUB_P2 = 'P2'
     SUB_P3 = 'P3'
+    SUB_P4 = 'P4'
+    SUB_P5 = 'P5'
+    SUB_P6 = 'P6'
     SUBJECT_CHOICES = (
         (SUB_P1, 'Práctica Estudiantil I'),
         (SUB_P2, 'Práctica Estudiantil II'),
-        (SUB_P3, 'Práctica Estudiantil III')
+        (SUB_P3, 'Práctica Estudiantil III'),
+        (SUB_P4, 'Práctica Colombia I'),
+        (SUB_P5, 'Práctica Colombia II'),
+        (SUB_P6, 'Práctica Colombia III')
     )
     SUBJECT_INFO = {
         SUB_P1: ('2016762', 3),
         SUB_P2: ('2016763', 6),
-        SUB_P3: ('2016764', 9)
+        SUB_P3: ('2016764', 9),
+        SUB_P4: ('1000070', 3),
+        SUB_P5: ('1000071', 6),
+        SUB_P6: ('1000072', 9)
     }
 
     institution = StringField(required=True, display='Institución/Empresa', default='')
@@ -37,6 +46,8 @@ class PEST(Request):
     duration = StringField(required=True, display='Duración', default='')
     documentation = BooleanField(
         required=True, display='¿Documentación Completa?', default=True)
+    creditsDisc = IntField(required=True, min_value=0, 
+        display='Créditos Disciplinares (Únicamente Ingeniería de Sistemas e Industrial)', default=0)
 
     regulation_list = ['008|2008|CSU', '102|2013|CSU', '016|2011|CAC']
 
@@ -52,6 +63,23 @@ class PEST(Request):
         'El estudiante {}cumple con el requisito de haber aprobado el ' +
         '70% de los créditos del plan de estudios. SIA: {:0.1f}% de avance en ' +
         'los créditos exigidos del plan de estudios.',
+        'El estudiante {}ha cursado otra de las asignaturas con ' +
+        'el nombre Práctica Estudiantil.',
+        'Requisitos: Pertinencia, objetivos, alcance, empresa {}, duración: {} ' +
+        'horas/semana durante {}, costos, descripción de actividades ' +
+        'a cargo de un profesor de la Facultad: {}, porcentajes de evaluación definidos ' +
+        '(Artículo 3 del {}).',
+        'Documentación {}cumple con requisitos: Formato está completamente diligenciado, ' +
+        'adjunta copia del Acuerdo firmado, ' +
+        'adjunta el recibido de la carta de presentación de la Universidad, ' +
+        'están fijados los porcentajes de evaluación.'
+    ]
+
+    # Analysis to Sistemas & Industrial
+    str_system_industrial_analysis = [
+        'El estudiante {}cumple con el requisito de haber aprobado los ' +
+        'créditos del plan de estudios. Créditos: {} aprobados ' +
+        'del componente disciplinar exigidos del plan de estudios.',
         'El estudiante {}ha cursado otra de las asignaturas con ' +
         'el nombre Práctica Estudiantil.',
         'Requisitos: Pertinencia, objetivos, alcance, empresa {}, duración: {} ' +
@@ -82,7 +110,11 @@ class PEST(Request):
             paragraph, self.is_affirmative_response_approval_status())
 
     def pcm(self, docx):
-        add_analysis_paragraph(docx, self.add_analysis())
+        if ((self.academic_program == str(2546)) or   
+                (self.academic_program == str(2879))):
+            add_analysis_paragraph(docx, self.add_system_industrial_analysis())
+        else:
+            add_analysis_paragraph(docx, self.add_analysis())
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
@@ -124,7 +156,9 @@ class PEST(Request):
 
     def add_analysis(self):
         analysis = []
+        # Avance por porcentaje
         modifier = '' if self.advance >= 70 else 'no '
+
         analysis.append(self.str_analysis[0].format(modifier, self.advance))
 
         modifier = '' if self.another_practice else 'no '
@@ -136,6 +170,30 @@ class PEST(Request):
 
         modifier = '' if self.documentation else 'no '
         analysis.append(self.str_analysis[3].format(modifier))
+
+        return analysis + self.extra_analysis
+
+    def add_system_industrial_analysis(self):
+        analysis = []
+
+        # Avance por creditos disciplinares
+        if ((self.creditsDisc >= 45 and  self.academic_program == str(2546)) or 
+                (self.creditsDisc >= 40 and  self.academic_program == str(2879))):
+            modifier = ''
+        else:
+            modifier = 'no '
+                
+        analysis.append(self.str_system_industrial_analysis[0].format(modifier, self.creditsDisc))
+
+        modifier = '' if self.another_practice else 'no '
+        analysis.append(self.str_system_industrial_analysis[1].format(modifier))
+
+        analysis.append(self.str_system_industrial_analysis[2].format(
+            self.institution, self.hours, self.duration, self.proffesor,
+            self.regulations[self.regulation_list[2]][0]))
+
+        modifier = '' if self.documentation else 'no '
+        analysis.append(self.str_system_industrial_analysis[3].format(modifier))
 
         return analysis + self.extra_analysis
 
