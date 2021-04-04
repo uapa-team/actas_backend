@@ -33,7 +33,7 @@ class RCUP(Request):
 
     analysis = [
         'El comité de {} considera que la situación personal está debidamente justificada.',
-        'Se le han aprobado {} reserva(s) de cupo adicionale(s).'
+        'Se le han aprobado {} reserva(s) de cupo adicional(es).'
     ]
 
     def cm(self, docx):
