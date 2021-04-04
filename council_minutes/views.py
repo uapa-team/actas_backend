@@ -40,7 +40,7 @@ def login(request):
     except User.DoesNotExist:
         return JsonResponse({'error': 'Error en ActasDB, usuario sin permisos en la aplicación.'},
                             status=HTTP_403_FORBIDDEN)
-    user = LDAPBackend().authenticate(request, username=username, password=password)
+#    user = LDAPBackend().authenticate(request, username=username, password=password)
     if not user:
         return JsonResponse({'error': 'Error en LDAP, contraseña o usuario no válido.'},
                             status=HTTP_404_NOT_FOUND)

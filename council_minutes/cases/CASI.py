@@ -45,7 +45,7 @@ class CASI(Request):
 
     str_cm = [
         'cancelar la(s) siguiente(s) asignatura(s) inscrita(s) del periodo académico {}',
-        'porque {}justifica debidamente la solicitud.'
+        'porque {} justifica debidamente la solicitud.'
     ]
 
     str_pcm = [
