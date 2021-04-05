@@ -9,21 +9,25 @@ class CINF(Request):
 
     full_name = 'Autorización carga inferior a la mínima'
 
-    CJT_ANSWER_DEFAULT = 'DF'
     CJT_ANSWER_JUST_DEB = 'JD'
     CJT_ANSWER_OTRO = 'OT'
     CJT_ANSWER_N_DEB = 'ND'
 
     CJT_ANSWER_CHOICES = (
-        (CJT_ANSWER_DEFAULT,''),
         (CJT_ANSWER_JUST_DEB,'Justifica debidamente su solicitud'),
         (CJT_ANSWER_N_DEB,'No justifica debidamente su solicitud'),
         (CJT_ANSWER_OTRO, 'Otro')
     )
 
+    CJT_ANSWERS_DICT = {
+        CJT_ANSWER_JUST_DEB : 'justifica debidamente su solicitud',
+        CJT_ANSWER_N_DEB : 'no justifica debidamente su solicitud',
+        CJT_ANSWER_OTRO : 'existen otros factores que lo justifican'
+    }
+
     council_decision = StringField(
         max_length=255, choices=CJT_ANSWER_CHOICES,
-        default=CJT_ANSWER_DEFAULT, display='Justificación del Consejo')
+        default=CJT_ANSWER_N_DEB, display='Justificación del Consejo')
     papa = FloatField(
         required=True, display='P.A.P.A.', min_value=0.0, max_value=5, default=0.0)
     available_creds = IntField(
@@ -81,12 +85,12 @@ class CINF(Request):
             self.pcm_answers_ng(paragraph)
 
     def cm_af(self, paragraph):
-        paragraph.add_run(self.council_decision + '. ' +
+        paragraph.add_run(self.CJT_ANSWERS_DICT[self.council_decision] + '. ' +
                           self.str_cm[2].format(self.str_cm[3] +
                                                 self.regulations['008|2008|CSU'][0]))
 
     def cm_ng(self, paragraph):
-        paragraph.add_run(self.council_decision + '. ' +
+        paragraph.add_run(self.CJT_ANSWERS_DICT[self.council_decision] + '. ' +
                           self.str_cm[2].format(self.str_cm[3] +
                                                 self.regulations['008|2008|CSU'][0]))
 
@@ -110,7 +114,7 @@ class CINF(Request):
                                                    self.regulations['008|2008|CSU'][0]))
 
     def pcm_answers_ng(self, paragraph):
-        paragraph.add_run(self.council_decision + '. ' +
+        paragraph.add_run(self.CJT_ANSWERS_DICT[self.council_decision] + '. ' +
                           self.str_cm[2].format(self.str_cm[3] +
                                                 self.regulations['008|2008|CSU'][0]))
 
