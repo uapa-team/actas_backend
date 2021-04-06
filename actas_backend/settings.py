@@ -25,7 +25,7 @@ AUTH_LDAP_CONNECTION_OPTIONS = {
 
 ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, os.getcwd()+"/certificate.pem")
 
-AUTH_LDAP_SERVER_URI = 'ldap://ldaprbog.unal.edu.co'
+AUTH_LDAP_SERVER_URI = os.environ.get('LDAP_HOST')
 AUTH_LDAP_USER_SEARCH = LDAPSearchUnion(
     LDAPSearch("ou=people,o=unal.edu.co",
                ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
@@ -81,7 +81,7 @@ SECRET_KEY = '2d=v4-s%^4(#u+4o$wz*y*stng(i4pq)gv8k38gof=a(mcjzq_'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = [os.environ.get('ACTAS_HOST'), '127.0.0.1']
 
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:4200',
@@ -142,11 +142,11 @@ WSGI_APPLICATION = 'actas_backend.wsgi.application'
 # Database and MongoDB config
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-MONGODB_AUTH = 'admin'
-MONGODB_USER = 'DjangoAPP'
-MONGODB_HOST = '168.176.26.91'
-MONGODB_NAME = 'test_env'
-MONGODB_PASS = 'Ks>d!g#64FZBsr>W'
+MONGODB_AUTH = os.environ.get('ACTAS_DB_AUTH')
+MONGODB_USER = os.environ.get('ACTAS_DB_USER')
+MONGODB_HOST = os.environ.get('ACTAS_DB_HOST')
+MONGODB_NAME = os.environ.get('ACTAS_DB_NAME')
+MONGODB_PASS = os.environ.get('ACTAS_DB_PASS')
 MONGODB_PORT = 27017
 MONGODB_AMCH = 'SCRAM-SHA-1'
 
