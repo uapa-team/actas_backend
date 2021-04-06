@@ -39,7 +39,7 @@ class CTIP(Request):
         paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
         paragraph.add_run(', ' + self.str_cm[1].format(self.council_decision))
-        if self.is_affirmative_response_approval_status():
+        if self.is_affirmative_response_approval_status() or self.approval_status in (self.AS_EN_ESPERA):
             self.add_subjects_change_tipology_table(docx)
 
     def cm_answer(self, paragraph):
