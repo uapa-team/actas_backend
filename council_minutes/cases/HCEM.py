@@ -8,7 +8,45 @@ from .case_utils import table_approvals_cases, table_repprovals_cases, add_analy
 
 class HCEM(Request):
 
-    class HomologatedSubject(Subject):
+    class HomologatedSubject(EmbeddedDocument):
+        TIP_PRE_FUND_OBLIGATORIA = 'PB'
+        TIP_PRE_FUND_OPTATIVA = 'PO'
+        TIP_PRE_DISC_OBLIGATORIA = 'PC'
+        TIP_PRE_DISC_OPTATIVA = 'PT'
+        TIP_PRE_TRAB_GRADO = 'PP'
+        TIP_PRE_LIBRE_ELECCION = 'PL'
+        TIP_PRE_NIVELACION = 'PE'
+        TIP_MOF_OBLIGATORIA = 'MO'
+        TIP_MOF_ACTIV_ACADEMICA = 'MC'
+        TIP_MOF_TRAB_GRADO = 'MP'
+        TIP_MOF_ELEGIBLE = 'ML'
+        TIP_DOC_ACTIV_ACADEMICA = 'DF'
+        TIP_DOC_TESIS = 'DS'
+        TIP_DOC_ELEGIBLE = 'DU'
+
+        TIP_CHOICES = (
+            (TIP_PRE_FUND_OBLIGATORIA, 'Fundamentación Obligatoria (B)'),
+            (TIP_PRE_FUND_OPTATIVA, 'Fundamentación Optativa (O)'),
+            (TIP_PRE_DISC_OBLIGATORIA, 'Disciplinar Obligatoria (C)'),
+            (TIP_PRE_DISC_OPTATIVA, 'Disciplinar Optativa (T)'),
+            (TIP_PRE_TRAB_GRADO, 'Trabajo de Grado Pregrado (P)'),
+            (TIP_PRE_LIBRE_ELECCION, 'Libre Elección (L)'),
+            (TIP_PRE_NIVELACION, 'Nivelación (E)'),
+            (TIP_MOF_OBLIGATORIA, 'Obligatoria Maestría (O)'),
+            (TIP_MOF_ACTIV_ACADEMICA, 'Actividad Académica Maestría (C)'),
+            (TIP_MOF_TRAB_GRADO, 'Tesis o Trabajo Final de Maestría (P)'),
+            (TIP_MOF_ELEGIBLE, 'Elegible Maestría (L)'),
+            (TIP_DOC_ACTIV_ACADEMICA, 'Actividad Académica Doctorado (F)'),
+            (TIP_DOC_TESIS, 'Tesis de Doctorado (S)'),
+            (TIP_DOC_ELEGIBLE, 'Elegible Doctorado (U)'),
+        )
+
+        name = StringField(required=True, display='Nombre Asignatura', default='')
+        code = StringField(required=True, display='Código', default='')
+        credits = IntField(required=True, display='Créditos', default=0)
+        tipology = StringField(
+            required=True, choices=TIP_CHOICES, display='Tipología', default=TIP_PRE_FUND_OBLIGATORIA)
+
         HT_HOMOLOGACION = 'H'
         HT_CONVALIDACION = 'C'
         HT_EQUIVALENCIA = 'E'
@@ -21,24 +59,188 @@ class HCEM(Request):
             (HT_ANDES, 'Homologación conv. Uniandes'),
             (HT_INTERNACIONAL, 'Homologación conv. internacional'),
         )
-        old_credits = IntField(default=3, min_value=0, required=True,
-                               display='Créditos de la asignatura en la anterior institución')
         old_name = StringField(
             required=True, display='Nombre Asignatura en la anterior institución', default='')
+        old_credits = IntField(default=3, min_value=0, required=True,
+                               display='Créditos de la asignatura en la anterior institución')
         old_grade = StringField(
             required=True, default='', display='Calificación anterior del estudiante')
         grade = StringField(
             required=True, default='', display='Nueva calificación del estudiante')
         period = StringField(display='Periodo', choices=Request.PERIOD_CHOICES,
                 default=Request.PERIOD_DEFAULT)
-        approved = BooleanField(
-            default=True, required=True, display='¿Fue aprobada la homologación?')
-        reason = StringField(
-            default='', display='Razón por la cuál no fue aprobada')
         h_type = StringField(required=True, default=HT_HOMOLOGACION,
                              choices=HT_CHOICES, display='Tipo de homologación')
+        reason = StringField(
+            default='', display='Razón por la cuál no fue aprobada')
+        approved = BooleanField(
+            default=True, required=True, display='¿Fue aprobada la homologación?')
+        
+        @staticmethod
+        def subjects_to_array(subjects):
+            """
+            A function that converts a List of Subjects into a classic array.
+            : param subjects: EmbeddedDocumentListField of Subjects to be converted
+            """
+            data = []
+            for subject in subjects:
+                data.append([
+                    subject.code,
+                    subject.name,
+                    "",
+                    subject.tipology[-1],
+                    str(subject.credits)
+                ])
+            return data
 
-    class MobilitySubject(Subject):
+        @staticmethod
+        def creds_summary(subjects):
+            """
+            A function that returns a summary of credits by tipology.
+            : param subjects: EmbeddedDocumentListField of Subjects to be computed
+            """
+            data = [0, 0, 0, 0, 0]
+            for sbj in subjects:
+                if sbj.tipology == TIP_PRE_FUND_OBLIGATORIA:
+                    try:
+                        if float(sbj.grade) >= 3.0:
+                            data[0] += sbj.credits
+                    except ValueError:
+                        if sbj.grade in ('AP', 'AS'):
+                            data[0] += sbj.credits
+                elif sbj.tipology == TIP_PRE_FUND_OPTATIVA:
+                    try:
+                        if float(sbj.grade) >= 3.0:
+                            data[1] += sbj.credits
+                    except ValueError:
+                        if sbj.grade in ('AP', 'AS'):
+                            data[1] += sbj.credits
+                elif sbj.tipology == TIP_PRE_DISC_OBLIGATORIA:
+                    try:
+                        if float(sbj.grade) >= 3.0:
+                            data[2] += sbj.credits
+                    except ValueError:
+                        if sbj.grade in ('AP', 'AS'):
+                            data[2] += sbj.credits
+                elif sbj.tipology == TIP_PRE_DISC_OPTATIVA:
+                    try:
+                        if float(sbj.grade) >= 3.0:
+                            data[3] += sbj.credits
+                    except ValueError:
+                        if sbj.grade in ('AP', 'AS'):
+                            data[3] += sbj.credits
+                elif sbj.tipology == TIP_PRE_LIBRE_ELECCION:
+                    try:
+                        if float(sbj.grade) >= 3.0:
+                            data[4] += sbj.credits
+                    except ValueError:
+                        if sbj.grade in ('AP', 'AS'):
+                            data[4] += sbj.credits
+            return data
+
+
+    class MobilitySubject(EmbeddedDocument):
+        TIP_PRE_FUND_OBLIGATORIA = 'PB'
+        TIP_PRE_FUND_OPTATIVA = 'PO'
+        TIP_PRE_DISC_OBLIGATORIA = 'PC'
+        TIP_PRE_DISC_OPTATIVA = 'PT'
+        TIP_PRE_TRAB_GRADO = 'PP'
+        TIP_PRE_LIBRE_ELECCION = 'PL'
+        TIP_PRE_NIVELACION = 'PE'
+        TIP_MOF_OBLIGATORIA = 'MO'
+        TIP_MOF_ACTIV_ACADEMICA = 'MC'
+        TIP_MOF_TRAB_GRADO = 'MP'
+        TIP_MOF_ELEGIBLE = 'ML'
+        TIP_DOC_ACTIV_ACADEMICA = 'DF'
+        TIP_DOC_TESIS = 'DS'
+        TIP_DOC_ELEGIBLE = 'DU'
+
+        TIP_CHOICES = (
+            (TIP_PRE_FUND_OBLIGATORIA, 'Fundamentación Obligatoria (B)'),
+            (TIP_PRE_FUND_OPTATIVA, 'Fundamentación Optativa (O)'),
+            (TIP_PRE_DISC_OBLIGATORIA, 'Disciplinar Obligatoria (C)'),
+            (TIP_PRE_DISC_OPTATIVA, 'Disciplinar Optativa (T)'),
+            (TIP_PRE_TRAB_GRADO, 'Trabajo de Grado Pregrado (P)'),
+            (TIP_PRE_LIBRE_ELECCION, 'Libre Elección (L)'),
+            (TIP_PRE_NIVELACION, 'Nivelación (E)'),
+            (TIP_MOF_OBLIGATORIA, 'Obligatoria Maestría (O)'),
+            (TIP_MOF_ACTIV_ACADEMICA, 'Actividad Académica Maestría (C)'),
+            (TIP_MOF_TRAB_GRADO, 'Tesis o Trabajo Final de Maestría (P)'),
+            (TIP_MOF_ELEGIBLE, 'Elegible Maestría (L)'),
+            (TIP_DOC_ACTIV_ACADEMICA, 'Actividad Académica Doctorado (F)'),
+            (TIP_DOC_TESIS, 'Tesis de Doctorado (S)'),
+            (TIP_DOC_ELEGIBLE, 'Elegible Doctorado (U)'),
+        )
+
+        name = StringField(required=True, display='Nombre Asignatura', default='')
+        code = StringField(required=True, display='Código', default='')
+        credits = IntField(required=True, display='Créditos', default=0)
+        tipology = StringField(
+            required=True, choices=TIP_CHOICES, display='Tipología', default=TIP_PRE_FUND_OBLIGATORIA)
+
+        @staticmethod
+        def subjects_to_array(subjects):
+            """
+            A function that converts a List of Subjects into a classic array.
+            : param subjects: EmbeddedDocumentListField of Subjects to be converted
+            """
+            data = []
+            for subject in subjects:
+                data.append([
+                    subject.code,
+                    subject.name,
+                    "",
+                    subject.tipology[-1],
+                    str(subject.credits)
+                ])
+            return data
+
+        @staticmethod
+        def creds_summary(subjects):
+            """
+            A function that returns a summary of credits by tipology.
+            : param subjects: EmbeddedDocumentListField of Subjects to be computed
+            """
+            data = [0, 0, 0, 0, 0]
+            for sbj in subjects:
+                if sbj.tipology == TIP_PRE_FUND_OBLIGATORIA:
+                    try:
+                        if float(sbj.grade) >= 3.0:
+                            data[0] += sbj.credits
+                    except ValueError:
+                        if sbj.grade in ('AP', 'AS'):
+                            data[0] += sbj.credits
+                elif sbj.tipology == TIP_PRE_FUND_OPTATIVA:
+                    try:
+                        if float(sbj.grade) >= 3.0:
+                            data[1] += sbj.credits
+                    except ValueError:
+                        if sbj.grade in ('AP', 'AS'):
+                            data[1] += sbj.credits
+                elif sbj.tipology == TIP_PRE_DISC_OBLIGATORIA:
+                    try:
+                        if float(sbj.grade) >= 3.0:
+                            data[2] += sbj.credits
+                    except ValueError:
+                        if sbj.grade in ('AP', 'AS'):
+                            data[2] += sbj.credits
+                elif sbj.tipology == TIP_PRE_DISC_OPTATIVA:
+                    try:
+                        if float(sbj.grade) >= 3.0:
+                            data[3] += sbj.credits
+                    except ValueError:
+                        if sbj.grade in ('AP', 'AS'):
+                            data[3] += sbj.credits
+                elif sbj.tipology == TIP_PRE_LIBRE_ELECCION:
+                    try:
+                        if float(sbj.grade) >= 3.0:
+                            data[4] += sbj.credits
+                    except ValueError:
+                        if sbj.grade in ('AP', 'AS'):
+                            data[4] += sbj.credits
+            return data
+
+
         GD_AP = 'AP'
         GD_NA = 'NA'
         HT_CHOICES = (
