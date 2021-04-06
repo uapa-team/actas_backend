@@ -1,7 +1,7 @@
 import datetime
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import StringField, DateTimeField, BooleanField
+from mongoengine import StringField, DateTimeField, BooleanField, ListField
 from mongoengine import EmbeddedDocumentListField
 from ..models import Request, Professor
 from .case_utils import add_analysis_paragraph
@@ -16,6 +16,10 @@ class DJCT(Request):
         required=True, choices=Request.GRADE_OPTION_CHOICES,# display='Opción de grado',
         default=Request.GRADE_OPTION_TESIS_MAESTRIA)
     advisor = StringField(required=True, display='Director', default='')
+    
+    # Added by request (not used when added - remove this when used):
+    coadvisor = ListField(StringField(), display='Codirector(es)')
+    
     title = StringField(
         requiered=True, display='Título de Tesis', default='')
     date_approval = DateTimeField(required=True, display='Fecha de Aprobación',

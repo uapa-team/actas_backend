@@ -1,6 +1,7 @@
 import docx
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
+from docx.table import _Cell
 from docx.shared import Pt, Cm
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
@@ -52,7 +53,7 @@ def add_analysis_paragraph(docx_, analysis_list, header=True):
     paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
     paragraph.paragraph_format.space_after = Pt(0)
     if header:
-        paragraph.add_run('Analisis: ').font.bold = True
+        paragraph.add_run('Análisis: ').font.bold = True
     add_analysis_list(docx_, analysis_list)
 
 
@@ -267,8 +268,9 @@ def table_english(docx_, subjects, details):
             each list must be a list with following data:
             [0]: Subject's SIA code
             [1]: Subject's SIA name
-            [2]: Subject's SIA credits
-            [3]: Subject's SIA tipology
+            [2]: Subject's SIA tipology
+            [3]: Subject's SIA grade
+            [4]: Subject's SIA credits
             details (list): A list with the datails of homologation,
             must be contains the following data:
             [0]: Exam or institution's name
@@ -311,14 +313,17 @@ def table_english(docx_, subjects, details):
     cell = table.cell(0, 0).merge(table.cell(0, 6)).paragraphs[0]
     cell.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
     cell.add_run(details[2] + '\t\tDNI. ' + details[3]).font.bold = True
+    cell.runs[0].font.size = Pt(8)
     cell = table.cell(1, 0).merge(table.cell(1, 4)).paragraphs[0]
     str_prog = 'Asignaturas a homologar en el plan de estudios {} ({})'
     cell.add_run(str_prog.format(details[4], details[5])).font.bold = True
+    cell.runs[0].font.size = Pt(8)
 
     cellp = table.cell(1, 5).merge(table.cell(2, 5)).paragraphs[0]
     cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
     table.cell(1, 5).merge(table.cell(2, 5)).paragraphs[0].add_run(
         'Examen de inglés presentado').font.bold = True
+    cellp.runs[0].font.size = Pt(8)
     table.cell(1, 5).merge(table.cell(2, 5)
                            ).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
 
@@ -326,46 +331,113 @@ def table_english(docx_, subjects, details):
     cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
     table.cell(1, 6).merge(table.cell(2, 6)).paragraphs[0].add_run(
         'Nota').font.bold = True
+    cellp.runs[0].font.size = Pt(8)
     table.cell(1, 6).merge(table.cell(2, 6)
                            ).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
 
     cell = table.cell(3, 5).merge(table.cell(
         len(subjects)+2, 5)).paragraphs[0]
     cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    cell.add_run(details[0])
+    cell.add_run(details[0]).font.size = Pt(8)
+    cell.runs[0].font.size = Pt(8)
     table.cell(3, 5).merge(table.cell(len(
         subjects)+2, 5)).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
 
     cell = table.cell(3, 6).merge(table.cell(
         len(subjects)+2, 6)).paragraphs[0]
     cell.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    cell.add_run(details[1])
+    cell.add_run(details[1]).font.size = Pt(8)
+    cell.runs[0].font.size = Pt(8)
     table.cell(3, 6).merge(table.cell(len(
         subjects)+2, 6)).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
 
     table.cell(2, 0).paragraphs[0].add_run('Código').font.bold = True
+    table.cell(2, 0).paragraphs[0].runs[0].font.size = Pt(8)
     table.cell(2, 1).paragraphs[0].add_run('Asignatura').font.bold = True
+    table.cell(2, 1).paragraphs[0].runs[0].font.size = Pt(8)
     table.cell(2, 2).paragraphs[0].add_run('C').font.bold = True
+    table.cell(2, 2).paragraphs[0].runs[0].font.size = Pt(8)
     table.cell(2, 3).paragraphs[0].add_run('T').font.bold = True
+    table.cell(2, 3).paragraphs[0].runs[0].font.size = Pt(8)
     table.cell(2, 4).paragraphs[0].add_run('Nota').font.bold = True
+    table.cell(2, 4).paragraphs[0].runs[0].font.size = Pt(8)
     index = 0
     credits_sum = 0
     for subject in subjects:
         credits_sum = credits_sum + int(3)
-        table.cell(index+3, 0).paragraphs[0].add_run(subject[0])
-        table.cell(index+3, 1).paragraphs[0].add_run(subject[1])
-        table.cell(index+3, 2).paragraphs[0].add_run(subject[2])
-        table.cell(index+3, 3).paragraphs[0].add_run(subject[3])
-        table.cell(index+3, 4).paragraphs[0].add_run(subject[4])
+        table.cell(index+3, 0).paragraphs[0].add_run(subject[0]).font.size = Pt(8)
+        table.cell(index+3, 1).paragraphs[0].add_run(subject[1]).font.size = Pt(8)
+        table.cell(index+3, 2).paragraphs[0].add_run(subject[4]).font.size = Pt(8)
+        table.cell(index+3, 4).paragraphs[0].add_run(subject[2]).font.size = Pt(8)
+        table.cell(index+3, 3).paragraphs[0].add_run(subject[3]).font.size = Pt(8)
         index = index + 1
-    cellp = table.cell(index+3, 0).merge(table.cell(index+3, 3)).paragraphs[0]
-    cellp.add_run('Créditos homologados P')
-    cellp = table.cell(index+3, 4).merge(table.cell(index+3, 6)).paragraphs[0]
-    cellp.add_run(str(credits_sum))
-    cellp = table.cell(index+4, 0).merge(table.cell(index+4, 3)).paragraphs[0]
-    cellp.add_run('Total créditos que se homologan')
-    cellp = table.cell(index+4, 4).merge(table.cell(index+4, 6)).paragraphs[0]
-    cellp.add_run(str(credits_sum))
+    
+    table.cell(index+3, 1).paragraphs[0].add_run('Créditos homologados E').font.size = Pt(8)
+    table.cell(index+3, 2).paragraphs[0].add_run(str(credits_sum)).font.size = Pt(8)
+    table.cell(index+4, 1).paragraphs[0].add_run('Total créditos que se homologan').font.size = Pt(8)
+    table.cell(index+4, 2).paragraphs[0].add_run(str(credits_sum)).font.size = Pt(8)
+
+    # Set required white table borders in last two columns:
+    set_cell_border(table.cell(7,0),
+    top={"val": "nil"},
+    bottom={"val": "nil"},
+    start={"val": "nil"},
+    end={"val": "nil"})
+
+    set_cell_border(table.cell(8,0),
+    top={"val": "nil"},
+    bottom={"val": "nil"},
+    start={"val": "nil"},
+    end={"val": "nil"})
+    
+    set_cell_border(table.cell(7,3),
+    top={"val": "nil"},
+    bottom={"val": "nil"},
+    start={"val": "nil"},
+    end={"val": "nil"})
+
+    set_cell_border(table.cell(8,3),
+    top={"val": "nil"},
+    bottom={"val": "nil"},
+    start={"val": "nil"},
+    end={"val": "nil"})
+    
+    set_cell_border(table.cell(7,4),
+    top={"val": "nil"},
+    bottom={"val": "nil"},
+    start={"val": "nil"},
+    end={"val": "nil"})
+
+    set_cell_border(table.cell(8,4),
+    top={"val": "nil"},
+    bottom={"val": "nil"},
+    start={"val": "nil"},
+    end={"val": "nil"})
+
+    set_cell_border(table.cell(7,5),
+    top={"val": "nil"},
+    bottom={"val": "nil"},
+    start={"val": "nil"},
+    end={"val": "nil"})
+
+    set_cell_border(table.cell(8,5),
+    top={"val": "nil"},
+    bottom={"val": "nil"},
+    start={"val": "nil"},
+    end={"val": "nil"})
+
+    set_cell_border(table.cell(7,6),
+    top={"val": "nil"},
+    bottom={"val": "nil"},
+    start={"val": "nil"},
+    end={"val": "nil"})
+
+    set_cell_border(table.cell(8,6),
+    top={"val": "nil"},
+    bottom={"val": "nil"},
+    start={"val": "nil"},
+    end={"val": "nil"})
+    
 
 
 def table_approvals(docx_, subjects, details):
@@ -630,15 +702,57 @@ def table_approvals(docx_, subjects, details):
             count, 6).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         total_homologated += int(tipology[tip])
         count += 1
+
     table.cell(count, 2).paragraphs[0].add_run(
         'Total créditos que se homologan').font.size = Pt(8)
     table.cell(count, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
     table.cell(count, 3).paragraphs[0].add_run(
         str(total_homologated)).font.size = Pt(8)
     table.cell(count, 3).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-    table.cell(0, 0).merge(table.cell(count, 1))
-    table.cell(0, 4).merge(table.cell(count, 7))
+    
+    # Set required white table borders in last two columns:
+    for cell in table.columns[0].cells:
+        set_cell_border(cell,
+        top={"val": "nil"},
+        bottom={"val": "nil"},
+        start={"val": "nil"},
+        end={"val": "nil"})
+    
+    for cell in table.columns[1].cells:
+        set_cell_border(cell,
+        top={"val": "nil"},
+        bottom={"val": "nil"},
+        start={"val": "nil"},
+        end={"val": "nil"})
 
+    for cell in table.columns[4].cells:
+        set_cell_border(cell,
+        top={"val": "nil"},
+        bottom={"val": "nil"},
+        start={"val": "nil"},
+        end={"val": "nil"}) 
+    
+    for cell in table.columns[5].cells:
+        set_cell_border(cell,
+        top={"val": "nil"},
+        bottom={"val": "nil"},
+        start={"val": "nil"},
+        end={"val": "nil"}) 
+    
+    for cell in table.columns[6].cells:
+        set_cell_border(cell,
+        top={"val": "nil"},
+        bottom={"val": "nil"},
+        start={"val": "nil"},
+        end={"val": "nil"}) 
+
+    for cell in table.columns[7].cells:
+        set_cell_border(cell,
+        top={"val": "nil"},
+        bottom={"val": "nil"},
+        start={"val": "nil"},
+        end={"val": "nil"})
+        
 
 def table_repprovals(docx_, subjects, details):
     '''Add a generated table with repprovals subjects
@@ -960,3 +1074,498 @@ def indent_table(table, indent):
         e.set(qn('w:w'), str(indent))
         e.set(qn('w:type'), 'dxa')
         tbl_pr[0].append(e)
+
+def table_approvals_cases(docx_, subjects, details, case):
+    '''Add a generated table with approvals subjects
+
+    Params:
+        docx_ (docx_): The document to which the table will be added
+        subjects (list): A list of list with the subjects in table,
+        each list must be a list with following data:
+        [0]: Subject's period
+        [1]: Subject's SIA code
+        [2]: Subject's SIA name
+        [3]: Subject's SIA credits
+        [4]: Subject's SIA tipology
+        [5]: Subject's SIA grade
+        [6]: Subject's old name
+        [7]: Subject's old grade
+        [8]: Subject's old credits
+        details (list): A list with the datails of homologation,
+        must be contains the following data:
+        [0]: Student's name
+        [1]: Student's DNI
+        [2]: Student's academica plan code
+        [3]: Source institution
+        case(str): Type of case (H, E, C)
+
+    Raises:
+        IndexError: All lists must have same size
+
+
+    '''
+    tipology = {}
+    periods = []
+    for asign in subjects:
+        if asign[4] in tipology:
+            tipology.update(
+                {asign[4]: tipology[asign[4]] + int(asign[8])})
+        else:
+            tipology.update({asign[4]: int(asign[8])})
+        if asign[0] not in periods:
+            periods.append(asign[0])
+    asign_number = len(subjects)
+    tipology_number = len(tipology)
+    table = docx_.add_table(
+        rows=(3+asign_number), cols=9, style='Table Grid')
+    table.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    indent_table(table, 963)
+    table.columns[0].width = 500000
+    table.columns[1].width = 550000
+    table.columns[2].width = 1350000
+    table.columns[3].width = 250000
+    table.columns[4].width = 200000
+    table.columns[5].width = 400000
+    table.columns[6].width = 1300000
+    table.columns[7].width = 400000
+    table.columns[8].width = 250000
+    for cell in table.columns[0].cells:
+        cell.width = 500000
+    for cell in table.columns[1].cells:
+        cell.width = 550000
+    for cell in table.columns[2].cells:
+        cell.width = 1350000
+    for cell in table.columns[3].cells:
+        cell.width = 250000
+    for cell in table.columns[4].cells:
+        cell.width = 200000
+    for cell in table.columns[5].cells:
+        cell.width = 400000
+    for cell in table.columns[6].cells:
+        cell.width = 1300000
+    for cell in table.columns[7].cells:
+        cell.width = 400000
+    for cell in table.columns[8].cells:
+        cell.width = 250000
+    cellp = table.cell(0, 0).merge(table.cell(0, 8)).paragraphs[0]
+    cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    cellp.add_run('{}\t\t\tDNI.{}'.format(
+        details[0], details[1])).font.bold = True
+    cellp.runs[0].font.size = Pt(8)
+    cellp = table.cell(1, 0).merge(table.cell(1, 5)).paragraphs[0]
+    cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    
+    if str(case) == 'C':
+        cadenaAux = 'Asignaturas a convalidar' 
+    elif str(case) == 'E':
+        cadenaAux = 'Asignaturas a equivaler' 
+    else:
+        cadenaAux = 'Asignaturas a homologar'
+
+    cellp.add_run(cadenaAux + ' en el plan de estudios de {} ({})'.format(
+        get_academic_program(details[2]), details[2])).font.bold = True
+    cellp.runs[0].font.size = Pt(8)
+    table.cell(1, 0).merge(table.cell(1, 5)
+                           ).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+    cellp = table.cell(1, 6).merge(table.cell(1, 8)).paragraphs[0]
+    cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    cellp.add_run('Asignaturas cursadas en {}'.format(
+        details[3])).font.bold = True
+    cellp.runs[0].font.size = Pt(8)
+    for i in range(2, asign_number + 3):
+        for j in range(9):
+            table.cell(
+                i, j).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+    table.cell(2, 0).paragraphs[0].add_run('Periodo').font.bold = True
+    table.cell(2, 0).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+    table.cell(2, 1).paragraphs[0].add_run('Código').font.bold = True
+    table.cell(2, 1).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+    table.cell(2, 2).paragraphs[0].add_run('Asignatura').font.bold = True
+    table.cell(2, 2).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+    table.cell(2, 3).paragraphs[0].add_run('C').font.bold = True
+    table.cell(2, 3).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+    table.cell(2, 4).paragraphs[0].add_run('T').font.bold = True
+    table.cell(2, 4).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+    table.cell(2, 5).paragraphs[0].add_run('Nota').font.bold = True
+    table.cell(2, 5).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+    table.cell(2, 6).paragraphs[0].add_run('Asignatura').font.bold = True
+    table.cell(2, 6).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+    table.cell(2, 7).paragraphs[0].add_run('Nota').font.bold = True
+    table.cell(2, 7).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+    table.cell(2, 8).paragraphs[0].add_run('C').font.bold = True
+    table.cell(2, 8).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+    for i in range(9):
+        table.cell(2, i).paragraphs[0].runs[0].font.size = Pt(8)
+    subjects.sort(key=lambda s: (s[0], s[2]))
+    summary_subjects_right = {}
+    summary_subjects_left = {}
+    for sbj in subjects:
+        if sbj[6] in summary_subjects_right:
+            summary_subjects_right[sbj[6]] += [sbj]
+        else:
+            if sbj[6] == '':
+                summary_subjects_right[list(
+                    summary_subjects_right.keys())[-1]] += [sbj]
+            else:
+                summary_subjects_right.update({sbj[6]: [sbj]})
+        if sbj[1] in summary_subjects_left:
+            summary_subjects_left[sbj[1]] += [sbj]
+        else:
+            if sbj[1] == '':
+                summary_subjects_left[list(
+                    summary_subjects_left.keys())[-1]] += [sbj]
+            else:
+                summary_subjects_left.update({sbj[1]: [sbj]})
+        index = 3
+    if len(summary_subjects_right) > len(summary_subjects_left):
+        for item in summary_subjects_left:
+            for k in range(6):
+                mg_c = table.cell(index, k).merge(table.cell(
+                    index + len(summary_subjects_left[item]) - 1, k)).paragraphs[0]
+                table.cell(index, k).merge(table.cell(
+                    index + len(summary_subjects_left[
+                        item]) - 1, k)).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                mg_c.add_run(
+                    str(summary_subjects_left[item][0][k])).font.size = Pt(8)
+            index += len(summary_subjects_left[item])
+        count = 3
+        for subject in subjects:
+            table.cell(count, 6).paragraphs[0].add_run(
+                subject[6]).font.size = Pt(8)
+            table.cell(count, 6).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 7).paragraphs[0].add_run(
+                subject[7]).font.size = Pt(8)
+            table.cell(count, 7).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 8).paragraphs[0].add_run(str(subject[8])
+                ).font.size = Pt(8)
+            table.cell(count, 8).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            count += 1
+    elif len(summary_subjects_right) < len(summary_subjects_left):
+        if len(summary_subjects_right) == 1:
+            for k in (6, 8):
+                mg_c = table.cell(index, k).merge(table.cell(
+                    index + len(subjects) - 1, k)).paragraphs[0]
+                table.cell(index, k).merge(table.cell(
+                    index + len(subjects) - 1, k)).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                mg_c.add_run(summary_subjects_right[list(
+                    summary_subjects_right.keys())[-1]][0][k]).font.size = Pt(8)
+            index += len(subjects)
+        else:
+            for item in summary_subjects_right:
+                for k in (6, 8):
+                    mg_c = table.cell(index, k).merge(table.cell(
+                        index + len(summary_subjects_right[item]) - 1, k)).paragraphs[0]
+                    table.cell(index, k).merge(table.cell(
+                        index + len(
+                            summary_subjects_right[
+                                item]) - 1, k)).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                    mg_c.add_run(
+                        summary_subjects_right[item][0][k]).font.size = Pt(8)
+                index += len(summary_subjects_right[item])
+        count = 3
+        for subject in subjects:
+            table.cell(count, 0).paragraphs[0].add_run(
+                subject[0]).font.size = Pt(8)
+            table.cell(count, 0).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 1).paragraphs[0].add_run(
+                subject[1]).font.size = Pt(8)
+            table.cell(count, 1).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 2).paragraphs[0].add_run(
+                subject[2]).font.size = Pt(8)
+            table.cell(count, 2).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 3).paragraphs[0].add_run(
+                str(subject[3])).font.size = Pt(8)
+            table.cell(count, 3).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 4).paragraphs[0].add_run(
+                subject[4]).font.size = Pt(8)
+            table.cell(count, 4).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 5).paragraphs[0].add_run(
+                subject[5]).font.size = Pt(8)
+            table.cell(count, 5).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            count += 1
+    else:
+        count = 3
+        for subject in subjects:
+            table.cell(count, 0).paragraphs[0].add_run(
+                subject[0]).font.size = Pt(8)
+            table.cell(count, 0).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 1).paragraphs[0].add_run(
+                subject[1]).font.size = Pt(8)
+            table.cell(count, 1).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 2).paragraphs[0].add_run(
+                subject[2]).font.size = Pt(8)
+            table.cell(count, 2).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 3).paragraphs[0].add_run(
+                str(subject[3])).font.size = Pt(8)
+            table.cell(count, 3).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 4).paragraphs[0].add_run(
+                subject[4]).font.size = Pt(8)
+            table.cell(count, 4).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 5).paragraphs[0].add_run(str(subject[5])
+                ).font.size = Pt(8)
+            table.cell(count, 5).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 6).paragraphs[0].add_run(
+                subject[6]).font.size = Pt(8)
+            table.cell(count, 6).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 7).paragraphs[0].add_run(
+                subject[7]).font.size = Pt(8)
+            table.cell(count, 7).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            table.cell(count, 8).paragraphs[0].add_run(str(subject[8])
+                ).font.size = Pt(8)
+            table.cell(count, 8).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            count += 1
+    total_homologated = 0
+    table = docx_.add_table(
+        rows=(tipology_number+1), cols=9, style='Table Grid')
+    table.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    indent_table(table, 963)
+
+    
+    table.columns[0].width = 500000
+    table.columns[1].width = 550000
+    table.columns[2].width = 1350000
+    table.columns[3].width = 250000
+    table.columns[4].width = 200000
+    table.columns[5].width = 400000
+    table.columns[6].width = 1300000
+    table.columns[7].width = 400000
+    table.columns[8].width = 250000
+    for cell in table.columns[0].cells:
+        cell.width = 500000
+    for cell in table.columns[1].cells:
+        cell.width = 550000
+    for cell in table.columns[2].cells:
+        cell.width = 1350000
+    for cell in table.columns[3].cells:
+        cell.width = 250000
+    for cell in table.columns[4].cells:
+        cell.width = 200000
+    for cell in table.columns[5].cells:
+        cell.width = 400000
+    for cell in table.columns[6].cells:
+        cell.width = 1300000
+    for cell in table.columns[7].cells:
+        cell.width = 400000
+    for cell in table.columns[8].cells:
+        cell.width = 250000
+    count = 0
+    for tip in tipology:
+        text = 'Créditos homologados ' + str(tip)
+        table.cell(count, 2).paragraphs[0].add_run(text).font.size = Pt(8)
+        table.cell(
+            count, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(count, 3).paragraphs[0].add_run(
+            str(tipology[tip])).font.size = Pt(8)
+        table.cell(
+            count, 3).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        table.cell(
+            count, 6).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        total_homologated += int(tipology[tip])
+        count += 1
+    table.cell(count, 2).paragraphs[0].add_run(
+        'Total créditos que se homologan').font.size = Pt(8)
+    table.cell(count, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+    table.cell(count, 3).paragraphs[0].add_run(
+        str(total_homologated)).font.size = Pt(8)
+    table.cell(count, 3).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    # Set required white table borders in last two columns:
+    for cell in table.columns[0].cells:
+        set_cell_border(cell,
+        top={"val": "nil"},
+        bottom={"val": "nil"},
+        start={"val": "nil"},
+        end={"val": "nil"})
+    
+    for cell in table.columns[1].cells:
+        set_cell_border(cell,
+        top={"val": "nil"},
+        bottom={"val": "nil"},
+        start={"val": "nil"},
+        end={"val": "nil"})
+
+    for cell in table.columns[4].cells:
+        set_cell_border(cell,
+        top={"val": "nil"},
+        bottom={"val": "nil"},
+        start={"val": "nil"},
+        end={"val": "nil"}) 
+    
+    for cell in table.columns[5].cells:
+        set_cell_border(cell,
+        top={"val": "nil"},
+        bottom={"val": "nil"},
+        start={"val": "nil"},
+        end={"val": "nil"}) 
+    
+    for cell in table.columns[6].cells:
+        set_cell_border(cell,
+        top={"val": "nil"},
+        bottom={"val": "nil"},
+        start={"val": "nil"},
+        end={"val": "nil"}) 
+
+    for cell in table.columns[7].cells:
+        set_cell_border(cell,
+        top={"val": "nil"},
+        bottom={"val": "nil"},
+        start={"val": "nil"},
+        end={"val": "nil"})
+    
+    for cell in table.columns[8].cells:
+        set_cell_border(cell,
+        top={"val": "nil"},
+        bottom={"val": "nil"},
+        start={"val": "nil"},
+        end={"val": "nil"})
+
+
+def table_repprovals_cases(docx_, subjects, details, case):
+    '''Add a generated table with repprovals subjects
+
+    Params:
+        docx_ (docx_): The document to which the table will be added
+        subjects (list): A list of list with the subjects in table,
+        each list must be a list with following data:
+        [0]: Subject's period
+        [1]: Subject's SIA name
+        [2]: Subject's old name
+        [3]: Subject's justification
+        [4]: Subject's old credits
+        [5]: Subject's grade
+        details (list): A list with the datails of homologation,
+        must be contains the following data:
+        [0]: Student's name
+        [1]: Student's DNI
+        [2]: Student's academica plan code
+        [3]: Source institution
+        case(str): Type of case (H, E, C)
+
+    Raises:
+        IndexError: All lists must have same size
+
+
+    '''
+    asign_number = len(subjects)
+    table = docx_.add_table(
+        rows=(3+asign_number), cols=6, style='Table Grid')
+    table.style.font.size = Pt(8)
+    table.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    indent_table(table, 963)
+    table.columns[0].width = 500000
+    table.columns[1].width = 850000
+    table.columns[2].width = 1400000
+    table.columns[3].width = 1850000
+    table.columns[4].width = 200000
+    table.columns[5].width = 400000
+    for cell in table.columns[0].cells:
+        cell.width = 500000
+        cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+    for cell in table.columns[1].cells:
+        cell.width = 850000
+        cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+    for cell in table.columns[2].cells:
+        cell.width = 1400000
+        cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+    for cell in table.columns[3].cells:
+        cell.width = 1850000
+        cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+    for cell in table.columns[4].cells:
+        cell.width = 200000
+        cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+    for cell in table.columns[5].cells:
+        cell.width = 400000
+        cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+    cellp = table.cell(0, 0).merge(table.cell(0, 5)).paragraphs[0]
+    cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    cellp.add_run('{}\t\t\tDNI.{}'.format(
+        details[0], details[1])).font.bold = True
+    cellp.runs[0].font.size = Pt(8)
+    cellp = table.cell(1, 0).merge(table.cell(1, 5)).paragraphs[0]
+    cellp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    if case == 'C':
+        cadenaAux = 'Asignaturas que no se convalidan' 
+    elif case == 'E':
+        cadenaAux = 'Asignaturas que no se equivalen' 
+    else:
+        cadenaAux = 'Asignaturas que no se homologan'
+        
+    cellp.add_run( cadenaAux + ' en el plan de estudios {} ({})'.format(
+        get_academic_program(details[2]), details[2])).font.bold = True
+    cellp.runs[0].font.size = Pt(8)
+    for i in range(2, asign_number + 3):
+        for j in range(6):
+            table.cell(
+                i, j).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+    table.cell(2, 0).paragraphs[0].add_run('Periodo').font.bold = True
+    table.cell(2, 0).paragraphs[0].runs[0].font.size = Pt(8)
+    table.cell(2, 1).paragraphs[0].add_run(
+        'Asignatura Universidad Nacional de Colombia - ({})'.format(details[2])).font.bold = True
+    table.cell(2, 1).paragraphs[0].runs[0].font.size = Pt(8)
+    table.cell(2, 2).paragraphs[0].add_run(
+        'Asignatura cursada en {}'.format(details[3])).font.bold = True
+    table.cell(2, 2).paragraphs[0].runs[0].font.size = Pt(8)
+    table.cell(2, 3).paragraphs[0].add_run('Justificación').font.bold = True
+    table.cell(2, 3).paragraphs[0].runs[0].font.size = Pt(8)
+    table.cell(2, 4).paragraphs[0].add_run('C').font.bold = True
+    table.cell(2, 4).paragraphs[0].runs[0].font.size = Pt(8)
+    table.cell(2, 5).paragraphs[0].add_run('Nota').font.bold = True
+    table.cell(2, 5).paragraphs[0].runs[0].font.size = Pt(8)
+    count = 3
+    for subject in subjects:
+        table.cell(count, 0).paragraphs[0].add_run(subject[0])
+        table.cell(count, 0).paragraphs[0].runs[0].font.size = Pt(8)
+        table.cell(count, 1).paragraphs[0].add_run(subject[1])
+        table.cell(count, 1).paragraphs[0].runs[0].font.size = Pt(8)
+        table.cell(count, 2).paragraphs[0].add_run(
+            subject[2])
+        table.cell(count, 2).paragraphs[0].runs[0].font.size = Pt(8)
+        table.cell(count, 3).paragraphs[0].add_run(str(subject[3]))
+        table.cell(count, 3).paragraphs[0].runs[0].font.size = Pt(8)
+        table.cell(count, 4).paragraphs[0].add_run(str(subject[4]))
+        table.cell(count, 4).paragraphs[0].runs[0].font.size = Pt(8)
+        table.cell(count, 5).paragraphs[0].add_run(subject[5])
+        table.cell(count, 5).paragraphs[0].runs[0].font.size = Pt(8)
+        count += 1
+
+
+# Extrated from https://programmersought.com/article/74085524416/ to edit cell borders:
+def set_cell_border(cell: _Cell, **kwargs):
+    """
+    Set cell`s border
+    Usage:
+    set_cell_border(
+        cell,
+        top={"sz": 12, "val": "single", "color": "#FF0000", "space": "0"},
+        bottom={"sz": 12, "color": "#00FF00", "val": "single"},
+        start={"sz": 24, "val": "dashed", "shadow": "true"},
+        end={"sz": 12, "val": "dashed"},
+    )
+    """
+    tc = cell._tc
+    tcPr = tc.get_or_add_tcPr()
+ 
+    # check for tag existnace, if none found, then create one
+    tcBorders = tcPr.first_child_found_in("w:tcBorders")
+    if tcBorders is None:
+        tcBorders = OxmlElement('w:tcBorders')
+        tcPr.append(tcBorders)
+ 
+    # list over all available tags
+    for edge in ('start', 'top', 'end', 'bottom', 'insideH', 'insideV'):
+        edge_data = kwargs.get(edge)
+        if edge_data:
+            tag = 'w:{}'.format(edge)
+ 
+            # check for tag existnace, if none found, then create one
+            element = tcBorders.find(qn(tag))
+            if element is None:
+                element = OxmlElement(tag)
+                tcBorders.append(element)
+ 
+            # looks like order of attributes is important
+            for key in ["sz", "val", "color", "space", "shadow"]:
+                if key in edge_data:
+                    element.set(qn('w:{}'.format(key)), str(edge_data[key]))

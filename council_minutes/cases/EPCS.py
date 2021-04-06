@@ -62,7 +62,7 @@ class EPCS(Request):
 
     str_cm = [
         'otorgar exención del pago de {} ({}) puntos de Derechos Académicos, a partir del periodo' +
-        ' académico {}, y durante el siguiente periodo académico, por tener créditos disponibles ' +
+        ' académico {}, y durante los siguientes cuatro(4) periodos académicos, por tener créditos disponibles ' +
         'al finalizar su estudios del programa de pregrado {} ({}), en la {}. ',
         'El cálculo de los créditos disponibles se realiza con base en el cupo de créditos establ' +
         'ecido en el Artículo 2 del {}.'

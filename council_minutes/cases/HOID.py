@@ -2,7 +2,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
 from mongoengine import EmbeddedDocumentListField, StringField
 from ..models import Request, Subject
-from .case_utils import add_analysis_paragraph, table_subjects
+from .case_utils import add_analysis_paragraph, table_english, get_academic_program
 
 
 class HOID(Request):
@@ -27,7 +27,6 @@ class HOID(Request):
     grade_got = StringField(required=True, default='B1',
                             display='Nivel Obtenido')
 
-    
     subs = []
     subs.append(Subject(name="Inglés I- Semestral",   code='1000044', credits=3, 
                             tipology=Subject.TIP_PRE_NIVELACION))
@@ -74,8 +73,13 @@ class HOID(Request):
         self.add_answer(paragraph)
 
     def pcm(self, docx):
+        final_analysis = []
         analysis = self.str_pcm[0].format(self.grade_got, self.institution)
-        add_analysis_paragraph(docx, [analysis])
+        final_analysis.append(analysis)
+        if len(self.extra_analysis) > 0:
+            for i in self.extra_analysis:
+                final_analysis.append(i)
+        add_analysis_paragraph(docx, final_analysis)
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         paragraph.paragraph_format.space_after = Pt(0)
@@ -103,7 +107,15 @@ class HOID(Request):
 
     def add_subjects(self, docx):
         data = Subject.subjects_to_array(self.subjects)
-        table_subjects(docx, data)
+        details = []
+        details.append(self.certification_type)
+        details.append(self.grade_got)
+        print(self.student_name)
+        details.append(self.student_name)
+        details.append(self.student_dni)
+        details.append(get_academic_program(self.academic_program))
+        details.append(self.academic_program)
+        table_english(docx, data, details)
 
     def resource_analysis(self, docx):
         last_paragraph = docx.paragraphs[-1]
@@ -116,3 +128,4 @@ class HOID(Request):
     def resource_answer(self, docx):
         last_paragraph = docx.paragraphs[-1]
         self.cm_answer(last_paragraph)
+
