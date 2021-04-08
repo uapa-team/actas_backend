@@ -492,8 +492,12 @@ class Request(DynamicDocument):
     def is_affirmative_response_approval_status(self):
         return self.approval_status in (self.AS_APRUEBA, self.AS_CONSEJO_RECOMIENDA)
 
+    def is_affirmative_or_waiting_response_approval_status(self):
+        return self.approval_status in (self.AS_APRUEBA, self.AS_CONSEJO_RECOMIENDA, self.AS_EN_ESPERA):
+
     def is_affirmative_response_advisor_response(self):
         return self.advisor_response in (self.ARCR_RECOMENDAR, self.ARCR_APROBAR)
+
 
     def is_pre(self):
         return self.academic_program in (self.PI_AGRICOLA, self.PI_CIVIL,
