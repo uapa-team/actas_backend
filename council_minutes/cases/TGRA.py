@@ -57,8 +57,8 @@ class TGRA(Request):
         paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
         # pylint: disable=no-member
-        table_subjects(docx,
-                       [['2015289' if self.type_tgra == 'TP' else '202599',
+        if self.is_affirmative_or_waiting_response_approval_status():
+            table_subjects(docx, [['2015289' if self.type_tgra == 'TP' else '202599',
                          self.get_type_tgra_display(), '1', Subject.TIP_PRE_TRAB_GRADO[1], '6']])
 
     def cm_answer(self, paragraph):

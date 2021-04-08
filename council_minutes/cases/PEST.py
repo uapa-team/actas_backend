@@ -100,7 +100,8 @@ class PEST(Request):
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
-        self.add_table(docx)
+        if self.is_affirmative_or_waiting_response_approval_status():
+            self.add_table(docx)
 
     def cm_answer(self, paragraph):
         # pylint: disable=no-member
