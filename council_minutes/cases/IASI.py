@@ -1,6 +1,6 @@
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import EmbeddedDocumentListField, BooleanField
+from mongoengine import EmbeddedDocumentListField, BooleanField, ListField, StringField
 from ..models import Request, Subject
 from .case_utils import table_subjects, add_analysis_paragraph
 
@@ -15,8 +15,37 @@ class IASI(Request):
 
     full_name = 'Inscripción de Asignaturas'
 
+    CJT_ANSWER_JUST_DEB = 'JD'
+    CJT_ANSWER_PROC_ACT = 'PA'
+    CJT_ANSWER_HIST_BAPI = 'HB'
+    CJT_ANSWER_PROC_MAS = 'PM'
+    CJT_ANSWER_OTRO = 'OT'
+    CJT_ANSWER_N_DEB = 'ND'
+
+    CJT_ANSWER_CHOICES = (
+        (CJT_ANSWER_JUST_DEB,'Justifica debidamente su solicitud'),
+        (CJT_ANSWER_PROC_ACT,'Proceso de actualización'),
+        (CJT_ANSWER_HIST_BAPI,'Inscripción en la historia académica BAPI'),
+        (CJT_ANSWER_PROC_MAS,'Falta de registro en el proceso masivo'),
+        (CJT_ANSWER_N_DEB,'No justifica debidamente su solicitud'),
+        (CJT_ANSWER_OTRO, 'Otro')
+    )
+
+    CJT_ANSWERS_DICT = {
+        CJT_ANSWER_JUST_DEB : 'justifica debidamente su solicitud',
+        CJT_ANSWER_PROC_ACT : 'se llevó a cabo un proceso de actualización',
+        CJT_ANSWER_HIST_BAPI : 'la asignatura estaba inscrita en la historia académica BAPI del estudiante',
+        CJT_ANSWER_PROC_MAS : 'no se registró la asignatura en el proceso masivo',
+        CJT_ANSWER_N_DEB : 'no justifica debidamente su solicitud',
+        CJT_ANSWER_OTRO : 'existen otros factores que lo justifican'
+    }
+
     subjects = EmbeddedDocumentListField(
         IASISubject, display='Asignaturas')
+
+    council_decision = StringField(
+        max_length=255, choices=CJT_ANSWER_CHOICES,
+        default=CJT_ANSWER_N_DEB, display='Justificación del Consejo')
 
     str_cm = [
         'inscribir la(s) siguiente(s) asignatura(s) del programa {} ({}), en el periodo académico' +
@@ -64,7 +93,7 @@ class IASI(Request):
             self.get_academic_program_display(),
             self.academic_program,
             self.academic_period,
-            self.council_decision))
+            self.CJT_ANSWERS_DICT[self.council_decision]))
         paragraph.add_run('({}).'.format(self.regulations['008|2008|CSU'][0]))
 
     def cm_answer_approved(self, paragraph):
@@ -76,7 +105,7 @@ class IASI(Request):
             self.get_academic_program_display(),
             self.academic_program,
             self.academic_period,
-            self.council_decision))
+            self.CJT_ANSWERS_DICT[self.council_decision]))
         paragraph.add_run('({}).'.format(self.regulations['008|2008|CSU'][0]))
 
     def cm_answer_not_approved(self, paragraph):
@@ -88,7 +117,7 @@ class IASI(Request):
             self.get_academic_program_display(),
             self.academic_program,
             self.academic_period,
-            self.council_decision))
+            self.CJT_ANSWERS_DICT[self.council_decision]))
         paragraph.add_run('({}).'.format(self.regulations['008|2008|CSU'][0]))
 
     def pcm(self, docx):
@@ -140,7 +169,7 @@ class IASI(Request):
             self.get_academic_program_display(),
             self.academic_program,
             self.academic_period,
-            self.council_decision))
+            self.CJT_ANSWERS_DICT[self.council_decision]))
 
     def pcm_answer_approved(self, paragraph):
         paragraph.add_run(
@@ -151,7 +180,7 @@ class IASI(Request):
             self.get_academic_program_display(),
             self.academic_program,
             self.academic_period,
-            self.council_decision))
+            self.CJT_ANSWERS_DICT[self.council_decision]))
 
     def pcm_answer_not_approved(self, paragraph):
         paragraph.add_run(
@@ -162,7 +191,7 @@ class IASI(Request):
             self.get_academic_program_display(),
             self.academic_program,
             self.academic_period,
-            self.council_decision))
+            self.CJT_ANSWERS_DICT[self.council_decision]))
 
     def resource_analysis(self, docx):
         last_paragraph = docx.paragraphs[-1]

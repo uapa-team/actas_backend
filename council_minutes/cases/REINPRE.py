@@ -18,18 +18,18 @@ class REINPRE(Request):
     RL_ANSWER_PAPA_CREDITOS = 'PC'
     RL_ANSWER_CHOICES = (
         (RL_ANSWER_RENOV_MATRICULA, 'No cumplir con los requisitos exigidos para la' +
-         ' renovación de la matrícula, en los plazos señalados por la Universidad.'),
+         ' renovación de la matrícula, en los plazos señalados por la Universidad'),
         (RL_ANSWER_PAPA,
-         'Presentar un Promedio Aritmético Ponderado Acumulado menor que tres punto cero (3.0).'),
+         'Presentar un Promedio Aritmético Ponderado Acumulado menor que tres punto cero (3.0)'),
         (RL_ANSWER_CUPO_CREDITOS,
          'No disponer de un cupo de créditos suficiente para inscribir las asignaturas' +
-         ' del plan de estudios pendientes de aprobación.'),
+         ' del plan de estudios pendientes de aprobación'),
         (RL_ANSWER_SANCION,
          'Recibir sanción disciplinaria de expulsión o suspensión impuesta de acuerdo' +
-         ' con las normas vigentes.'),
+         ' con las normas vigentes'),
         (RL_ANSWER_PAPA_CREDITOS,
-         'PAPA menor a 3.0 y cupo de créditos insuficiente.'),
-        (RL_ANSWER_OTRO, 'Otro.')
+         'PAPA menor a 3.0 y cupo de créditos insuficiente'),
+        (RL_ANSWER_OTRO, 'Otro')
     )
 
     full_name = 'Reingreso Pregrado'
@@ -261,13 +261,24 @@ class REINPRE(Request):
         table.cell(7, 0).merge(table.cell(7, 1)
                                ).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         # pylint: disable=no-member
+        if self.RL_ANSWER_RENOV_MATRICULA in self.reason_of_loss:
+            table.cell(7, 2).paragraphs[0].add_run(
+                self.RL_ANSWER_CHOICES[0][1] + '. \n').font.size = Pt(8)
+        if self.RL_ANSWER_PAPA in self.reason_of_loss:
+            table.cell(7, 2).paragraphs[0].add_run(
+                self.RL_ANSWER_CHOICES[1][1] + '. \n').font.size = Pt(8)
+        if self.RL_ANSWER_CUPO_CREDITOS in self.reason_of_loss:
+            table.cell(7, 2).paragraphs[0].add_run(
+                self.RL_ANSWER_CHOICES[2][1] + '. \n').font.size = Pt(8)
+        if self.RL_ANSWER_SANCION in self.reason_of_loss:
+            table.cell(7, 2).paragraphs[0].add_run(
+                self.RL_ANSWER_CHOICES[3][1] + '. \n').font.size = Pt(8)
         if self.RL_ANSWER_PAPA_CREDITOS in self.reason_of_loss:
             table.cell(7, 2).paragraphs[0].add_run(
-                self.RL_ANSWER_CHOICES[1][1] + '\n' +
-                self.RL_ANSWER_CHOICES[2][1]).font.size = Pt(8)
-        else:
+                self.RL_ANSWER_CHOICES[4][1] + '. \n').font.size = Pt(8)
+        if self.RL_ANSWER_OTRO in self.reason_of_loss:
             table.cell(7, 2).paragraphs[0].add_run(
-                self.get_reason_of_loss_display()).font.size = Pt(8)
+                self.RL_ANSWER_CHOICES[5][1] + '. \n').font.size = Pt(8)
         table.cell(7, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         mg_cll = table.cell(8, 0).merge(table.cell(8, 2)).paragraphs[0].add_run(
             self.str_pcm_pre_acadinfo[8])
@@ -323,7 +334,7 @@ class REINPRE(Request):
         table.cell(12, 2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
 
         # Optional: Grade needed with N credits to keep student condition.
-        if (self.RL_ANSWER_PAPA in self.reason_of_loss or RL_ANSWER_PAPA_CREDITOS in self.reason_of_loss):
+        if (self.RL_ANSWER_PAPA in self.reason_of_loss or self.RL_ANSWER_PAPA_CREDITOS in self.reason_of_loss):
             table = docx.add_table(rows=5, cols=2)
             for col in table.columns:
                 for cell in col.cells:
@@ -428,6 +439,31 @@ class REINPRE(Request):
                           self.str_pcm_pre[19])
 
     def get_analysis(self):
+        rl_analysis_list = []
+        rl_analysis = ''
+        if self.RL_ANSWER_RENOV_MATRICULA in self.reason_of_loss:
+            rl_analysis_list.append(self.RL_ANSWER_CHOICES[0][1])  
+        if self.RL_ANSWER_PAPA in self.reason_of_loss:
+            rl_analysis_list.append(self.RL_ANSWER_CHOICES[1][1]) 
+        if self.RL_ANSWER_CUPO_CREDITOS in self.reason_of_loss:
+            rl_analysis_list.append(self.RL_ANSWER_CHOICES[2][1]) 
+        if self.RL_ANSWER_SANCION in self.reason_of_loss:
+            rl_analysis_list.append(self.RL_ANSWER_CHOICES[3][1]) 
+        if self.RL_ANSWER_PAPA_CREDITOS in self.reason_of_loss:
+            rl_analysis_list.append(self.RL_ANSWER_CHOICES[4][1]) 
+        if self.RL_ANSWER_OTRO in self.reason_of_loss:
+            rl_analysis_list.append(self.RL_ANSWER_CHOICES[5][1]) 
+        
+        if len(rl_analysis_list)==1:
+            rl_analysis = rl_analysis_list[0]
+        if len(rl_analysis_list)>1:
+            for i in range(len(rl_analysis_list)):
+                if i < len(rl_analysis_list)-1:
+                    rl_analysis = rl_analysis + (rl_analysis_list[i]+', ')
+                else:
+                    rl_analysis = rl_analysis + ('y ' + rl_analysis_list[i])
+
+
         analysis = []
         modifier = 'No h' if self.first_reing else 'H'
         analysis.append(self.str_analysis[0].format(
@@ -436,7 +472,7 @@ class REINPRE(Request):
         analysis.append(self.str_analysis[1].format(
             self.regulations['239|2009|VAC'][0],
             # pylint: disable=no-member
-            self.loss_period, self.get_reason_of_loss_display()
+            self.loss_period, rl_analysis
         ))
         modifier = 'T' if self.papa >= 2.7 else 'No t'
         analysis.append(self.str_analysis[2].format(

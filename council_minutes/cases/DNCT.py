@@ -27,7 +27,7 @@ class DNCT(Request):
     code_thesis = StringField(
         default='', display='Código de asignatura Tesis de doctorado')
 
-    proffesors_thesis = EmbeddedDocumentListField(
+    professors_thesis = EmbeddedDocumentListField(
         Professor, display='Docentes jurados evaluadores del proyecto de tesis')
 
     regulation_list = ['056|2012|CSU', '040|2017|CFA']
@@ -67,19 +67,19 @@ class DNCT(Request):
         paragraph.add_run('El Comité Asesor ')
         paragraph.add_run('DESIGNA:').font.bold = True
 
-    def add_proffesors(self, professors):
+    def add_professors(self, professors):
         answer = ''
         for index in range(len(professors)-2):
-            answer = answer + self.add_proffesor(professors[index])
+            answer = answer + self.add_professor(professors[index])
             answer += ', '
         if len(professors) > 1:
-            answer = answer + self.add_proffesor(professors[-2])
+            answer = answer + self.add_professor(professors[-2])
             answer += ' y el profesor(a) '
         if len(professors) != 0:
-            answer = answer + self.add_proffesor(professors[-1])
+            answer = answer + self.add_professor(professors[-1])
         return answer
         
-    def add_proffesor(self, professor):
+    def add_professor(self, professor):
         answer = ''
         answer = answer + str(professor.name)
         answer = answer + ' del departamento ' + str(professor.get_department_display())
@@ -97,7 +97,7 @@ class DNCT(Request):
         paragraph.add_run(self.str_pcm[4].format(
             self.get_academic_program_display(), 
             self.thesis_name,
-            self.add_proffesors(self.proffesors_thesis)
+            self.add_professors(self.professors_thesis)
         ))
         paragraph.style = 'List Bullet'
         paragraph = docx.add_paragraph()
@@ -105,7 +105,7 @@ class DNCT(Request):
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(self.str_pcm[5].format(
             self.get_academic_program_display(), 
-            self.add_proffesors(self.proffesors_thesis)
+            self.add_professors(self.professors_thesis)
         ))
         paragraph.style = 'List Bullet'
 
