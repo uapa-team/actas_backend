@@ -82,7 +82,7 @@ class CTIP(Request):
         paragraph.add_run(self.str_comittee_header + ' ')
         self.pcm_answer(paragraph)
         paragraph.add_run(', ' + self.str_cm[1].format(self.CJT_ANSWERS_DICT[self.council_decision]))
-        if self.is_affirmative_response_advisor_response():
+        if self.is_affirmative_response_advisor_response() or self.is_waiting_response_advisor_response():
             self.add_subjects_change_tipology_table(docx)
 
     def pcm_answer(self, paragraph):

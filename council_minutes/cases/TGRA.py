@@ -57,7 +57,7 @@ class TGRA(Request):
         paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
         # pylint: disable=no-member
-        if self.is_affirmative_response_approval_status() or self.is_waiting_response_approval_status():
+        if self.is_affirmative_response_approval_status():
             table_subjects(docx, [['2015289' if self.type_tgra == 'TP' else '202599',
                          self.get_type_tgra_display(), '1', Subject.TIP_PRE_TRAB_GRADO[1], '6']])
 
@@ -77,7 +77,7 @@ class TGRA(Request):
         paragraph.add_run(self.str_answer + ': ').bold = True
         paragraph.add_run(self.str_comittee_header + ' ')
         self.pcm_answer(paragraph)
-        if self.is_affirmative_response_advisor_response():
+        if self.is_affirmative_response_advisor_response() or self.is_waiting_response_advisor_response():
             # pylint: disable=no-member
             table_subjects(docx,
                            [['2015289' if self.type_tgra == 'TP' else '202599',

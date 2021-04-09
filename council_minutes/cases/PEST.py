@@ -99,7 +99,7 @@ class PEST(Request):
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
-        if self.is_affirmative_response_approval_status() or is_waiting_response_approval_status():
+        if self.is_affirmative_response_approval_status():
             self.add_table(docx)
 
     def cm_answer(self, paragraph):
@@ -121,7 +121,8 @@ class PEST(Request):
         paragraph.add_run(self.str_answer + ' ').font.bold = True
         paragraph.add_run(self.str_comittee_header + ' ')
         self.pcm_answer(paragraph)
-        #self.add_table(docx)
+        if self.is_waiting_response_advisor_response() or self.is_affirmative_response_advisor_response():
+            self.add_table(docx)
 
     def pcm_answer(self, paragraph):
         paragraph.add_run(
