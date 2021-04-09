@@ -139,117 +139,15 @@ class HCEM(Request):
             return data
 
 
-    class MobilitySubject(EmbeddedDocument):
-        TIP_PRE_FUND_OBLIGATORIA = 'PB'
-        TIP_PRE_FUND_OPTATIVA = 'PO'
-        TIP_PRE_DISC_OBLIGATORIA = 'PC'
-        TIP_PRE_DISC_OPTATIVA = 'PT'
-        TIP_PRE_TRAB_GRADO = 'PP'
-        TIP_PRE_LIBRE_ELECCION = 'PL'
-        TIP_PRE_NIVELACION = 'PE'
-        TIP_MOF_OBLIGATORIA = 'MO'
-        TIP_MOF_ACTIV_ACADEMICA = 'MC'
-        TIP_MOF_TRAB_GRADO = 'MP'
-        TIP_MOF_ELEGIBLE = 'ML'
-        TIP_DOC_ACTIV_ACADEMICA = 'DF'
-        TIP_DOC_TESIS = 'DS'
-        TIP_DOC_ELEGIBLE = 'DU'
-
-        TIP_CHOICES = (
-            (TIP_PRE_FUND_OBLIGATORIA, 'Fundamentación Obligatoria (B)'),
-            (TIP_PRE_FUND_OPTATIVA, 'Fundamentación Optativa (O)'),
-            (TIP_PRE_DISC_OBLIGATORIA, 'Disciplinar Obligatoria (C)'),
-            (TIP_PRE_DISC_OPTATIVA, 'Disciplinar Optativa (T)'),
-            (TIP_PRE_TRAB_GRADO, 'Trabajo de Grado Pregrado (P)'),
-            (TIP_PRE_LIBRE_ELECCION, 'Libre Elección (L)'),
-            (TIP_PRE_NIVELACION, 'Nivelación (E)'),
-            (TIP_MOF_OBLIGATORIA, 'Obligatoria Maestría (O)'),
-            (TIP_MOF_ACTIV_ACADEMICA, 'Actividad Académica Maestría (C)'),
-            (TIP_MOF_TRAB_GRADO, 'Tesis o Trabajo Final de Maestría (P)'),
-            (TIP_MOF_ELEGIBLE, 'Elegible Maestría (L)'),
-            (TIP_DOC_ACTIV_ACADEMICA, 'Actividad Académica Doctorado (F)'),
-            (TIP_DOC_TESIS, 'Tesis de Doctorado (S)'),
-            (TIP_DOC_ELEGIBLE, 'Elegible Doctorado (U)'),
-        )
-
-        name = StringField(required=True, display='Nombre Asignatura', default='')
-        code = StringField(required=True, display='Código', default='')
-        credits = IntField(required=True, display='Créditos', default=0)
-        tipology = StringField(
-            required=True, choices=TIP_CHOICES, display='Tipología', default=TIP_PRE_FUND_OBLIGATORIA)
-
-        @staticmethod
-        def subjects_to_array(subjects):
-            """
-            A function that converts a List of Subjects into a classic array.
-            : param subjects: EmbeddedDocumentListField of Subjects to be converted
-            """
-            data = []
-            for subject in subjects:
-                data.append([
-                    subject.code,
-                    subject.name,
-                    "",
-                    subject.tipology[-1],
-                    str(subject.credits)
-                ])
-            return data
-
-        @staticmethod
-        def creds_summary(subjects):
-            """
-            A function that returns a summary of credits by tipology.
-            : param subjects: EmbeddedDocumentListField of Subjects to be computed
-            """
-            data = [0, 0, 0, 0, 0]
-            for sbj in subjects:
-                if sbj.tipology == TIP_PRE_FUND_OBLIGATORIA:
-                    try:
-                        if float(sbj.grade) >= 3.0:
-                            data[0] += sbj.credits
-                    except ValueError:
-                        if sbj.grade in ('AP', 'AS'):
-                            data[0] += sbj.credits
-                elif sbj.tipology == TIP_PRE_FUND_OPTATIVA:
-                    try:
-                        if float(sbj.grade) >= 3.0:
-                            data[1] += sbj.credits
-                    except ValueError:
-                        if sbj.grade in ('AP', 'AS'):
-                            data[1] += sbj.credits
-                elif sbj.tipology == TIP_PRE_DISC_OBLIGATORIA:
-                    try:
-                        if float(sbj.grade) >= 3.0:
-                            data[2] += sbj.credits
-                    except ValueError:
-                        if sbj.grade in ('AP', 'AS'):
-                            data[2] += sbj.credits
-                elif sbj.tipology == TIP_PRE_DISC_OPTATIVA:
-                    try:
-                        if float(sbj.grade) >= 3.0:
-                            data[3] += sbj.credits
-                    except ValueError:
-                        if sbj.grade in ('AP', 'AS'):
-                            data[3] += sbj.credits
-                elif sbj.tipology == TIP_PRE_LIBRE_ELECCION:
-                    try:
-                        if float(sbj.grade) >= 3.0:
-                            data[4] += sbj.credits
-                    except ValueError:
-                        if sbj.grade in ('AP', 'AS'):
-                            data[4] += sbj.credits
-            return data
-
-
+    class MobilitySubject(Subject):
         GD_AP = 'AP'
         GD_NA = 'NA'
         HT_CHOICES = (
-            (GD_AP, 'aprobada'),
-            (GD_NA, 'reprobada'),
+            (GD_AP, 'Aprobada'),
+            (GD_NA, 'Reprobada'),
         )
         period = StringField(display='Periodo', 
                 choices=Request.PERIOD_CHOICES, default=Request.PERIOD_DEFAULT)
-        code = StringField(display='Código de la asignatura', default='')
         grade = StringField(display='Calificación',
                             default=GD_AP, choices=HT_CHOICES)
 
@@ -462,21 +360,20 @@ class HCEM(Request):
                 paragraph = docx.add_paragraph()
                 paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
                 paragraph.paragraph_format.space_after = Pt(0)
-                paragraph.style = 'List Bullet'
+                paragraph.style = 'List Number 2'
                 if not pre:
                     paragraph.add_run(self.str_comittee_header + ' ')
                 else:
                     paragraph.add_run(self.str_council_header + ' ')
-                paragraph.add_run(
-                    self.srt_status[pre][1] + ' ').font.bold = True
-                paragraph.add_run(self.str_cm[6] + ' ')
+#                paragraph.add_run(
+#                    self.srt_status[pre][1] + ' ').font.bold = True
+                paragraph.add_run(self.str_cm[6] + ' ')#Calificar
                 paragraph.add_run('{} ({})'.format(
                     sbj.get_grade_display(), sbj.grade) + ' ')
-                try:
-                    paragraph.add_run(self.str_cm[7].format(
-                        sbj.code, self.homologable_subjects[sbj.code], sbj.period) + '.')
-                except KeyError as e:
-                    print(e)
+                
+                paragraph.add_run(self.str_cm[7].format(#Asignatura cod_ - name_ en el periodo _
+                        sbj.code, sbj.name, sbj.period) + '.')
+                
 
     def pcm(self, docx):
         self.add_analysis(docx)

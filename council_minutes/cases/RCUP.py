@@ -1,6 +1,6 @@
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
-from mongoengine import IntField
+from mongoengine import IntField,StringField
 from ..models import Request
 from .case_utils import add_analysis_paragraph
 
@@ -9,6 +9,25 @@ class RCUP(Request):
 
     full_name = 'Reserva de cupo adicional'
 
+    CJT_ANSWER_JUST_DEB = 'JD'
+    CJT_ANSWER_OTRO = 'OT'
+    CJT_ANSWER_N_DEB = 'ND'
+
+    CJT_ANSWER_CHOICES = (
+        (CJT_ANSWER_JUST_DEB,'Justifica debidamente su solicitud'),
+        (CJT_ANSWER_N_DEB,'No justifica debidamente su solicitud'),
+        (CJT_ANSWER_OTRO, 'Otro')
+    )
+
+    CJT_ANSWERS_DICT = {
+        CJT_ANSWER_JUST_DEB : 'justifica debidamente su solicitud',
+        CJT_ANSWER_N_DEB : 'no justifica debidamente su solicitud',
+        CJT_ANSWER_OTRO : 'existen otros factores que lo justifican'
+    }
+
+    council_decision = StringField(
+        max_length=255, choices=CJT_ANSWER_CHOICES,
+        default=CJT_ANSWER_JUST_DEB, display='Justificación del Consejo')
     index = IntField(min_value=0, default=1,
                      display='Reservas adicionales aprobadas')
 
@@ -48,7 +67,7 @@ class RCUP(Request):
         paragraph.add_run(
             self.get_approval_status_display().upper() + ' ').font.bold = True
         paragraph.add_run(self.str_cm[0].format(
-            self.academic_period, self.council_decision))
+            self.academic_period, self.CJT_ANSWERS_DICT[self.council_decision]))
         paragraph.add_run(self.str_cm[2].format(
             self.regulations[self.regulation_list[0]][0]))
 
