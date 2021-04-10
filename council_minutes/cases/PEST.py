@@ -24,24 +24,23 @@ class PEST(Request):
         (SUB_P6, 'Práctica Colombia III')
     )
     SUBJECT_INFO = {
-        SUB_P1: ('2016762', 3),
-        SUB_P2: ('2016763', 6),
-        SUB_P3: ('2016764', 9),
-        SUB_P4: ('1000070', 3),
-        SUB_P5: ('1000071', 6),
-        SUB_P6: ('1000072', 9)
+        SUB_P1: ('2016762', 3,'Práctica Estudiantil I'),
+        SUB_P2: ('2016763', 6,'Práctica Estudiantil II'),
+        SUB_P3: ('2016764', 9,'Práctica Estudiantil III')
     }
 
     institution = StringField(required=True, display='Institución/Empresa', default='')
     is_intern = BooleanField(required=True, display='¿Es práctica interna?', default=False)
-    proffesor = StringField(required=True, display='Profesor', default='')
+    professor = StringField(required=True, display='Profesor', default='')
     ins_person = StringField(required=True, display='Encargado Institución', default='')
     subject = StringField(required=True, choices=SUBJECT_CHOICES,
                           default=SUB_P1, display='Asignatura')
     group = StringField(required=True, display='Grupo', default='0')
     advance = FloatField(required=True, min_value=0, display='Avance SIA', default=0.0)
     another_practice = BooleanField(
-        required=True, display='¿Primera practica?', default=False)
+        required=True, display='¿Primera práctica?', default=False)  
+    another_practice_institution = StringField(required=False,display='Empresas de prácticas anteriores (si aplica)',
+        default='')
     hours = IntField(required=True, min_value=0, display='Horas Semana', default=0)
     duration = StringField(required=True, display='Duración', default='')
     documentation = BooleanField(
@@ -52,7 +51,7 @@ class PEST(Request):
     regulation_list = ['008|2008|CSU', '102|2013|CSU', '016|2011|CAC']
 
     str_cm = [
-        'inscribir la siguiente asignatura ',
+        'inscribir la asignatura ',
         'en el periodo académico {}, a desarrollar en la empresa {}, a cargo del docente ' +
         '{} por parte de la Universidad Nacional de Colombia',
         ' y {} por parte de la entidad',
@@ -100,7 +99,8 @@ class PEST(Request):
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
-        self.add_table(docx)
+        if self.is_affirmative_response_approval_status():
+            self.add_table(docx)
 
     def cm_answer(self, paragraph):
         # pylint: disable=no-member
@@ -121,7 +121,8 @@ class PEST(Request):
         paragraph.add_run(self.str_answer + ' ').font.bold = True
         paragraph.add_run(self.str_comittee_header + ' ')
         self.pcm_answer(paragraph)
-        self.add_table(docx)
+        if self.is_waiting_response_advisor_response() or self.is_affirmative_response_advisor_response():
+            self.add_table(docx)
 
     def pcm_answer(self, paragraph):
         paragraph.add_run(
@@ -131,13 +132,13 @@ class PEST(Request):
             paragraph, self.is_affirmative_response_advisor_response())
 
     def add_text(self, paragraph, affirmative):
-        code, _credits = self.SUBJECT_INFO[self.subject]
+        code, _credits, name = self.SUBJECT_INFO[self.subject]
         # pylint: disable=no-member
-        paragraph.add_run(self.str_cm[0])
+        paragraph.add_run(self.str_cm[0]+str(name)+' ')
 
         if affirmative:
             paragraph.add_run(self.str_cm[1].format(
-                self.academic_period, self.institution, self.proffesor
+                self.academic_period, self.institution, self.professor
             ))
             if not self.is_intern:
                 paragraph.add_run(self.str_cm[2].format(self.ins_person))
@@ -149,7 +150,7 @@ class PEST(Request):
             ))
     
     def add_table(self, docx):
-        code, _credits = self.SUBJECT_INFO[self.subject]
+        code, _credits, name = self.SUBJECT_INFO[self.subject]
         table_subjects(docx, [[
             code, self.get_subject_display(), self.group, 'L', str(_credits)
         ]])
@@ -161,11 +162,11 @@ class PEST(Request):
 
         analysis.append(self.str_analysis[0].format(modifier, self.advance))
 
-        modifier = '' if self.another_practice else 'no '
+        modifier = '' if not self.another_practice else 'no '
         analysis.append(self.str_analysis[1].format(modifier))
 
         analysis.append(self.str_analysis[2].format(
-            self.institution, self.hours, self.duration, self.proffesor,
+            self.institution, self.hours, self.duration, self.professor,
             self.regulations[self.regulation_list[2]][0]))
 
         modifier = '' if self.documentation else 'no '

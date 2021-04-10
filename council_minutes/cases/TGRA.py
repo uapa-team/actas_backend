@@ -42,8 +42,8 @@ class TGRA(Request):
         'Formato de registro diligenciado (Artículo 8): Revisado.',
         'Dirección de un profesor de la Universidad, aceptado y formalizado (Artículo 6) en Acta ' +
         '{} de Comité del {}{}{} en modalidad: {}.',
-        '{}a cursado por lo menos {} céditos del componente disciplinar. SIA: {} créditos',
-        'Tífulo del trabajo de grado: {}.',
+        '{}a cursado por lo menos {} créditos del componente disciplinar. SIA: {} créditos',
+        'Título del trabajo de grado: {}.',
         'Institución: {}',
         'Docente encargado: {}'
         'Debido a que formalizó la inscripción de la asignatura Trabajo de Grado en los plazos es' +
@@ -57,8 +57,8 @@ class TGRA(Request):
         paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
         # pylint: disable=no-member
-        table_subjects(docx,
-                       [['2015289' if self.type_tgra == 'TP' else '202599',
+        if self.is_affirmative_response_approval_status():
+            table_subjects(docx, [['2015289' if self.type_tgra == 'TP' else '202599',
                          self.get_type_tgra_display(), '1', Subject.TIP_PRE_TRAB_GRADO[1], '6']])
 
     def cm_answer(self, paragraph):
@@ -77,7 +77,7 @@ class TGRA(Request):
         paragraph.add_run(self.str_answer + ': ').bold = True
         paragraph.add_run(self.str_comittee_header + ' ')
         self.pcm_answer(paragraph)
-        if self.is_affirmative_response_advisor_response():
+        if self.is_affirmative_response_advisor_response() or self.is_waiting_response_advisor_response():
             # pylint: disable=no-member
             table_subjects(docx,
                            [['2015289' if self.type_tgra == 'TP' else '202599',

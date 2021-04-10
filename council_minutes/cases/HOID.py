@@ -86,7 +86,7 @@ class HOID(Request):
         paragraph.add_run(self.str_answer + ':\n').font.bold = True
         paragraph.add_run(self.str_comittee_header + ' ')
         self.pcm_answer(paragraph)
-        if self.is_affirmative_response_advisor_response():
+        if self.is_affirmative_response_advisor_response() or self.is_waiting_response_advisor_response():
             self.add_subjects(docx)
 
     def pcm_answer(self, paragraph):

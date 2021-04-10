@@ -26,6 +26,8 @@ class CBAP(Request):
     def cm(self, docx):
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.left_indent = Cm(1.5)
+        paragraph.paragraph_format.right_indent = Cm(1.5)
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(self.str_council_header + ' ')
         self.cm_answer(paragraph)
@@ -54,11 +56,15 @@ class CBAP(Request):
         self.pcm_analysis(docx)
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.left_indent = Cm(1.5)
+        paragraph.paragraph_format.right_indent = Cm(1.5)
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph = docx.add_paragraph()
         paragraph.add_run(self.str_answer + ': ').bold = True
         paragraph = docx.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        paragraph.paragraph_format.left_indent = Cm(1.5)
+        paragraph.paragraph_format.right_indent = Cm(1.5)
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.add_run(self.str_comittee_header + ' ')
         self.pcm_answer(paragraph)
