@@ -190,7 +190,7 @@ class PEST(Request):
         analysis.append(self.str_system_industrial_analysis[1].format(modifier))
 
         analysis.append(self.str_system_industrial_analysis[2].format(
-            self.institution, self.hours, self.duration, self.proffesor,
+            self.institution, self.hours, self.duration, self.professor,
             self.regulations[self.regulation_list[2]][0]))
 
         modifier = '' if self.documentation else 'no '
