@@ -13,7 +13,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 from mongoengine.errors import ValidationError
 from .models import Request, Person, SubjectAutofill, GroupsInfo, Subgroup
-from .helpers import QuerySetEncoder, get_fields, get_period_choices
+from .helpers import QuerySetEncoder, get_fields, get_period_choices, querydict_to_dict
 from .writter import UnifiedWritter
 from .updater import update_request
 from .cases import *
@@ -198,17 +198,6 @@ def case(request):
     else:
         return JsonResponse({'error': 'Error en ActasDB, usuario sin permisos en la aplicación.'},
                             status=HTTP_403_FORBIDDEN)
-
-
-def querydict_to_dict(query_dict):
-    data = {}
-    for key in query_dict.keys():
-        v = query_dict.getlist(key)
-        if len(v) == 1:
-            v = v[0]
-        data[key] = v
-    return data
-
 
 @api_view(["GET"])
 def get_docx_genquerie(request):
